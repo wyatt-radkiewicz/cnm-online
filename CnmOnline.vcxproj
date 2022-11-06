@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{E70D38B0-A6F3-4E33-90EB-C5C00759AC4D}</ProjectGuid>
+    <RootNamespace>CnmOnline</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)\Dependencies\sdl2\include;$(SolutionDir)\Dependencies\sdl2_mixer\include;$(SolutionDir)\Dependencies\sdl2_net\include;$(SolutionDir)\Dependencies\lua\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Dependencies\lua;$(SolutionDir)\Dependencies\sdl2\lib\x86;$(SolutionDir)\Dependencies\sdl2_mixer\lib\x86;$(SolutionDir)\Dependencies\sdl2_net\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)\Dependencies\sdl2\include;$(SolutionDir)\Dependencies\sdl2_mixer\include;$(SolutionDir)\Dependencies\sdl2_net\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\Libraries\sdl2\lib\x64;D:\VisualStudio\Libraries\sdl2_mixer\lib\x64;D:\VisualStudio\Libraries\sdl2_net\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SolutionDir)\Dependencies\sdl2\include;$(SolutionDir)\Dependencies\sdl2_mixer\include;$(SolutionDir)\Dependencies\sdl2_net\include;$(SolutionDir)\Dependencies\lua\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Dependencies\lua;$(SolutionDir)\Dependencies\sdl2\lib\x86;$(SolutionDir)\Dependencies\sdl2_mixer\lib\x86;$(SolutionDir)\Dependencies\sdl2_net\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SolutionDir)\Dependencies\sdl2\include;$(SolutionDir)\Dependencies\sdl2_mixer\include;$(SolutionDir)\Dependencies\sdl2_net\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VisualStudio\Libraries\sdl2\lib\x64;D:\VisualStudio\Libraries\sdl2_mixer\lib\x64;D:\VisualStudio\Libraries\sdl2_net\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_mixer.lib;SDL2_net.lib;liblua54.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>4194304</StackReserveSize>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_mixer.lib;SDL2_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>4194304</StackReserveSize>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_mixer.lib;SDL2_net.lib;liblua54.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>4194304</StackReserveSize>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_mixer.lib;SDL2_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>4194304</StackReserveSize>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="audio.h" />
+    <ClInclude Include="background.h" />
+    <ClInclude Include="blocks.h" />
+    <ClInclude Include="bossbar.h" />
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="client.h" />
+    <ClInclude Include="command.h" />
+    <ClInclude Include="console.h" />
+    <ClInclude Include="ending_text.h" />
+    <ClInclude Include="enemies.h" />
+    <ClInclude Include="fadeout.h" />
+    <ClInclude Include="filesystem.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="game_console.h" />
+    <ClInclude Include="gui.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="interaction.h" />
+    <ClInclude Include="item.h" />
+    <ClInclude Include="logic_links.h" />
+    <ClInclude Include="lparse.h" />
+    <ClInclude Include="gamelua.h" />
+    <ClInclude Include="master_server.h" />
+    <ClInclude Include="net.h" />
+    <ClInclude Include="netgame.h" />
+    <ClInclude Include="net_file.h" />
+    <ClInclude Include="obj_grid.h" />
+    <ClInclude Include="packet.h" />
+    <ClInclude Include="player.h" />
+    <ClInclude Include="player_spawns.h" />
+    <ClInclude Include="pool.h" />
+    <ClInclude Include="renderer.h" />
+    <ClInclude Include="serial.h" />
+    <ClInclude Include="server.h" />
+    <ClInclude Include="spawners.h" />
+    <ClInclude Include="supervirus.h" />
+    <ClInclude Include="teleport_infos.h" />
+    <ClInclude Include="utility.h" />
+    <ClInclude Include="wobj.h" />
+    <ClInclude Include="world.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="audio.c" />
+    <ClCompile Include="background.c" />
+    <ClCompile Include="blocks.c" />
+    <ClCompile Include="bossbar.c" />
+    <ClCompile Include="camera.c" />
+    <ClCompile Include="client.c" />
+    <ClCompile Include="command.c" />
+    <ClCompile Include="console.c" />
+    <ClCompile Include="ending_text.c" />
+    <ClCompile Include="enemies.c" />
+    <ClCompile Include="fadeout.c" />
+    <ClCompile Include="filesystem.c" />
+    <ClCompile Include="game.c" />
+    <ClCompile Include="gamestate_bgedit.c" />
+    <ClCompile Include="gamestate_bitmapbench.c" />
+    <ClCompile Include="gamestate_blockpropsedit.c" />
+    <ClCompile Include="gamestate_blocksedit.c" />
+    <ClCompile Include="gamestate_client.c" />
+    <ClCompile Include="gamestate_client_connecting.c" />
+    <ClCompile Include="gamestate_client_downloading.c" />
+    <ClCompile Include="gamestate_dedicated_server.c" />
+    <ClCompile Include="gamestate_endtext_editor.c" />
+    <ClCompile Include="gamestate_hosted_server.c" />
+    <ClCompile Include="gamestate_lighteditor.c" />
+    <ClCompile Include="gamestate_mainmenu.c" />
+    <ClCompile Include="gamestate_master_server.c" />
+    <ClCompile Include="gamestate_objedit.c" />
+    <ClCompile Include="gamestate_singleplayer.c" />
+    <ClCompile Include="game_console.c" />
+    <ClCompile Include="gui.c" />
+    <ClCompile Include="input.c" />
+    <ClCompile Include="interaction.c" />
+    <ClCompile Include="item.c" />
+    <ClCompile Include="logic_links.c" />
+    <ClCompile Include="lparse.c" />
+    <ClCompile Include="gamelua.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="net.c" />
+    <ClCompile Include="netgame.c" />
+    <ClCompile Include="net_file.c" />
+    <ClCompile Include="obj_grid.c" />
+    <ClCompile Include="packet.c" />
+    <ClCompile Include="player.c" />
+    <ClCompile Include="player_spawns.c" />
+    <ClCompile Include="pool.c" />
+    <ClCompile Include="renderer.c" />
+    <ClCompile Include="serial.c" />
+    <ClCompile Include="serial_common.c" />
+    <ClCompile Include="serial_old.c" />
+    <ClCompile Include="server.c" />
+    <ClCompile Include="spawners.c" />
+    <ClCompile Include="supervirus.c" />
+    <ClCompile Include="teleport_infos.c" />
+    <ClCompile Include="utility.c" />
+    <ClCompile Include="wobj.c" />
+    <ClCompile Include="wobj_types.c" />
+    <ClCompile Include="world.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="audio.cnma" />
+    <None Include="super_city.cnmb" />
+    <None Include="super_city.cnms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="cnm_log.txt" />
+    <Text Include="config.txt" />
+    <Text Include="MOD_READ.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="gfx.bmp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

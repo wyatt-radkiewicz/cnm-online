@@ -1,0 +1,335 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{31d137d6-4086-47d1-bcb9-ba40ccd019ad}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="background.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="blocks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ending_text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filesystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="interaction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="net.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="net_file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="netgame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="obj_grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="player_spawns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="spawners.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teleport_infos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wobj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="enemies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fadeout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bossbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="packet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logic_links.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="supervirus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gamelua.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="master_server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="audio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="background.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="blocks.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="command.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="console.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ending_text.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filesystem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_console.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_bgedit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_blockpropsedit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_blocksedit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_client_connecting.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_client_downloading.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_dedicated_server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_endtext_editor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_hosted_server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_lighteditor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_mainmenu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_objedit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_singleplayer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="interaction.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="item.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="net.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="net_file.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="netgame.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="obj_grid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="player.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="player_spawns.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pool.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="spawners.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="teleport_infos.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utility.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wobj.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wobj_types.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="world.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enemies.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_bitmapbench.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fadeout.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bossbar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lparse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serial_old.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serial_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="packet.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logic_links.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="supervirus.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamelua.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamestate_master_server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="audio.cnma">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="super_city.cnmb">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="super_city.cnms">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="cnm_log.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="config.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="MOD_READ.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="gfx.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
