@@ -1,4 +1,5 @@
-#include <string.h>
+// REMOVED GAME LUA SUPPORT
+/*#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -1071,4 +1072,4 @@ static int gamelua_ApplyPlayerWeaponDamage(lua_State *L)
 	}
 	WobjGenericAttack_Update(wobj);
 	return 0;
-}
+}*/

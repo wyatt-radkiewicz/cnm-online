@@ -1379,9 +1379,9 @@ static void Wobj_SfxPoint_Draw(WOBJ *wobj, int camx, int camy) {
 }
 
 #define LUAOBJ_DEF {\
-	WobjLua_Create,\
-	WobjLua_Update,\
-	WobjLua_Draw,\
+	NULL,\
+	NULL,\
+	NULL,\
 	WobjGeneric_Hurt,\
 	{\
 		{448, 1344, 32, 32},\

@@ -301,7 +301,7 @@ void GameState_Base_Init(void)
 }
 void GameState_Base_Quit(void)
 {
-	AutorunLua_ClearPrgm();
+	//AutorunLua_ClearPrgm();
 	NetGame_Quit();
 	NetTcp_ClosePort();
 	Net_Quit();
