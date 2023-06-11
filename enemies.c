@@ -1502,7 +1502,7 @@ void WobjBozoLaserMinion_Update(WOBJ *wobj)
 
 		if (player->x > wobj->x && wobj->vel_x < wobj->custom_floats[0])
 			wobj->vel_x += 0.5f;
-		if (player->x < wobj->x && wobj->vel_x > wobj->custom_floats[0])
+		if (player->x < wobj->x && wobj->vel_x > -wobj->custom_floats[0])
 			wobj->vel_x -= 0.5f;
 		if (wobj->custom_floats[0] == 0.0f)
 			wobj->vel_x = 0.0f;
@@ -1575,7 +1575,7 @@ void WobjBozoLaserLockon_Update(WOBJ *wobj)
 }
 void WobjBozoLaserPart_Create(WOBJ *wobj)
 {
-	wobj->strength = 5.8333333333f;
+	wobj->strength = 1.0f;
 	wobj->custom_ints[0] = 0;
 	wobj->flags = WOBJ_IS_HOSTILE;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 16.0f, 16.0f);
@@ -2219,6 +2219,7 @@ void WobjRockGuySmasher_Update(WOBJ *wobj)
 			wobj->custom_ints[1] = 0;
 			wobj->anim_frame = 2;
 			wobj->y += 32.0f;
+			if (~wobj->flags & WOBJ_HFLIP) wobj->x -= 64.0f;
 			Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 96.0f, 64.0f);
 			return;
 		}

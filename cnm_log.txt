@@ -1,6 +1,3 @@
 WELCOME TO CNM ONLINE!
 Game lua scripts are deprecated...
 WELCOME TO CNM ONLINE Alpha 8.11!
-Player PLAYER connected with node id 1!
-d with node id 1!
-Player PLAYER connected with node id 0!

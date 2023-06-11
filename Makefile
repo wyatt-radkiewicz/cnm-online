@@ -16,6 +16,8 @@ release: CFLAGS += -O2
 release: $(BUILD_DIR)/$(TARGET_NAME)
 
 # Build commands
+run: $(BUILD_DIR)/$(TARGET_NAME)
+	$(BUILD_DIR)/$(TARGET_NAME)
 $(BUILD_DIR)/$(TARGET_NAME): $(OBJS)
 	mkdir -p $(dir $@)
 	$(CC) $^ $(LDFLAGS) -o $@
@@ -23,10 +25,6 @@ $(BUILD_DIR)/$(TARGET_NAME): $(OBJS)
 $(BUILD_DIR)/%.o: %.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $@
-
-.PHONY: run
-run:
-	$(BUILD_DIR)/$(TARGET_NAME)
 
 .PHONY: clean
 clean:
