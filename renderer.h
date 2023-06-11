@@ -24,13 +24,13 @@ int Renderer_GetBitmapPixel(int x, int y);
 
 void Renderer_Clear(int color);
 void Renderer_DrawEmptyRect(const CNM_RECT *rect, int color, int trans, int light);
-#ifndef CNM_NO_X86ASSEMBLY
-void __cdecl Renderer_DrawRect(const CNM_RECT *rect, int color, int trans, int light);
-void __stdcall Renderer_DrawBitmap(int x, int y, const CNM_RECT *src, int trans, int light);
-#else
+//#ifndef CNM_NO_X86ASSEMBLY
+//void __cdecl Renderer_DrawRect(const CNM_RECT *rect, int color, int trans, int light);
+//void __stdcall Renderer_DrawBitmap(int x, int y, const CNM_RECT *src, int trans, int light);
+//#else
 void Renderer_DrawRect(const CNM_RECT *rect, int color, int trans, int light);
 void Renderer_DrawBitmap(int x, int y, const CNM_RECT *src, int trans, int light);
-#endif
+//#endif
 void Renderer_DrawBitmap2(int x, int y, const CNM_RECT *src, int trans, int light, int hflip, int vflip);
 //void Renderer_DrawBitmapScaled(const CNM_RECT *dest, const CNM_RECT *src, int trans, int light);
 //void Renderer_SetPixel(int x, int y, int color, int trans, int light);

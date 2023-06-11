@@ -69,7 +69,7 @@ void Blocks_LoadBlockProps(const BLOCK_PROPS *props, int count)
 }
 BLOCK_PROPS *Blocks_GetBlockProp(BLOCK block_id)
 {
-	if (block_id > -1 && block_id < blocks_props_count)
+	if (block_id < blocks_props_count)
 		return blocks_props + block_id;
 	else
 		return NULL;

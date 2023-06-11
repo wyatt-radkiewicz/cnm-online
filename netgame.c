@@ -36,7 +36,7 @@ void NetGame_Init(void)
 	{
 		damages_size[i] = DAMAGES_HASH_INC;
 		damages[i] = malloc(damages_size[i] * sizeof(NETGAME_DAMAGE_ENTRY));
-		memset(damages[i], 0, sizeof(damages[i]));
+		memset(damages[i], 0, sizeof(*damages[i]));
 	}
 	for (i = 0; i < NETGAME_MAX_NODES; i++)
 	{

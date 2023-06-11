@@ -111,7 +111,7 @@ int Util_StringPrintF(char *buffer, int buffer_size, const char *format, va_list
 				break;
 
 			case 'c':
-				if (!Utility_PutChar(&count, &buffer, buffer_size, va_arg(args, char)))
+				if (!Utility_PutChar(&count, &buffer, buffer_size, (char)va_arg(args, int)))
 					return buffer_size;
 				break;
 			}

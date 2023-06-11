@@ -1,0 +1,971 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/audio.o",
+      "audio.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/audio.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/audio.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/blocks.o",
+      "blocks.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/blocks.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/blocks.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/background.o",
+      "background.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/background.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/background.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/client.o",
+      "client.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/client.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/client.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/command.o",
+      "command.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/command.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/command.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/bossbar.o",
+      "bossbar.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/bossbar.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/bossbar.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/console.o",
+      "console.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/console.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/console.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/camera.o",
+      "camera.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/camera.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/camera.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/game_console.o",
+      "game_console.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/game_console.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/game_console.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/enemies.o",
+      "enemies.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/enemies.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/enemies.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/game.o",
+      "game.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/game.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/game.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/fadeout.o",
+      "fadeout.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/fadeout.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/fadeout.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/ending_text.o",
+      "ending_text.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/ending_text.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/ending_text.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/filesystem.o",
+      "filesystem.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/filesystem.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/filesystem.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_bgedit.o",
+      "gamestate_bgedit.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_bgedit.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_bgedit.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamelua.o",
+      "gamelua.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamelua.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamelua.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_blockpropsedit.o",
+      "gamestate_blockpropsedit.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_blockpropsedit.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_blockpropsedit.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_blocksedit.o",
+      "gamestate_blocksedit.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_blocksedit.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_blocksedit.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_bitmapbench.o",
+      "gamestate_bitmapbench.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_bitmapbench.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_bitmapbench.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_client.o",
+      "gamestate_client.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_client.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_client.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_client_connecting.o",
+      "gamestate_client_connecting.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_client_connecting.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_client_connecting.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_client_downloading.o",
+      "gamestate_client_downloading.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_client_downloading.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_client_downloading.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_dedicated_server.o",
+      "gamestate_dedicated_server.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_dedicated_server.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_dedicated_server.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_endtext_editor.o",
+      "gamestate_endtext_editor.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_endtext_editor.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_endtext_editor.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_hosted_server.o",
+      "gamestate_hosted_server.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_hosted_server.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_hosted_server.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_lighteditor.o",
+      "gamestate_lighteditor.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_lighteditor.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_lighteditor.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_mainmenu.o",
+      "gamestate_mainmenu.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_mainmenu.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_mainmenu.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_objedit.o",
+      "gamestate_objedit.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_objedit.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_objedit.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_master_server.o",
+      "gamestate_master_server.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_master_server.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_master_server.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gamestate_singleplayer.o",
+      "gamestate_singleplayer.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gamestate_singleplayer.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gamestate_singleplayer.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/gui.o",
+      "gui.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/gui.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/gui.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/input.o",
+      "input.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/input.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/input.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/interaction.o",
+      "interaction.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/interaction.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/interaction.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/item.o",
+      "item.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/item.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/item.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/logic_links.o",
+      "logic_links.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/logic_links.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/logic_links.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/lparse.o",
+      "lparse.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/lparse.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/lparse.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/main.o",
+      "main.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/main.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/net.o",
+      "net.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/net.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/net.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/net_file.o",
+      "net_file.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/net_file.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/net_file.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/netgame.o",
+      "netgame.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/netgame.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/netgame.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/obj_grid.o",
+      "obj_grid.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/obj_grid.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/obj_grid.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/packet.o",
+      "packet.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/packet.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/packet.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/player.o",
+      "player.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/player.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/player.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/player_spawns.o",
+      "player_spawns.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/player_spawns.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/player_spawns.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/pool.o",
+      "pool.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/pool.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/pool.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/serial.o",
+      "serial.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/serial.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/serial.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/renderer.o",
+      "renderer.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/renderer.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/renderer.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/server.o",
+      "server.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/server.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/server.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/serial_common.o",
+      "serial_common.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/serial_common.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/serial_common.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/serial_old.o",
+      "serial_old.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/serial_old.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/serial_old.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/spawners.o",
+      "spawners.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/spawners.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/spawners.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/teleport_infos.o",
+      "teleport_infos.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/teleport_infos.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/teleport_infos.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/utility.o",
+      "utility.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/utility.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/utility.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/supervirus.o",
+      "supervirus.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/supervirus.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/supervirus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/wobj_types.o",
+      "wobj_types.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/wobj_types.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/wobj_types.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/wobj.o",
+      "wobj.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/wobj.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/wobj.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-o",
+      "build/world.o",
+      "world.c"
+    ],
+    "directory": "/Users/wyattradkiewicz/Documents/cnm-online",
+    "file": "/Users/wyattradkiewicz/Documents/cnm-online/world.c",
+    "output": "/Users/wyattradkiewicz/Documents/cnm-online/build/world.o"
+  }
+]

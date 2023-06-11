@@ -29,7 +29,7 @@ void Serial_LoadAudioCfg(const char *cnma_file)
 	{
 		float findex;
 		int index;
-		char lualine[GAMELUA_LINE_SIZE];
+		char lualine[4096];//GAMELUA_LINE_SIZE];
 		char index_buf[64];
 		int mode = 0;
 		char filename[1024];
@@ -118,14 +118,20 @@ void Serial_SaveConfig(void)
 	FILE *fp = fopen("config.txt", "w");
 	if (fp != NULL)
 	{
-		fprintf(fp, "%s\n%s\n%d\n%d\n%d\n%d\n%s",
-				Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string,
-				Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string,
+		fputc('\"', fp);
+		fputs(Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string, fp);
+		fputs("\"\n", fp);
+		fputc('\"', fp);
+		fputs(Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string, fp);
+		fputs("\"\n", fp);
+		fprintf(fp, "%d\n%d\n%d\n%d\n",
 				Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
 				Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
 				Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer,
-				(int)(Audio_GetGlobalVolume()*100.0f),
-				Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string);
+				(int)(Audio_GetGlobalVolume()*100.0f));
+		fputc('\"', fp);
+		fputs(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string, fp);
+		fputs("\"\n", fp);
 		fclose(fp);
 	}
 	else
@@ -133,19 +139,33 @@ void Serial_SaveConfig(void)
 		Console_Print("Cannot save config to config.txt!");
 	}
 }
+static void Serial_LoadQuotedString(FILE *fp, char *string) {
+	char buf[2] = {0};
+	int in_str = CNM_FALSE;
+	buf[0] = fgetc(fp);
+	while (buf[0] && !feof(fp)) {
+		if (buf[0] == '\"' && !in_str) {
+			in_str = CNM_TRUE;
+		} else if (in_str) {
+			strcat(string, buf);
+		}
+		buf[0] = fgetc(fp);
+		if (buf[0] == '\"' && in_str) break;
+	}
+}
 void Serial_LoadConfig(void)
 {
 	FILE *fp = fopen("config.txt", "r");
 	if (fp != NULL)
 	{
-		fscanf(fp, "%s\n%s\n%d\n%d\n%d\n%d\n%s",
-			   Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string,
-			   Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string,
+		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string);
+		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string);
+		fscanf(fp, "\n%d\n%d\n%d\n%d",
 			   &Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
 			   &Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
 			   &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer,
-			   &Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.integer,
-			   Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string);
+			   &Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.integer);
+		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string);
 		//Renderer_SetFullscreen(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer);
 		//Renderer_SetHiResMode(Game_GetVar(GAME_VAR_HIRESMODE)->data.integer);
 		Renderer_SetScreenModeFull(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,

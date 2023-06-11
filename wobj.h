@@ -182,6 +182,31 @@ typedef enum _WOBJ_TYPES
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
 #define Wobj_DamageLighting(w, l) (((w)->flags & WOBJ_DAMAGE_INDICATE) ? 0 : (l))
 
+#define WOBJDATA_STRUCT_DEF(name) struct name \
+	{ \
+		float x, y; \
+		float vel_x, vel_y; \
+		float custom_floats[2]; \
+		int custom_ints[2]; \
+		float speed, jump; \
+		float strength, health; \
+		int money; \
+		int anim_frame; \
+		int type; \
+		int item; \
+		int flags; \
+		int last_sound_played : 8; \
+		int last_sound_uuid : 24; \
+		unsigned int link_node : 8; \
+		unsigned int link_uuid : 24; \
+		CNM_BOX hitbox; \
+		unsigned int node_id : 8; \
+		unsigned int uuid : 24; \
+	};
+
+
+WOBJDATA_STRUCT_DEF(wobjdata)
+
 typedef struct _WOBJ WOBJ;
 typedef struct _WOBJ_TYPE
 {
@@ -197,29 +222,7 @@ typedef struct _WOBJ_TYPE
 } WOBJ_TYPE;
 typedef struct _WOBJ
 {
-	struct wobjdata
-	{
-		float x, y;
-		float vel_x, vel_y;
-		float custom_floats[2];
-		int custom_ints[2];
-		float speed, jump;
-		float strength, health;
-		int money;
-		int anim_frame;
-		int type;
-		int item;
-		int flags;
-		int last_sound_played : 8;
-		int last_sound_uuid : 24;
-		unsigned int link_node : 8;
-		unsigned int link_uuid : 24;
-		CNM_BOX hitbox;
-
-		unsigned int node_id : 8;
-		unsigned int uuid : 24;
-	};
-
+	WOBJDATA_STRUCT_DEF()
 	struct
 	{
 		int owned;
@@ -286,6 +289,7 @@ WOBJ *Wobj_GetWobjColliding(WOBJ *wobj, int flags);
 WOBJ *Wobj_GetWobjCollidingWithType(WOBJ *wobj, int type);
 int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y);
 void Wobj_IterateOverOwned(WOBJ **iter);
+void Wobj_IterateOverDebugUnowned(WOBJ **iter);
 void Wobj_InitGridIteratorOwned(WOBJ_GRID_ITER *iter, int gx, int gy);
 void Wobj_GridIteratorIterate(WOBJ_GRID_ITER *iter);
 void Wobj_UpdateWobjMovedPosition(WOBJ *wobj);

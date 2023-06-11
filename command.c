@@ -21,6 +21,7 @@
 #include "item.h"
 #include "ending_text.h"
 #include "packet.h"
+#include "obj_grid.h"
 
 #define COMMAND_COUNT (sizeof(command_names) / sizeof(*command_names))
 
@@ -77,6 +78,7 @@ static void Command_WobjPlayerPacketTest(const char *args);
 static void Command_ActivateSupervirus(const char *args);
 static void Command_NetFakeLoss(const char *args);
 static void Command_NetShowBandwidth(const char *args);
+static void Command_WobjReport(const char *args);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -130,7 +132,8 @@ static const char *const command_names[] =
 	"wobj_player_packet_test",
 	"DONT_LOOK",
 	"net_fake_loss",
-	"net_show_bandwidth"
+	"net_show_bandwidth",
+	"wobj_report"
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -185,7 +188,8 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_WobjPlayerPacketTest,
 	Command_ActivateSupervirus,
 	Command_NetFakeLoss,
-	Command_NetShowBandwidth
+	Command_NetShowBandwidth,
+	Command_WobjReport
 };
 
 static const char *Command_ExtractArg(const char *args, int arg);
@@ -616,4 +620,29 @@ static void Command_NetFakeLoss(const char *args)
 static void Command_NetShowBandwidth(const char *args)
 {
 	Game_GetVar(GAME_VAR_SHOW_BANDWIDTH)->data.integer = atoi(Command_ExtractArg(args, 0));
+}
+static void debug_print_wobj(WOBJ *w) {
+	Console_Print("new wobj %d", (int)(intptr_t)w);
+	Console_Print("pos: %f %f", w->x, w->y);
+	Console_Print("node: %d", w->node_id);
+	Console_Print("uuid: %d", w->uuid);
+	for (int i = 0; i < NETGAME_MAX_HISTORY; i++) {
+		Console_Print("history_frames[%d]: %d", i, w->history_frames[i]);
+	}
+}
+static void Command_WobjReport(const char *args) {
+	Console_Print("====== UNOWNED WOBJS ========");
+	WOBJ *wobj = NULL;
+	Wobj_IterateOverDebugUnowned(&wobj);
+	while (wobj) {
+		debug_print_wobj(wobj);
+		Wobj_IterateOverDebugUnowned(&wobj);
+	}
+	Console_Print("====== OWNED WOBJS ========");
+	wobj = NULL;
+	Wobj_IterateOverOwned(&wobj);
+	while (wobj) {
+		debug_print_wobj(wobj);
+		Wobj_IterateOverOwned(&wobj);
+	}
 }

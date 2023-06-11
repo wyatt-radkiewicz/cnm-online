@@ -19,6 +19,17 @@ static int *camy;
 static int last_server_objects_frame = -1;
 static int self_timeout = 0;
 
+static void Debug_PrintUnowneds() {
+	int num_objs_debug = 0;
+	WOBJ *tmp_test = NULL;
+	Wobj_IterateOverDebugUnowned(&tmp_test);
+	while (tmp_test) {
+		num_objs_debug++;
+		Wobj_IterateOverDebugUnowned(&tmp_test);
+	}
+	Console_Print("num unowneds: %d", num_objs_debug);
+}
+
 NETGAME_NODE *Client_GetNode(void)
 {
 	return client_node;
@@ -115,6 +126,8 @@ void Client_Update(NET_PACKET *packet)
 
 	if (packet->hdr.type == NET_SERVER_OWNED_OBJECTS)
 	{
+		Wobj_CreateUnowned(WOBJ_SLIME, 0, 0, 0, 0, 0, 0, 0, 0);
+		Debug_PrintUnowneds();
 		WOBJ wobj_data;
 		NET_OWNED_OBJECTS header;
 		memcpy(&header, packet->data, sizeof(NET_OWNED_OBJECTS));
@@ -134,6 +147,7 @@ void Client_Update(NET_PACKET *packet)
 		ptr += sizeof(NET_OWNED_OBJECTS);
 		num_errors = 0;
 		num_deltas = 0;
+		
 		for (i = 0; i < header.num_objects; i++)
 		{
 			//NetGame_ParseWobjFromOwnedPacket((NET_OWNED_OBJECTS*)packet->data, &head);
@@ -159,6 +173,7 @@ void Client_Update(NET_PACKET *packet)
 			//Interaction_ApplyHurtPacketsToWobj(new_wobj);
 			NetGame_AttemptWobjAudioPlayback(new_wobj);
 			ptr += WOBJ_NET_SIZE;
+			//Debug_PrintUnowneds();
 		}
 		if (last_server_objects_frame != header.frame)
 		{

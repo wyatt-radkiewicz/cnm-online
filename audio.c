@@ -2,11 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#ifdef _WIN32
-#include <SDL_Mixer.h>
-#else
-#include <SDL2/SDL_Mixer.h>
-#endif
+#include <SDL_mixer.h>
 #include "console.h"
 #include "utility.h"
 #include "audio.h"
@@ -21,12 +17,13 @@ static Mix_Chunk *audio_chunks[AUDIO_MAX_IDS];
 static int audio_x, audio_y;
 static int audio_current_mus = -1;
 static int audio_no_audio = CNM_FALSE;
-static int audio_chunk_volume = MIX_MAX_VOLUME;
+static int audio_chunk_volume = MIX_MAX_VOLUME/2;
+static float set_volume = 0.0;
 
 void Audio_Init(void)
 {
-	Mix_Init(MIX_INIT_MID);
-	if (Mix_OpenAudio(8000, AUDIO_U8, 2, 1024) == -1)
+	Mix_Init(0);
+	if (Mix_OpenAudio(44100, AUDIO_U16, 2, 4096) == -1)
 	{
 		Console_Print("An error occured while trying to initialize the audio sub system!");
 		return;
@@ -66,6 +63,7 @@ void Audio_SetGlobalVolume(float volume)
 	int old_audio;
 	if (!audio_initialized)
 		return;
+	set_volume = volume;
 	old_audio = audio_no_audio;
 	audio_no_audio = (volume == 0.0f);
 	if (audio_no_audio)
@@ -81,26 +79,26 @@ void Audio_SetGlobalVolume(float volume)
 
 	//audio_musvolume = (int)(volume * (float)MIX_MAX_VOLUME);
 	Mix_VolumeMusic((int)(volume * (float)MIX_MAX_VOLUME));
-	audio_chunk_volume = (int)(volume * (float)MIX_MAX_VOLUME);
+	audio_chunk_volume = (int)(volume * 0.35 * (float)MIX_MAX_VOLUME);
 }
 float Audio_GetGlobalVolume(void)
 {
-	return (float)audio_chunk_volume / (float)MIX_MAX_VOLUME;
+	return set_volume;
 }
 void Audio_AddMusicEntry(int music_id, const char *music_file)
 {
 	//audio_initialized = CNM_TRUE;
 	if (!audio_initialized)
 		return;
-	if (strcmp(music_file, "2drend.dll") == 0) goto skip_file_check;
+	//if (strcmp(music_file, "2drend.dll") == 0) goto skip_file_check;
 
-	if (strchr(music_file, '.') == NULL || (strcmp(strchr(music_file, '.'), ".wav") != 0 && strcmp(strchr(music_file, '.'), ".mid") != 0))
-	{
-		Console_Print("music file %s is in an invalid format.", music_file);
-		return;
-	}
+	//if (strchr(music_file, '.') == NULL || (strcmp(strchr(music_file, '.'), ".wav") != 0 && strcmp(strchr(music_file, '.'), ".mid") != 0))
+	//{
+	//	Console_Print("music file %s is in an invalid format.", music_file);
+	//	return;
+	//}
 
-skip_file_check:
+//skip_file_check:
 	Audio_StopMusic();
 	if (audio_musics[music_id] != NULL)
 		Mix_FreeMusic(audio_musics[music_id]);
@@ -112,11 +110,11 @@ void Audio_AddSoundEntry(int sound_id, const char *sound_file)
 	if (!audio_initialized)
 		return;
 
-	if (strchr(sound_file, '.') == NULL || strcmp(strchr(sound_file, '.'), ".wav") != 0)
-	{
-		Console_Print("sound %s is in an invalid format.", sound_file);
-		return;
-	}
+	//if (strchr(sound_file, '.') == NULL || strcmp(strchr(sound_file, '.'), ".wav") != 0)
+	//{
+	//	Console_Print("sound %s is in an invalid format.", sound_file);
+	//	return;
+	//}
 
 	if (audio_chunks[sound_id] != NULL)
 		Mix_FreeChunk(audio_chunks[sound_id]);
@@ -137,7 +135,7 @@ void Audio_PlayMusic(int index, int loop)
 	if (audio_no_audio)
 		return;
 	Mix_PlayMusic(audio_musics[index], loop ? -1 : 0);
-	Mix_VolumeMusic(audio_chunk_volume);
+	//Mix_VolumeMusic(audio_chunk_volume);
 }
 int Audio_GetCurrentPlayingMusic(void)
 {

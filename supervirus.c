@@ -5,7 +5,7 @@
 #define B 0xf7
 #define W 0x04
 
-extern unsigned char _supervirus_bitmap[] = {
+unsigned char _supervirus_bitmap[] = {
 	T, T, B, W, W, W, W, W, W, W, W, W, B, T,
 	T, B, W, W, W, W, W, W, B, B, W, W, B, T,
 	T, B, W, W, W, W, W, B, B, B, B, W, W, B,

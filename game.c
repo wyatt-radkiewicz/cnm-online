@@ -1,10 +1,6 @@
 #include <string.h>
 #include <time.h>
-#ifdef _WIN32
 #include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 #include "blocks.h"
 #include "command.h"
 #include "console.h"
@@ -221,7 +217,7 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_CL_TIME_BETWEEN_UPDATES].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_CL_SHOW_NODEUUIDS].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_NOCLIP].data.integer = CNM_FALSE;
-	game_vars[GAME_VAR_NODOWNLOAD].data.integer = CNM_FALSE;
+	game_vars[GAME_VAR_NODOWNLOAD].data.integer = CNM_TRUE;
 	game_vars[GAME_VAR_ENABLE_SERVER_PVP].data.integer = 0;
 	game_vars[GAME_VAR_SV_CHEATS].data.integer = dgame_info.enable_cheats;
 	game_vars[GAME_VAR_SUPERVIRUS].data.integer = CNM_FALSE;
@@ -348,6 +344,12 @@ static void AttachToConsole(void)
 	clearerr(stdin);
 
 	printf("Attached To Console!\n");
+}
+
+#else
+
+static void AttachToConsole(void) {
+	printf("Null: can't attach to new console window...\n");
 }
 
 #endif

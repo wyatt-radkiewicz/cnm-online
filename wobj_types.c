@@ -1391,7 +1391,7 @@ static void Wobj_SfxPoint_Draw(WOBJ *wobj, int camx, int camy) {
 	CNM_TRUE,\
 	CNM_TRUE\
 	},
-extern WOBJ_TYPE wobj_types[WOBJ_MAX] =
+WOBJ_TYPE wobj_types[WOBJ_MAX] =
 {
 	{ /* 0: Null Object */
 		NULL, NULL, NULL, NULL,

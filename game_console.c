@@ -146,8 +146,13 @@ void GameConsole_HandleInput(int input, char c)
 			gameconsole_state == GAMECONSOLE_STATE_FRONT)
 		{
 			Audio_PlaySound(44, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
-			if (strlen(gameconsole_back_buffer) < UTIL_MAX_TEXT_WIDTH)
-				strcat(gameconsole_back_buffer, &c);
+			if (strlen(gameconsole_back_buffer) + 1 < UTIL_MAX_TEXT_WIDTH) {
+				char *tmp = gameconsole_back_buffer;
+				for (; *tmp; tmp++) {}
+				*(tmp++) = c;
+				*tmp = '\0';
+			}
+				//strcat(gameconsole_back_buffer, &c);
 		}
 		break;
 		case GAMECONSOLE_INPUT_BACKSPACE:

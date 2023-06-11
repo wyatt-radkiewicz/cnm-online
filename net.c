@@ -1,10 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#ifdef _WIN32
 #include <SDL_net.h>
-#else
-#include <SDL2/SDL_net.h>
-#endif
 #include "net.h"
 #include "utility.h"
 #include "console.h"

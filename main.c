@@ -1,11 +1,7 @@
 #include <string.h>
 #include "game.h"
 #include "utility.h"
-#ifdef _WIN32
 #include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 
 static DEDICATED_GAME_INFO gi;
 
@@ -24,7 +20,7 @@ static void Parse_Args(int argc, char **argv) {
 		}
 		if (mode == 2)
 		{
-			strncpy(gi.serv_name, argv[i], sizeof(gi.lvl));
+			strncpy(gi.serv_name, argv[i], sizeof(gi.serv_name));
 			gi.serv_name[sizeof(gi.serv_name) - 1] = '\0';
 			if (strlen(gi.serv_name) < 3)
 				strcpy(gi.serv_name, "NAME TOO SMALL");

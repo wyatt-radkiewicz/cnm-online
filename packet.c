@@ -1,9 +1,9 @@
 #include <math.h>
-#include <WinSock2.h>
+//#include <WinSock2.h>
 #include "packet.h"
 
-#define WINXP
-#ifdef WINXP
+//#define WINXP
+//#ifdef WINXP
 unsigned int htonf(float Value) {
 	unsigned int *bytes = (unsigned int*)&Value;
 	return bytes[0] << 24 |
@@ -19,7 +19,7 @@ float ntohf(unsigned Value) {
 		bytes[3];
 	return *((float *)&val);
 }
-#endif
+//#endif
 
 int packet_bytecount(int head) {
 	return (head / 8) + ((head % 8) ? 1 : 0);

@@ -1,9 +1,5 @@
 #include <string.h>
-#ifdef _WIN32
 #include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 #include "input.h"
 #include "console.h"
 #include "game_console.h"
@@ -16,7 +12,7 @@ static int input_repeated_buttons[INPUT_BUTTONS_MAX];
 static INPUT_QUITCALLBACK input_callback = NULL;
 static int input_state_stack[INPUT_MAX_STATES];
 static int input_state_top;
-static int input_last_char;
+static char input_last_char;
 static int input_initialized = CNM_FALSE;
 
 static SDL_GameController *input_pad;
@@ -99,6 +95,7 @@ void Input_Update(void)
 				case SDL_SCANCODE_SPACE: input_repeated_buttons[INPUT_DROP] = CNM_TRUE; break;
 				case SDL_SCANCODE_GRAVE: input_repeated_buttons[INPUT_CONSOLE] = CNM_TRUE; break;
 				case SDL_SCANCODE_BACKSPACE: input_repeated_buttons[INPUT_BACKSPACE] = CNM_TRUE; break;
+				default: break;
 			}
 			break;
 		case SDL_CONTROLLERDEVICEADDED:
@@ -115,6 +112,7 @@ void Input_Update(void)
 				input_pad = NULL;
 			}
 			break;
+		default: break;
 		}
 	}
 
@@ -337,6 +335,7 @@ static char Input_ScancodeToChar(SDL_Scancode c, int shift, int caps)
 			case SDL_SCANCODE_X:	return 'x';
 			case SDL_SCANCODE_Y:	return 'y';
 			case SDL_SCANCODE_Z:	return 'z';
+			default: break;
 		}
 	}
 	else
@@ -370,6 +369,7 @@ static char Input_ScancodeToChar(SDL_Scancode c, int shift, int caps)
 			case SDL_SCANCODE_X:	return 'X';
 			case SDL_SCANCODE_Y:	return 'Y';
 			case SDL_SCANCODE_Z:	return 'Z';
+			default: break;
 		}
 
 		if (!shift)
@@ -397,6 +397,7 @@ static char Input_ScancodeToChar(SDL_Scancode c, int shift, int caps)
 				case SDL_SCANCODE_RIGHTBRACKET:	return ']';
 				case SDL_SCANCODE_BACKSLASH:	return '\\';
 				case SDL_SCANCODE_GRAVE:	return '`';
+				default: break;
 			}
 		}
 		else
@@ -424,6 +425,7 @@ static char Input_ScancodeToChar(SDL_Scancode c, int shift, int caps)
 				case SDL_SCANCODE_RIGHTBRACKET:	return '}';
 				case SDL_SCANCODE_BACKSLASH:	return '|';
 				case SDL_SCANCODE_GRAVE:	return '~';
+				default: break;
 			}
 		}
 	}

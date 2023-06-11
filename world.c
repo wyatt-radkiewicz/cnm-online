@@ -120,10 +120,10 @@ void World_Start(int mode)
 void World_Stop(void)
 {
 	// General cleanup
-	PlayerSpawn_ClearAllSpawns();
-	Spawners_UnloadSpawners();
 	Wobj_DestroyOwnedWobjs();
 	Wobj_DestroyUnownedWobjs();
+	Spawners_UnloadSpawners();
+	PlayerSpawn_ClearAllSpawns();
 	TeleportInfos_FreeLegacyLevelInfo();
 	EndingText_ClearAllLines();
 

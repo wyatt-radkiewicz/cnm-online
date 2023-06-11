@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "filesystem.h"
 #include "serial.h"
+#include "console.h"
 
 static char levels[FILESYSTEM_MAX_LEVELS][FILESYSTEM_MAX_LENGTH];
 static char level_names[FILESYSTEM_MAX_LEVELS][UTIL_MAX_TEXT_WIDTH + 1];
@@ -101,7 +103,7 @@ void FileSystem_Init(void)
 static void FileSystem_RegisterFile(const char *file_name, FILESYSTEM_REGISTERED_FILE *rf)
 {
 	FILE *fp = fopen(file_name, "rb");
-	unsigned char curr_byte;
+	unsigned char *byte_buffer;
 	if (fp != NULL)
 	{
 		rf->used = CNM_TRUE;
@@ -109,13 +111,13 @@ static void FileSystem_RegisterFile(const char *file_name, FILESYSTEM_REGISTERED
 		rf->size = (unsigned int)ftell(fp);
 		rewind(fp);
 		strcpy(rf->name, file_name);
+		byte_buffer = malloc(rf->size);
+		fread(byte_buffer, rf->size, 1, fp);
 
 		rf->checksum = 0;
-		while (fread(&curr_byte, 1, 1, fp))
-		{
-			rf->checksum += curr_byte;
-		}
+		for (int i = 0; i < rf->size; i++) rf->checksum += byte_buffer[i];
 
+		free(byte_buffer);
 		fclose(fp);
 	}
 }
@@ -213,10 +215,7 @@ void FileSystem_SearchForLevels(int clear_level_list)
 		}
 	} while (FindNextFileA(find_handle, &find_data) != 0);
 }
-
-#endif
-
-#ifdef __APPLE__
+#elif defined(__APPLE__)
 
 #include <dirent.h>
 
@@ -237,14 +236,15 @@ void FileSystem_SearchForLevels(int clear_level_list)
     struct dirent *dir;
     const char *period;
     
-    d = opendir(".");
+    d = opendir("./levels");
     if (d) {
         while ((dir = readdir(d)) != NULL) {
             period = strchr(dir->d_name, '.');
             if (period != NULL && strcmp(period, ".cnmb") == 0) {
                 char cnms_level_name_path[FILESYSTEM_MAX_LENGTH + 1];
                 int l;
-                strcpy(levels[num_levels], dir->d_name);
+                strcpy(levels[num_levels], "levels/");
+                strcat(levels[num_levels], dir->d_name);
                 
                 Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels]);
                 
@@ -262,12 +262,12 @@ void FileSystem_SearchForLevels(int clear_level_list)
     }
 }
 
-#endif
-
-#ifdef __EMSCRIPTEN__
+#else
 
 void FileSystem_SearchForLevels(int clear_level_list)
 {
+	Console_Print("No filesystem functions, loading hardcoded levels");
+	
 	num_levels = 0;
 	if (clear_level_list)
 	{

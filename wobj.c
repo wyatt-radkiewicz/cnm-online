@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include "console.h"
 #include "wobj.h"
 //#include "pool.h"
 #include "obj_grid.h"
@@ -853,6 +854,18 @@ void Wobj_IterateOverOwned(WOBJ **iter)
 	{
 		*iter = (*iter)->internal.next;
 	}
+}
+void Wobj_IterateOverDebugUnowned(WOBJ **iter)
+{
+	int id = ((*iter) - unowned) + 1;
+	if (*iter == NULL) id = 0;
+	for (; id < unowned_size; id++) {
+		if (unowned[id].type != WOBJ_NULL) {
+			*iter = unowned + id;
+			return;
+		}
+	}
+	*iter = NULL;
 }
 void Wobj_InitGridIteratorOwned(WOBJ_GRID_ITER *iter, int gx, int gy)
 {

@@ -21,7 +21,7 @@
 #include "camera.h"
 #include "fadeout.h"
 
-extern PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
+PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
 
 static int *anim_lengths;
 
@@ -64,7 +64,7 @@ static int anim_offsets[PLAYER_ANIM_MAX][6][2] =
 		{0, 32}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	}
 };
-extern int skin_bases[10][2] =
+int skin_bases[10][2] =
 {
 	{128, 1824},
 	{256, 1824},
@@ -1146,7 +1146,7 @@ static void DrawHealthBar(int x, int y, int w) {
 		0, 11, 22, 11
 	};
 	int xoff = 0;
-	for (w; w > 0; w -= 32) {
+	for (; w > 0; w -= 32) {
 		int ww = w;
 		if (ww > 32) ww = 32;
 		Util_SetRect(&r, 288 + (fine % 32), 4256 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
@@ -1159,7 +1159,7 @@ static void DrawHealthOutline(int x, int y, int w)
 	CNM_RECT r;
 
 	int xoff = 0;
-	for (w; w > 0; w -= 32)
+	for (; w > 0; w -= 32)
 	{
 		int ww = w;
 		Util_SetRect(&r, 320, 4247, 32, 9);
@@ -1178,7 +1178,7 @@ static void DrawHealthBG(int x, int y, int w)
 	CNM_RECT r;
 
 	int xoff = 0;
-	for (w; w > 0; w -= 32)
+	for (; w > 0; w -= 32)
 	{
 		int ww = w;
 		if (ww > 32) ww = 32;
