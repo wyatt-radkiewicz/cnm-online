@@ -1114,6 +1114,8 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 		wobj->item = 0;
 	else
 		wobj->item = wobj->custom_ints[1];
+	wobj->custom_floats[0] = wobj->vel_x;
+	wobj->custom_floats[1] = wobj->vel_y;
 }
 static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 {
@@ -1123,20 +1125,26 @@ static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 		wobj->y += wobj->vel_y;
 		wobj->money &= ~CMPF_FIRST_GO;
 		wobj->money |= CMPF_WAS_ON;
+		wobj->item--;
 	}
 	else
 	{
-		if (wobj->vel_x != 0.0f)
-		{
-			wobj->custom_floats[0] = wobj->vel_x;
-			wobj->vel_x = 0.0f;
+		if (~wobj->money & CMPF_FIRST_GO) {
+			if (wobj->vel_x != 0.0f) {
+				wobj->custom_floats[0] = -wobj->vel_x;
+				wobj->vel_x = 0.0f;
+			}
+			if (wobj->vel_y != 0.0f) {
+				wobj->custom_floats[1] = -wobj->vel_y;
+				wobj->vel_y = 0.0f;
+			}
 		}
-
-		if (!(wobj->money & CMPF_STOP_ON_TURN) && !(wobj->money & CMPF_HOP_ON))
+		if (!(wobj->money & CMPF_STOP_ON_TURN) && (wobj->money & CMPF_HOP_ON))
 		{
 			wobj->item = wobj->custom_ints[1];
-			wobj->vel_x = -1.0f * wobj->custom_floats[0];
-			wobj->vel_y *= -1.0f;
+			wobj->vel_x = wobj->custom_floats[0];
+			wobj->vel_y *= wobj->custom_floats[1];
+			return;
 		}
 		if (wobj->money & CMPF_STOP_ON_TURN)
 		{
@@ -1148,13 +1156,8 @@ static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 					!(wobj->money & CMPF_WAS_ON))
 				{
 					wobj->item = wobj->custom_ints[1];
-					if (!(wobj->money & CMPF_FIRST_GO))
-					{
-						wobj->vel_x = -1.0f * wobj->custom_floats[0];
-						wobj->vel_y *= -1.0f;
-					}
-					else
-						wobj->vel_x = wobj->custom_floats[0];
+					wobj->vel_x = wobj->custom_floats[0];
+					wobj->vel_y *= wobj->custom_floats[1];
 				}
 			}
 			else
@@ -1164,7 +1167,6 @@ static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 			Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 		}
 	}
-	wobj->item--;
 }
 static void WobjCustomizableMovingPlatform_Draw(WOBJ *wobj, int camx, int camy)
 {

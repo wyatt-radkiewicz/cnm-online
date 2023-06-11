@@ -9,6 +9,7 @@
 #include "player.h"
 #include "packet.h"
 #include "renderer.h"
+#include "obj_grid.h"
 
 static int connected_to_server;
 static int downloading_files;
@@ -18,17 +19,6 @@ static int *camx;
 static int *camy;
 static int last_server_objects_frame = -1;
 static int self_timeout = 0;
-
-static void Debug_PrintUnowneds() {
-	int num_objs_debug = 0;
-	WOBJ *tmp_test = NULL;
-	Wobj_IterateOverDebugUnowned(&tmp_test);
-	while (tmp_test) {
-		num_objs_debug++;
-		Wobj_IterateOverDebugUnowned(&tmp_test);
-	}
-	Console_Print("num unowneds: %d", num_objs_debug);
-}
 
 NETGAME_NODE *Client_GetNode(void)
 {
@@ -127,7 +117,6 @@ void Client_Update(NET_PACKET *packet)
 	if (packet->hdr.type == NET_SERVER_OWNED_OBJECTS)
 	{
 		Wobj_CreateUnowned(WOBJ_SLIME, 0, 0, 0, 0, 0, 0, 0, 0);
-		Debug_PrintUnowneds();
 		WOBJ wobj_data;
 		NET_OWNED_OBJECTS header;
 		memcpy(&header, packet->data, sizeof(NET_OWNED_OBJECTS));

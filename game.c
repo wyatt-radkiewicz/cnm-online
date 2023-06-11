@@ -219,7 +219,11 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_NOCLIP].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_NODOWNLOAD].data.integer = CNM_TRUE;
 	game_vars[GAME_VAR_ENABLE_SERVER_PVP].data.integer = 0;
+#ifdef DEBUG
+	game_vars[GAME_VAR_SV_CHEATS].data.integer = CNM_TRUE;
+#else
 	game_vars[GAME_VAR_SV_CHEATS].data.integer = dgame_info.enable_cheats;
+#endif
 	game_vars[GAME_VAR_SUPERVIRUS].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_SHOW_BANDWIDTH].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_ADVERTISE_SERVER].data.integer = dgame_info.advertise;

@@ -497,7 +497,9 @@ NET_RECV_OBJECTS_BUFFER *NetGame_RecvBuf(void) {
 	static NET_RECV_OBJECTS_BUFFER buf;
 	return &buf;
 }
-#define RECV_DESTROY 0 // Removeing/adding
+
+// Removeing/adding
+#define RECV_DESTROY 0
 #define RECV_KEEP 1
 void NetGame_RemoveAndAddNewUnownedServerWobjs(int _node) {
 	NET_RECV_OBJECTS_BUFFER *rbuf = NetGame_RecvBuf();

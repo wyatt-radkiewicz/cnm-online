@@ -5,20 +5,9 @@ SRCS := $(wildcard *.c)
 OBJS := $(addprefix $(BUILD_DIR)/,$(SRCS:%.c=%.o))
 
 # Flags
-CFLAGS := $(CFLAGS)
-LDFLAGS := $(LDFLAGS)
-
-# OS Specific
-ifneq ($(OS),Windows_NT)
-	UNAME := $(shell uname -s)
-	ifeq ($(UNAME),Darwin)
-		CFLAGS += $(shell sdl2-config --cflags)
-		SDL_LDFLAGS := $(shell sdl2-config --libs)
-		LDFLAGS += $(SDL_LDFLAGS) -lSDL2_mixer -lSDL2_net
-    endif
-else
-	$(error Please use WSL or MINGW)
-endif
+CFLAGS := $(CFLAGS) $(shell sdl2-config --cflags)
+SDL_LDFLAGS := $(shell sdl2-config --libs)
+LDFLAGS := $(LDFLAGS) $(SDL_LDFLAGS) -lSDL2_mixer -lSDL2_net
 
 # Build modes
 debug: CFLAGS += -DDEBUG -g -O0

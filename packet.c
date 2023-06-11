@@ -1,19 +1,20 @@
 #include <math.h>
+#include <stdint.h>
 //#include <WinSock2.h>
 #include "packet.h"
 
 //#define WINXP
 //#ifdef WINXP
-unsigned int htonf(float Value) {
-	unsigned int *bytes = (unsigned int*)&Value;
+uint32_t htonf(float Value) {
+	uint8_t *bytes = (uint8_t*)&Value;
 	return bytes[0] << 24 |
 		bytes[1] << 16 |
 		bytes[2] << 8 |
 		bytes[3];
 }
-float ntohf(unsigned Value) {
-	unsigned int* bytes = (unsigned int*)&Value;
-	unsigned int val = bytes[0] << 24 |
+float ntohf(uint32_t Value) {
+	uint8_t* bytes = (uint8_t*)&Value;
+	uint32_t val = bytes[0] << 24 |
 		bytes[1] << 16 |
 		bytes[2] << 8 |
 		bytes[3];
