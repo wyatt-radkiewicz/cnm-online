@@ -6,7 +6,7 @@
 static bool g_initialized;
 
 // Implementation specific!
-static const usize LOG_PATH_MAX = 4096;
+#define LOG_PATH_MAX 4096
 static FILE *g_log_file, *g_err_file;
 static char g_log_path_buf[LOG_PATH_MAX];
 
