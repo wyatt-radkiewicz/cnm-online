@@ -605,19 +605,21 @@ static void EditSpawnElementCI(GUI_ELEMENT *elem, int index)
 	if (current_spawner->wobj_type == WOBJ_CUSTOMIZEABLE_MOVEABLE_PLATFORM)
 	{
 		int converted;
-		float fconverted;
+		float fconverted, fpart;
 
 		Gui_SetNumberElementInt(elem->frame, 9, current_spawner->custom_int & 0xf);
 		Gui_SetNumberElementInt(elem->frame, 10, current_spawner->custom_int >> 4 & 0xfff);
 
 		converted = current_spawner->custom_int >> 16 & 0xff;
-		fconverted = (float)((converted >> 2 & 0x3f) - 32);
-		fconverted += 0.25f * (float)(converted & 0x3);
+		fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
+		fpart = 0.25f * (float)(converted & 0x3);
+		fconverted += fconverted < 0 ? -fpart : fpart;
 		Gui_SetFloatElementFloat(elem->frame, 11, fconverted);
 
 		converted = current_spawner->custom_int >> 24 & 0xff;
-		fconverted = (float)((converted >> 2 & 0x3f) - 32);
-		fconverted += 0.25f * (float)(converted & 0x3);
+		fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
+		fpart = 0.25f * (float)(converted & 0x3);
+		fconverted += fconverted < 0 ? -fpart : fpart;
 		Gui_SetFloatElementFloat(elem->frame, 12, fconverted);
 	}
 }
@@ -1035,18 +1037,20 @@ void GameState_ObjEdit_Update(void)
 		{
 			eframe->num_elements = 13;
 			int converted;
-			float fconverted;
+			float fconverted, fpart;
 			converted = current_spawner->custom_int & 0xf;
 			Gui_InitNumberElement(eframe, 9, EditCMPElementBitmapX, "BITMAP X (32 WIDTH): ", 0, 15, converted);
 			converted = current_spawner->custom_int >> 4 & 0xfff;
 			Gui_InitNumberElement(eframe, 10, EditCMPElementBitmapY, "BITMAP Y (32 WIDTH): ", 0, 4095, converted);
 			converted = current_spawner->custom_int >> 16 & 0xff;
-			fconverted = (float)((converted >> 2 & 0x3f) - 32);
-			fconverted += 0.25f * (float)(converted & 0x3);
+			fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
+			fpart = 0.25f * (float)(converted & 0x3);
+			fconverted += fconverted < 0 ? -fpart : fpart;
 			Gui_InitFloatElement(eframe, 11, EditCMPElementSpeedX, "SPEED X: ", -32.0f, 31.75f, fconverted);
 			converted = current_spawner->custom_int >> 24 & 0xff;
-			fconverted = (float)((converted >> 2 & 0x3f) - 32);
-			fconverted += 0.25f * (float)(converted & 0x3);
+			fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
+			fpart = 0.25f * (float)(converted & 0x3);
+			fconverted += fconverted < 0 ? -fpart : fpart;
 			Gui_InitFloatElement(eframe, 12, EditCMPElementSpeedY, "SPEED Y: ", -32.0f, 31.75f, fconverted);
 		}
 		else

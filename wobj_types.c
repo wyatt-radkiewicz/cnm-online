@@ -1086,16 +1086,19 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 	wobj->flags = WOBJ_IS_SOLID | WOBJ_IS_MOVESTAND;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 
-	int converted;
-	float fconverted;
+	unsigned int converted;
+	float fconverted, fpart;
 	converted = wobj->custom_ints[0] >> 16 & 0xff;
-	fconverted = (float)((converted >> 2 & 0x3f) - 32);
-	fconverted += 0.25f * (float)(converted & 0x3);
+	fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
+	fpart = 0.25f * (float)(converted & 0x3);
+	fconverted += fconverted < 0 ? -fpart : fpart;
 	wobj->vel_x = fconverted;
 	converted = wobj->custom_ints[0] >> 24 & 0xff;
-	fconverted = (float)((converted >> 2 & 0x3f) - 32);
-	fconverted += 0.25f * (float)(converted & 0x3);
+	fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
+	fpart = 0.25f * (float)(converted & 0x3);
+	fconverted += fconverted < 0 ? -fpart : fpart;
 	wobj->vel_y = fconverted;
+	Console_Print("x: %f, y: %f", wobj->vel_x, wobj->vel_y);
 
 	if (wobj->custom_floats[0] < 0.0f)
 	{
@@ -1139,11 +1142,11 @@ static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 				wobj->vel_y = 0.0f;
 			}
 		}
-		if (!(wobj->money & CMPF_STOP_ON_TURN) && (wobj->money & CMPF_HOP_ON))
+		if (!(wobj->money & CMPF_STOP_ON_TURN) && !(wobj->money & CMPF_HOP_ON))
 		{
 			wobj->item = wobj->custom_ints[1];
 			wobj->vel_x = wobj->custom_floats[0];
-			wobj->vel_y *= wobj->custom_floats[1];
+			wobj->vel_y = wobj->custom_floats[1];
 			return;
 		}
 		if (wobj->money & CMPF_STOP_ON_TURN)
@@ -1157,7 +1160,7 @@ static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 				{
 					wobj->item = wobj->custom_ints[1];
 					wobj->vel_x = wobj->custom_floats[0];
-					wobj->vel_y *= wobj->custom_floats[1];
+					wobj->vel_y = wobj->custom_floats[1];
 				}
 			}
 			else
