@@ -1,2 +1,5 @@
 .code/
 build/
+.DS_Store
+Thumbs.db
+cnm_log.txt
