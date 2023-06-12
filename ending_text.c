@@ -134,6 +134,9 @@ void Dialoge_Update(void)
 	if (dialoge_current_line > dialoge_line_end)
 		dialoge_active = CNM_FALSE;
 }
+int Dialoge_IsActive(void) {
+	return dialoge_active;
+}
 void Dialoge_Draw(void)
 {
 	CNM_RECT r;

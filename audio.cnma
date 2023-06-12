@@ -68,6 +68,7 @@ MODE SOUNDS
 48 sounds/gib.wav
 49 sounds/wind.wav
 50 sounds/howl.wav
+51 sounds/swap.wav
 MODE MUSIC_VOLUME_OVERRIDE
 MODE LEVELSELECT_ORDER
 bonus _

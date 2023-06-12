@@ -4,6 +4,9 @@
 #include "console.h"
 #include "utility.h"
 
+// this is one file where we DO want to use raw fopen so we disable new.h's saftey bars
+#undef fopen
+
 static FILE *console_file;
 static CONSOLE_CALLBACK console_callback;
 static char printbuf[2048];

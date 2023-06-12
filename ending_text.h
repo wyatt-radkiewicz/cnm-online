@@ -17,5 +17,6 @@ void Dialoge_Start(int start_line, int end_line);
 void Dialoge_Update(void);
 void Dialoge_Draw(void);
 void Dialoge_End(void);
+int Dialoge_IsActive(void);
 
 #endif

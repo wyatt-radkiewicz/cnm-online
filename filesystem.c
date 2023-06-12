@@ -4,7 +4,14 @@
 #include "filesystem.h"
 #include "serial.h"
 #include "console.h"
+#include "xmacro_impl.h"
 
+// due to new.h's making fopen deprecated
+#undef fopen
+xmacro_as_str(_FILE_LIFETIME_XMACROS, file_lifetime)
+xmacro_as_str(_FILE_RESULT_XMACROS, file_result)
+
+#ifndef REFACTOR
 static char levels[FILESYSTEM_MAX_LEVELS][FILESYSTEM_MAX_LENGTH];
 static char level_names[FILESYSTEM_MAX_LEVELS][UTIL_MAX_TEXT_WIDTH + 1];
 CNM_RECT level_previews[FILESYSTEM_MAX_LEVELS];
@@ -310,5 +317,6 @@ void FileSystem_SearchForLevels(int clear_level_list)
 			strcpy(level_names[l], levels[l]);
 	}
 }
+#endif
 
 #endif

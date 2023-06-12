@@ -201,8 +201,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->flags &= ~WOBJ_DONT_DRAW;
 	}
 
-	float accel = 0.4f;
-	float dec = 0.2f;
+	float accel = 1.3f;
+	float dec = 1.0f;
 	WOBJ *other;
 	float final_speed;
 	float final_grav;
@@ -239,37 +239,55 @@ void WobjPlayer_Update(WOBJ *wobj)
 			accel /= 2.0f;
 			dec /= 2.0f;
 		}
+		if (~wobj->flags & WOBJ_IS_GROUNDED) {
+			accel /= 2.0f;
+			dec /= 5.0f;
+			if (wobj->vel_y < -1.0f) {
+				final_speed *= 0.8f;
+				accel *= 2.5f;
+			}
+		}
 		if (local_data->in_water != local_data->last_in_water)
 			Interaction_CreateWobj(WOBJ_WATER_SPLASH_EFFECT, wobj->x, wobj->y - 16.0f, 0, 0.0f);
 
 		if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) && wobj->vel_x < final_speed)
 		{
-			if (Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING) ||
-				Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING))
-				wobj->vel_x = final_speed;
+			//if (wobj->vel_x < final_speed) {
+			if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x += accel * 4.0f;
+			else if (wobj->vel_x < 0.0) wobj->vel_x += accel * 3.0f;
+			else wobj->vel_x += accel;
+			//}
+			//if (Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING) ||
+			//	Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING))
+			//	wobj->vel_x = final_speed;
 
-			if (wobj->vel_x <= accel && wobj->vel_x >= -accel)
-				wobj->vel_x = final_speed;
-			else
-				wobj->vel_x += accel;
+			//if (wobj->vel_x <= accel && wobj->vel_x >= -accel)
+			//	wobj->vel_x = final_speed;
+			//else
+			//	wobj->vel_x += accel;
 
-			if (wobj->vel_x < 0.0f)
-				wobj->vel_x += accel * 2.0f;
+			//if (wobj->vel_x < 0.0f)
+			//	wobj->vel_x += accel * 2.0f;
 			wobj->flags &= ~WOBJ_HFLIP;
 		}
 		if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) && wobj->vel_x > -final_speed)
 		{
-			if (Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
-				Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING))
-				wobj->vel_x = -final_speed;
+			//if (wobj->vel_x > -final_speed) {
+			if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 4.0f;
+			else if (wobj->vel_x > 0.0) wobj->vel_x -= accel * 3.0f;
+			else wobj->vel_x -= accel;
+			//}
+			//if (Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
+			//	Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING))
+			//	wobj->vel_x = -final_speed;
 
-			if (wobj->vel_x <= accel && wobj->vel_x >= -accel)
-				wobj->vel_x = -final_speed;
-			else
-				wobj->vel_x -= accel;
+			//if (wobj->vel_x <= accel && wobj->vel_x >= -accel)
+			//	wobj->vel_x = -final_speed;
+			//else
+			//	wobj->vel_x -= accel;
 
-			if (wobj->vel_x > 0.0f)
-				wobj->vel_x -= accel * 2.0f;
+			//if (wobj->vel_x > 0.0f)
+			//	wobj->vel_x -= accel * 2.0f;
 			wobj->flags |= WOBJ_HFLIP;
 		}
 
@@ -296,8 +314,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if ((Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
 			Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING)) &&
 			(!Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) &&
-			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)))
-			wobj->vel_x = 0.0f;
+			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING))) {
+			//wobj->vel_x = 0.0f;
+			if (wobj->vel_x > dec) {
+				wobj->vel_x -= dec;
+			} else if (wobj->vel_x < -dec) {
+				wobj->vel_x += dec;
+			} else {
+				wobj->vel_x = 0.0f;
+			}
+		}
 
 		if (!(Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
 			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)))
@@ -611,7 +637,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 
 	if (--local_data->beastchurger_timer == 0)
 	{
-		wobj->strength /= 4.0f;
+		wobj->strength /= 25.0f;
 		Audio_PlayMusic(local_data->beastchurger_music, CNM_TRUE);
 	}
 
@@ -792,6 +818,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 	Item_TryPickupAndDrop(wobj);
 	Item_Update(wobj);
 	Item_TryUse(wobj);
+
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		int curritem = Item_GetCurrentItem()->type;
+		int offhand = local_data->offhand_item;
+		Item_DestroyCurrentItem(wobj);
+		//wobj->item = offhand;
+		Item_PickupByType(wobj, offhand);
+		Audio_PlaySound(51, CNM_FALSE, wobj->x, wobj->y);
+		local_data->offhand_item = curritem;
+	}
 
 	int recved_lava_damage = CNM_FALSE;
 	float old_hp = wobj->health;
@@ -1252,6 +1288,7 @@ void Player_ResetHUD(void) {
 }
 void Player_DrawHUD(WOBJ *player) {
 	CNM_RECT r;
+	PLAYER_LOCAL_DATA *local_data = (PLAYER_LOCAL_DATA *)player->local_data;
 
 	char temp_hud[64];
 	Util_SetRect(&r, 192, 4224, 96, 6);
@@ -1391,5 +1428,14 @@ void Player_DrawHUD(WOBJ *player) {
 	Renderer_DrawText(bx+8, by+22, 0, RENDERER_LIGHT, "JP");
 	Renderer_DrawText(bx+62 - (strlen(temp_hud) - 1) * 8, by+22, 0, RENDERER_LIGHT, temp_hud);
 
+	// Draw score hud
+	Util_SetRect(&r, 64, 4288, 96, 32);
+	Renderer_DrawBitmap(0, 0, &r, 2, RENDERER_LIGHT);
+	sprintf(temp_hud, "%08d", local_data->score);
+	Renderer_DrawText(29, 5, 0, RENDERER_LIGHT, temp_hud);
+	if (local_data->offhand_item) {
+		Renderer_DrawBitmap(-2, -4, &item_types[local_data->offhand_item].frames[0], 0, RENDERER_LIGHT);
+	}
+	
 	StepAndDrawParticles();
 }

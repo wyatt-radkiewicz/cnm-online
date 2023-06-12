@@ -802,7 +802,7 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 		pld = player->local_data;
 		if (pld->beastchurger_timer < 0)
 		{
-			player->strength *= 4.0f;
+			player->strength *= 25.0f;
 			pld->beastchurger_music = Audio_GetCurrentPlayingMusic();
 			Audio_PlayMusic(6, CNM_TRUE);
 		}

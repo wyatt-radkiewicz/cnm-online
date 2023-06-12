@@ -220,6 +220,8 @@ void WobjDragon_Update(WOBJ *wobj)
 	if (Game_GetFrame() % 30 == 0)
 	{
 		WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+		if (closest_player->x > wobj->x + 64.0f) wobj->flags |= WOBJ_HFLIP;
+		else wobj->flags &= ~WOBJ_HFLIP;
 		if (Interaction_GetDistanceToWobj(wobj, closest_player) < (float)RENDERER_WIDTH)
 		{
 			float ang = atan2f(closest_player->y - cy, closest_player->x - cx);

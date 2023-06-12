@@ -76,6 +76,8 @@ typedef struct _PLAYER_LOCAL_DATA
 	int created_vortexes_node[PLAYER_MAX_VORTEXES];
 	int created_vortexes_uuid[PLAYER_MAX_VORTEXES];
 	int created_vortexes_id;
+	unsigned int score;
+	int offhand_item;
 } PLAYER_LOCAL_DATA;
 
 void WobjPlayer_Create(WOBJ *wobj);

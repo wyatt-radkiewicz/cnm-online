@@ -1,5 +1,6 @@
 #include <string.h>
 #include <SDL.h>
+#include "game.h"
 #include "input.h"
 #include "console.h"
 #include "game_console.h"
@@ -14,6 +15,7 @@ static int input_state_stack[INPUT_MAX_STATES];
 static int input_state_top;
 static char input_last_char;
 static int input_initialized = CNM_FALSE;
+static int mouse_pressed;
 
 static SDL_GameController *input_pad;
 
@@ -68,6 +70,12 @@ void Input_Update(void)
 	{
 		switch (event.type)
 		{
+		case SDL_MOUSEBUTTONDOWN:
+			mouse_pressed = CNM_TRUE;
+			break;
+		case SDL_MOUSEBUTTONUP:
+			mouse_pressed = CNM_FALSE;
+			break;
 		case SDL_QUIT:
 			if (input_callback != NULL)
 				input_callback();
@@ -132,6 +140,14 @@ void Input_Update(void)
 	input_buttons[INPUT_DROP] = keys[SDL_SCANCODE_SPACE];
 	input_buttons[INPUT_CONSOLE] = keys[SDL_SCANCODE_GRAVE];
 	input_buttons[INPUT_BACKSPACE] = keys[SDL_SCANCODE_BACKSPACE];
+	if (Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_CLIENT || Game_TopState() == GAME_STATE_DEDICATED_SERVER) {
+		input_buttons[INPUT_UP] = keys[SDL_SCANCODE_SPACE] || keys[SDL_SCANCODE_X] || keys[SDL_SCANCODE_UP];
+		input_buttons[INPUT_DOWN] = keys[SDL_SCANCODE_Z] || keys[SDL_SCANCODE_DOWN] || mouse_pressed || keys[SDL_SCANCODE_S];
+		input_buttons[INPUT_LEFT] = keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A];
+		input_buttons[INPUT_RIGHT] = keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D];
+		input_buttons[INPUT_ENTER] = keys[SDL_SCANCODE_RETURN] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_C];
+		input_buttons[INPUT_DROP] = keys[SDL_SCANCODE_V] || keys[SDL_SCANCODE_E];
+	}
 
 	if (input_pad != NULL)
 	{

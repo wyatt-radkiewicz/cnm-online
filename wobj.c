@@ -47,8 +47,8 @@ void Wobj_Init(void)
 	wobj_node_id = 0;
 	unowned_size = 0;
 	major_reset = CNM_FALSE;
-	owned_grid = ObjGrid_Create(128, 128);
-	unowned_grid = ObjGrid_Create(128, 64);
+	owned_grid = ObjGrid_Create(256, 256);
+	unowned_grid = ObjGrid_Create(256, 256);
 
 	WobjSearch_Reset();
 	//wobj_pool = Pool_Create(sizeof(WOBJ));

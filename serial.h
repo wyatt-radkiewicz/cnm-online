@@ -1,6 +1,9 @@
 #ifndef _serial_h_
 #define _serial_h_
 #include "utility.h"
+#ifdef REFACTOR
+#include "new.h"
+#endif
 
 void Serial_CondenceBlockFileAndSave(const char *cnmb_file);
 void Serial_LoadBlocks(const char *cnmb_file);

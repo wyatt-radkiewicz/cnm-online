@@ -1106,7 +1106,6 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 	fpart = 0.25f * (float)(converted & 0x3);
 	fconverted += fconverted < 0 ? -fpart : fpart;
 	wobj->vel_y = fconverted;
-	Console_Print("x: %f, y: %f", wobj->vel_x, wobj->vel_y);
 
 	if (wobj->custom_floats[0] < 0.0f)
 	{
@@ -3180,6 +3179,19 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{480, 3936, 32, 32}
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE // Can respawn?
+	},
+	{ // 141: Finishing Trigger Object
+		Wobj_Trigger32x32_Create, // Create
+		NULL, // Update
+		NULL, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{352, 2992, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward

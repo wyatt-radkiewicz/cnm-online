@@ -1,7 +1,47 @@
 #ifndef _filesystem_h_
 #define _filesystem_h_
+#include <stdio.h>
 #include "utility.h"
+#include "new.h"
+#include "str.h"
+#include "types.h"
+#include "result.h"
 
+#include "xmacro_start.h"
+#define _FILE_LIFETIME_XMACROS \
+	ENUM(FileLifetimeGlobal) \
+	ENUM(FileLifetimeLevel)
+xmacro_enum(_FILE_LIFETIME_XMACROS, file_lifetime)
+#define _FILE_RESULT_XMACROS \
+	ENUM(FileResultOk) \
+	ENUM(FileResultNotFound) \
+	ENUM(FileResultNotAllowed) \
+	ENUM(FileResultReachedEOF)
+xmacro_enum(_FILE_RESULT_XMACROS, file_result)
+#define _FILE_ACCESS_XMACROS \
+	ENUM(FileAccessR) \
+	ENUM(FileAccessW) \
+	ENUM(FileAccessRW)
+xmacro_enum(_FILE_ACCESS_XMACROS, file_access)
+#include "xmacro_end.h"
+
+typedef struct file_t {
+	FILE *_fp;
+} file_t;
+make_result_type(file_open, file_result_t, file_t)
+make_result_type(file_tell, file_result_t, usize)
+make_result_type(file_size, file_result_t, usize)
+
+file_open_result_t file_open(str_t game_path, file_lifetime_t lifetime, file_access_t access);
+file_result_t file_close(file_t *file);
+file_result_t file_read(file_t *file, usize size, void *buf);
+file_result_t file_write(file_t *file, usize size, const void *buf);
+file_tell_result_t file_tell(const file_t *file);
+file_result_t file_seek(file_t *file, usize offset);
+file_size_result_t file_size(const file_t *file);
+
+// Release build is "stable" debug build is not
+#ifndef REFACTOR
 #define FILESYSTEM_MAX_LEVELS 48
 #define FILESYSTEM_MAX_MIDIS 48
 #define FILESYSTEM_MAX_WAVS 64
@@ -39,5 +79,6 @@ const FILESYSTEM_REGISTERED_FILE *FileSystem_GetRegisteredSpawnersFile(void);
 const FILESYSTEM_REGISTERED_FILE *FileSystem_GetRegisteredMusicFile(int id);
 const FILESYSTEM_REGISTERED_FILE *FileSystem_GetRegisteredSoundFile(int id);
 int FileSystem_DoesFileExist(const char *file_name, unsigned int checksum);
+#endif
 
 #endif

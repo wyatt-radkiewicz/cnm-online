@@ -100,6 +100,8 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 				{
 					interaction_player->money += wobj_types[victim->type].money_reward;
 					interaction_player->strength += wobj_types[victim->type].strength_reward;
+					PLAYER_LOCAL_DATA *pld = (PLAYER_LOCAL_DATA *)interaction_player->local_data;
+					pld->score += wobj_types[victim->type].score_reward;
 				}
 				Wobj_DestroyWobj(victim);
 			}
@@ -133,6 +135,10 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 				{
 					interaction_player->money += wobj_types[victim->type].money_reward;
 					interaction_player->strength += wobj_types[victim->type].strength_reward;
+					if (interaction_player == Game_GetVar(GAME_VAR_PLAYER)->data.pointer) {
+						PLAYER_LOCAL_DATA *pld = (PLAYER_LOCAL_DATA *)interaction_player->local_data;
+						pld->score += wobj_types[victim->type].score_reward;
+					}
 				}
 				Interaction_DestroyWobj(victim);
 			}

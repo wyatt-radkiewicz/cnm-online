@@ -153,6 +153,7 @@ typedef enum _WOBJ_TYPES
 	WOBJ_LUA14,
 	WOBJ_LUA15,
 	WOBJ_NOUPGRADE_TRIGGER,
+	WOBJ_FINISH_TRIGGER,
 	WOBJ_MAX
 } WOBJ_TYPES;
 
@@ -219,6 +220,7 @@ typedef struct _WOBJ_TYPE
 	int money_reward;
 	int do_interp;
 	int respawnable;
+	int score_reward;
 } WOBJ_TYPE;
 typedef struct _WOBJ
 {
