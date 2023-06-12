@@ -1158,7 +1158,7 @@ void WobjSpiderWalker_Update(WOBJ *wobj)
 		Interaction_PlaySound(wobj, 29);
 
 	if (wobj->custom_ints[1]-- <= 0 || Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * 3.0f, 0.0f) ||
-		!Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * wobj->hitbox.w, -5.0f))
+		!Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * wobj->hitbox.w, 5.0f))
 	{
 		wobj->custom_ints[1] = Util_RandInt(30, 30*3);
 		wobj->custom_floats[0] *= -1.0f;
@@ -1261,8 +1261,9 @@ void WobjMovingFireVertical_Create(WOBJ *wobj)
 	wobj->speed = wobj->custom_floats[0];
 	wobj->custom_floats[0] = wobj->y;
 	wobj->custom_floats[1] = wobj->y + (float)wobj->custom_ints[0];
-	if (wobj->custom_floats[1] < wobj->custom_floats[0])
-		wobj->speed *= -1.0f;
+	if (wobj->speed < 0) {
+		wobj->y = wobj->custom_floats[1];
+	}
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
 void WobjMovingFireVertical_Update(WOBJ *wobj)
@@ -1281,8 +1282,11 @@ void WobjMovingFireHorizontal_Create(WOBJ *wobj)
 	wobj->speed = wobj->custom_floats[0];
 	wobj->custom_floats[0] = wobj->x;
 	wobj->custom_floats[1] = wobj->x + (float)wobj->custom_ints[0];
-	if (wobj->custom_floats[1] < wobj->custom_floats[0])
-		wobj->speed *= -1.0f;
+	if (wobj->speed < 0) {
+		wobj->x = wobj->custom_floats[1];
+	}
+	//if (wobj->custom_floats[1] < wobj->custom_floats[0])
+	//	wobj->speed *= -1.0f;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
 void WobjMovingFireHorizontal_Update(WOBJ *wobj)

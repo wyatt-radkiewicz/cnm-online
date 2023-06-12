@@ -3,3 +3,4 @@ build/
 .DS_Store
 Thumbs.db
 cnm_log.txt
+run_editor.sh

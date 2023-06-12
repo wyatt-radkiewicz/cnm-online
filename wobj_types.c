@@ -175,6 +175,10 @@ static void WobjScMovingPlatform_Create(WOBJ *wobj)
 	wobj->custom_ints[1] = wobj->custom_ints[0];
 	wobj->vel_x = wobj->custom_floats[0];
 	wobj->vel_y = 0.0f;
+
+	if (wobj->vel_x < 0.0) {
+		wobj->x += wobj->custom_ints[1] * -wobj->vel_x;
+	}
 }
 static void WobjScMovingPlatform_Update(WOBJ *wobj)
 {
@@ -197,6 +201,10 @@ static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
 	wobj->custom_ints[1] = wobj->custom_ints[0];
 	wobj->vel_y = wobj->custom_floats[0];
 	wobj->vel_x = 0.0f;
+
+	if (wobj->vel_y < 0.0) {
+		wobj->y += wobj->custom_ints[1] * -wobj->vel_y;
+	}
 }
 static void WobjMovingPlatformVertical_Update(WOBJ *wobj)
 {

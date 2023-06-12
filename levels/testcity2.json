@@ -45,22 +45,14 @@
     },
     {
       "pos": [
-        40.0,
-        192.0
+        48.0,
+        200.0
       ],
       "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            1,
-            0
-          ],
-          "target_relative": [
-            128.0,
-            0.0
-          ],
-          "speed": 3.0,
-          "start_paused": false,
-          "one_way": false
+        "MovingFire": {
+          "vertical": false,
+          "dist": 128,
+          "speed": 3.0
         }
       },
       "spawning_criteria": {
@@ -72,49 +64,14 @@
     },
     {
       "pos": [
-        216.0,
-        112.0
+        48.0,
+        152.0
       ],
       "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            1,
-            0
-          ],
-          "target_relative": [
-            0.0,
-            128.0
-          ],
-          "speed": 3.0,
-          "start_paused": false,
-          "one_way": false
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null
-    },
-    {
-      "pos": [
-        96.0,
-        120.0
-      ],
-      "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            1,
-            0
-          ],
-          "target_relative": [
-            128.0,
-            -128.0
-          ],
-          "speed": 3.0,
-          "start_paused": true,
-          "one_way": false
+        "MovingFire": {
+          "vertical": false,
+          "dist": 128,
+          "speed": -3.0
         }
       },
       "spawning_criteria": {
