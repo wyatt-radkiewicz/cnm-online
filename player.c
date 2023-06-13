@@ -142,6 +142,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->curranim = PLAYER_ANIM_STANDING;
 	local_data->currframe = 0;
 	local_data->animspd = 0;
+	local_data->control_mul = 1.0f;
 	if (wobj->internal.owned)
 	{
 		if (local_data->currskin != 9)
@@ -154,6 +155,8 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->fire_resistance = 0;
 	local_data->grav = Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
 	local_data->grav_add = 0.0f;
+	local_data->sliding_cap_landing_speed = CNM_FALSE;
+	local_data->slide_jump_cooldown = 0;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
@@ -282,17 +285,29 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		} else {
 			local_data->grav_add = 0.0f;
+			if (wobj->vel_y >= -1.0f) {
+				local_data->control_mul = 1.0f;
+				if (local_data->sliding_cap_landing_speed) {
+					if (wobj->vel_x > final_speed) wobj->vel_x = final_speed;
+					if (wobj->vel_x < -final_speed) wobj->vel_x = -final_speed;
+				}
+				local_data->sliding_cap_landing_speed = CNM_FALSE;
+			}
 		}
 		if (local_data->in_water != local_data->last_in_water)
 			Interaction_CreateWobj(WOBJ_WATER_SPLASH_EFFECT, wobj->x, wobj->y - 16.0f, 0, 0.0f);
+		float cmul = local_data->control_mul;
+		if (cmul < 0.0f) cmul = 0.0f;
+		local_data->control_mul += 0.01f;
+		if (local_data->control_mul > 1.0f) local_data->control_mul = 1.0f;
 
 		if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) && wobj->vel_x < final_speed)
 		{
 			//if (wobj->vel_x < final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x < 0.0f)) {
-				if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x += accel * 4.0f;
-				else if (wobj->vel_x < 0.0) wobj->vel_x += accel * 3.0f;
-				else wobj->vel_x += accel;
+				if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x += accel * 4.0f * cmul;
+				else if (wobj->vel_x < 0.0) wobj->vel_x += accel * 3.0f * cmul;
+				else wobj->vel_x += accel * cmul;
 			}
 			//}
 			//if (Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING) ||
@@ -312,9 +327,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//if (wobj->vel_x > -final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x > 0.0f)) {
-				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 4.0f;
-				else if (wobj->vel_x > 0.0) wobj->vel_x -= accel * 3.0f;
-				else wobj->vel_x -= accel;
+				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 4.0f * cmul;
+				else if (wobj->vel_x > 0.0) wobj->vel_x -= accel * 3.0f * cmul;
+				else wobj->vel_x -= accel * cmul;
 			}
 			//}
 			//if (Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
@@ -351,22 +366,30 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		}
 
-		if (Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) && (wobj->vel_x > 2.0f || wobj->vel_x < -2.0f) && !local_data->is_sliding) {
-			wobj->vel_x *= 1.5f;
-			if (local_data->sliding_crit_timer > 0 && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) wobj->vel_x *= 1.5f;
-			wobj->vel_x = CNM_CLAMP(wobj->vel_x, -PLAYER_SLIDING_MAX_SPD, PLAYER_SLIDING_MAX_SPD);
-			local_data->is_sliding = CNM_TRUE;
-			local_data->sliding_jump_timer = 5;
-			wobj->hitbox.y = 16.0f;
-			wobj->hitbox.h = 15.0f;
+		if (Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->is_sliding && local_data->slide_jump_cooldown <= 0) {
+			if (wobj->vel_x > 2.0f || wobj->vel_x < -2.0f || local_data->sliding_crit_timer > 0) {
+				wobj->vel_x *= 1.25f;
+				if (local_data->sliding_crit_timer > 0 && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) {
+					if (wobj->flags & WOBJ_HFLIP && wobj->vel_x > -final_speed) wobj->vel_x = -final_speed;
+					else if (~wobj->flags & WOBJ_HFLIP && wobj->vel_x < final_speed) wobj->vel_x = final_speed;  
+					wobj->vel_x *= 1.5f;
+				} else {
+					wobj->vel_x = CNM_CLAMP(wobj->vel_x, -PLAYER_SLIDING_MAX_SPD, PLAYER_SLIDING_MAX_SPD);
+				}
+				local_data->is_sliding = CNM_TRUE;
+				local_data->sliding_jump_timer = 5;
+				wobj->hitbox.y = 16.0f;
+				wobj->hitbox.h = 15.0f;
+			}
 		}
 		if (Wobj_IsGrouneded(wobj) && !local_data->is_sliding) {
 			wobj->hitbox.y = 2.0f;
 			wobj->hitbox.h = 29.0f;
 		}
-		if (!Wobj_IsGrouneded(wobj)) local_data->sliding_crit_timer = 4;
+		if (!Wobj_IsGrouneded(wobj)) local_data->sliding_crit_timer = 8;
 		local_data->sliding_crit_timer--;
 		local_data->sliding_jump_timer--;
+		if (Wobj_IsGrouneded(wobj)) local_data->slide_jump_cooldown--;
 		if (local_data->is_sliding) {
 			if (wobj->vel_x > dec) {
 				wobj->vel_x -= dec;
@@ -387,9 +410,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding) {
 			//wobj->vel_x = 0.0f;
 			if (wobj->vel_x > dec) {
-				wobj->vel_x -= dec;
+				wobj->vel_x -= dec * cmul;
 			} else if (wobj->vel_x < -dec) {
-				wobj->vel_x += dec;
+				wobj->vel_x += dec * cmul;
 			} else {
 				wobj->vel_x = 0.0f;
 			}
@@ -399,9 +422,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding)
 		{
 			if (wobj->vel_x > dec)
-				wobj->vel_x -= dec;
+				wobj->vel_x -= dec * cmul;
 			else if (wobj->vel_x < -dec)
-				wobj->vel_x += dec;
+				wobj->vel_x += dec * cmul;
 			else
 				wobj->vel_x = 0.0f;
 			if (!local_data->animforce_cooldown && Wobj_IsGrouneded(wobj)&&
@@ -536,16 +559,23 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->animtimer = 0;
 
 				if (local_data->is_sliding) {
+					local_data->slide_jump_cooldown = 10;
 					local_data->is_sliding = CNM_FALSE;
-					if (wobj->vel_x > -2.25f && wobj->vel_x < 2.25f) {
+					if (wobj->vel_x > -2.5f && wobj->vel_x < 2.5f) {
 						wobj->vel_y *= 1.25f;
-						wobj->vel_x *= 0.8f;
+						wobj->vel_x *= 0.1f;
+						local_data->control_mul = 0.5f;
 					} else if (local_data->sliding_jump_timer > 0) {
 						wobj->vel_x *= 1.1f;
 						wobj->vel_y *= 0.5f;
+						local_data->control_mul = -0.5f;
+						local_data->sliding_cap_landing_speed = CNM_TRUE;
 					} else {
-						if (wobj->vel_x < -final_speed) wobj->vel_x = -final_speed;
-						else if (wobj->vel_x > final_speed) wobj->vel_x = final_speed;
+						wobj->vel_x *= 0.9f;
+						wobj->vel_y *= 0.9f;
+						local_data->control_mul = 0.0f;
+						//if (wobj->vel_x < -final_speed) wobj->vel_x = -final_speed;
+						//else if (wobj->vel_x > final_speed) wobj->vel_x = final_speed;
 					}
 				}
 			}

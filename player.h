@@ -87,6 +87,9 @@ typedef struct _PLAYER_LOCAL_DATA
 	int is_sliding;
 	int sliding_crit_timer;
 	int sliding_jump_timer;
+	int slide_jump_cooldown;
+	float control_mul;
+	int sliding_cap_landing_speed;
 	//float stored_yvel;
 } PLAYER_LOCAL_DATA;
 
