@@ -792,7 +792,7 @@ int Wobj_TryTeleportWobj(WOBJ *wobj)
 	TELEPORT_INFO *info;
 	WOBJ *collisions[WOBJ_MAX_COLLISIONS];
 	Wobj_GetCollision(wobj, collisions);
-	while (collisions[i] != NULL && i < WOBJ_MAX_COLLISIONS)
+	while (i < WOBJ_MAX_COLLISIONS && collisions[i] != NULL)
 	{
 		if (collisions[i]->type == WOBJ_TELEPORT || 
 			(collisions[i]->type == WOBJ_TELEAREA1 && collisions[i]->custom_ints[1]))
