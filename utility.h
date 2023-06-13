@@ -15,7 +15,7 @@
 #define STRINGIZE(s) #s
 #define CNM_MIN(x, m) ((x) < (m) ? (x) : (m))
 #define CNM_MAX(x, m) ((x) > (m) ? (x) : (m))
-#define CNM_CLAMP(x, min, max) (CNM_MIN(CNM_MAX(x, max), min))
+#define CNM_CLAMP(x, min, max) (CNM_MAX(CNM_MIN(x, max), min))
 #define UTIL_MAX_TEXT_WIDTH (320 / 8)
 #define CNM_PI 3.141599265f
 #define CNM_2RAD(d) ((d) / 180.0f * CNM_PI)

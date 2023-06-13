@@ -1,5 +1,6 @@
 .code/
 build/
+.cache/
 .DS_Store
 Thumbs.db
 cnm_log.txt

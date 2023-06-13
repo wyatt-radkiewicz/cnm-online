@@ -1238,17 +1238,19 @@ void WobjRotatingFireColunmPiece_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 25.0f;
-	wobj->speed = wobj->custom_floats[0];
-	wobj->custom_floats[0] = (float)wobj->custom_ints[0];
-	wobj->custom_floats[1] = wobj->y;
-	wobj->vel_x = wobj->x - wobj->custom_floats[0]; // This is how far away it is from the center
+	wobj->speed = 0.0;
+	wobj->custom_floats[0] = CNM_2RAD(wobj->custom_floats[0]);
+	//wobj->custom_ints[0] = wobj->custom_ints[0];
+	wobj->custom_ints[1] = (int)wobj->y;
+	wobj->vel_x = wobj->x - (float)wobj->custom_ints[0]; // This is how far away it is from the center
+	//if (wobj->x < wobj->custom_ints[0]) wobj->speed = CNM_PI;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
 void WobjRotatingFireColunmPiece_Update(WOBJ *wobj)
 {
-	float angle = CNM_2RAD((float)Game_GetFrame() * wobj->speed);
-	wobj->x = wobj->custom_floats[0] + (cosf(angle) * wobj->vel_x);
-	wobj->y = wobj->custom_floats[1] + (sinf(angle) * wobj->vel_x);
+	wobj->speed += wobj->custom_floats[0];
+	wobj->x = (float)wobj->custom_ints[0] + (cosf(wobj->speed) * wobj->vel_x);
+	wobj->y = (float)wobj->custom_ints[1] - (sinf(wobj->speed) * wobj->vel_x);
 }
 void WobjRotatingFireColunmPiece_Draw(WOBJ *wobj, int camx, int camy)
 {
@@ -2229,7 +2231,7 @@ void WobjRockGuySmasher_Update(WOBJ *wobj)
 		if ((Interaction_GetDistanceToWobj(player, wobj) < 128.0f && wobj->custom_ints[1] > 120) ||
 			Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[1] * 4.0f, -1.0f) ||
 			(wobj->custom_ints[1] > 30*10) ||
-			(on_wrong_side && wobj->custom_ints[1] > 30*3))
+			(on_wrong_side && wobj->custom_ints[1] > 30*2))
 		{
 			wobj->custom_ints[0] = RGSMASHER_SMASHING;
 			wobj->custom_ints[1] = 0;

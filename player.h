@@ -13,6 +13,8 @@
 #define PLAYER_ANIM_SLIDE 6
 #define PLAYER_ANIM_MAX 7
 
+#define PLAYER_SLIDING_MAX_SPD (final_speed * 1.9f)
+
 #define PLAYER_HP_NORMAL_MAX 200
 #define PLAYER_HP_MAX 1000
 #define PLAYER_FINISH_TIMER (30*10)
@@ -83,6 +85,9 @@ typedef struct _PLAYER_LOCAL_DATA
 	int finish_timer;
 	float grav, grav_add;
 	int is_sliding;
+	int sliding_crit_timer;
+	int sliding_jump_timer;
+	//float stored_yvel;
 } PLAYER_LOCAL_DATA;
 
 void WobjPlayer_Create(WOBJ *wobj);

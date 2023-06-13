@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "renderer.h"
+#include "utility.h"
 #include "wobj.h"
 #include "input.h"
 #include "blocks.h"
@@ -236,7 +237,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		final_grav *= maxpowerinfos[local_data->mpoverride].grav;
 	}
 	if (local_data->is_sliding) {
-		accel = 0.3f;
+		accel = 0.1f;
 		dec = 0.2f;
 	}
 
@@ -274,11 +275,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 				final_speed *= 0.8f;
 				accel *= 2.5f;
 			}
-			if (wobj->vel_y > -wobj->jump / 4.0f) {
-				if (!Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) && !Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
-					local_data->grav_add += 0.05f;
-				} else {
-					local_data->grav_add = 0.0f;
+			if (wobj->vel_y > -wobj->jump / 2.0f) {
+				if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING)) {
+					local_data->grav_add += 0.1f;
 				}
 			}
 		} else {
@@ -312,7 +311,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) && wobj->vel_x > -final_speed)
 		{
 			//if (wobj->vel_x > -final_speed) {
-			if (!local_data->is_sliding || (wobj->vel_x < 0.0f)) {
+			if (!local_data->is_sliding || (wobj->vel_x > 0.0f)) {
 				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 4.0f;
 				else if (wobj->vel_x > 0.0) wobj->vel_x -= accel * 3.0f;
 				else wobj->vel_x -= accel;
@@ -352,10 +351,22 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		}
 
-		if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && (wobj->vel_x > 2.0f || wobj->vel_x < -2.0f) && !local_data->is_sliding) {
-			wobj->vel_x *= 2.0f;
+		if (Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) && (wobj->vel_x > 2.0f || wobj->vel_x < -2.0f) && !local_data->is_sliding) {
+			wobj->vel_x *= 1.5f;
+			if (local_data->sliding_crit_timer > 0 && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) wobj->vel_x *= 1.5f;
+			wobj->vel_x = CNM_CLAMP(wobj->vel_x, -PLAYER_SLIDING_MAX_SPD, PLAYER_SLIDING_MAX_SPD);
 			local_data->is_sliding = CNM_TRUE;
+			local_data->sliding_jump_timer = 5;
+			wobj->hitbox.y = 16.0f;
+			wobj->hitbox.h = 15.0f;
 		}
+		if (Wobj_IsGrouneded(wobj) && !local_data->is_sliding) {
+			wobj->hitbox.y = 2.0f;
+			wobj->hitbox.h = 29.0f;
+		}
+		if (!Wobj_IsGrouneded(wobj)) local_data->sliding_crit_timer = 4;
+		local_data->sliding_crit_timer--;
+		local_data->sliding_jump_timer--;
 		if (local_data->is_sliding) {
 			if (wobj->vel_x > dec) {
 				wobj->vel_x -= dec;
@@ -515,9 +526,28 @@ void WobjPlayer_Update(WOBJ *wobj)
 				float jmp_speed = final_jmp;
 				if (local_data->in_water)
 					jmp_speed /= 1.5f;
+				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+				if (plat != NULL && plat->flags & WOBJ_IS_MOVESTAND)
+				{
+					jmp_speed -= plat->vel_y;
+				}
 				wobj->vel_y = -jmp_speed;
 				local_data->jumped = 5;
 				local_data->animtimer = 0;
+
+				if (local_data->is_sliding) {
+					local_data->is_sliding = CNM_FALSE;
+					if (wobj->vel_x > -2.25f && wobj->vel_x < 2.25f) {
+						wobj->vel_y *= 1.25f;
+						wobj->vel_x *= 0.8f;
+					} else if (local_data->sliding_jump_timer > 0) {
+						wobj->vel_x *= 1.1f;
+						wobj->vel_y *= 0.5f;
+					} else {
+						if (wobj->vel_x < -final_speed) wobj->vel_x = -final_speed;
+						else if (wobj->vel_x > final_speed) wobj->vel_x = final_speed;
+					}
+				}
 			}
 		}
 		// Max power double jumping
@@ -937,6 +967,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (local_data->is_sliding) {
 		local_data->curranim = PLAYER_ANIM_SLIDE;
 		local_data->animspd = 2;
+		if (wobj->vel_x > 4.0f || wobj->vel_x < -4.0f) local_data->animspd = 1;
+		if (wobj->vel_x > 6.0f || wobj->vel_x < -6.0f) local_data->animspd = 0;
 	}
 	if (!Wobj_IsGrouneded(wobj) && !local_data->animforce_cooldown)
 	{
@@ -1139,7 +1171,7 @@ static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame)
 		r->h = 40;
 		if (anim == PLAYER_ANIM_SLIDE) {
 			r->x = 40 + frame * 40;
-			r->y = 4278;
+			r->y = 4728;
 		}
 	}
 }
