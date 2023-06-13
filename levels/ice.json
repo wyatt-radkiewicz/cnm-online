@@ -6139,7 +6139,9 @@
     {
       "solid": true,
       "transparency": 0,
-      "damage_type": "None",
+      "damage_type": {
+        "Ice": 0.03
+      },
       "anim_speed": 1,
       "frames": [
         [
@@ -6159,7 +6161,9 @@
     {
       "solid": true,
       "transparency": 0,
-      "damage_type": "None",
+      "damage_type": {
+        "Ice": 0.03
+      },
       "anim_speed": 1,
       "frames": [
         [

@@ -35,7 +35,7 @@ void Serial_LoadAudioCfg(const char *cnma_file)
 		char filename[1024];
 		char levelpath[96];
 		FileSystem_RegisterAudioCfg(cnma_file);
-		Audio_AddMusicEntry(18, "2drend.dll");
+		Audio_AddMusicEntry(AUDIO_MAX_IDS - 1, "2drend.dll");
 		while (fscanf(fp, "%s %s", index_buf, filename) == 2)
 		{
 			index = atoi(index_buf);
@@ -86,7 +86,7 @@ void Serial_LoadAudioCfg(const char *cnma_file)
 				{
 					strcpy(levelpath, "levels/");
 					strcat(levelpath, index_buf);
-					FileSystem_AddLevelToLevelOrder(levelpath);
+					FileSystem_SetLevelParScore(FileSystem_AddLevelToLevelOrder(levelpath), atoi(filename));
 				}
 				else if (mode == 3)
 				{

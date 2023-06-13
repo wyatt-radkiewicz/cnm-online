@@ -93,6 +93,37 @@ static void WobjShotgunItem_Create(WOBJ *wobj)
 	wobj->hitbox.h = 32.0f;
 }
 
+static void Wobj_ShotgunPel_Create(WOBJ *wobj) {
+	wobj->strength = 1.0f;
+	wobj->anim_frame = 0;
+	wobj->custom_ints[0] = 0;
+	wobj->flags = WOBJ_IS_PLAYER_WEAPON | WOBJ_IS_PLAYER_BULLET;
+	Util_SetBox(&wobj->hitbox, 2.0f, 2.0f, 4.0f, 4.0f);
+	wobj->speed = 0.3f;
+	wobj->local_data = (void *)1234;
+	wobj->custom_ints[0] = 0;
+	wobj->custom_floats[1] = 1.0f;
+}
+static void Wobj_ShotgunPel_Update(WOBJ *wobj) {
+	wobj->custom_ints[0]++;
+	wobj->x += wobj->vel_x;
+	wobj->y += wobj->vel_y;
+	if (wobj->vel_x > 0.0f) wobj->vel_x -= 0.1f;
+	else wobj->vel_x += 0.1f;
+	wobj->vel_y += wobj->speed;
+	WobjGenericAttack_Update(wobj);
+	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || wobj->custom_ints[0]++ >= (30*5) || Wobj_GetWobjColliding(wobj, WOBJ_IS_BREAKABLE))
+	{
+		if (wobj->anim_frame == 1 && wobj->local_data != NULL && wobj->custom_ints[0] < 10) {
+			WOBJ *plr = (WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
+			float k = (10.0f - (float)wobj->custom_ints[0]) * wobj->custom_floats[1];
+			if (plr->x > wobj->x) plr->vel_x += k;
+			else plr->vel_x -= k;
+		}
+		Interaction_DestroyWobj(wobj);
+	}
+}
+
 static void WobjPlayerPellet_Create(WOBJ *wobj)
 {
 	wobj->strength = 1.0f;
@@ -530,7 +561,7 @@ static void WobjRocket_Update(WOBJ *wobj)
 			explosion->flags |= WOBJ_HFLIP;
 		if (wobj->flags & WOBJ_IS_PLAYER_WEAPON)
 			explosion->flags |= WOBJ_IS_PLAYER_WEAPON;
-		explosion->strength = wobj->strength + 0.25f;
+		explosion->strength = wobj->strength;
 		Interaction_DestroyWobj(wobj);
 	}
 }
@@ -627,7 +658,9 @@ static void WobjUltraSwordBoomerang_Create(WOBJ *wobj)
 	wobj->anim_frame = wobj->custom_ints[0];
 	wobj->custom_ints[0] = 0;
 	wobj->custom_ints[1] = 0;
+	wobj->vel_x  = 0.0f; wobj->vel_y = 0.0f;
 	wobj->money = 0; // Used as timer
+	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
 static void WobjUltraSwordBoomerang_Update(WOBJ *wobj)
 {
@@ -653,6 +686,8 @@ static void WobjUltraSwordBoomerang_Update(WOBJ *wobj)
 	{
 		const float t = CNM_2RAD(-90.0f + ((float)wobj->custom_ints[0] * 4.0f));
 		wobj->custom_ints[0]++;
+		wobj->custom_floats[0] += wobj->vel_x;
+		wobj->custom_floats[1] += wobj->vel_y;
 		wobj->x = wobj->custom_floats[0] + (cosf(t)) * 180.0f * wobj->speed;
 		wobj->y = wobj->custom_floats[1] + (sinf(2.0f * t) / 2.0f) * 60.0f;
 		if (wobj->speed > 0.0f)
@@ -708,14 +743,14 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 		wobj->flags &= ~WOBJ_HFLIP;
 		wobj->flags |= (player->flags & WOBJ_HFLIP);
 
-		int frame = wobj->custom_ints[0] / 5;
-		if (frame > 2)
-			frame = 2;
+		int frame = wobj->custom_ints[0] / 2;
+		if (frame > 5)
+			frame = 5;
 		wobj->anim_frame = frame;
 		//wobj->x = player->x + x_offsets[frame] * wobj->custom_floats[0];
 		//wobj->y = player->y + y_offsets[frame];
 
-		if (wobj->anim_frame == 2)
+		if (wobj->anim_frame == 5 || wobj->anim_frame == 4)
 		{
 			Util_SetBox(&wobj->hitbox, -32.0f, 0.0f, 92.0f, 32.0f);
 			WOBJ *victim = Interaction_GetVictim(wobj, WOBJ_IS_HOSTILE | WOBJ_IS_BREAKABLE);
@@ -723,8 +758,8 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 			Interaction_DamageFoundWobjs(wobj);
 			Interaction_DamageOtherPlayers(wobj);
 			//WobjGenericAttack_Update(wobj);
-			if (wobj->custom_ints[0] >= 10 && wobj->custom_ints[0] <= 13)
-			{
+			//if (wobj->custom_ints[0] >= 8 && wobj->custom_ints[0] <= 12)
+			//{
 				if (wobj->custom_ints[0] == 10)
 					Interaction_PlaySound(wobj, 15);
 
@@ -742,11 +777,11 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 						player->y -= 1.0f;
 					}
 				}
-			}
+			//}
 		}
 	}
 
-	if (wobj->custom_ints[0]++ > 15)
+	if (wobj->custom_ints[0]++ > 12)
 	{
 		WOBJ *blast = Interaction_CreateWobj(PLAYER_HEAVY_BLAST, wobj->x, wobj->y - 1.0f, 0, wobj->custom_floats[0]);
 		blast->speed = 9.0f;
@@ -2351,9 +2386,12 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{416, 2464, 32, 32},
-			{448, 2464, 32, 32},
-			{384, 2492, 32, 32}
+			{0, 2512, 32, 32},
+			{64, 2512, 32, 32},
+			{96, 2512, 32, 32},
+			{0, 2512+32, 32, 32},
+			{32, 2512+32, 32, 32},
+			{64, 2512+32, 32, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3192,6 +3230,33 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{352, 2992, 32, 32}
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE // Can respawn?
+	},
+	{ // 142: Shotgun Pelletes Object
+		Wobj_ShotgunPel_Create, // Create
+		Wobj_ShotgunPel_Update, // Update
+		WobjGeneric_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{288, 32, 6, 6},
+			{304, 32, 9, 4}
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE // Can respawn?
+	},
+	{ // 143: Gravity Trigger Object
+		Wobj_Trigger32x32_Create, // Create
+		NULL, // Update
+		NULL, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{480, 1344, 32, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward

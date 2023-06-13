@@ -1,5 +1,6 @@
 #include <string.h>
 #include <SDL.h>
+#include "SDL_scancode.h"
 #include "game.h"
 #include "input.h"
 #include "console.h"
@@ -91,6 +92,7 @@ void Input_Update(void)
 			{
 				case SDL_SCANCODE_UP: input_repeated_buttons[INPUT_UP] = CNM_TRUE; break;
 				case SDL_SCANCODE_DOWN: input_repeated_buttons[INPUT_DOWN] = CNM_TRUE; break;
+				case SDL_SCANCODE_LCTRL: input_repeated_buttons[INPUT_FIRE] = CNM_TRUE; break;
 				case SDL_SCANCODE_LEFT: input_repeated_buttons[INPUT_LEFT] = CNM_TRUE; break;
 				case SDL_SCANCODE_RIGHT: input_repeated_buttons[INPUT_RIGHT] = CNM_TRUE; break;
 				case SDL_SCANCODE_W: input_repeated_buttons[INPUT_W] = CNM_TRUE; break;
@@ -128,6 +130,7 @@ void Input_Update(void)
 	memcpy(input_last_buttons, input_buttons, sizeof(input_buttons));
 	input_buttons[INPUT_UP] = keys[SDL_SCANCODE_UP];
 	input_buttons[INPUT_DOWN] = keys[SDL_SCANCODE_DOWN];
+	input_buttons[INPUT_FIRE] = keys[SDL_SCANCODE_Z] || mouse_pressed;
 	input_buttons[INPUT_LEFT] = keys[SDL_SCANCODE_LEFT];
 	input_buttons[INPUT_RIGHT] = keys[SDL_SCANCODE_RIGHT];
 	input_buttons[INPUT_W] = keys[SDL_SCANCODE_W];
@@ -140,9 +143,9 @@ void Input_Update(void)
 	input_buttons[INPUT_DROP] = keys[SDL_SCANCODE_SPACE];
 	input_buttons[INPUT_CONSOLE] = keys[SDL_SCANCODE_GRAVE];
 	input_buttons[INPUT_BACKSPACE] = keys[SDL_SCANCODE_BACKSPACE];
-	if (Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_CLIENT || Game_TopState() == GAME_STATE_DEDICATED_SERVER) {
-		input_buttons[INPUT_UP] = keys[SDL_SCANCODE_SPACE] || keys[SDL_SCANCODE_X] || keys[SDL_SCANCODE_UP];
-		input_buttons[INPUT_DOWN] = keys[SDL_SCANCODE_Z] || keys[SDL_SCANCODE_DOWN] || mouse_pressed || keys[SDL_SCANCODE_S];
+	if ((Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_CLIENT || Game_TopState() == GAME_STATE_DEDICATED_SERVER) && Input_TopState() <= INPUT_STATE_PLAYING) {
+		input_buttons[INPUT_UP] = keys[SDL_SCANCODE_SPACE] || keys[SDL_SCANCODE_X] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W];
+		input_buttons[INPUT_DOWN] = keys[SDL_SCANCODE_DOWN]|| keys[SDL_SCANCODE_S];
 		input_buttons[INPUT_LEFT] = keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A];
 		input_buttons[INPUT_RIGHT] = keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D];
 		input_buttons[INPUT_ENTER] = keys[SDL_SCANCODE_RETURN] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_C];

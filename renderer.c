@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <SDL.h>
+#include "SDL_surface.h"
+#include "SDL_video.h"
 #include "renderer.h"
 #include "console.h"
 #include "game.h"
@@ -126,48 +128,61 @@ void Renderer_Update(void)
 	if (!renderer_hires_mode)
 		SDL_BlitSurface(renderer_scr, NULL, SDL_GetWindowSurface(renderer_win), NULL);
 	else {
+		SDL_Surface *winsurf = SDL_GetWindowSurface(renderer_win);
+		SDL_FillRect(winsurf, NULL, SDL_MapRGB(winsurf->format, 10, 27, 71));
+		SDL_BlitSurface(renderer_scr, NULL, renderer_hires_temp, NULL);
+		SDL_Rect r = {0, 0, RENDERER_WIDTH * 3, RENDERER_HEIGHT * 3};
+		if (renderer_fullscreen) {
+			SDL_DisplayMode dm;
+			SDL_GetCurrentDisplayMode(0, &dm);
+			r.h = dm.h;
+			r.w = dm.h / 3 * 4;
+			r.x = (dm.w - r.w) / 2;
+			r.y = 0;
+		}
+		SDL_BlitScaled(renderer_hires_temp, NULL, winsurf, &r);
 		//SDL_Surface *temp_scr = SDL_CreateRGBSurface(0, RENDERER_WIDTH * 2, RENDERER_HEIGHT * 2, 32, 0, 0, 0, 0);
-		SDL_Surface *wsurf = SDL_GetWindowSurface(renderer_win);
-		Uint32 colors[256];
-		{
-			SDL_Color *unconvcols = renderer_scr->format->palette->colors;
-			for (int i = 0; i < 256; i++)
-			{
-				colors[i] = SDL_MapRGBA(
-					wsurf->format,
-					unconvcols[i].r,
-					unconvcols[i].g,
-					unconvcols[i].b,
-					0xff
-				);
-			}
-		}
-		Uint32 *dst = (Uint32 *)wsurf->pixels;
-		Uint8 *src = (Uint8 *)renderer_scr->pixels;
-		int x = 0, y = 0;
+		//SDL_Surface *wsurf = SDL_GetWindowSurface(renderer_win);
+		//Uint32 colors[256];
+		//{
+		//	SDL_Color *unconvcols = renderer_scr->format->palette->colors;
+		//	for (int i = 0; i < 256; i++)
+		//	{
+		//		colors[i] = SDL_MapRGBA(
+		//			wsurf->format,
+		//			unconvcols[i].r,
+		//			unconvcols[i].g,
+		//			unconvcols[i].b,
+		//			0xff
+		//		);
+		//	}
+		//}
+		//Uint32 *dst = (Uint32 *)wsurf->pixels;
+		//Uint8 *src = (Uint8 *)renderer_scr->pixels;
+		//int x = 0, y = 0;
 
-#define REPEAT8(X) X X X X X X X X
-#define REPEAT16(X) REPEAT8(X) REPEAT8(X)
-#define REPEAT32(X) REPEAT16(X) REPEAT16(X)
-#define REPEAT64(X) REPEAT32(X) REPEAT32(X)
-#define REPEATWIDTH(X) REPEAT64(X) REPEAT64(X) REPEAT64(X) REPEAT64(X) REPEAT64(X)
-		for (; y < RENDERER_HEIGHT;)
-		{
-			REPEATWIDTH(
-				*dst = colors[*src];
-				dst++;
-				*dst = colors[*src];
-				src++; dst++;
-			)
-			src -= RENDERER_WIDTH;
-			REPEATWIDTH(
-				*dst = colors[*src];
-				dst++;
-				*dst = colors[*src];
-				src++; dst++;
-			)
-			y++;
-		}
+//#define REPEAT8(X) X X X X X X X X
+//#define REPEAT16(X) REPEAT8(X) REPEAT8(X)
+//#define REPEAT32(X) REPEAT16(X) REPEAT16(X)
+//#define REPEAT64(X) REPEAT32(X) REPEAT32(X)
+//#define REPEATWIDTH(X) REPEAT64(X) REPEAT64(X) REPEAT64(X) REPEAT64(X) REPEAT64(X)
+		//for (; y < RENDERER_HEIGHT;)
+		//{
+		//	REPEATWIDTH(
+		//		*dst = colors[*src];
+		//		dst++;
+		//		*dst = colors[*src];
+		//		src++; dst++;
+		//	)
+		//	src -= RENDERER_WIDTH;
+		//	REPEATWIDTH(
+		//		*dst = colors[*src];
+		//		dst++;
+		//		*dst = colors[*src];
+		//		src++; dst++;
+		//	)
+		//	y++;
+		//}
 		//SDL_BlitSurface(renderer_hires_temp, NULL, SDL_GetWindowSurface(renderer_win), NULL);
 		/*SDL_PixelFormat *screen_format = renderer_scr->format;
 		Uint32 *pixels = (Uint32 *)(renderer_hires_temp->pixels);
@@ -229,8 +244,15 @@ static void Renderer_UpdateWindowFromSettings(void)
 	int height = RENDERER_HEIGHT;
 	if (renderer_hires_mode)
 	{
-		width *= 2;
-		height *= 2;
+		width *= 3;
+		height *= 3;
+	}
+	if (renderer_fullscreen) {
+		// non 4 by 3 aspect ratio assume width is more than height
+		SDL_DisplayMode dm;
+		SDL_GetCurrentDisplayMode(0, &dm);
+		height = dm.h;
+		width = dm.w;
 	}
 	//if (renderer_hires_temp != NULL) SDL_FreeSurface(renderer_hires_temp);
 	if (renderer_win != NULL) SDL_DestroyWindow(renderer_win);
@@ -249,7 +271,7 @@ static void Renderer_UpdateWindowFromSettings(void)
 	else
 	{
 		SDL_FreeSurface(renderer_hires_temp);
-		renderer_hires_temp = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGBA32);
+		renderer_hires_temp = SDL_CreateRGBSurfaceWithFormat(0, RENDERER_WIDTH, RENDERER_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
 		SDL_ConvertSurfaceFormat(SDL_GetWindowSurface(renderer_win), SDL_PIXELFORMAT_RGBA32, 0);
 	}
 }

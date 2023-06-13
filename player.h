@@ -10,10 +10,12 @@
 #define PLAYER_ANIM_MELEE 4
 #define PLAYER_ANIM_JUMP_END 4
 #define PLAYER_ANIM_HURT 5
-#define PLAYER_ANIM_MAX 6
+#define PLAYER_ANIM_SLIDE 6
+#define PLAYER_ANIM_MAX 7
 
 #define PLAYER_HP_NORMAL_MAX 200
 #define PLAYER_HP_MAX 1000
+#define PLAYER_FINISH_TIMER (30*10)
 
 #define PLAYER_UPGRADE_NONE 0
 #define PLAYER_UPGRADE_SHOES 1
@@ -78,6 +80,9 @@ typedef struct _PLAYER_LOCAL_DATA
 	int created_vortexes_id;
 	unsigned int score;
 	int offhand_item;
+	int finish_timer;
+	float grav, grav_add;
+	int is_sliding;
 } PLAYER_LOCAL_DATA;
 
 void WobjPlayer_Create(WOBJ *wobj);

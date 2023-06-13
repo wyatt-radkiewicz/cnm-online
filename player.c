@@ -33,6 +33,7 @@ static int anim_lengths1[PLAYER_ANIM_MAX] =
 	1, // shooting
 	1, // melee
 	1, // hurt
+	1, // slide
 };
 static int anim_lengths2[PLAYER_ANIM_MAX] =
 {
@@ -42,6 +43,7 @@ static int anim_lengths2[PLAYER_ANIM_MAX] =
 	2, // jumping1
 	2, // jumping2
 	1, // hurt
+	2, // slide
 };
 static int anim_offsets[PLAYER_ANIM_MAX][6][2] = 
 {
@@ -62,7 +64,10 @@ static int anim_offsets[PLAYER_ANIM_MAX][6][2] =
 	},
 	{ // hurt
 		{0, 32}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
-	}
+	},
+	{ // slide
+		{64, 32}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
+	},
 };
 int skin_bases[10][2] =
 {
@@ -146,6 +151,8 @@ void WobjPlayer_Create(WOBJ *wobj)
 
 	local_data->upgrade_state = PLAYER_UPGRADE_NONE;
 	local_data->fire_resistance = 0;
+	local_data->grav = Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+	local_data->grav_add = 0.0f;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
@@ -153,19 +160,29 @@ void WobjPlayer_Update(WOBJ *wobj)
 {
 	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
 
-	if (Game_GetVar(GAME_VAR_NOCLIP)->data.integer)
+	// Finishing and noclipping
+	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
+		local_data->finish_timer++;
+		//if (local_data->finish_timer > PLAYER_FINISH_TIMER) {
+		//	//local_data->currframe = 0;
+		//	//wobj->anim_frame = 0;
+		//}
+	}
+	if (Game_GetVar(GAME_VAR_NOCLIP)->data.integer || local_data->finish_timer > 0)
 	{
 		float spd = wobj->speed * 2.0f;
-		if (Input_GetButton(INPUT_DROP, INPUT_STATE_PLAYING))
+		if (Input_GetButton(INPUT_DROP, INPUT_STATE_PLAYING) && local_data->finish_timer <= 0)
 			spd *= 3.0f;
-		if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING))
-			wobj->x += spd;
-		if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING))
-			wobj->y += spd;
-		if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING))
-			wobj->x -= spd;
-		if (Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING))
-			wobj->y -= spd;
+		if (local_data->finish_timer == 0 || local_data->finish_timer > PLAYER_FINISH_TIMER) {
+			if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING))
+				wobj->x += spd;
+			if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING))
+				wobj->y += spd;
+			if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING))
+				wobj->x -= spd;
+			if (Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING))
+				wobj->y -= spd;
+		}
 		return;
 	}
 	
@@ -211,12 +228,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 
 	final_speed = wobj->speed;
 	final_jmp = wobj->jump;
-	final_grav = Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+	final_grav = local_data->grav + local_data->grav_add;
 	if (local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER)
 	{
 		final_speed *= maxpowerinfos[local_data->mpoverride].spd;
 		final_jmp *= maxpowerinfos[local_data->mpoverride].jmp;
 		final_grav *= maxpowerinfos[local_data->mpoverride].grav;
+	}
+	if (local_data->is_sliding) {
+		accel = 0.3f;
+		dec = 0.2f;
 	}
 
 	if (local_data->animforce_cooldown_timer-- <= 0)
@@ -225,6 +246,13 @@ void WobjPlayer_Update(WOBJ *wobj)
 	// Water things
 	if (!local_data->vortexed_mode)
 	{
+		BLOCK_PROPS *ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
+		if (ice_props->dmg_type != BLOCK_DMG_TYPE_ICE)
+			ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
+		if (ice_props->dmg_type == BLOCK_DMG_TYPE_ICE) {
+			accel *= (float)ice_props->dmg / 100.0f;
+			dec *= (float)ice_props->dmg / 100.0f;
+		}
 		local_data->last_in_water = local_data->in_water;
 		BLOCK_PROPS *water_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE));
 		local_data->in_water = water_props->dmg_type == BLOCK_DMG_TYPE_LAVA;
@@ -246,6 +274,15 @@ void WobjPlayer_Update(WOBJ *wobj)
 				final_speed *= 0.8f;
 				accel *= 2.5f;
 			}
+			if (wobj->vel_y > -wobj->jump / 4.0f) {
+				if (!Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) && !Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
+					local_data->grav_add += 0.05f;
+				} else {
+					local_data->grav_add = 0.0f;
+				}
+			}
+		} else {
+			local_data->grav_add = 0.0f;
 		}
 		if (local_data->in_water != local_data->last_in_water)
 			Interaction_CreateWobj(WOBJ_WATER_SPLASH_EFFECT, wobj->x, wobj->y - 16.0f, 0, 0.0f);
@@ -253,9 +290,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) && wobj->vel_x < final_speed)
 		{
 			//if (wobj->vel_x < final_speed) {
-			if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x += accel * 4.0f;
-			else if (wobj->vel_x < 0.0) wobj->vel_x += accel * 3.0f;
-			else wobj->vel_x += accel;
+			if (!local_data->is_sliding || (wobj->vel_x < 0.0f)) {
+				if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x += accel * 4.0f;
+				else if (wobj->vel_x < 0.0) wobj->vel_x += accel * 3.0f;
+				else wobj->vel_x += accel;
+			}
 			//}
 			//if (Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING) ||
 			//	Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING))
@@ -273,9 +312,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) && wobj->vel_x > -final_speed)
 		{
 			//if (wobj->vel_x > -final_speed) {
-			if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 4.0f;
-			else if (wobj->vel_x > 0.0) wobj->vel_x -= accel * 3.0f;
-			else wobj->vel_x -= accel;
+			if (!local_data->is_sliding || (wobj->vel_x < 0.0f)) {
+				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 4.0f;
+				else if (wobj->vel_x > 0.0) wobj->vel_x -= accel * 3.0f;
+				else wobj->vel_x -= accel;
+			}
 			//}
 			//if (Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
 			//	Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING))
@@ -310,11 +351,29 @@ void WobjPlayer_Update(WOBJ *wobj)
 					local_data->animspd = 0;
 			}
 		}
+
+		if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && (wobj->vel_x > 2.0f || wobj->vel_x < -2.0f) && !local_data->is_sliding) {
+			wobj->vel_x *= 2.0f;
+			local_data->is_sliding = CNM_TRUE;
+		}
+		if (local_data->is_sliding) {
+			if (wobj->vel_x > dec) {
+				wobj->vel_x -= dec;
+			} else if (wobj->vel_x < -dec) {
+				wobj->vel_x += dec;
+			} else {
+				wobj->vel_x = 0.0f;
+			}
+			float absvelx = wobj->vel_x < 0.0f ? -wobj->vel_x : wobj->vel_x;
+			if (absvelx < 1.5f || !Wobj_IsGrouneded(wobj)) {
+				local_data->is_sliding = CNM_FALSE;
+			}
+		}
 	
 		if ((Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
 			Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING)) &&
 			(!Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) &&
-			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING))) {
+			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding) {
 			//wobj->vel_x = 0.0f;
 			if (wobj->vel_x > dec) {
 				wobj->vel_x -= dec;
@@ -326,7 +385,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 
 		if (!(Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
-			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)))
+			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding)
 		{
 			if (wobj->vel_x > dec)
 				wobj->vel_x -= dec;
@@ -620,6 +679,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_HEALTH_SET_TRIGGER);
 	if (other != NULL)
 		wobj->health = other->custom_floats[0];
+	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_GRAV_TRIGGER);
+	if (other != NULL)
+		local_data->grav = other->custom_floats[0];
+	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_FINISH_TRIGGER);
+	if (other != NULL) {
+		Audio_PlayMusic(2, CNM_FALSE);
+		wobj->flags |= WOBJ_HAS_PLAYER_FINISHED;
+	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BGSPEED_X);
 	if (other != NULL)
 		Background_GetLayer(other->custom_ints[0])->speed[0] = other->custom_floats[0];
@@ -866,7 +933,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 		else
 			wobj->flags |= WOBJ_DAMAGE_INDICATE;
 	}
-	
+
+	if (local_data->is_sliding) {
+		local_data->curranim = PLAYER_ANIM_SLIDE;
+		local_data->animspd = 2;
+	}
 	if (!Wobj_IsGrouneded(wobj) && !local_data->animforce_cooldown)
 	{
 		if (local_data->curranim != PLAYER_ANIM_JUMP)
@@ -1066,6 +1137,10 @@ static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame)
 		r->y = 4608+dy*40;
 		r->w = 40;
 		r->h = 40;
+		if (anim == PLAYER_ANIM_SLIDE) {
+			r->x = 40 + frame * 40;
+			r->y = 4278;
+		}
 	}
 }
 static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
@@ -1107,6 +1182,11 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 	);
 	//wobj->flags &= WOBJ_DAMAGE_INDICATE;
 
+	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
+		Util_SetRect(&r, 384, 32, 32, 32);
+		Renderer_DrawBitmap((int)wobj->x - camx - skin9offsetx, (int)wobj->y - camy - skin9offsety - 32, &r, 0, RENDERER_LIGHT);
+	}
+	
 	if (Game_GetFrame() % 3 == 0)
 		wobj->flags &= ~WOBJ_DAMAGE_INDICATE;
 
@@ -1438,4 +1518,29 @@ void Player_DrawHUD(WOBJ *player) {
 	}
 	
 	StepAndDrawParticles();
+
+	// draw finish hud
+	if (player->flags & WOBJ_HAS_PLAYER_FINISHED && local_data->finish_timer < PLAYER_FINISH_TIMER) {
+		int par = Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer;
+		int score = local_data->score;
+		int time_score = 20 - (Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer / (30 * 60));
+		if (time_score < 0) time_score = 0;
+		time_score *= 100 * 85;
+		int rank = (int)((float)(score + time_score) / (float)par * 4.0);
+		if (rank > 4) rank = 4;
+		bx = RENDERER_WIDTH / 2 - 64, by = RENDERER_HEIGHT / 2 - 40;
+		Util_SetRect(&r, 128, 2432, 32, 32);
+		if (local_data->finish_timer < PLAYER_FINISH_TIMER / 4) {
+			r.y += Util_RandInt(0, 4) * 32;
+		} else {
+			r.y += rank * 32;
+		}
+		Renderer_DrawBitmap(bx + 80, by + 32, &r, 0, RENDERER_LIGHT);
+		Util_SetRect(&r, 0, 2432, 128, 80);
+		Renderer_DrawBitmap(bx, by, &r, 0, RENDERER_LIGHT);
+		Renderer_DrawText(bx + 4, by + 8, 0, RENDERER_LIGHT, "SCORE: %d", score);
+		Renderer_DrawText(bx + 4, by + 16, 0, RENDERER_LIGHT, "TIME BONUS: %d", time_score);
+		Renderer_DrawText(bx + 4, by + 24, 0, RENDERER_LIGHT, "TOTAL: %d", score + time_score);
+		Renderer_DrawText(bx + 4, by + 32, 0, RENDERER_LIGHT, "A-RANK: %d", par);
+	}
 }

@@ -1391,13 +1391,23 @@ void WobjSuperDragonBoss_Update(WOBJ *wobj)
 	{
 		if (Game_GetFrame() % 6 == 0)
 		{
+			WOBJ *np = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+			float shoot_ang = atan2f(np->y - wobj->y, np->x - wobj->x);
 			Interaction_CreateWobj
 			(
 				WOBJ_FIREBALL,
 				wobj->x + 64.0f,
 				wobj->y + (float)Util_RandInt(0, 128),
 				0,
-				((wobj->flags & WOBJ_HFLIP) ? CNM_PI : 0.0f)
+				shoot_ang
+			);
+			Interaction_CreateWobj
+			(
+				WOBJ_FIREBALL,
+				wobj->x + 64.0f,
+				wobj->y + (float)Util_RandInt(0, 128),
+				0,
+				shoot_ang + 0.5f
 			);
 		}
 
@@ -1444,9 +1454,9 @@ void WobjSuperDragonBoss_Update(WOBJ *wobj)
 	else if (data->state == SUPER_DRAGON_STATE_TAKINGOFF)
 	{
 		const float spd = 8.0f;
-		if (wobj->x > data->origin_x)
+		if (wobj->x > data->origin_x + 250.0f)
 			wobj->x -= spd;
-		if (wobj->x < data->origin_x)
+		if (wobj->x < data->origin_x + 250.0f)
 			wobj->x += spd;
 		if (wobj->y > data->origin_y)
 			wobj->y -= spd;

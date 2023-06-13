@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "console.h"
+#include "filesystem.h"
 #include "renderer.h"
 #include "blocks.h"
 #include "serial.h"
@@ -62,6 +63,11 @@ void World_Start(int mode)
 	BossBar_Init();
 	Player_ResetHUD();
 
+	// Misc game global vars
+	Game_GetVar(GAME_VAR_GRAVITY)->data.decimal = 0.5f;
+	Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer = 0;
+	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(Filesystem_GetLevelIdFromName(Game_GetVar(GAME_VAR_LEVEL)->data.string));
+
 	// Make sure the player is the first thing created as some other entities might depend on it for creation
 	PlayerSpawns_SetMode(PLAYER_SPAWN_TYPE_NORMAL_MODES);
 	player = Wobj_CreateOwned(WOBJ_PLAYER, 0.0f, 0.0f, Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer, 0.0f);
@@ -69,7 +75,6 @@ void World_Start(int mode)
 
 	// Updating and getting world variables
 	Game_GetVar(GAME_VAR_PLAYER)->data.pointer = player;
-	Game_GetVar(GAME_VAR_GRAVITY)->data.decimal = 0.5f;
 
 	// Initialize the spawner multi/single-player mode
 	if (mode == WORLD_MODE_SINGLEPLAYER)
@@ -137,6 +142,9 @@ void World_Update(int mode)
 	int x, y, camx, camy;
 
 	// Misc updates
+	if (~player->flags & WOBJ_HAS_PLAYER_FINISHED) {
+		Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer++;
+	}
 	Audio_SetListenerOrigin((int)player->x, (int)player->y);
 	Dialoge_Update();
 	

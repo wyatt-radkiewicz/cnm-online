@@ -17,6 +17,7 @@ static char level_names[FILESYSTEM_MAX_LEVELS][UTIL_MAX_TEXT_WIDTH + 1];
 CNM_RECT level_previews[FILESYSTEM_MAX_LEVELS];
 static int level_order[FILESYSTEM_MAX_LEVELS];
 static int level_diffs[FILESYSTEM_MAX_LEVELS];
+static int level_pars[FILESYSTEM_MAX_LEVELS];
 static int num_levels;
 
 static FILESYSTEM_REGISTERED_FILE bmp_file, cnma_file, cnmb_file, cnms_file;
@@ -34,6 +35,12 @@ const char *FileSystem_GetLevelName(int level)
 {
 	return level_names[level];
 }
+int FileSystem_GetLevelParScore(int level) {
+	return level_pars[level];
+}
+void FileSystem_SetLevelParScore(int level, int par) {
+	level_pars[level] = par;
+}
 int FileSystem_GetLevelDifficulty(int level)
 {
 	if (level_diffs[level] > 9)
@@ -49,7 +56,7 @@ void FileSystem_ResetLevelOrderBuffer(void)
 	for (int i = 0; i < FILESYSTEM_MAX_LEVELS; i++)
 		level_order[i] = i;
 }
-void FileSystem_AddLevelToLevelOrder(const char *levelname)
+int FileSystem_AddLevelToLevelOrder(const char *levelname)
 {
 	// First search up the index of the level name
 	int lvl_index = -1;
@@ -63,7 +70,7 @@ void FileSystem_AddLevelToLevelOrder(const char *levelname)
 			}
 		}
 		if (lvl_index == -1)
-			return;
+			return -1;
 	}
 
 	// Find the index of the old level order in the level order array
@@ -78,16 +85,26 @@ void FileSystem_AddLevelToLevelOrder(const char *levelname)
 			}
 		}
 		if (ordered_index == -1)
-			return;
+			return lvl_index;
 	}
 
 	// Next move everything in front of it forward 1
 	memmove(level_order + 1, level_order, ordered_index * sizeof(int));
 	level_order[0] = lvl_index;
+	return lvl_index;
 }
 int FileSystem_GetLevelFromLevelOrder(int level)
 {
 	return level_order[level];
+}
+int Filesystem_GetLevelIdFromName(const char *levelname) {
+	int id = 0;
+	for (int i = 0; i < FILESYSTEM_MAX_LEVELS; i++) {
+		if (strcmp(levelname, level_names[i]) == 0) {
+			id = i;
+		}
+	}
+	return id;
 }
 
 void FileSystem_Init(void)

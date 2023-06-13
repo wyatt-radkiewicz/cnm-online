@@ -154,6 +154,8 @@ typedef enum _WOBJ_TYPES
 	WOBJ_LUA15,
 	WOBJ_NOUPGRADE_TRIGGER,
 	WOBJ_FINISH_TRIGGER,
+	WOBJ_SHOTGUN_PEL,
+	WOBJ_GRAV_TRIGGER,
 	WOBJ_MAX
 } WOBJ_TYPES;
 
@@ -179,6 +181,7 @@ typedef enum _WOBJ_TYPES
 #define WOBJ_DONT_DRAW		(1 << 18)
 #define WOBJ_PLAYER_IS_RESPAWNING (1 << 19)
 #define WOBJ_IS_PLAYER_BULLET (1 << 20)
+#define WOBJ_HAS_PLAYER_FINISHED (1 << 21)
 
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
 #define Wobj_DamageLighting(w, l) (((w)->flags & WOBJ_DAMAGE_INDICATE) ? 0 : (l))

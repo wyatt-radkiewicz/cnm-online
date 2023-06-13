@@ -28,23 +28,6 @@
     },
     {
       "pos": [
-        319.27545,
-        256.0
-      ],
-      "type_data": {
-        "BozoLaserMinion": {
-          "speed": 2.0
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null
-    },
-    {
-      "pos": [
         48.0,
         200.0
       ],
@@ -72,6 +55,113 @@
           "vertical": false,
           "dist": 128,
           "speed": -3.0
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null
+    },
+    {
+      "pos": [
+        671.823,
+        224.0
+      ],
+      "type_data": "FinishTrigger",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null
+    },
+    {
+      "pos": [
+        672.0,
+        191.63773
+      ],
+      "type_data": "FinishTrigger",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null
+    },
+    {
+      "pos": [
+        671.823,
+        160.0
+      ],
+      "type_data": "FinishTrigger",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null
+    },
+    {
+      "pos": [
+        120.0,
+        288.0
+      ],
+      "type_data": {
+        "DroppedItem": {
+          "item": "GoldenAxe"
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null
+    },
+    {
+      "pos": [
+        336.0,
+        256.0
+      ],
+      "type_data": {
+        "Slime": {
+          "flying": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 1.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 5
+      },
+      "dropped_item": null
+    },
+    {
+      "pos": [
+        288.0,
+        256.0
+      ],
+      "type_data": {
+        "GravityTrigger": {
+          "gravity": 0.2
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null
+    },
+    {
+      "pos": [
+        288.0,
+        288.0
+      ],
+      "type_data": {
+        "GravityTrigger": {
+          "gravity": 0.2
         }
       },
       "spawning_criteria": {

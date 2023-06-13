@@ -608,6 +608,7 @@ static void Command_ActivateSupervirus(const char *args)
 		return;
 	WOBJ *p = (WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer = 1;
+	Audio_PlayMusic(AUDIO_MAX_IDS - 1, CNM_TRUE);
 	Interaction_CreateWobj(WOBJ_SUPERVIRUS, p->x - 160.0f, p->y - 160.0f, 0, 0.0f);
 	Interaction_CreateWobj(WOBJ_SUPERVIRUS, p->x + 160.0f, p->y - 160.0f, 0, 0.0f);
 	Interaction_CreateWobj(WOBJ_SUPERVIRUS, p->x - 160.0f, p->y + 160.0f, 0, 0.0f);

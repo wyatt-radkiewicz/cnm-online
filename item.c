@@ -8,6 +8,7 @@
 #include "input.h"
 #include "player.h"
 #include "audio.h"
+#include "utility.h"
 
 //static void NULL(ITEM *item, WOBJ *player, int camx, int camy);
 static void ItemGeneric_MusleFlash(ITEM *item, WOBJ* player);
@@ -272,7 +273,7 @@ ITEM_TYPE item_types[] =
 		ItemGeneric_MusleFlash, // Update
 		NULL, // On Pickup
 		ItemShotgun_OnDrop, // On Drop
-		ItemGoldenShotgun_OnUse, // On Use
+		ItemShotgun_OnUse, // On Use
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM // Generic dropped item object
@@ -342,7 +343,7 @@ ITEM_TYPE item_types[] =
 		ItemGeneric_MusleFlash, // Update
 		NULL, // On Pickup
 		ItemShotgun_OnDrop, // On Drop
-		ItemAWP_OnUse, // On Use
+		ItemSniper_OnUse, // On Use
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
@@ -408,7 +409,7 @@ ITEM_TYPE item_types[] =
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
 	},
 	{ // 34: Heavy Hammer
-		{92, 480, 32, 32},
+		{96, 480, 32, 32},
 		ItemHeavyHammer_OnUpdate, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -561,10 +562,10 @@ void Item_TryUse(WOBJ *player)
 {
 	if (player->item != ITEM_TYPE_NOITEM)
 	{
-		if (item_types[player->item].use_on_held && Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING))
+		if (item_types[player->item].use_on_held && Input_GetButton(INPUT_FIRE, INPUT_STATE_PLAYING))
 			Item_Use(player);
 		else if (!item_types[player->item].use_on_held && 
-				 Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING))
+				 Input_GetButtonPressed(INPUT_FIRE, INPUT_STATE_PLAYING))
 			Item_Use(player);
 	}
 }
@@ -599,14 +600,33 @@ static void ItemGeneric_MusleFlash(ITEM *item, WOBJ *player)
 
 static void ItemShotgun_OnUse(ITEM *shotgun, WOBJ *player)
 {
-	WOBJ *w = Interaction_CreateWobj(WOBJ_PLAYER_PELLET,
-									 player->x, player->y, 0,
-									 (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f);
-	w->strength = player->strength + 0.02f;
-	Interaction_PlaySound(player, 0);
-	shotgun->use_timer = 10;
-	shotgun->custom_timer = 10;
+	//WOBJ *w = Interaction_CreateWobj(WOBJ_PLAYER_PELLET,
+	//								 player->x, player->y, 0,
+	//								 (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f);
+	//w->strength = player->strength + 0.02f;
+	//Interaction_PlaySound(player, 0);
+	//shotgun->use_timer = 10;
+	//shotgun->custom_timer = 15;
+	//Player_PlayShootAnim(player);
+
+	int numbullets = 8 - (shotgun->custom_timer < 0 ? 0 : shotgun->custom_timer / 5);
+	if (numbullets < 3) numbullets = 3;
+	float spread = (float)shotgun->custom_timer / 2.0f;
+	float dir = (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f;
+	if (spread < 0.0f) spread = 0.0f;
+	spread += 1.0f;
+	for (int i = 0; i < numbullets; i++) {
+		WOBJ *pel = Interaction_CreateWobj(WOBJ_SHOTGUN_PEL, player->x + 16.0f, player->y + 12.0f, 0, 0.0f);
+		pel->strength = player->strength + 0.01f;
+		if (shotgun->type == ITEM_TYPE_GOLDEN_SHOTGUN) pel->strength += 0.1f;
+		pel->y += spread * 2.0f - (spread / 2.0f);
+		pel->vel_x = player->vel_x + dir * 20.0 * (Util_RandFloat() * 0.25 + 0.75);
+		pel->vel_y = player->vel_y + (Util_RandFloat() * 2.0f - 1.0f) * spread;
+	}
 	Player_PlayShootAnim(player);
+	Interaction_PlaySound(player, 0);
+	shotgun->custom_timer = 20+10;
+	shotgun->use_timer = 10;
 }
 static void ItemShotgun_OnDrop(ITEM *shotgun, WOBJ *player)
 {
@@ -615,19 +635,52 @@ static void ItemShotgun_OnDrop(ITEM *shotgun, WOBJ *player)
 
 static void ItemSniper_OnUse(ITEM *shotgun, WOBJ *player)
 {
-	WOBJ *w = Interaction_CreateWobj(WOBJ_PLAYER_PELLET,
-									 player->x, player->y, 0,
-									 (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f);
-	w->speed = 16.0f;
-	w->strength = player->strength + 0.5f;
-	Interaction_PlaySound(player, 11);
-	shotgun->use_timer = 15;
-	shotgun->custom_timer = 10;
+	//WOBJ *w = Interaction_CreateWobj(WOBJ_PLAYER_PELLET,
+	//								 player->x, player->y, 0,
+	//								 (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f);
+	//w->speed = 16.0f;
+	//w->strength = player->strength + 0.5f;
+	//Interaction_PlaySound(player, 11);
+	//shotgun->use_timer = 15;
+	//shotgun->custom_timer = 10;
 
+	//if (player->flags & WOBJ_HFLIP)
+	//	player->vel_x += 3.0f;
+	//else
+	//	player->vel_x -= 3.0f;
+
+	float dmg_mul = 1.0f - CNM_MAX((float)shotgun->custom_timer + 8.0f, 0.0f) / 20.0f; 
+	float spread = (float)shotgun->custom_timer / 2.25f;
+	float dir = (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f;
+	if (spread < 0.0f) spread = 0.0f;
+	float sprd_rnd = (Util_RandFloat() * 2.0f - 1.0f);
+	for (int i = 0; i < (shotgun->type == ITEM_TYPE_AWP ? 5 : 1); i++) {
+		WOBJ *pel = Interaction_CreateWobj(WOBJ_SHOTGUN_PEL, player->x + 16.0f, player->y + 13.0f, 0, 0.0f);
+		pel->strength = player->strength + (1.0f * dmg_mul);
+		pel->anim_frame = 1;
+		if (shotgun->type == ITEM_TYPE_AWP) {
+			pel->x -= 11.0f;
+			pel->x += (float)i * 5.0f;
+			pel->custom_floats[1] = 0.35f;
+		} else {
+			pel->custom_floats[1] = 0.8f;
+		}
+		pel->y += spread * 2.0f - (spread / 2.0f);
+		pel->vel_x = player->vel_x + dir * 20.0;
+		pel->vel_y = player->vel_y + sprd_rnd * spread;
+		pel->speed = 0.01f;
+		if (player->flags & WOBJ_HFLIP) pel->flags |= WOBJ_HFLIP;
+	}
+	Player_PlayShootAnim(player);
+	Interaction_PlaySound(player, 11);
+	shotgun->custom_timer = 37;
+	shotgun->use_timer = 25;
+
+	float knockback = (shotgun->type == ITEM_TYPE_AWP) ? 5.0f : 3.0f;
 	if (player->flags & WOBJ_HFLIP)
-		player->vel_x += 3.0f;
+		player->vel_x += knockback;
 	else
-		player->vel_x -= 3.0f;
+		player->vel_x -= knockback;
 }
 
 static void ItemAWP_OnUse(ITEM *awp, WOBJ *player)
@@ -660,51 +713,82 @@ static void ItemGenericMelee_Update(ITEM *melee, WOBJ *player)
 	switch (melee->type)
 	{
 	case ITEM_TYPE_KNIFE:
-		strength_mul[0] = 0.0f;
-		strength_mul[1] = 0.0f;
+		strength_mul[0] = 0.85f;
+		strength_mul[1] = 0.5f;
 		range = 28.0f;
 		break;
 	case ITEM_TYPE_SWORD:
-		strength_mul[0] = 0.12f;
-		strength_mul[1] = 0.12f;
+		strength_mul[0] = 1.75f;
+		strength_mul[1] = 1.0f;
 		range = 32.0f;
 		break;
 	case ITEM_TYPE_GOLDEN_AXE:
-		strength_mul[0] = 0.5f;
-		strength_mul[1] = 0.5f;
+		strength_mul[0] = 5.0f;
+		strength_mul[1] = 3.75f;
 		range = 40.0f;
 		break;
 	}
 
-	if (!melee->last_in_use && melee->in_use)
-	{
-		Interaction_PlaySound(player, 2);
-		obj->strength = player->strength + strength_mul[0];
+	if (melee->custom_timer > 0) return;
+	if (melee->custom_timer == 0) {
+		melee->custom_floats[0] = -1.0f;
 	}
-	else
-	{
-		obj->strength = player->strength + strength_mul[1];
+	if (melee->in_use && !melee->custom_ints[0]) {
+		if (melee->custom_floats[0] <= 0.0f) {
+			melee->custom_floats[0] = 0.5f * CNM_PI;
+		}
+		melee->custom_floats[0] += 4.0f / 180.0f * CNM_PI;
+		if (melee->custom_floats[0] >= 0.9f * CNM_PI) {
+			melee->custom_timer = 20;
+			obj->x = player->x;
+			obj->y = player->y;
+			obj->hitbox.w = 0.0f;
+			obj->hitbox.h = 0.0f;
+			obj->anim_frame = 1;
+			Wobj_UpdateGridPos(obj);
+			return;
+		}
+	}
+	if (melee->last_in_use && !melee->in_use && !melee->custom_ints[0]) {
+		melee->custom_ints[0] = 1;
+		Interaction_PlaySound(player, 2);
+		player->vel_x *= 0.6f;
+		player->vel_y *= 0.6f;
+		melee->custom_floats[1] = (melee->custom_floats[0] - (0.5f * CNM_PI)) / 0.9f * 0.8f + 0.5f;
+		melee->custom_floats[0] = 0.5f * CNM_PI;
 	}
 
-	if (melee->in_use)
-	{
-		if (player->flags & WOBJ_HFLIP)
-			obj->x = player->x - range;
-		else
-			obj->x = player->x + range;
-		obj->flags = (obj->flags & ~WOBJ_HFLIP) | (player->flags & WOBJ_HFLIP);
-		obj->y = player->y;
+	if (melee->custom_ints[0]) {
+		if (melee->custom_floats[0] >= 45.0f) {
+			obj->strength = player->strength + strength_mul[0] * melee->custom_floats[1];
+		} else {
+			obj->strength = player->strength + strength_mul[1] * melee->custom_floats[1];
+		}
+		if (melee->custom_floats[0] <= 0.0f) {
+			melee->custom_ints[0] = 0;
+		}
+		melee->custom_floats[0] -= 18.0f / 180.0f * CNM_PI;
 		obj->hitbox.w = 32.0f;
 		obj->hitbox.h = 32.0f;
-		obj->anim_frame = 0;
-		Wobj_UpdateGridPos(obj);
-	}
-	else
-	{
+	} else {
 		obj->hitbox.w = 0.0f;
 		obj->hitbox.h = 0.0f;
-		obj->anim_frame = 1;
 	}
+
+	if (melee->custom_floats[0] <= 0.0f) {
+		obj->x = player->x;
+		obj->y = player->y;
+		obj->anim_frame = 1;
+	} else {
+		if (player->flags & WOBJ_HFLIP)
+			obj->x = player->x - cosf(melee->custom_floats[0]) * range;
+		else
+			obj->x = player->x + cosf(melee->custom_floats[0]) * range;
+		obj->flags = (obj->flags & ~WOBJ_HFLIP) | (player->flags & WOBJ_HFLIP);
+		obj->y = player->y - sinf(melee->custom_floats[0]) * range * (2.0f / 3.0f);
+		obj->anim_frame = 0;
+	}
+	Wobj_UpdateGridPos(obj);
 }
 static void ItemGenericMelee_OnPickup(ITEM *melee, WOBJ *player)
 {
@@ -739,10 +823,12 @@ static void ItemUltraSword_OnUpdate(ITEM *sword, WOBJ *player)
 		case 3: b->anim_frame = 3; break;
 		default: b->anim_frame = 0; break;
 		}
-		b->flags |= WOBJ_IS_PLAYER_WEAPON;
-		b->strength = player->strength + 0.17f;
+		b->flags |= WOBJ_IS_PLAYER_WEAPON | WOBJ_IS_PLAYER_BULLET;
+		b->strength = player->strength + 0.14f;
 		b->link_node = player->node_id;
 		b->link_uuid = player->uuid;
+		b->vel_x = player->vel_x / 3.0f;
+		b->vel_y = player->vel_y;
 	}
 }
 static void ItemUltraSword_OnUse(ITEM *sword, WOBJ *player)
@@ -1066,15 +1152,15 @@ static void ItemHeavyHammer_OnUse(ITEM *hammer, WOBJ *player)
 	hammer->melee_obj->link_node = player->node_id;
 	hammer->melee_obj->link_uuid = player->uuid;
 	hammer->melee_obj->strength = player->strength + 0.4f;
-	hammer->use_timer = 16;
+	hammer->use_timer = 14;
 	hammer->custom_ints[0] = hammer->melee_obj->node_id;
 	hammer->custom_ints[1] = hammer->melee_obj->uuid;
 	Player_PlayMeleeAnim(player);
 }
 static void ItemHeavyHammer_OnUpdate(ITEM *hammer, WOBJ *player)
 {
-	static const float x_offsets[3] = {-4.0f, 8.0f, 32.0f};
-	static const float y_offsets[3] = {-24.0f, -20.0f, 0.0f};
+	static const float x_offsets[6] = {-4.0f, 0.0f, 4.0f, 8.0f, 14.0f, 32.0f};
+	static const float y_offsets[6] = {-24.0f, -28.0f, -20.0f, -16.0f, -10.0f, 0.0f};
 
 	if (hammer->use_timer > 0)
 	{

@@ -110,7 +110,9 @@ static void BackgroundEditorButton(GUI_ELEMENT *elem, int index)
 }
 static void StartNewGame(GUI_ELEMENT *elem, int index)
 {
-	strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(FileSystem_GetLevelFromLevelOrder(startnewgame->elements[9].props.set_index)));
+	int id = FileSystem_GetLevelFromLevelOrder(startnewgame->elements[9].props.set_index);
+	strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
+	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
 	Game_SwitchState(GAME_STATE_SINGLEPLAYER);
 }
 static void JoinGameIpCallback(GUI_ELEMENT *elem, int index)

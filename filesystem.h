@@ -59,11 +59,14 @@ void FileSystem_SearchForLevels(int clear_level_list);
 const char *FileSystem_GetLevel(int level);
 const CNM_RECT *FileSystem_GetLevelPreview(int level);
 const char *FileSystem_GetLevelName(int level);
+void FileSystem_SetLevelParScore(int level, int par);
+int FileSystem_GetLevelParScore(int level);
 int FileSystem_GetLevelDifficulty(int level);
 int FileSystem_NumLevels(void);
 void FileSystem_ResetLevelOrderBuffer(void);
-void FileSystem_AddLevelToLevelOrder(const char *levelname);
+int FileSystem_AddLevelToLevelOrder(const char *levelname);
 int FileSystem_GetLevelFromLevelOrder(int level);
+int Filesystem_GetLevelIdFromName(const char *levelname);
 
 void FileSystem_Init(void);
 void FileSystem_RegisterGfx(const char *bmp_file);
