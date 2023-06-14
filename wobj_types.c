@@ -2459,9 +2459,9 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjBozoMk2_Create, // Create
 		WobjBozoMk2_Update, // Update
 		WobjGeneric_Draw, // Draw
-		NULL, // Hurt callback
+		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 2688, 64, 128},
+			{208, 2432, 48, 64},
 			{384+64, 2688, 64, 128}
 		},
 		0.05f, // Strength reward
@@ -3272,6 +3272,46 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{0, 0, 32, 32},
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE // Can respawn?
+	},
+	{ // 145: Enemy Rockets
+		WobjEnemyRocket_Create, // Create
+		WobjEnemyRocket_Update, // Update
+		WobjGeneric_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{96, 320, 32, 32},
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE // Can respawn?
+	},
+	{ // 146: Bozo Waypoint
+		WobjBozoWaypoint_Create, // Create
+		NULL, // Update
+		NULL, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{384, 2528, 32, 32},
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE // Can respawn?
+	},
+	{ // 147: Bozo Fireball
+		WobjBozoFireball_Create, // Create
+		WobjBozoFireball_Update, // Update
+		WobjFireball_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{96, 256, 32, 32},
+			{96, 256+32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward

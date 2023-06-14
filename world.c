@@ -50,6 +50,7 @@ void World_Start(int mode)
 	}
 
 	// Initialize things to defualt values
+	Enemies_Reset();
 	LogicLinks_ResetLinks();
 	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS - 1);
 	Spawners_UnloadSpawners();

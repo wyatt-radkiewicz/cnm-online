@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "console.h"
+#include "interaction.h"
 #include "wobj.h"
 //#include "pool.h"
 #include "obj_grid.h"
@@ -32,6 +33,7 @@ static WOBJ *search_map[WOBJ_SEARCH_MAP_SIZE];
 
 static void Wobj_FreeOwnedWobjAndRemove(WOBJ *wobj);
 
+static void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py);
 static WOBJ *WobjSearch_FindEntry(int node, int uuid);
 static void WobjSearch_DestoryEntry(int node, int uuid);
 static void WobjSearch_Reset(void);
@@ -452,6 +454,17 @@ void Wobj_GetCollisionsWithFlags(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLIS
 void Wobj_GetCollisionsWithType(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS], int type) {
 	Wobj_GetCollisionsGeneral(subject, collisions, type, WobjCollisionTypeCriteria);
 }
+// Calculates interpolated positions for moving platforms for better netplay
+static void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py) {
+	if (!wobj->interpolate || ~wobj->flags & WOBJ_IS_MOVESTAND || ~wobj->flags & WOBJ_IS_SOLID || Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_HOSTED_SERVER || Game_TopState() == GAME_STATE_DEDICATED_SERVER) {
+		*px = wobj->x; *py = wobj->y;
+		return;
+	}
+
+	int interp_node = (Interaction_GetMode() == INTERACTION_MODE_CLIENT) ? 0 : wobj->node_id;
+	*px = wobj->interp_x + ((wobj->x - wobj->interp_x) * (wobj->interp_frame / (float)NetGame_GetNode(interp_node)->avgframes_between_updates));
+	*py = wobj->interp_y + ((wobj->y - wobj->interp_y) * (wobj->interp_frame / (float)NetGame_GetNode(interp_node)->avgframes_between_updates));
+}
 void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS])
 {
 	OBJGRID_ITER iter;
@@ -459,6 +472,7 @@ void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS])
 	WOBJ *other;
 	OBJGRID *grids[2] = {unowned_grid, owned_grid};
 	int collisions_size = 0, i, x, y;
+	float interp_x, interp_y;
 
 	memset(collisions, 0, sizeof(WOBJ *) * WOBJ_MAX_COLLISIONS);
 	a.x = subject->x + subject->hitbox.x;
@@ -481,8 +495,9 @@ void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS])
 						ObjGrid_AdvanceIter(&iter);
 						continue;
 					}
-					b.x = other->x + other->hitbox.x;
-					b.y = other->y + other->hitbox.y;
+					WobjCalculate_InterpolatedPos(other, &interp_x, &interp_y);
+					b.x = interp_x + other->hitbox.x;
+					b.y = interp_y + other->hitbox.y;
 					b.w = other->hitbox.w;
 					b.h = other->hitbox.h;
 					if (Util_AABBCollision(&a, &b))
@@ -651,6 +666,16 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 			wobj->x += plat->vel_x;
 			if (plat->vel_y > 0.0f)
 				wobj->y += plat->vel_y;
+			//if (Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_HOSTED_SERVER || Game_TopState() == GAME_STATE_DEDICATED_SERVER) {
+			//	wobj->x += plat->vel_x;
+			//	if (plat->vel_y > 0.0f)
+			//		wobj->y += plat->vel_y;
+			//} else {
+			//	// Interpolate things
+			//	wobj->x += plat->vel_x;
+			//	if (plat->vel_y > 0.0f)
+			//		wobj->y += plat->vel_y;
+			//}
 		}
 	}
 	wobj->y -= 1.0f;
@@ -713,6 +738,7 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 	WOBJ *collider;
 	int x, y;
 	CNM_BOX h, other_h;
+	float interp_x, interp_y;
 	Wobj_GetCollision(obj, collisions);
 	for (i = 0; i < WOBJ_MAX_COLLISIONS; i++)
 	{
@@ -740,11 +766,12 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 			h.y = obj->y + obj->hitbox.y;
 			h.w = obj->hitbox.w;
 			h.h = obj->hitbox.h;
+			WobjCalculate_InterpolatedPos(collider, &interp_x, &interp_y);
 			Util_SetBox
 			(
 				&other_h,
-				collider->x + collider->hitbox.x,
-				collider->y + collider->hitbox.y,
+				interp_x + collider->hitbox.x,
+				interp_y + collider->hitbox.y,
 				collider->hitbox.w,
 				collider->hitbox.h
 			);

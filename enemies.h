@@ -3,6 +3,8 @@
 
 typedef struct _WOBJ WOBJ;
 
+void Enemies_Reset(void);
+
 // Slimes
 void WobjSlime_Create(WOBJ *wobj);
 void WobjSlime_Update(WOBJ *wobj);
@@ -39,6 +41,9 @@ void WobjBozoPin_Draw(WOBJ *wobj, int camx, int camy);
 // Bozo
 void WobjBozo_Create(WOBJ *wobj);
 void WobjBozo_Update(WOBJ *wobj);
+void WobjBozoWaypoint_Create(WOBJ *wobj);
+void WobjBozoFireball_Create(WOBJ *wobj);
+void WobjBozoFireball_Update(WOBJ *wobj);
 
 // Silver Slime
 void WobjSliverSlime_Create(WOBJ *wobj);
@@ -121,6 +126,8 @@ void WobjBozoLaserPart_Update(WOBJ *wobj);
 // Bozo Mk.2
 void WobjBozoMk2_Create(WOBJ *wobj);
 void WobjBozoMk2_Update(WOBJ *wobj);
+void WobjEnemyRocket_Create(WOBJ *wobj);
+void WobjEnemyRocket_Update(WOBJ *wobj);
 
 // Spike Guy
 void WobjSpikeGuy_Create(WOBJ *wobj);

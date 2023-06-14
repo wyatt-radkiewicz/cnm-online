@@ -141,7 +141,7 @@ void WobjHeavy_Create(WOBJ *wobj)
 	wobj->link_node = s->node_id;
 	wobj->link_uuid = s->uuid;
 	wobj->strength = 4.0f;
-	wobj->health = 10.0f;
+	wobj->health = 7.0f;
 	wobj->anim_frame = 0;
 	if (wobj->custom_floats[0] < 0.0f)
 		wobj->flags |= WOBJ_HFLIP;
@@ -371,6 +371,17 @@ void WobjBozoPin_Draw(WOBJ *wobj, int camx, int camy)
 	WobjGeneric_Draw(wobj, camx, camy);
 }
 
+#define BOZO_WAYPOINTS_MAX 32
+static float bzx[BOZO_WAYPOINTS_MAX], bzy[BOZO_WAYPOINTS_MAX];
+static int bznum;
+void Enemies_Reset(void) {
+	bznum = 0;
+}
+void WobjBozoWaypoint_Create(WOBJ *wobj) {
+	if (bznum >= BOZO_WAYPOINTS_MAX) return;
+	bzx[bznum] = wobj->x;
+	bzy[bznum++] = wobj->y;
+}
 void WobjBozo_Create(WOBJ *wobj)
 {
 	wobj->hitbox.x = 0.0f;
@@ -388,6 +399,44 @@ void WobjBozo_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
 	wobj->anim_frame = (wobj->health < 50.0f) ? 1 : 0;
+	if (bznum != 0) {
+		float tx = bzx[wobj->custom_ints[0]];
+		float ty = bzy[wobj->custom_ints[0]];
+		if (wobj->custom_ints[1] == 0) {
+			if (wobj->x < tx) wobj->x += 4.0f;
+			if (wobj->x > tx) wobj->x -= 4.0f;
+			if (wobj->y < ty) wobj->y += 4.0f;
+			if (wobj->y > ty) wobj->y -= 4.0f;
+			if (fabsf(wobj->x - tx) < 8.0f && fabsf(wobj->y - ty) < 8.0f) {
+				wobj->custom_ints[1] = Util_RandInt(1, 3); // modes 1-2
+				wobj->money = 0;
+			}
+		} else if (wobj->custom_ints[1] == 1) {
+			if (wobj->money++ >= 30*8) {
+				wobj->custom_ints[0] = Util_RandInt(0, bznum);
+				wobj->custom_ints[1] = 0;
+			}
+			if (wobj->money % (30*3) == 0) {
+				WOBJ *bozo_pin = Interaction_CreateWobj(WOBJ_BOZO_PIN, wobj->x + 32.0f, wobj->y + 64.0f, 0, 5.5f);
+			}
+		} else if (wobj->custom_ints[1] == 2) {
+			if (wobj->money++ >= 30*8) {
+				wobj->custom_ints[0] = Util_RandInt(0, bznum);
+				wobj->custom_ints[1] = 0;
+			}
+			if (wobj->money % 2 == 0) {
+				if ((wobj->money / 2) % 16 < 12) {
+					float ang = ((float)wobj->money * 4.0f) / 180.0f * CNM_PI;
+					WOBJ *fireball = Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x + 32.0f, wobj->y + 64.0f, 0, ang);
+					fireball = Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x + 32.0f, wobj->y + 64.0f, 0, ang+(0.5*CNM_PI));
+					fireball = Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x + 32.0f, wobj->y + 64.0f, 0, ang+(1.5*CNM_PI));
+					fireball = Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x + 32.0f, wobj->y + 64.0f, 0, ang+(1.0*CNM_PI));
+				}
+			}
+		}
+		return;
+	}
+	
 
 	if (Game_GetFrame() % 30 * 5 == 0)
 	{
@@ -407,6 +456,24 @@ void WobjBozo_Update(WOBJ *wobj)
 		}
 	}
 	Wobj_TryTeleportWobj(wobj);
+}
+void WobjBozoFireball_Create(WOBJ *wobj) {
+	wobj->custom_ints[0] = 30*10;
+	wobj->speed = 6.5f;
+	wobj->strength = 3.333333333f;
+	wobj->health = 10000.0f;
+	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->hitbox.x = 0.0f;
+	wobj->hitbox.y = 0.0f;
+	wobj->hitbox.w = 32.0f;
+	wobj->hitbox.h = 32.0f;
+	Interaction_PlaySound(wobj, 16);
+}
+void WobjBozoFireball_Update(WOBJ *wobj) {
+	wobj->x += cosf(wobj->custom_floats[0]) * wobj->speed;
+	wobj->y += sinf(wobj->custom_floats[0]) * wobj->speed;
+	if (wobj->custom_ints[0]-- <= 0)
+		Interaction_DestroyWobj(wobj);
 }
 
 void WobjSliverSlime_Create(WOBJ *wobj)
@@ -1256,7 +1323,7 @@ void WobjSpiderWalker_Update(WOBJ *wobj)
 		Interaction_PlaySound(wobj, 29);
 
 	if (wobj->custom_ints[1]-- <= 0 || Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * 3.0f, 0.0f) ||
-		!Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * wobj->hitbox.w, 5.0f))
+		!Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * wobj->hitbox.w, -5.0f))
 	{
 		wobj->custom_ints[1] = Util_RandInt(30, 30*3);
 		wobj->custom_floats[0] *= -1.0f;
@@ -1564,7 +1631,7 @@ void WobjSuperDragonBoss_Update(WOBJ *wobj)
 		if (wobj->y < data->origin_y)
 			wobj->y += spd;
 
-		if (fabsf(wobj->x - data->origin_x) < spd * 1.5f && fabsf(wobj->y - data->origin_y) < spd * 1.5f)
+		if (fabsf(wobj->x - (data->origin_x + 250.0f)) < spd * 1.5f && fabsf(wobj->y - data->origin_y) < spd * 1.5f)
 		{
 			data->state = SUPER_DRAGON_STATE_FLYING;
 			data->state_timer = 0;
@@ -1703,62 +1770,104 @@ void WobjBozoLaserPart_Update(WOBJ *wobj)
 		Interaction_DestroyWobj(wobj);
 }
 
+#define BZM2_SPD 4.0f
 void WobjBozoMk2_Create(WOBJ *wobj)
 {
-	wobj->hitbox.x = 0.0f;
-	wobj->hitbox.y = 0.0f;
-	wobj->hitbox.w = 64.0f;
-	wobj->hitbox.h = 128.0f;
-	wobj->custom_ints[1] = CNM_FALSE;
-	wobj->custom_ints[0] = 0;
+	Util_SetBox(&wobj->hitbox, 8.0f, 8.0f, 32.0f, 56.0f);
 	wobj->anim_frame = 0;
 	wobj->flags = WOBJ_IS_HOSTILE;
-	wobj->health = 60.0f;
+	wobj->health = 20.0f;
 	wobj->strength = 3.33333333f;
-	wobj->custom_floats[0] = wobj->y - 128.0f;
-	wobj->custom_floats[1] = wobj->y + 128.0f;
-	wobj->speed = 4.0f;
+	wobj->custom_ints[0] = 0; // State
+	wobj->money = 0; // State timer
 }
 void WobjBozoMk2_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
-
-	wobj->anim_frame = (wobj->health < 500000.0f) ? 1 : 0;
-
-	if (Game_GetFrame() % 30 * 5 == 0)
-	{
-		WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
-		wobj->custom_ints[1] = (Interaction_GetDistanceToWobj(wobj, closest_player) < (float)RENDERER_WIDTH);
-	}
-
-	if (wobj->y < wobj->custom_floats[0])
-		wobj->speed = 4.0f;
-	else if (wobj->y > wobj->custom_floats[1])
-		wobj->speed = -4.0f;
-	wobj->y += wobj->speed;
-
-	if (Game_GetFrame() % 60 == 0)
-	{
-		if ((Game_GetFrame() / 60) % 2 == 0)
-			Interaction_PlaySound(wobj, 28);
-		else
-			Interaction_PlaySound(wobj, 19);
-	}
-
-	int timer = (wobj->health < (3000000.0f / 2.0f)) ? 5 : 30;
-	if (Game_GetFrame() % timer == 0)
-	{
-		if (wobj->custom_ints[1])
-		{
-			WOBJ *nme;
-			if (Util_RandInt(0, 100) > 50)
-				nme = Interaction_CreateWobj(WOBJ_BOZO_PIN, wobj->x + 32.0f, wobj->y + 64.0f, 0, 7.0f);
-			else
-				nme = Interaction_CreateWobj(BOZO_LASER_MINION, wobj->x + 32.0f, wobj->y + 64.0f, 0, 5.5f);
+	WOBJ *np = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+	WobjPhysics_BeginUpdate(wobj);
+	if (wobj->custom_ints[0] == 0) { // Mk2 is in idle
+		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+		if (Interaction_GetDistanceToWobj(wobj, np) <= 320.0f) {
+			wobj->custom_ints[0] = 1; // Set into walk state
+			wobj->money = 0;
+		}
+	} else if (wobj->custom_ints[0] == 1) { // Walking state
+		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+		if (wobj->x + 24.0f > np->x) wobj->vel_x = -BZM2_SPD;
+		else wobj->vel_x = BZM2_SPD;
+		if (wobj->money++ > 45) {
+			wobj->money = 17;
+			wobj->custom_ints[0] = 2; // Set into jumping state
+			float time_jump = (float)wobj->money;
+			float think_x = np->x + np->vel_x * time_jump;
+			float spd = (think_x - wobj->x) / time_jump;
+			wobj->vel_x = spd;
+			wobj->vel_y = -10.0f;
+			wobj->custom_floats[1] = wobj->vel_x;
+		}
+	} else if (wobj->custom_ints[0] == 2) { // Jumping state
+		wobj->vel_x = wobj->custom_floats[1];
+		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+		if (wobj->vel_y > 0.0f && Wobj_IsGrouneded(wobj) && wobj->money-- <= 20) {
+			wobj->vel_x = 0.0f;
+			wobj->custom_ints[0] = 3; // Floating upwards state
+			wobj->money = 50;
+		}
+	} else if (wobj->custom_ints[0] == 3) { // Floating upwards state
+		wobj->vel_x = 0.0f;
+		if (wobj->money > 20) {
+			wobj->vel_y = -1.0f;
+		} else {
+			wobj->vel_y = 0.0f;
+		}
+		if (wobj->money-- <= 0) {
+			wobj->custom_ints[0] = 4; // Firing state
+			wobj->money = 0;
+		}
+	} else if (wobj->custom_ints[0] == 4) { // Firing state
+		wobj->vel_y = 0.0f;
+		wobj->vel_x = 0.0f;
+		wobj->money++;
+		float ang = atan2f((np->y + 16.0f) - (wobj->y + 20.0f), (np->x + 16.0f) - (wobj->x + 10.0f));
+		if (wobj->money % 40 == 0) {
+			WOBJ *rocket = Interaction_CreateWobj(WOBJ_ENEMY_ROCKET, wobj->x + 10.0f, wobj->y + 20.0f, 8, ang);
+		}
+		if (wobj->money % 10 == 0) {
+			WOBJ *fireball = Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x + 10.0f, wobj->y + 20.0f, 0, ang + (Util_RandFloat() * 2.0f - 1.0f) * 0.5f);
+		}
+		if (wobj->money > 50*3) {
+			wobj->custom_ints[0] = 1; // Walking state
+			wobj->money = 0;
 		}
 	}
-
-	Wobj_TryTeleportWobj(wobj);
+	
+	WobjPhysics_ApplyWindForces(wobj);
+	WobjPhysics_EndUpdate(wobj);
+}
+void WobjEnemyRocket_Create(WOBJ *wobj) {
+	wobj->hitbox.x = 13.0f;
+	wobj->hitbox.y = 13.0f;
+	wobj->hitbox.w = 20.0f;
+	wobj->hitbox.h = 7.0f;
+	wobj->vel_x = (float)wobj->custom_ints[0] * cosf(wobj->custom_floats[0]);
+	wobj->vel_y = (float)wobj->custom_ints[0] * sinf(wobj->custom_floats[0]);
+	wobj->flags |= wobj->vel_x < 0.0f ? WOBJ_HFLIP : 0;
+	wobj->custom_ints[1] = 0;
+	Interaction_PlaySound(wobj, 7);
+}
+void WobjEnemyRocket_Update(WOBJ *wobj) {
+	wobj->x += wobj->vel_x;
+	wobj->y += wobj->vel_y;
+	if (wobj->custom_ints[1]++ >= 30*4)
+		Interaction_DestroyWobj(wobj);
+	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) ||
+		Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID) ||
+		Wobj_GetWobjColliding(wobj, WOBJ_IS_PLAYER))
+	{
+		WOBJ *explosion = Interaction_CreateWobj(WOBJ_KAMAKAZI_SLIME_EXPLOSION, wobj->x - 96.0f, wobj->y - 96.0f, 0, 0.0f);
+		Interaction_DestroyWobj(wobj);
+	}
 }
 
 void WobjSpikeGuy_Create(WOBJ *wobj)
@@ -2017,7 +2126,7 @@ void WobjKamakaziSlime_Draw(WOBJ *wobj, int camx, int camy)
 void WobjKamakaziSlimeExplosion_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE;
-	wobj->strength = 13.33333f;
+	wobj->strength = 1.6667f;
 	wobj->custom_ints[0] = 20;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 192.0f, 192.0f);
 	Interaction_PlaySound(wobj, 6);
