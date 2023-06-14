@@ -1587,7 +1587,7 @@ void Player_DrawHUD(WOBJ *player) {
 		int score = local_data->score;
 		int time_score = 20 - (Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer / (30 * 60));
 		if (time_score < 0) time_score = 0;
-		time_score *= 100 * 85;
+		time_score *= 100 * 12;
 		int rank = (int)((float)(score + time_score) / (float)par * 4.0);
 		if (rank > 4) rank = 4;
 		bx = RENDERER_WIDTH / 2 - 64, by = RENDERER_HEIGHT / 2 - 40;

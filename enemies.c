@@ -1,5 +1,6 @@
 #include <string.h>
 #include <math.h>
+#include "interaction.h"
 #include "renderer.h"
 #include "wobj.h"
 #include "input.h"
@@ -114,65 +115,125 @@ void WobjFlyingSlime_Update(WOBJ *wobj)
 	Wobj_TryTeleportWobj(wobj);
 }
 
+void WobjHeavySheildBox_Create(WOBJ *wobj) {
+	Util_SetBox(&wobj->hitbox, 0.0, 0.0, 32.0f, 40.0f);
+	wobj->flags = WOBJ_IS_BREAKABLE;
+}
+void WobjHeavySheildBox_Draw(WOBJ *wobj, int camx, int camy) {
+#ifdef DEBUG
+	//CNM_RECT r;
+	//Util_SetRect(&r, wobj->x - camx + wobj->hitbox.x, wobj->y - camy + wobj->hitbox.y, wobj->hitbox.w, wobj->hitbox.h);
+	//Renderer_DrawRect(&r, 15, 3, RENDERER_LIGHT);
+	//Renderer_DrawText(54, 54, 0, RENDERER_LIGHT, "%f", wobj->health);
+#endif
+}
+void WobjHeavy_Destroy(WOBJ *wobj) {
+	WOBJ *sh = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
+	if (sh) {
+		Interaction_DestroyWobj(sh);
+	}
+}
 void WobjHeavy_Create(WOBJ *wobj)
 {
-	wobj->hitbox.x = 0.0f;
-	wobj->hitbox.y = 0.0f;
-	wobj->hitbox.w = 48.0f;
-	wobj->hitbox.h = 64.0f;
+	Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
 	wobj->flags = WOBJ_IS_HOSTILE;
-	wobj->strength = 5.0f;
-	wobj->health = 14.0f;
+	WOBJ *s = Interaction_CreateWobj(WOBJ_HEAVY_SHEILD_BOX, wobj->x, wobj->y, 0, 0.0f);
+	wobj->link_node = s->node_id;
+	wobj->link_uuid = s->uuid;
+	wobj->strength = 4.0f;
+	wobj->health = 10.0f;
 	wobj->anim_frame = 0;
-	wobj->custom_ints[1] = 0;
-	wobj->custom_ints[0] = 45;
-	wobj->speed = wobj->custom_floats[0];
-	if (wobj->speed < 0.0f)
+	if (wobj->custom_floats[0] < 0.0f)
 		wobj->flags |= WOBJ_HFLIP;
+	wobj->custom_ints[0] = 0;
+	wobj->custom_ints[1] = 0;
+	wobj->money = 0;
+	wobj->on_destroy = WobjHeavy_Destroy;
 }
+#define HEAVY_SPD 2.0f
 void WobjHeavy_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
-	wobj->x += wobj->speed * 2.0f;
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID) ||
-		!Wobj_IsCollidingWithBlocks(wobj, (wobj->speed > 0.0f ? 48.0f : -48.0f) + wobj->speed * 2.0f, 16.0f))
-	{
-		wobj->speed *= -1.0f;
-		wobj->custom_ints[1] = 0;
+	WobjPhysics_BeginUpdate(wobj);
+	WOBJ *sh = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
+	if (sh) {
+		sh->health = 1000000.0f;
+		Wobj_UpdateGridPos(sh);
 	}
-	wobj->x -= wobj->speed;
-	if (wobj->custom_ints[1]++ >= 30 * 2)
-	{
-		wobj->speed *= -1.0f;
-		wobj->custom_ints[1] = 0;
+	WOBJ *plr = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+	if (Game_GetFrame() % 45 == 0 || wobj->custom_ints[0] == 1) {
+		if (plr->x + 16.0f > wobj->x + 32.0f) wobj->flags &= ~WOBJ_HFLIP;
+		else wobj->flags |= WOBJ_HFLIP;
 	}
-
-	if (fabsf(wobj->speed) > 0.0f)
-	{
-		int sound_rate = (int)(30.0f - fabsf(wobj->speed) * 4.0f);
-		if (sound_rate < 5)
-			sound_rate = 5;
-		if (Game_GetFrame() % sound_rate == 0)
-			Interaction_PlaySound(wobj, 24);
-	}
-
-	wobj->custom_ints[0]--;
-	if (wobj->custom_ints[0] == 0)
-	{
-		wobj->anim_frame = 1;
-		Interaction_PlaySound(wobj, 15);
-		WOBJ *blast = Interaction_CreateWobj(WOBJ_HEAVY_BLAST, wobj->x + 32.0f, wobj->y + 32.0f, 0, 0.0f);
-		blast->speed = 7.0f;
-		if (wobj->flags & WOBJ_HFLIP)
-			blast->speed *= -1.0f;
-		blast->flags = (blast->flags & ~WOBJ_HFLIP) | (wobj->flags & WOBJ_HFLIP);
-	}
-	if (wobj->custom_ints[0] <= -15)
-	{
+	wobj->strength = 4.0f;
+	wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+	Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
+	int is_close = Interaction_GetDistanceToWobj(wobj, plr) <= 96.0f;
+	if (wobj->custom_ints[0] == 0) {
+		if (Game_GetFrame() % 30 == 0) {
+			wobj->custom_ints[1] = Util_RandInt(0, 1);
+			if (is_close) {
+				wobj->custom_ints[1] = 0;
+			}
+		}
+		wobj->money++;
+		if (wobj->money > 85 || (wobj->money > 25 && is_close)) {
+			wobj->custom_ints[0] = 1;
+			wobj->money = 0;
+		}
+		wobj->anim_frame = 2 + ((Game_GetFrame() / 5) & 1);
+		if (wobj->custom_ints[1] == 0) {
+			if (wobj->flags & WOBJ_HFLIP) wobj->vel_x = -HEAVY_SPD;
+			else wobj->vel_x = HEAVY_SPD;
+			if (!Wobj_IsCollidingWithBlocks(wobj, (wobj->flags & WOBJ_HFLIP ? -48.0f : 48.0f), 16.0f)) {
+				wobj->custom_ints[1] = 2 + (wobj->flags & WOBJ_HFLIP) != 0;
+				wobj->x += (float)(((wobj->flags & WOBJ_HFLIP) != 0) * 2 - 1) * 2.0f * HEAVY_SPD;
+			}
+		} else if (wobj->custom_ints[1] == 1) {
+			wobj->vel_x = 0.0f;
+		} else if (wobj->custom_ints[1] == 2) {
+			wobj->vel_x = HEAVY_SPD;
+		} else {
+			wobj->vel_x = -HEAVY_SPD;
+		}
+		wobj->strength = 4.0f;
+		if (sh) {
+			sh->y = wobj->y + 20.0f;
+			Util_SetBox(&sh->hitbox, 0.0, 0.0, 32.0f, 40.0f);
+			if (wobj->flags & WOBJ_HFLIP) {
+				sh->x = wobj->x - 20.0f;
+			} else {
+				sh->x = wobj->x + wobj->hitbox.x + wobj->hitbox.w - (32.0f - 20.0f);
+			}
+		}
+	} else if (wobj->custom_ints[0] == 1) {
+		if (sh) {
+			Util_SetBox(&sh->hitbox, 0.0, 0.0, 0.0f, 0.0f);
+		}
 		wobj->anim_frame = 0;
-		wobj->custom_ints[0] = 30*2;
+		if (wobj->money > 15) {
+			wobj->anim_frame = 1;
+			wobj->strength = 20.0f;
+			if (wobj->flags & WOBJ_HFLIP)
+				Util_SetBox(&wobj->hitbox, -16.0f, 0.0f, 48.0f, 64.0f);
+			else
+				Util_SetBox(&wobj->hitbox, 24.0f, 0.0f, 48.0f, 64.0f);
+		}
+		wobj->vel_x = 0.0f;
+		if (wobj->money++ > 20) {
+			WOBJ *blast = Interaction_CreateWobj(WOBJ_HEAVY_BLAST, wobj->x + 32.0f, wobj->y + 32.0f, 0, 0.0f);
+			blast->speed = 7.0f;
+			if (wobj->flags & WOBJ_HFLIP)
+				blast->speed *= -1.0f;
+			blast->flags = (blast->flags & ~WOBJ_HFLIP) | (wobj->flags & WOBJ_HFLIP);
+			wobj->custom_ints[0] = 0;
+			wobj->custom_ints[1] = 0;
+			wobj->money = 0;
+		}
 	}
-	Wobj_TryTeleportWobj(wobj);
+	
+	WobjPhysics_ApplyWindForces(wobj);
+	WobjPhysics_EndUpdate(wobj);
 }
 
 void WobjHeavyBlast_Create(WOBJ *wobj)
@@ -266,16 +327,38 @@ void WobjBozoPin_Create(WOBJ *wobj)
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->health = 20.0f;
 	wobj->strength = 3.0f;
+	wobj->custom_ints[0] = 0;
+	wobj->speed = 4.0f;
+	wobj->custom_floats[1] = 0.0f;
 }
 void WobjBozoPin_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
 	WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
-	if (Interaction_GetDistanceToWobj(wobj, closest_player) < (float)196.0f)
+	if (Interaction_GetDistanceToWobj(wobj, closest_player) < (float)320.0f)
 	{
-		float ang = atan2f(closest_player->y - wobj->y, closest_player->x - wobj->x);
-		wobj->x += cosf(ang) * wobj->custom_floats[0];
-		wobj->y += sinf(ang) * wobj->custom_floats[0];
+		wobj->custom_ints[0]++;
+		float tang = atan2f(closest_player->y - wobj->y, closest_player->x - wobj->x);
+		if (wobj->custom_ints[0] > 30*4) wobj->speed += (0.5f - wobj->speed) * 0.5f;
+		if (wobj->custom_ints[0] > 30*6) {
+			wobj->x += Util_RandFloat() * 2.0f - 1.0f;
+			wobj->y += Util_RandFloat() * 2.0f - 1.0f;
+			if (wobj->custom_ints[0] > 30*7) {
+				if (tang > wobj->custom_floats[1]) wobj->custom_floats[1] += 7.0f / 180.0f * CNM_PI;
+				else wobj->custom_floats[1] -= 7.0f / 180.0f * CNM_PI;
+				wobj->speed = 8.0f;
+			}
+			if (wobj->custom_ints[0] > 30*9) {
+				wobj->speed = 4.0f;
+				wobj->custom_ints[0] = 0;
+			}
+		}
+		if (wobj->custom_ints[0] < 30*7) {
+			wobj->custom_floats[1] = tang;
+		}
+		wobj->x += cosf(wobj->custom_floats[1]) * wobj->speed;
+		wobj->y += sinf(wobj->custom_floats[1]) * wobj->speed;
+
 	}
 
 	if (Game_GetFrame() % 25 == 0)
@@ -341,6 +424,19 @@ void WobjSliverSlime_Create(WOBJ *wobj)
 	wobj->custom_floats[0] = (float)(Util_RandInt(0, 1) * 2 - 1) * wobj->speed;
 }
 
+// TODO: Update lava monster
+enum LAVAMONSTER_STATES {
+	LMS_IDLE,
+	LMS_CHASING,
+	LMS_DROP,
+	LMS_FLYING,
+	LMS_SHOOTING,
+	LMS_SWOOP,
+};
+typedef struct _LAVAMONSTER_LOCAL_DATA {
+	int state;
+	int state_timer;
+} LAVAMONSTER_LOCAL_DATA;
 void WobjLavaMonster_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE;
@@ -1303,6 +1399,7 @@ void WobjMovingFireHorizontal_Update(WOBJ *wobj)
 	}
 }
 
+// TODO: Update super dragon
 #define MAX_SUPER_DRAGONS 32
 typedef struct _SUPER_DRAGON_DATA
 {
@@ -1401,16 +1498,18 @@ void WobjSuperDragonBoss_Update(WOBJ *wobj)
 				wobj->x + 64.0f,
 				wobj->y + (float)Util_RandInt(0, 128),
 				0,
-				shoot_ang
+				(np->x + 16.0f > wobj->x + 64.0f ? 0.0f : CNM_PI)
 			);
-			Interaction_CreateWobj
-			(
-				WOBJ_FIREBALL,
-				wobj->x + 64.0f,
-				wobj->y + (float)Util_RandInt(0, 128),
-				0,
-				shoot_ang + 0.5f
-			);
+			if (Game_GetFrame() % 6*3 == 0) {
+				Interaction_CreateWobj
+				(
+					WOBJ_FIREBALL,
+					wobj->x + 64.0f,
+					wobj->y + (float)Util_RandInt(0, 128),
+					0,
+					shoot_ang
+				);
+			}
 		}
 
 		if (data->state_timer++ > 30 * 10)

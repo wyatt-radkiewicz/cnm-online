@@ -1940,7 +1940,9 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
 			{128, 224, 64, 64},
-			{128, 288, 64, 64}
+			{128, 288, 64, 64},
+			{160, 2432, 64, 64},
+			{160, 2432+64, 64, 64},
 		},
 		0.0f, // Strength reward
 		100, // Money reward
@@ -3261,6 +3263,19 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		0, // Money reward
 		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE // Can respawn?
+	},
+	{ // 144: WOBJ_HEAVY_SHEILD_BOX
+		WobjHeavySheildBox_Create, // Create
+		NULL, // Update
+		WobjHeavySheildBox_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{0, 0, 32, 32},
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
 		CNM_FALSE // Can respawn?
 	},
 };

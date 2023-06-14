@@ -15,6 +15,8 @@ void WobjFlyingSlime_Update(WOBJ *wobj);
 // Heavys
 void WobjHeavy_Create(WOBJ *wobj);
 void WobjHeavy_Update(WOBJ *wobj);
+void WobjHeavySheildBox_Create(WOBJ *wobj);
+void WobjHeavySheildBox_Draw(WOBJ *wobj, int camx, int camy);
 
 // Heavy Blasts
 void WobjHeavyBlast_Create(WOBJ *wobj);
