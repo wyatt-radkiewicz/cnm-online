@@ -16,6 +16,11 @@ MODE MUSIC
 16 music/arena.wav
 17 music/ice.wav
 18 music/bonus.wav
+19 music/rooftop.wav
+20 music/neon.wav
+21 music/neonboss.wav
+22 music/bdsmain.wav
+23 music/gay.wav
 MODE SOUNDS
 0 sounds/gun.wav
 1 sounds/hurt.wav
