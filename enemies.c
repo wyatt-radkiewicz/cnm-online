@@ -425,7 +425,7 @@ void WobjBozo_Update(WOBJ *wobj)
 				wobj->custom_ints[1] = 0;
 			}
 			if (wobj->money % 2 == 0) {
-				if ((wobj->money / 2) % 16 < 12) {
+				if ((wobj->money / 2) % 16 < 11) {
 					float ang = ((float)wobj->money * 4.0f) / 180.0f * CNM_PI;
 					WOBJ *fireball = Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x + 32.0f, wobj->y + 64.0f, 0, ang);
 					fireball = Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x + 32.0f, wobj->y + 64.0f, 0, ang+(0.5*CNM_PI));
@@ -1777,7 +1777,7 @@ void WobjBozoMk2_Create(WOBJ *wobj)
 	wobj->anim_frame = 0;
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->health = 20.0f;
-	wobj->strength = 3.33333333f;
+	wobj->strength = 1.666667f;
 	wobj->custom_ints[0] = 0; // State
 	wobj->money = 0; // State timer
 }
@@ -1785,19 +1785,23 @@ void WobjBozoMk2_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
 	WOBJ *np = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+	if (np->x > wobj->x + 24.0f) wobj->flags &= ~WOBJ_HFLIP;
+	else wobj->flags |= WOBJ_HFLIP;
 	WobjPhysics_BeginUpdate(wobj);
 	if (wobj->custom_ints[0] == 0) { // Mk2 is in idle
 		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+		wobj->anim_frame = 0;
 		if (Interaction_GetDistanceToWobj(wobj, np) <= 320.0f) {
 			wobj->custom_ints[0] = 1; // Set into walk state
 			wobj->money = 0;
 		}
 	} else if (wobj->custom_ints[0] == 1) { // Walking state
 		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+		wobj->anim_frame = (wobj->money / 5) % 3;
 		if (wobj->x + 24.0f > np->x) wobj->vel_x = -BZM2_SPD;
 		else wobj->vel_x = BZM2_SPD;
-		if (wobj->money++ > 45) {
-			wobj->money = 17;
+		if (wobj->money++ > 90) {
+			wobj->money = 12;
 			wobj->custom_ints[0] = 2; // Set into jumping state
 			float time_jump = (float)wobj->money;
 			float think_x = np->x + np->vel_x * time_jump;
@@ -1809,12 +1813,13 @@ void WobjBozoMk2_Update(WOBJ *wobj)
 	} else if (wobj->custom_ints[0] == 2) { // Jumping state
 		wobj->vel_x = wobj->custom_floats[1];
 		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
-		if (wobj->vel_y > 0.0f && Wobj_IsGrouneded(wobj) && wobj->money-- <= 20) {
+		if (wobj->vel_y > 0.0f && Wobj_IsGrouneded(wobj) && wobj->money-- <= 6) {
 			wobj->vel_x = 0.0f;
 			wobj->custom_ints[0] = 3; // Floating upwards state
-			wobj->money = 50;
+			wobj->money = 60;
 		}
 	} else if (wobj->custom_ints[0] == 3) { // Floating upwards state
+		wobj->anim_frame = 3;
 		wobj->vel_x = 0.0f;
 		if (wobj->money > 20) {
 			wobj->vel_y = -1.0f;
@@ -1826,6 +1831,7 @@ void WobjBozoMk2_Update(WOBJ *wobj)
 			wobj->money = 0;
 		}
 	} else if (wobj->custom_ints[0] == 4) { // Firing state
+		wobj->anim_frame = 4;
 		wobj->vel_y = 0.0f;
 		wobj->vel_x = 0.0f;
 		wobj->money++;

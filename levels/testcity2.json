@@ -58,25 +58,8 @@
     },
     {
       "pos": [
-        488.20032,
-        192.0
-      ],
-      "type_data": {
-        "Bozo": {
-          "mark_ii": false
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null
-    },
-    {
-      "pos": [
-        816.0,
-        248.10097
+        496.0,
+        224.0
       ],
       "type_data": {
         "Bozo": {

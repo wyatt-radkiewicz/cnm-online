@@ -665,17 +665,7 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 		{
 			wobj->x += plat->vel_x;
 			if (plat->vel_y > 0.0f)
-				wobj->y += plat->vel_y;
-			//if (Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_HOSTED_SERVER || Game_TopState() == GAME_STATE_DEDICATED_SERVER) {
-			//	wobj->x += plat->vel_x;
-			//	if (plat->vel_y > 0.0f)
-			//		wobj->y += plat->vel_y;
-			//} else {
-			//	// Interpolate things
-			//	wobj->x += plat->vel_x;
-			//	if (plat->vel_y > 0.0f)
-			//		wobj->y += plat->vel_y;
-			//}
+				wobj->y += plat->vel_y * 1.5f;
 		}
 	}
 	wobj->y -= 1.0f;
