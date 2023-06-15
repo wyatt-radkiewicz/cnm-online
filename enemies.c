@@ -380,7 +380,7 @@ void Enemies_Reset(void) {
 void WobjBozoWaypoint_Create(WOBJ *wobj) {
 	if (bznum >= BOZO_WAYPOINTS_MAX) return;
 	bzx[bznum] = wobj->x;
-	bzy[bznum++] = wobj->y;
+	bzy[bznum++] = wobj->y - (64.0f - 16.0f);
 }
 void WobjBozo_Create(WOBJ *wobj)
 {
