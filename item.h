@@ -76,6 +76,7 @@ typedef struct _ITEM
 extern ITEM_TYPE item_types[];
 
 void Item_Init(void);
+void Item_Reset(void);
 ITEM *Item_GetCurrentItem(void);
 const ITEM_TYPE *Item_GetItemType(int type_id);
 

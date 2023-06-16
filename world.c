@@ -24,6 +24,7 @@
 #include "teleport_infos.h"
 #include "logic_links.h"
 #include "player.h"
+#include "item.h"
 
 #define TITLE_CARD_MAX_LINES 6
 
@@ -51,6 +52,7 @@ void World_Start(int mode)
 
 	// Initialize things to defualt values
 	Enemies_Reset();
+	Item_Reset();
 	LogicLinks_ResetLinks();
 	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS - 1);
 	Spawners_UnloadSpawners();

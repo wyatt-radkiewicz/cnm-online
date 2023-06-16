@@ -1806,11 +1806,15 @@ void WobjBozoMk2_Update(WOBJ *wobj)
 			float time_jump = (float)wobj->money;
 			float think_x = np->x + np->vel_x * time_jump;
 			float spd = (think_x - wobj->x) / time_jump;
+			if (spd > 13.0f) spd = 13.0f;
+			if (spd < -13.0f) spd = -13.0f;
 			wobj->vel_x = spd;
 			wobj->vel_y = -10.0f;
 			wobj->custom_floats[1] = wobj->vel_x;
 		}
 	} else if (wobj->custom_ints[0] == 2) { // Jumping state
+		if (Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[1], 0.0f))
+			wobj->custom_floats[1] *= -1.0f;
 		wobj->vel_x = wobj->custom_floats[1];
 		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
 		if (wobj->vel_y > 0.0f && Wobj_IsGrouneded(wobj) && wobj->money-- <= 6) {

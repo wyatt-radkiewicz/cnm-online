@@ -466,6 +466,9 @@ void Item_Init(void)
 {
 	memset(&item_current, 0, sizeof(item_current));
 }
+void Item_Reset(void) {
+	memset(&item_current, 0, sizeof(item_current));
+}
 ITEM *Item_GetCurrentItem(void)
 {
 	return &item_current;

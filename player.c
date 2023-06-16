@@ -157,6 +157,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->grav_add = 0.0f;
 	local_data->sliding_cap_landing_speed = CNM_FALSE;
 	local_data->slide_jump_cooldown = 0;
+	local_data->offhand_item = 0;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
