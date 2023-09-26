@@ -1,6 +1,6 @@
 #include <string.h>
 #include <SDL.h>
-#include "SDL_scancode.h"
+#include <SDL_scancode.h>
 #include "game.h"
 #include "input.h"
 #include "console.h"

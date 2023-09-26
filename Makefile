@@ -1,13 +1,14 @@
 # Sources/build dirs
 TARGET_NAME := cnmonline
 BUILD_DIR := ./build
-SRCS := $(wildcard *.c)
-OBJS := $(addprefix $(BUILD_DIR)/,$(SRCS:%.c=%.o))
+SOURCE_DIR := ./src
+SRCS := $(wildcard $(SOURCE_DIR)/*.c)
+OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(SRCS)))
 
 # Flags
-CFLAGS := $(CFLAGS) $(shell sdl2-config --cflags)
-SDL_LDFLAGS := $(shell sdl2-config --libs)
-LDFLAGS := $(LDFLAGS) $(SDL_LDFLAGS) -lSDL2_mixer -lSDL2_net
+CFLAGS := $(CFLAGS) $(shell sdl2-config --cflags) -I$(SOURCE_DIR)
+SDL_LDFLAGS := $(shell sdl2-config --libs) -lSDL2_mixer -lSDL2_net
+LDFLAGS := $(LDFLAGS) $(SDL_LDFLAGS)
 
 # Build modes
 release: CFLAGS += -O2
@@ -22,9 +23,13 @@ $(BUILD_DIR)/$(TARGET_NAME): $(OBJS)
 	mkdir -p $(dir $@)
 	$(CC) $^ $(LDFLAGS) -o $@
 
-$(BUILD_DIR)/%.o: %.c
-	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $@
+define BUILD_SRC
+$(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(1))): $(1) $(addprefix $(SOURCE_DIR)/,$(2))
+	mkdir -p $$(dir $$@)
+	$$(CC) $$(CFLAGS) $$(CPPFLAGS) -c $$< -o $$@
+endef
+
+$(foreach src,$(SRCS),$(eval $(call BUILD_SRC,$(src),$(shell grep "#include \"[:alnum:|.|\"]*" $(src) | awk -F ' ' '{print $$2 }' | awk -F '\"' '{print $$2 }'))))
 
 .PHONY: clean
 clean:

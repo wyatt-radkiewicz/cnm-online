@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <SDL.h>
-#include "SDL_surface.h"
-#include "SDL_video.h"
+#include <SDL_surface.h>
+#include <SDL_video.h>
 #include "renderer.h"
 #include "console.h"
 #include "game.h"
