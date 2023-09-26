@@ -11,10 +11,10 @@ SDL_LDFLAGS := $(shell sdl2-config --libs) -lSDL2_mixer -lSDL2_net
 LDFLAGS := $(LDFLAGS) $(SDL_LDFLAGS)
 
 # Build modes
-release: CFLAGS += -O2
-release: $(BUILD_DIR)/$(TARGET_NAME)
 debug: CFLAGS += -DDEBUG -g -O0
 debug: $(BUILD_DIR)/$(TARGET_NAME)
+release: CFLAGS += -O2
+release: $(BUILD_DIR)/$(TARGET_NAME)
 
 # Build commands
 run: $(BUILD_DIR)/$(TARGET_NAME)
