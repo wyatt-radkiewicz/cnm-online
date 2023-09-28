@@ -746,6 +746,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_FINISH_TRIGGER);
 	if (other != NULL) {
 		Audio_PlayMusic(2, CNM_FALSE);
+		local_data->final_time_forscore = Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer;
 		wobj->flags |= WOBJ_HAS_PLAYER_FINISHED;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BGSPEED_X);
@@ -1586,7 +1587,7 @@ void Player_DrawHUD(WOBJ *player) {
 	if (player->flags & WOBJ_HAS_PLAYER_FINISHED && local_data->finish_timer < PLAYER_FINISH_TIMER) {
 		int par = Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer;
 		int score = local_data->score;
-		int time_score = 20 - (Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer / (30 * 60));
+		int time_score = 20 - (local_data->final_time_forscore / (30 * 60));
 		if (time_score < 0) time_score = 0;
 		time_score *= 100 * 12;
 		int rank = (int)((float)(score + time_score) / (float)par * 4.0);

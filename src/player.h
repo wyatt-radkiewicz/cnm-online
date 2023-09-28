@@ -90,6 +90,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int slide_jump_cooldown;
 	float control_mul;
 	int sliding_cap_landing_speed;
+	int final_time_forscore;
 	//float stored_yvel;
 } PLAYER_LOCAL_DATA;
 

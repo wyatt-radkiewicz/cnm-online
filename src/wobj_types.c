@@ -1470,7 +1470,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.00f,
 		10,
 		CNM_TRUE,
-		CNM_TRUE
+		CNM_TRUE,
 	},
 	{ /* 3: Player Object */
 		WobjPlayer_Create, WobjPlayer_Update, WobjPlayer_Draw, NULL,
@@ -1931,7 +1931,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.00f, // Strength reward
 		20, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		100, // Score reward
 	},
 	{ // 36: Heavy Object
 		WobjHeavy_Create, // Create
@@ -1947,7 +1948,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		100, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		100, // Score reward
 	},
 	{ // 37: Heavy Blast Object
 		WobjHeavyBlast_Create, // Create
@@ -1976,7 +1978,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		1000, // Money reward
 		CNM_FALSE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		200, // Score reward
 	},
 	{ // 39: Fireball Object
 		WobjFireball_Create, // Create
@@ -2010,7 +2013,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		750, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		150, // Score reward
 	},
 	{ // 41: Bozo Object
 		WobjBozo_Create, // Create
@@ -2024,7 +2028,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		10000, // Money reward
 		CNM_FALSE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		500, // Score reward
 	},
 	{ // 42: Sliver Slime Object
 		WobjSliverSlime_Create, // Create
@@ -2052,7 +2057,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		5000, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		50, // Score reward
 	},
 	{ // 44: TT Minion Small Object
 		WobjTTMinionSmall_Create, // Create
@@ -2078,7 +2084,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		10000, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		100, // Score reward
 	},
 	{ // 46: Slime Walker Object
 		WobjSlimeWalker_Create, // Create
@@ -2094,7 +2101,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		5000, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		100, // Score reward
 	},
 	{ // 47: Mega Fish Object
 		WobjMegaFish_Create, // Create
@@ -2124,7 +2132,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.01f, // Strength reward
 		12500, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		4900, // Score reward
 	},
 	{ // 49: Lava Dragon Body Piece Object
 		WobjLavaDragonBody_Create, // Create
@@ -2338,7 +2347,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.01f, // Strength reward
 		10000, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		900, // Score reward
 	},
 	{ // 64: Super Dragon Boss Landing Zone Object
 		WobjSuperDragonLandingZone_Create, // Create
@@ -2424,7 +2434,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		20000, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		300, // Score reward
 	},
 	{ // 70: Bozo Laser Lock-On Target Object
 		WobjBozoLaserLockon_Create, // Create
@@ -2470,7 +2481,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.05f, // Strength reward
 		100000, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		4900, // Score reward
 	},
 	{ // 73: Checkpoint Object
 		WobjCheckpoint_Create, // Create
@@ -2496,7 +2508,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		100, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		100, // Score reward
 	},
 	{ // 75: Spike Guy Spike Attack Object
 		WobjSpikeGuySpike_Create, // Create
@@ -2817,7 +2830,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		500, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		100, // Score reward
 	},
 	{ // 98: Small Rock Guy (1) Enemy Object
 		WobjRockGuySmall1_Create, // Create
@@ -2858,7 +2872,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		750, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		200, // Score reward
 	},
 	{ // 101: Smasher Rock Guy Enemy Object
 		WobjRockGuySmasher_Create, // Create
@@ -2874,7 +2889,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		1500, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_TRUE // Can respawn?
+		CNM_TRUE, // Can respawn?
+		400, // Score reward
 	},
 	{ // 102: Spear from a medium Rock Guy Enemy Object
 		WobjRockGuySpear_Create, // Create

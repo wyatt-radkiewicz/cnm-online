@@ -232,7 +232,7 @@ void WobjHeavy_Update(WOBJ *wobj)
 		}
 	}
 	
-	WobjPhysics_ApplyWindForces(wobj);
+	//WobjPhysics_ApplyWindForces(wobj);
 	WobjPhysics_EndUpdate(wobj);
 }
 
@@ -329,6 +329,7 @@ void WobjBozoPin_Create(WOBJ *wobj)
 	wobj->strength = 3.0f;
 	wobj->custom_ints[0] = 0;
 	wobj->speed = 4.0f;
+	if (wobj->custom_floats[0] == 0.0f) wobj->speed = 0.0f;
 	wobj->custom_floats[1] = 0.0f;
 }
 void WobjBozoPin_Update(WOBJ *wobj)
@@ -393,6 +394,7 @@ void WobjBozo_Create(WOBJ *wobj)
 	wobj->anim_frame = 0;
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->health = 100.0f;
+	if (wobj->custom_floats[0] > 0.001f) wobj->health = wobj->custom_floats[0];
 	wobj->strength = 16.66667f;
 }
 void WobjBozo_Update(WOBJ *wobj)

@@ -318,20 +318,21 @@ void FileSystem_SearchForLevels(int clear_level_list)
 		"tt.cnmb"
 	};
 	for (int i = 0; i < sizeof(hardcoded_levels)/sizeof(const char *); i++) {
-		char cnms_level_name_path[FILESYSTEM_MAX_LENGTH + 1];
-		int l;
-		strcpy(levels[num_levels], hardcoded_levels[i]);
-
-		Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels]);
-
-		*strrchr(levels[num_levels++], '.') = '\0';
-
-		l = num_levels - 1;
-		strcpy(cnms_level_name_path, levels[l]);
-		strcat(cnms_level_name_path, ".cnms");
-		Serial_LoadSpawnersLevelName(cnms_level_name_path, level_names[l]);
-		if (strcmp(level_names[l], "") == 0)
-			strcpy(level_names[l], levels[l]);
+        char cnms_level_name_path[FILESYSTEM_MAX_LENGTH + 1];
+        int l;
+        strcpy(levels[num_levels], "levels/");
+        strcat(levels[num_levels], hardcoded_levels[i]);
+        
+        Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels]);
+        
+        *strrchr(levels[num_levels++], '.') = '\0';
+        
+        l = num_levels - 1;
+        strcpy(cnms_level_name_path, levels[l]);
+        strcat(cnms_level_name_path, ".cnms");
+        Serial_LoadSpawnersLevelName(cnms_level_name_path, level_names[l]);
+        if (strcmp(level_names[l], "") == 0)
+            strcpy(level_names[l], levels[l]);
 	}
 }
 #endif

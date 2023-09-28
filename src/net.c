@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <string.h>
-#include <SDL_net.h>
 #include "net.h"
 #include "utility.h"
 #include "console.h"
 #include "game.h"
 #include "pool.h"
 
+
+static int net_initialized = CNM_FALSE;
 #define NET_MAX_POLLING_FUNCS 8
 
 typedef struct _NET_SAFE
@@ -15,17 +16,20 @@ typedef struct _NET_SAFE
 	int times_sent;
 	struct _NET_SAFE *next, *last;
 } NET_SAFE;
-
-static int net_initialized = CNM_FALSE;
-static UDPsocket net_socket;
 static NET_SAFE *net_head;
 static int net_fake_loss;
 static uint32_t net_avg_incoming[30];
 static uint32_t net_avg_outgoing[30];
-//static POOL *net_pool;
-static UDPpacket *net_packet;
 static int net_id;
 static NET_POLL_FUNC polling_funcs[NET_MAX_POLLING_FUNCS];
+//static POOL *net_pool;
+
+#ifndef __EMSCRIPTEN__
+#include <SDL_net.h>
+
+
+static UDPsocket net_socket;
+static UDPpacket *net_packet;
 
 static void Net_Send2(const NET_PACKET *packet, int is_new);
 static void Net_DestroySafe(NET_SAFE *s);
@@ -133,27 +137,6 @@ const char *Net_GetStringFromIp(NET_ADDR *addr)
 	a.port = addr->port;
 	strcpy(ipbuf, SDLNet_ResolveIP(&a));
 	return ipbuf;
-}
-NET_PACKET *Net_CreatePacket(int type, int safe, const NET_ADDR *addr, int size, const void *data)
-{
-	NET_PACKET *packet = malloc(sizeof(NET_PACKET));
-	packet->hdr.type = type;
-	packet->hdr.safe = safe;
-	if (size > NET_DATA_SIZE)
-		size = NET_DATA_SIZE;
-	packet->hdr.size = size;
-	if (size && data != NULL)
-	{
-		memcpy(packet->data, data, size);
-	}
-	packet->hdr.id = net_id++;
-	if (addr != NULL)
-		memcpy(&packet->hdr.addr, addr, sizeof(NET_ADDR));
-	return packet;
-}
-void Net_DestroyPacket(NET_PACKET *packet)
-{
-	free(packet);
 }
 void Net_Send(NET_PACKET *packet)
 {
@@ -535,4 +518,110 @@ void NetTcp_Send(const NET_PACKET *p)
 		else
 			NetTcp_ClosePort();
 	}
+}
+#else
+
+void Net_Init(void) {
+	
+}
+void Net_Quit(void) {
+	
+}
+
+void Net_FakeLoss(int percent) {
+	
+}
+
+NetU32 Net_HostToNetU32(NetU32 host) {
+	return host;
+}
+NetU16 Net_HostToNetU16(NetU16 host) {
+	return host;
+}
+NetU32 Net_NetToHostU32(NetU32 net) {
+	return net;
+}
+NetU16 Net_NetToHostU16(NetU16 net) {
+	return net;
+}
+NET_ADDR Net_GetIpFromString(const char *string) {
+	return (NET_ADDR){
+		.host = 0,
+		.port = 0,
+	};
+}
+const char *Net_GetStringFromIp(NET_ADDR *addr) {
+	return "127.0.0.1";
+}
+void Net_Send(NET_PACKET *packet) {
+	
+}
+NET_PACKET *Net_Recv(void) {
+	return NULL;
+}
+void Net_Update(void) {
+	
+}
+void Net_PollPackets(int max_num) {
+	
+}
+void Net_AddPollingFunc(NET_POLL_FUNC func) {
+	
+}
+void Net_RemovePollingFunc(NET_POLL_FUNC func) {
+	
+}
+int Net_GetAvgUDPIncomingBandwidth(void) {
+	return 1;
+}
+int Net_GetAvgUDPOutgoingBandwidth(void) {
+	return 1;
+}
+void Net_InitAvgUDPOutgoingBandwidth(void) {
+	
+}
+
+void NetTcp_OpenServerPort(void) {
+	
+}
+void NetTcp_ResetServerPort(void) {
+	
+}
+int NetTcp_OpenClientPort(NET_ADDR server) {
+	return 0;
+}
+void NetTcp_ClosePort(void) {
+	
+}
+int NetTcp_HasConnection(void) {
+	return 0;
+}
+NET_PACKET *NetTcp_Recv(void) {
+	return NULL;
+}
+void NetTcp_Send(const NET_PACKET *p) {
+	
+}
+#endif
+
+NET_PACKET *Net_CreatePacket(int type, int safe, const NET_ADDR *addr, int size, const void *data)
+{
+	NET_PACKET *packet = malloc(sizeof(NET_PACKET));
+	packet->hdr.type = type;
+	packet->hdr.safe = safe;
+	if (size > NET_DATA_SIZE)
+		size = NET_DATA_SIZE;
+	packet->hdr.size = size;
+	if (size && data != NULL)
+	{
+		memcpy(packet->data, data, size);
+	}
+	packet->hdr.id = net_id++;
+	if (addr != NULL)
+		memcpy(&packet->hdr.addr, addr, sizeof(NET_ADDR));
+	return packet;
+}
+void Net_DestroyPacket(NET_PACKET *packet)
+{
+	free(packet);
 }

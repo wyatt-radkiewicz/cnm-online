@@ -1,0 +1,49 @@
+TIMER SCORE GIVING
+Your score starts at 24000, and goes down in increments of 1200 every minute.
+(That is about as much score as 4-10 enemies). Here is the time to score chart:
+
+| Minute | 	Score |
+1			24000
+2			22800
+3			21600
+4			20400
+5			19200
+6			18000
+7			16800
+8			15600
+9			14400
+10			13200
+11			12000
+12			10800
+13			9600
+14			8400
+15			7200
+16			6000
+17			4800
+18			3600
+19			2400
+20 			1200
+21			0
+
+ENEMY SCORE GIVING
+| Enemy |		Score |
+Slime			100
+Heavy			200
+Dragon			300
+Bozo Pin		250
+Bozo			600
+Lava Monster	150
+Big TT Minion	200
+Slime Walker	200
+Lava Dragon		5000
+Super Dragon	1000
+Bozo Lazer		400
+Bozo Mk.II		5000
+Spike Guy		200
+Monkey Rock		200
+Rock Slider		300
+Rock Smasher	500
+
+LEVEL SCORES
+Super City		13000
+Arid Canyon		19000
