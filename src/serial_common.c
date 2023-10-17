@@ -178,3 +178,4 @@ void Serial_LoadConfig(void)
 		Console_Print("Cannot load config.txt!");
 	}
 }
+
