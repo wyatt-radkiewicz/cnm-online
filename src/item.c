@@ -9,6 +9,7 @@
 #include "player.h"
 #include "audio.h"
 #include "utility.h"
+#include "savedata.h"
 
 //static void NULL(ITEM *item, WOBJ *player, int camx, int camy);
 static void ItemGeneric_MusleFlash(ITEM *item, WOBJ* player);
@@ -457,6 +458,16 @@ ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
+	},
+	{ // 38: 1-Up Orange Juice Box 
+		{128, 736, 32, 32},
+		NULL, // Update
+		NULL, // On Pickup
+		NULL, // On Drop
+		ItemGenericConsumeable_OnUse, // On Use
+		NULL, // Draw
+		CNM_FALSE, // Can be used when "use" is held
+		WOBJ_DROPPED_ITEM, // What object it is when dropped
 	}
 };
 
@@ -869,6 +880,8 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 	case ITEM_TYPE_100MONEY:
 	case ITEM_TYPE_500MONEY:
 		Interaction_PlaySound(player, 5); break;
+	case ITEM_TYPE_1UP_JUICE:
+		Interaction_PlaySound(player, 55); break;
 	}
 
 	PLAYER_LOCAL_DATA *pld;
@@ -902,6 +915,7 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 		break;
 	case ITEM_TYPE_MEGA_POTION: player->health += 1000.0f; break;
 	case ITEM_TYPE_ULTRA_MEGA_POTION: player->health += 10000.0f; break;
+	case ITEM_TYPE_1UP_JUICE: g_current_save.lives++; break;
 	}
 
 	//player->item = ITEM_TYPE_NOITEM;

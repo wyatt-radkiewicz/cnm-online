@@ -7,6 +7,15 @@
 
 savedata_t g_current_save;
 
+void new_save(savedata_t *data) {
+	data->hp = 100;
+	data->jump = 100;
+	data->level = 0;
+	data->lives = 3;
+	data->speed = 50;
+	data->strength = 5;
+}
+
 static void save_data(LParse *lp, const savedata_t *data);
 static void load_data(LParse *lp, savedata_t *data);
 void save_game(int slot, const savedata_t *data) {

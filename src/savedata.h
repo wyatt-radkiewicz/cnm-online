@@ -10,6 +10,7 @@ typedef struct savedata {
 
 extern savedata_t g_current_save;
 
+void new_save(savedata_t *data);
 void save_game(int slot, const savedata_t *data);
 void load_game(int slot, savedata_t *data);
 

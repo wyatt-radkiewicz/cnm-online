@@ -21,6 +21,7 @@
 #include "filesystem.h"
 #include "camera.h"
 #include "fadeout.h"
+#include "savedata.h"
 
 PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
 
@@ -83,6 +84,9 @@ int skin_bases[10][2] =
 	{128, 768},
 	{5, 4616}
 };
+
+// For when the player dies and respawns
+static float _hud_player_y = 0.0f, _hud_player_yvel = 0.0f;
 
 static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame);
 static void StepPlayerAnimation(WOBJ *player);
@@ -215,6 +219,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->flags |= WOBJ_DONT_DRAW;
 		wobj->flags |= WOBJ_PLAYER_IS_RESPAWNING;
 		wobj->health = 100.0f;
+		if (local_data->death_limbo_counter == 30) {
+			_hud_player_y = -320.0f;
+			_hud_player_yvel = 0.0f;
+		}
 		return;
 	}
 	wobj->flags &= ~WOBJ_PLAYER_IS_RESPAWNING;
@@ -918,8 +926,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->death_cam_timer = 45+20+2;
 		//Camera_TeleportPos((int)wobj->x + 16, (int)wobj->y + 16);
 		Fadeout_FadeDeath(45, 20, 20);
+		g_current_save.lives--;
 		wobj->flags |= WOBJ_INVULN;
 		local_data->death_limbo_counter = 20+20+45+20;
+		_hud_player_y = 0.0f;
+		_hud_player_yvel = -5.0f;
 		wobj->vel_x = 0.0f;
 		wobj->vel_y = 0.0f;
 		wobj->flags |= WOBJ_PLAYER_IS_RESPAWNING;
@@ -1207,6 +1218,28 @@ static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame)
 		}
 	}
 }
+CNM_RECT get_player_src_rect(int anim_frame, int *skin9offsetx, int *skin9offsety) {
+	CNM_RECT pr;
+
+	unsigned int af = *((unsigned int *)(&anim_frame));
+	pr.w = 32;
+	pr.h = 32;
+	pr.x = (af&0xffff);
+	pr.y = ((af >> 16)&0x7fff);
+	
+	if (skin9offsetx) *skin9offsetx = 0;
+	if (skin9offsety) *skin9offsety = 0;
+	if (af & 0x80000000) {
+		
+		//if (pr.y >= 4000) {
+			if (skin9offsetx) *skin9offsetx = -5;
+			if (skin9offsety) *skin9offsety = -8;
+			pr.w = 40;
+			pr.h = 40;
+		//}
+	}
+	return pr;
+}
 static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 {
 	//PLAYER_LOCAL_DATA *ld = (PLAYER_LOCAL_DATA *)wobj->local_data;
@@ -1215,29 +1248,12 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 	wobj_center_x = wobj->x + 16.0f; //wobj->x + (float)(wobj_types[wobj->type].frames[wobj->anim_frame].w / 2);
 	wobj_center_y = wobj->y + 16.0f; //wobj->y + (float)(wobj_types[wobj->type].frames[wobj->anim_frame].h / 2);
 	
-	
-		unsigned int af = *((unsigned int *)(&wobj->anim_frame));
-		pr.w = 32;
-		pr.h = 32;
-		pr.x = (af&0xffff);
-		pr.y = ((af >> 16)&0x7fff);
-	
-		int skin9offsetx = 0;
-		int skin9offsety = 0;
-	if (af & 0x80000000) {
-		
-		//if (pr.y >= 4000) {
-			skin9offsetx = 5;
-			skin9offsety = 8;
-			pr.w = 40;
-			pr.h = 40;
-		//}
-	}
-
+	int skin9offsetx, skin9offsety;
+	pr = get_player_src_rect(wobj->anim_frame, &skin9offsetx, &skin9offsety);
 	Renderer_DrawBitmap2
 	(
-		(int)wobj->x - camx - skin9offsetx,
-		(int)wobj->y - camy - skin9offsety,
+		(int)wobj->x - camx + skin9offsetx,
+		(int)wobj->y - camy + skin9offsety,
 		&pr,
 		0,
 		Wobj_DamageLighting(wobj, Blocks_GetCalculatedBlockLight((int)wobj_center_x / BLOCK_SIZE, (int)wobj_center_y / BLOCK_SIZE)),
@@ -1248,7 +1264,7 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 
 	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
 		Util_SetRect(&r, 384, 32, 32, 32);
-		Renderer_DrawBitmap((int)wobj->x - camx - skin9offsetx, (int)wobj->y - camy - skin9offsety - 32, &r, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap((int)wobj->x - camx + skin9offsetx, (int)wobj->y - camy + skin9offsety - 32, &r, 0, RENDERER_LIGHT);
 	}
 	
 	if (Game_GetFrame() % 3 == 0)
@@ -1430,6 +1446,7 @@ void Player_ResetHUD(void) {
 	memset(hp, 0, sizeof(hp));
 	next_hp = 0;
 }
+
 void Player_DrawHUD(WOBJ *player) {
 	CNM_RECT r;
 	PLAYER_LOCAL_DATA *local_data = (PLAYER_LOCAL_DATA *)player->local_data;
@@ -1561,16 +1578,45 @@ void Player_DrawHUD(WOBJ *player) {
 		Renderer_DrawBitmap(3, RENDERER_HEIGHT - 35, &item_types[player->item].frames[0], 0, RENDERER_LIGHT);
 	}
 
+	//Util_SetRect(&r, 0, 4288, 64, 32);
+	//Renderer_DrawBitmap2(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 32, &r, 2, RENDERER_LIGHT, 1, 1);
 	Util_SetRect(&r, 0, 4288, 64, 32);
-	Renderer_DrawBitmap2(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 32, &r, 2, RENDERER_LIGHT, 1, 1);
+	Renderer_DrawBitmap(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 32, &r, 2, RENDERER_LIGHT);
 
 	int bx = RENDERER_WIDTH - 64, by = RENDERER_HEIGHT - 32;
-	sprintf(temp_hud, "%d%%%%", (int)ceilf(player->speed * 20.0f));
-	Renderer_DrawText(bx+8, by+10, 0, RENDERER_LIGHT, "SP");
-	Renderer_DrawText(bx+62 - (strlen(temp_hud)-1) * 8, by+10, 0, RENDERER_LIGHT, temp_hud);
-	sprintf(temp_hud, "%d%%%%", (int)ceilf(player->jump * 10.0f));
-	Renderer_DrawText(bx+8, by+22, 0, RENDERER_LIGHT, "JP");
-	Renderer_DrawText(bx+62 - (strlen(temp_hud) - 1) * 8, by+22, 0, RENDERER_LIGHT, temp_hud);
+	int skinoffx, skinoffy, anim = local_data->curranim, fr = local_data->currframe;
+	_hud_player_y += _hud_player_yvel;
+	_hud_player_yvel += 0.3f;
+	if (local_data->death_limbo_counter > 30) {
+		anim = PLAYER_ANIM_HURT;
+		fr = 0;
+	} else if (local_data->death_limbo_counter > 0) {
+		if (_hud_player_y >= -0.01f && _hud_player_y <= 0.01f) {
+			anim = PLAYER_ANIM_STANDING;
+		}
+	} else if (_hud_player_y >= 0.0f) {
+		_hud_player_y = 0.0f;
+		_hud_player_yvel = 0.0f;
+	}
+	if (_hud_player_y < -1.0f && local_data->death_limbo_counter <= 30) {
+		anim = PLAYER_ANIM_JUMP;
+		fr = 0;
+	}
+	PlayerAnimGetRect(&r, local_data->currskin, anim, fr); // Get the source rect
+	get_player_src_rect(player->anim_frame, &skinoffx, &skinoffy); // Get draw offsets
+	skinoffx += 34-5;
+	skinoffy += 11-4 + (int)_hud_player_y;
+	Renderer_DrawBitmap2(bx+skinoffx, by+skinoffy, &r, 0, RENDERER_LIGHT, 1, 0);
+	Util_SetRect(&r, 0, 4288+32, 64, 16);
+	Renderer_DrawBitmap(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 16, &r, 0, RENDERER_LIGHT);
+	sprintf(temp_hud, "%d", g_current_save.lives);
+	Renderer_DrawText(RENDERER_WIDTH - 64+6, RENDERER_HEIGHT - 32+18, 0, RENDERER_LIGHT, temp_hud);
+	//sprintf(temp_hud, "%d%%%%", (int)ceilf(player->speed * 20.0f));
+	//Renderer_DrawText(bx+8, by+10, 0, RENDERER_LIGHT, "SP");
+	//Renderer_DrawText(bx+62 - (strlen(temp_hud)-1) * 8, by+10, 0, RENDERER_LIGHT, temp_hud);
+	//sprintf(temp_hud, "%d%%%%", (int)ceilf(player->jump * 10.0f));
+	//Renderer_DrawText(bx+8, by+22, 0, RENDERER_LIGHT, "JP");
+	//Renderer_DrawText(bx+62 - (strlen(temp_hud) - 1) * 8, by+22, 0, RENDERER_LIGHT, temp_hud);
 
 	// Draw score hud
 	Util_SetRect(&r, 64, 4288, 96, 32);

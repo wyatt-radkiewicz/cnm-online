@@ -22,6 +22,7 @@
 #include "interaction.h"
 #include "background.h"
 #include "gamelua.h"
+#include "savedata.h"
 
 #define GAME_MAX_STATES 32
 
@@ -283,6 +284,7 @@ void GameState_Base_Init(void)
 	FileSystem_RegisterGfx("gfx.bmp");
 	FileSystem_SearchForLevels(CNM_FALSE);
 	Serial_LoadAudioCfg("audio.cnma");
+	new_save(&g_current_save);
 	Console_Print("WELCOME TO CNM ONLINE "CNM_VERSION_STRING"!");
 	
 	strcpy(game_vars[GAME_VAR_LEVEL].data.string, dgame_info.lvl);

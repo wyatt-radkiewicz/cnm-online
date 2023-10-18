@@ -1673,6 +1673,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 			{160, 480, 32, 32},	// Unused
 			{192, 480, 32, 32},	// Unused
 			{224, 480, 32, 32},	// Unused
+			{128, 736, 32, 32}, // 1-Up box
 		},
 		0.0f,				  // Strength Reward
 		0,					  // Money Reward
