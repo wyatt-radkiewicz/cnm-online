@@ -215,6 +215,7 @@ SPAWNER *Spawners_Iterate(SPAWNER *iter)
 		return iter->alloc.next;
 	}
 }
+//#include "console.h"
 void Spawners_CreateWobjsFromSpawners(int gridx, int gridy)
 {
 	OBJGRID_ITER iter;
@@ -258,6 +259,7 @@ void Spawners_CreateWobjsFromSpawners(int gridx, int gridy)
 		/* Spawn a thing */
 		for (int i = 0; i < create_count; i++)
 		{
+			//if (spawner->wobj_type == WOBJ_CUSTOMIZEABLE_MOVEABLE_PLATFORM) Console_Print("%u -> ci", spawner->custom_int);
 			created = Wobj_CreateOwned(spawner->wobj_type, spawner->x, spawner->y, spawner->custom_int, spawner->custom_float);
 			created->parent_spawner = spawner;
 			//created->dropped_death_item = spawner->dropped_item;

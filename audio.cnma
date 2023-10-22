@@ -79,6 +79,8 @@ MODE SOUNDS
 53 sounds/train1.wav
 54 sounds/train2.wav
 55 sounds/1up.wav
+56 sounds/itembroke.wav
+57 sounds/repair.wav
 MODE MUSIC_VOLUME_OVERRIDE
 MODE LEVELSELECT_ORDER
 race 0

@@ -47,6 +47,7 @@ typedef enum _ITEM_TYPES
 	ITEM_TYPE_KEY_GREEN,
 	ITEM_TYPE_KEY_BLUE,
 	ITEM_TYPE_1UP_JUICE,
+	ITEM_TYPE_WRENCH,
 } ITEM_TYPES;
 
 typedef struct _WOBJ WOBJ;
@@ -61,15 +62,17 @@ typedef struct _ITEM_TYPE
 	ITEM_DRAW_FUNC draw;
 	int use_on_held;
 	int wobj_dropped_type;
+	float max_durability;
 } ITEM_TYPE;
 
 typedef struct _ITEM
 {
 	int type;
-	int anim_frame, times_used, life_timer, use_timer, durability;
+	int anim_frame, times_used, life_timer, use_timer;
 	int custom_timer;
 	int custom_ints[2];
 	float custom_floats[2];
+	float durability;
 	WOBJ *melee_obj, *objs[8];
 	int in_use, last_in_use;
 } ITEM;
@@ -83,7 +86,8 @@ const ITEM_TYPE *Item_GetItemType(int type_id);
 
 void Item_TryPickupAndDrop(WOBJ *player);
 void Item_Pickup(WOBJ *player, WOBJ *dropped_item);
-void Item_PickupByType(WOBJ *player, int itemtype);
+// Set durability to a negative number to use max durability for the item
+void Item_PickupByType(WOBJ *player, int itemtype, float durability);
 void Item_Drop(WOBJ *player);
 void Item_Update(WOBJ *player);
 void Item_Draw(WOBJ *player, int camx, int camy);

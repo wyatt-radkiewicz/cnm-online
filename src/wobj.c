@@ -114,6 +114,8 @@ WOBJ *Wobj_CreateOwned(int type, float x, float y, int ci, float cf)
 		memcpy(wobj->history + i, (struct wobjdata *)wobj, sizeof(struct wobjdata));
 	}
 
+	//if (type == WOBJ_CUSTOMIZEABLE_MOVEABLE_PLATFORM)
+	//	Console_Print("ci: %d", ci);
 	if (wobj_types[type].create != NULL)
 		wobj_types[type].create(wobj);
 	return wobj;
@@ -860,6 +862,22 @@ int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y)
 	CNM_BOX b;
 	Util_SetBox(&b, wobj->x + offset_x + wobj->hitbox.x, wobj->y + offset_y + wobj->hitbox.y, wobj->hitbox.w, wobj->hitbox.h);
 	return Blocks_IsCollidingWithSolid(&b);
+}
+int Wobj_IsCollidingWithBlocksOrObjects(WOBJ *wobj, float offset_x, float offset_y) {
+	if (Wobj_IsCollidingWithBlocks(wobj, offset_x, offset_y)) return CNM_TRUE;
+	WOBJ *other, *jump_through;
+	wobj->y += offset_y;
+	wobj->x += offset_x;
+	other = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+	if ((jump_through = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH)) != NULL)
+	{
+		if (((wobj->y - offset_y) + wobj->hitbox.y + wobj->hitbox.h) > (jump_through->y + jump_through->hitbox.y + 1) ||
+			wobj->vel_y < 0.0f)
+			jump_through = NULL;
+	}
+	wobj->y -= offset_y;
+	wobj->x -= offset_x;
+	return other || jump_through;
 }
 void Wobj_IterateOverOwned(WOBJ **iter)
 {

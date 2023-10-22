@@ -359,16 +359,28 @@ void Serial_LoadSpawners(const char *cnms_file)
 	ee[5] = lparse_get_entry(lp, "SP_CF");
 	ee[6] = lparse_get_entry(lp, "SP_DITEM");
 	Spawners_UnloadSpawners();
+	//Console_Print("LOADING!!!");
 	for (i = 0; i < num_spawners; i++) {
+		//Console_Print("ee[4] offs: %u, ee[4] id: %d", ee[4]->offs, (int)(ee[4] - lp->entries));
+		// Console_Print("i: %d", i);
 		lparse_get_data(lp, ee[0], i*2, 1, &tmpspawner.x);
 		lparse_get_data(lp, ee[0], i*2+1, 1, &tmpspawner.y);
 		lparse_get_data(lp, ee[1], i, 1, &tmpspawner.wobj_type);
+		//Console_Print("wobj type: %d", tmpspawner.wobj_type);
 		lparse_get_data(lp, ee[2], i, 1, &tmpspawner.duration);
 		lparse_get_data(lp, ee[3], i, 1, &tmpspawner.max);
 		created = Spawners_CreateSpawner(tmpspawner.x, tmpspawner.y, tmpspawner.wobj_type, tmpspawner.duration, tmpspawner.max);
 		lparse_get_data(lp, ee[4], i, 1, &created->custom_int);
 		lparse_get_data(lp, ee[5], i, 1, &created->custom_float);
 		lparse_get_data(lp, ee[6], i, 1, &created->dropped_item);
+		// if (tmpspawner.wobj_type == WOBJ_CUSTOMIZEABLE_MOVEABLE_PLATFORM) {
+		// 	Console_Print("loaded cmp ci = %u", created->custom_int);
+		// 	Console_Print("duration = %u", tmpspawner.duration);
+		// 	Console_Print("max = %u", tmpspawner.max);
+		// 	Console_Print("dropped item = %u", created->dropped_item);
+		// 	Console_Print("custom_float: %f", created->custom_float);
+		// 	Console_Print("max spawners: %d", num_spawners);
+		// }
 	}
 	FileSystem_RegisterSpawners(cnms_file);
 	

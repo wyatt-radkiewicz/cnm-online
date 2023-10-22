@@ -811,8 +811,8 @@
     },
     {
       "pos": [
-        6112.0,
-        896.0
+        6096.215,
+        880.0
       ],
       "type_data": {
         "CustomizeableMoveablePlatform": {
@@ -839,7 +839,7 @@
     {
       "pos": [
         6272.0,
-        719.68945
+        720.0
       ],
       "type_data": {
         "CustomizeableMoveablePlatform": {
@@ -1451,7 +1451,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1464,11 +1464,11 @@
     {
       "pos": [
         9472.0,
-        1569.2821
+        1568.0
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1485,7 +1485,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1502,7 +1502,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1515,11 +1515,11 @@
     {
       "pos": [
         9472.0,
-        1472.0
+        1471.6895
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1531,12 +1531,12 @@
     },
     {
       "pos": [
-        9472.0,
+        9471.689,
         1440.0
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1553,7 +1553,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1570,7 +1570,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1587,7 +1587,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1604,7 +1604,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1621,7 +1621,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1638,7 +1638,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1655,7 +1655,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1672,7 +1672,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1689,7 +1689,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1706,7 +1706,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": ""
         }
       },
       "spawning_criteria": {
@@ -1741,57 +1741,6 @@
       "type_data": {
         "RockGuy": {
           "rock_guy_type": "Medium"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null
-    },
-    {
-      "pos": [
-        224.0,
-        1456.0
-      ],
-      "type_data": {
-        "UpgradeTrigger": {
-          "trigger_type": "CrystalWings"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null
-    },
-    {
-      "pos": [
-        320.0,
-        1456.0
-      ],
-      "type_data": {
-        "UpgradeTrigger": {
-          "trigger_type": "Wings"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null
-    },
-    {
-      "pos": [
-        784.0,
-        1376.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "Wrench"
         }
       },
       "spawning_criteria": {

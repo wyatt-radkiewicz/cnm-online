@@ -78,9 +78,12 @@ MODE SOUNDS
 52 sounds/carage.wav
 53 sounds/train1.wav
 54 sounds/train2.wav
+55 sounds/1up.wav
+56 sounds/itembroke.wav
 MODE MUSIC_VOLUME_OVERRIDE
 MODE LEVELSELECT_ORDER
 race 0
+ghz 0
 bonus 100
 arena 100
 rrn 0

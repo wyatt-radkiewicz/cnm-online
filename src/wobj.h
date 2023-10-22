@@ -299,6 +299,7 @@ int Wobj_TryTeleportWobj(WOBJ *wobj);
 WOBJ *Wobj_GetWobjColliding(WOBJ *wobj, int flags);
 WOBJ *Wobj_GetWobjCollidingWithType(WOBJ *wobj, int type);
 int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y);
+int Wobj_IsCollidingWithBlocksOrObjects(WOBJ *wobj, float offset_x, float offset_y);
 void Wobj_IterateOverOwned(WOBJ **iter);
 void Wobj_IterateOverDebugUnowned(WOBJ **iter);
 void Wobj_InitGridIteratorOwned(WOBJ_GRID_ITER *iter, int gx, int gy);

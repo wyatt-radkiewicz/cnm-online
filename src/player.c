@@ -25,6 +25,8 @@
 
 PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
 
+#define FLAPACCEL 8.0f 
+
 static int *anim_lengths;
 
 static int anim_lengths1[PLAYER_ANIM_MAX] = 
@@ -162,6 +164,15 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->sliding_cap_landing_speed = CNM_FALSE;
 	local_data->slide_jump_cooldown = 0;
 	local_data->offhand_item = 0;
+	local_data->lock_controls = CNM_FALSE;
+	//local_data->flap_accadd = 0.0f;
+	//local_data->flap_spdadd = 0.0f;
+	local_data->isflying = CNM_FALSE;
+	local_data->numflaps = 0;
+	local_data->isdiving = CNM_FALSE;
+	local_data->saved_diving_vel = 0.0f;
+	local_data->upgradehp = 100.0f;
+	//local_data->item_durability = 100.0f;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
@@ -177,7 +188,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		//	//wobj->anim_frame = 0;
 		//}
 	}
-	if (Game_GetVar(GAME_VAR_NOCLIP)->data.integer || local_data->finish_timer > 0)
+	if (Game_GetVar(GAME_VAR_NOCLIP)->data.integer)
 	{
 		float spd = wobj->speed * 2.0f;
 		if (Input_GetButton(INPUT_DROP, INPUT_STATE_PLAYING) && local_data->finish_timer <= 0)
@@ -193,6 +204,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 				wobj->y -= spd;
 		}
 		return;
+	}
+	if (local_data->finish_timer == 0 || local_data->finish_timer > PLAYER_FINISH_TIMER) {
+		local_data->lock_controls = CNM_FALSE;
+	} else {
+		local_data->lock_controls = CNM_TRUE;
 	}
 	
 	local_data->pvp_damage_indicator_timer--;
@@ -242,6 +258,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	final_speed = wobj->speed;
 	final_jmp = wobj->jump;
 	final_grav = local_data->grav + local_data->grav_add;
+
 	if (local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER)
 	{
 		final_speed *= maxpowerinfos[local_data->mpoverride].spd;
@@ -252,6 +269,63 @@ void WobjPlayer_Update(WOBJ *wobj)
 		accel = 0.1f;
 		dec = 0.2f;
 	}
+
+	// Air drag due to wings
+	// if (local_data->upgrade_state == PLAYER_UPGRADE_WINGS) {
+	// 	if (!Wobj_IsGrouneded(wobj)) {
+	// 		if (fabsf(wobj->vel_x) > wobj->speed * 0.6f && wobj->vel_y < 4.0f) {
+	// 				float decfactor = dec / 2.0f;
+	// 				if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) && wobj->vel_x > 0.0f) decfactor += accel;
+	// 				if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) && wobj->vel_x < 0.0f) decfactor += accel;
+	// 				if (wobj->vel_x > 0.0f) wobj->vel_x -= decfactor;
+	// 				if (wobj->vel_x < 0.0f) wobj->vel_x += decfactor;
+	// 				//local_data->flap_spdadd -= dec / 2.0f;
+	// 		} else if (fabsf(wobj->vel_x) < wobj->speed * 2.0f && wobj->vel_y > 4.0f) {
+	// 			if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING)) {
+	// 				// if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING)) wobj->vel_x += 0.05f;
+	// 				// if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) wobj->vel_x -= 0.05f;
+	// 				local_data->flap_spdadd += 0.05f + 0.1f;
+	// 				wobj->vel_y *= 0.75f;
+	// 			}
+	// 		}
+	// 	}
+	// }
+	if (Wobj_IsGrouneded(wobj)) {
+		local_data->isflying = CNM_FALSE;
+		local_data->numflaps = 0;
+	}
+	if ((local_data->upgrade_state == PLAYER_UPGRADE_WINGS ||
+		local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) && !Wobj_IsGrouneded(wobj)) {
+		//if (local_data->isdiving) local_data->slide_jump_cooldown = 3;
+		if (wobj->vel_y > 1.0f && wobj->vel_y < 9.0f && local_data->isflying) {
+			final_speed += wobj->vel_y / 3.0f;
+			if (!Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING)) wobj->vel_y *= 0.85f;
+		}
+		if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) && 
+			!Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) &&
+			wobj->vel_y > 1.0f) {
+			local_data->isdiving = CNM_TRUE;
+			wobj->vel_y += 0.2f;
+			if (fabsf(wobj->vel_x) < wobj->speed * 3.0f) {
+				const float spdadd = local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS ? 0.5f : 0.2f;
+				if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING)) wobj->vel_x += spdadd;
+				if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) wobj->vel_x -= spdadd;
+			}
+			local_data->saved_diving_vel = local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS ? wobj->vel_y * 1.25f : wobj->vel_y / 2.0f;
+		}
+	}
+	if (Wobj_IsGrouneded(wobj) && local_data->isdiving && local_data->upgrade_state != PLAYER_UPGRADE_CRYSTAL_WINGS) {
+		local_data->isdiving = CNM_FALSE;
+		local_data->saved_diving_vel = 0.0f;
+		if (wobj->vel_x > wobj->speed * 1.5f) wobj->vel_x = wobj->speed * 1.5f;
+		if (wobj->vel_x < wobj->speed * -1.5f) wobj->vel_x = wobj->speed * -1.5f;
+	}
+	//final_speed -= local_data->flap_spdadd;
+	//local_data->flap_spdadd -= 0.05f;
+	//if (Wobj_IsGrouneded(wobj)) local_data->flap_spdadd = 0.0f;
+	//if (local_data->flap_spdadd < 0.0f) local_data->flap_spdadd = 0.0f;
+	//local_data->flap_accadd -= 0.01f;
+	//if (local_data->flap_accadd < 0.0f) local_data->flap_accadd = 0.0f;
 
 	if (local_data->animforce_cooldown_timer-- <= 0)
 		local_data->animforce_cooldown = CNM_FALSE;
@@ -288,8 +362,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 				accel *= 2.5f;
 			}
 			if (wobj->vel_y > -wobj->jump / 2.0f) {
-				if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING)) {
-					local_data->grav_add += 0.1f;
+				if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->lock_controls) {
+					//local_data->grav_add += 0.1f;
 				}
 			}
 		} else {
@@ -307,10 +381,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 			Interaction_CreateWobj(WOBJ_WATER_SPLASH_EFFECT, wobj->x, wobj->y - 16.0f, 0, 0.0f);
 		float cmul = local_data->control_mul;
 		if (cmul < 0.0f) cmul = 0.0f;
-		local_data->control_mul += 0.01f;
-		if (local_data->control_mul > 1.0f) local_data->control_mul = 1.0f;
+		if (local_data->control_mul < 1.0f) local_data->control_mul += 0.01f;
+		if (local_data->control_mul > 1.0f) local_data->control_mul -= 0.01f;
+		if (fabsf(local_data->control_mul - 1.0f) < 0.08f) local_data->control_mul = 1.0f;
+		//local_data->control_mul += local_data->flap_accadd;
 
-		if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) && wobj->vel_x < final_speed)
+		if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) && wobj->vel_x < final_speed && !local_data->lock_controls)
 		{
 			//if (wobj->vel_x < final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x < 0.0f)) {
@@ -332,7 +408,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			//	wobj->vel_x += accel * 2.0f;
 			wobj->flags &= ~WOBJ_HFLIP;
 		}
-		if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) && wobj->vel_x > -final_speed)
+		if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) && wobj->vel_x > -final_speed && !local_data->lock_controls)
 		{
 			//if (wobj->vel_x > -final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x > 0.0f)) {
@@ -364,7 +440,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 
 		if ((Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) || Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING)) &&
-			!local_data->animforce_cooldown && Wobj_IsGrouneded(wobj))
+			!local_data->animforce_cooldown && Wobj_IsGrouneded(wobj) && !local_data->lock_controls)
 		{
 			if (local_data->curranim != PLAYER_ANIM_JUMP_END)
 			{
@@ -375,7 +451,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		}
 
-		if (Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->is_sliding && local_data->slide_jump_cooldown <= 0) {
+		if (Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->is_sliding && local_data->slide_jump_cooldown <= 0 && !local_data->lock_controls) {
 			if (wobj->vel_x > 2.0f || wobj->vel_x < -2.0f || local_data->sliding_crit_timer > 0) {
 				wobj->vel_x *= 1.25f;
 				if (local_data->sliding_crit_timer > 0 && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) {
@@ -416,7 +492,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if ((Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
 			Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING)) &&
 			(!Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) &&
-			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding) {
+			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding && !local_data->lock_controls) {
 			//wobj->vel_x = 0.0f;
 			if (wobj->vel_x > dec) {
 				wobj->vel_x -= dec * cmul;
@@ -428,7 +504,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 
 		if (!(Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
-			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding)
+			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding && !local_data->lock_controls)
 		{
 			if (wobj->vel_x > dec)
 				wobj->vel_x -= dec * cmul;
@@ -448,7 +524,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			if (!Wobj_IsGrouneded(wobj))
 			{
-				if (!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING))
+				if (!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls)
 				{
 					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocks(wobj, 0.0f, 32.0f); i++)
 						wobj->y += 24.0f;
@@ -477,28 +553,60 @@ void WobjPlayer_Update(WOBJ *wobj)
 		else if (local_data->upgrade_state == PLAYER_UPGRADE_WINGS || (
 				local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER &&
 				maxpowerinfos[local_data->mpoverride].ability == 2
-				))
+				) || local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS)
 		{
-			if (!Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING))
+			if (!Wobj_IsGrouneded(wobj) && Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls &&
+				(local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS || local_data->numflaps < 2))
 			{
-				if (wobj->vel_y > -3.0f)
-					wobj->vel_y = -3.0f;
+				local_data->isflying = CNM_TRUE;
+				if (!local_data->isdiving || wobj->vel_y < 3.0f) {
+					local_data->numflaps++;
+					if (wobj->vel_y > 2.0f) wobj->vel_y = 2.0f;
+					wobj->vel_y -= FLAPACCEL;
+					if (local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) wobj->vel_y -= FLAPACCEL;
+					local_data->isdiving = CNM_FALSE;
+					//local_data->flap_spdadd = wobj->speed * (1.0f / 5.0f);
+					//local_data->flap_accadd = 0.1f;
+					//wobj->vel_x *= 0.6f;
+					//local_data->saved_diving_vel = 0.0f;
+					if (local_data->upgrade_state == PLAYER_UPGRADE_WINGS) {
+						local_data->control_mul = 0.2f;
+						if (wobj->vel_x > wobj->speed / 2.0f) wobj->vel_x = wobj->speed / 2.0f;
+						else if (wobj->vel_x < -wobj->speed / 2.0f) wobj->vel_x = -wobj->speed / 2.0f;
+						else if (wobj->vel_x > 0.75f) wobj->vel_x = wobj->speed / 2.5f;
+						else if (wobj->vel_x < -0.75f) wobj->vel_x = -wobj->speed / 2.5f;
+					} else {
+						local_data->control_mul = 2.0f;
+						wobj->vel_x *= 0.75f;
+					}
+					if (wobj->vel_y < -FLAPACCEL) wobj->vel_y = -FLAPACCEL;
+				}
+			}
+			if (!Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls) {
+				if (local_data->isdiving && wobj->vel_y > -local_data->saved_diving_vel) {
+					if (local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) wobj->vel_x *= 1.0f;
+					else wobj->vel_x *= 0.7f;
+					wobj->vel_y -= 1.0f;
+					if (wobj->vel_y <= -local_data->saved_diving_vel) {
+						local_data->isdiving = CNM_FALSE;
+					}
+				}
 			}
 		}
-		else if (local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS)
-		{
-			if (!Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING))
-			{
-				if (fabsf(wobj->vel_x) < 15.0f)
-					wobj->vel_x *= 1.1f;
+		//else if (local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS)
+		//{
+		//	if (!Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls)
+		//	{
+		//		if (fabsf(wobj->vel_x) < 15.0f)
+		//			wobj->vel_x *= 1.1f;
 
-				if (wobj->vel_y > -15.0f)
-					wobj->vel_y -= final_grav * 2.0f;
-			}
-		}
+		//		if (wobj->vel_y > -15.0f)
+		//			wobj->vel_y -= final_grav * 2.0f;
+		//	}
+		//}
 		else if (local_data->upgrade_state == PLAYER_UPGRADE_VORTEX)
 		{
-			if (!Wobj_IsGrouneded(wobj) && Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING))
+			if (!Wobj_IsGrouneded(wobj) && Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls)
 			{
 				int do_attract = CNM_FALSE;
 				WOBJ *old_vortex = Wobj_GetAnyWOBJFromUUIDAndNode
@@ -553,7 +661,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->jumped = 0;
 				wobj->vel_y = 0.0f;
 			}
-			if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING))
+			if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls)
 			{
 				float jmp_speed = final_jmp;
 				if (local_data->in_water)
@@ -595,7 +703,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) &&
 				local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER &&
 				maxpowerinfos[local_data->mpoverride].ability == 1 &&
-				!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP))
+				!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && !local_data->lock_controls)
 			{
 				float jmp_speed = final_jmp / 1.5f;
 				if (local_data->in_water)
@@ -630,7 +738,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				//local_data->ability3_timer = 30;
 			}
 		}
-		if (local_data->jumped > 0 && !Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && wobj->vel_y < (final_jmp / -2.0f))
+		if (local_data->jumped > 0 && !Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && wobj->vel_y < (final_jmp / -2.0f && !local_data->lock_controls))
 		{
 			wobj->vel_y = final_jmp / -2.0f;
 		}
@@ -680,14 +788,20 @@ void WobjPlayer_Update(WOBJ *wobj)
 		Background_SetVisibleLayers(other->custom_ints[0], other->custom_ints[1]);
 	int old_upgrade_state = local_data->upgrade_state;
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_SHOES);
-	if (other != NULL)
+	if (other != NULL) {
 		local_data->upgrade_state = PLAYER_UPGRADE_SHOES;
+		local_data->upgradehp = 100.0f;
+	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_WINGS);
-	if (other != NULL)
+	if (other != NULL) {
 		local_data->upgrade_state = PLAYER_UPGRADE_WINGS;
+		local_data->upgradehp = 100.0f;
+	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_CRYSTAL_WINGS);
-	if (other != NULL)
+	if (other != NULL) {
 		local_data->upgrade_state = PLAYER_UPGRADE_CRYSTAL_WINGS;
+		local_data->upgradehp = 50.0f;
+	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_NOUPGRADE_TRIGGER);
 	if (other != NULL)
 		local_data->upgrade_state = PLAYER_UPGRADE_NONE;
@@ -704,8 +818,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_VORTEX_UPGRADE_TRIGGER);
-	if (other != NULL)
+	if (other != NULL) {
 		local_data->upgrade_state = PLAYER_UPGRADE_VORTEX;
+		local_data->upgradehp = 100.0f;
+	}
 
 	if (local_data->upgrade_state != PLAYER_UPGRADE_MAXPOWER && old_upgrade_state == PLAYER_UPGRADE_MAXPOWER) {
 		wobj->strength /= maxpowerinfos[local_data->mpoverride].strength;
@@ -746,7 +862,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		Interaction_PlaySound(wobj, 33);
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_HEALTH_SET_TRIGGER);
-	if (other != NULL)
+	if (other != NULL && local_data->finish_timer <= 0)
 		wobj->health = other->custom_floats[0];
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_GRAV_TRIGGER);
 	if (other != NULL)
@@ -866,7 +982,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		GetVortexPos(wobj, local_data->vortex_ang, &wobj->x, &wobj->y);
 
 		if ((Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) || local_data->vortex_death)
-			&& !Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f))
+			&& !Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) && !local_data->lock_controls)
 		{
 			float new_ang = local_data->vortex_ang + (CNM_2RAD(90.0f) * local_data->vortex_dir);
 			float new_spd = fabsf(CNM_2DEG(local_data->vortex_speed)) * 0.8f;
@@ -879,7 +995,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 	}
 
-	if (local_data->vortex_death)
+	if (local_data->vortex_death && local_data->finish_timer <= 0)
 	{
 		wobj->health -= 100.0f;
 	}
@@ -903,7 +1019,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			wobj->y = new_tele_pos[1];
 		}
 	}
-	if (wobj->health <= 0.0f)
+	if (wobj->health <= 0.0f && local_data->finish_timer <= 0)
 	{
 		Interaction_PlaySound(wobj, 47);
 		local_data->in_water = CNM_FALSE;
@@ -933,12 +1049,18 @@ void WobjPlayer_Update(WOBJ *wobj)
 		_hud_player_yvel = -5.0f;
 		wobj->vel_x = 0.0f;
 		wobj->vel_y = 0.0f;
+		local_data->upgradehp -= 15.0f;
+		if (wobj->item) {
+			Item_GetCurrentItem()->durability -= 7.5f;
+		}
+		//local_data->item_durability -= 10.0f;
 		wobj->flags |= WOBJ_PLAYER_IS_RESPAWNING;
 		{
 			//WOBJ *tempitem;
 			int itemtype = Item_GetCurrentItem()->type;
+			float durability = Item_GetCurrentItem()->durability;
 			Item_DestroyCurrentItem(wobj);
-			Item_PickupByType(wobj, itemtype);
+			Item_PickupByType(wobj, itemtype, durability);
 			//tempitem = Wobj_CreateOwned(WOBJ_DROPPED_ITEM, wobj->x, wobj->y, itemtype, 0.0f);
 			//Item_Pickup(wobj, tempitem);
 		}
@@ -951,7 +1073,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	//wobj->y += stored_movestand_yvel;
 
 	// HPCOST from MAXPOWER upgrade
-	if (local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER) {
+	if (local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER && local_data->finish_timer <= 0) {
 		wobj->health -= maxpowerinfos[local_data->mpoverride].hpcost / 30.0f;
 	}
 
@@ -959,14 +1081,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 	Item_Update(wobj);
 	Item_TryUse(wobj);
 
-	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING) && !local_data->lock_controls) {
 		int curritem = Item_GetCurrentItem()->type;
+		float currdur = Item_GetCurrentItem()->durability;
 		int offhand = local_data->offhand_item;
 		Item_DestroyCurrentItem(wobj);
 		//wobj->item = offhand;
-		Item_PickupByType(wobj, offhand);
+		Item_PickupByType(wobj, offhand, local_data->offhand_durability);
 		Audio_PlaySound(51, CNM_FALSE, wobj->x, wobj->y);
 		local_data->offhand_item = curritem;
+		local_data->offhand_durability = currdur;
 	}
 
 	int recved_lava_damage = CNM_FALSE;
@@ -976,7 +1100,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (!local_data->ability3_hasjumped) {
 		local_data->ability3_timer--;
 	}
-	if (local_data->ability3_timer <= 0) {
+	if (local_data->ability3_timer <= 0 && local_data->finish_timer <= 0) {
 		if (local_data->fire_resistance-- <= 0)
 			recved_lava_damage = Interaction_WobjReceiveBlockDamage(wobj);
 		if (wobj->health >= old_hp)
@@ -990,9 +1114,17 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (wobj->health < old_hp)
 	{
 		wobj->flags |= WOBJ_DAMAGE_INDICATE;
+		local_data->upgradehp -= 0.5f;
+		if (wobj->item) {
+			Item_GetCurrentItem()->durability -= 0.1f;
+		}
+		//local_data->item_durability -= 0.33f;
 		local_data->animforce_cooldown_timer = 4;
 		local_data->animforce_cooldown = CNM_TRUE;
 		local_data->curranim = PLAYER_ANIM_HURT;
+	}
+	if (local_data->upgradehp <= 0.0f) {
+		local_data->upgrade_state = PLAYER_UPGRADE_NONE;
 	}
 
 	if ((recved_lava_damage || recved_normal_damage) && !Audio_IsSoundPlaying(1))
@@ -1049,8 +1181,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->health = PLAYER_HP_MAX;
 	if (wobj->strength > 9.99f)
 		wobj->strength = 9.99f;
-	if (wobj->money > 99999)
-		wobj->money = 99999;
+	// if (wobj->money > 99999)
+	// 	wobj->money = 99999;
 }
 void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 {
@@ -1076,6 +1208,49 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 	//Util_SetRect(&r, (wobj->item % 8) * 32, 352 + (wobj->item / 8) * 32, 32, 32);
 	//if (wobj->item)
 	//	Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 0, RENDERER_LIGHT);
+	if ((wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_WINGS ||
+		(wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_CRYSTAL_WINGS)
+	{
+		int iscryst = (wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_CRYSTAL_WINGS;
+		const CNM_RECT frames[] = {
+			{ 256,    2992, 48, 48 },	
+			{ 256+48, 2992, 48, 48 },	
+			{ 256,    2992+48, 48, 48 },	
+			{ 256+48, 2992+48, 48, 48 },
+			{ 0, 7008, 48, 48 },
+			{ 48, 7008, 48, 48 },
+		}, framesc[] = {
+			{ 256,    2992+96, 48, 48 },	
+			{ 256+48, 2992+96, 48, 48 },	
+			{ 256,    2992+96+48, 48, 48 },	
+			{ 256+48, 2992+96+48, 48, 48 },	
+			{ 0,  7008+48, 48, 48 },
+			{ 48, 7008+48, 48, 48 },
+		};
+		int frame = 0;
+		if (wobj->vel_y > 0.0f || Wobj_IsGrouneded(wobj)) {
+			int spd = 1;
+			if (wobj->vel_y < 8.0f) spd = 2;
+			if (wobj->vel_y < 6.0f) spd = 3;
+			if (wobj->vel_y < 4.0f) spd = 4;
+			if (wobj->vel_y < 2.0f) spd = 5;
+			if (wobj->vel_y < 0.1f) spd = 13;
+			int isdiving = wobj->vel_y > 4.0f ? 4 : 0;
+			frame = (Game_GetFrame() / spd) % 2 + isdiving;
+		} else if (wobj->vel_y > -FLAPACCEL / 4.0f * 1.0f) frame = 2;
+		else if (wobj->vel_y > -FLAPACCEL / 4.0f * 2.0f) frame = 3;
+		else if (wobj->vel_y > -FLAPACCEL / 4.0f * 3.0f) frame = 2;
+		else if (wobj->vel_y > -FLAPACCEL / 4.0f * 4.0f) frame = 1;
+		int flipdist = wobj->flags & WOBJ_HFLIP ? 7 : 10;
+		Renderer_DrawBitmap2(
+			(int)wobj->x - flipdist - camx,
+			(int)wobj->y - 14 - camy,
+			(iscryst ? framesc : frames) + frame,
+			iscryst ? 1 : 0, RENDERER_LIGHT,
+			wobj->flags & WOBJ_HFLIP,
+			CNM_FALSE);
+	}
+
 	DrawPlayerChar(wobj, camx, camy);
 	Renderer_DrawBitmap2
 	(
@@ -1109,20 +1284,13 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 			Util_SetRect(&r, 192, 1120+48, 48, 48);
 		Renderer_DrawBitmap((int)wobj->x - camx - 8, (int)wobj->y - camy - 8, &r, 0, RENDERER_LIGHT);
 		break;
-	case PLAYER_UPGRADE_WINGS:
-		if ((Game_GetFrame() / 4) % 2 == 0)
-			Util_SetRect(&r, 320, 352, 36, 38);
-		else
-			Util_SetRect(&r, 356, 352, 28, 38);
-		Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 0, RENDERER_LIGHT);
-		break;
-	case PLAYER_UPGRADE_CRYSTAL_WINGS:
-		if ((Game_GetFrame() / 2) % 2 == 0)
-			Util_SetRect(&r, 384 - 2, 352, 48, 48);
-		else
-			Util_SetRect(&r, 384+64, 352, 48, 48);
-		Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 4, RENDERER_LIGHT);
-		break;
+	// case PLAYER_UPGRADE_CRYSTAL_WINGS:
+	// 	if ((Game_GetFrame() / 2) % 2 == 0)
+	// 		Util_SetRect(&r, 384 - 2, 352, 48, 48);
+	// 	else
+	// 		Util_SetRect(&r, 384+64, 352, 48, 48);
+	// 	Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 4, RENDERER_LIGHT);
+	// 	break;
 	}
 }
 
@@ -1334,6 +1502,38 @@ void Player_OnRecievePVPDamage(WOBJ *player) {
 	if (!Audio_IsSoundPlaying(1)) Interaction_PlaySound(player, 1);
 }
 
+static void DrawUpgradeHPBar(int x, int y, int w) {
+	CNM_RECT r;
+
+	int fine = (Game_GetFrame() / 3), coarse = (Game_GetFrame() / 10), ccoarse = (Game_GetFrame() / 5);
+	int offsets[4] = {
+		0, 11, 22, 11
+	};
+	int xoff = 0;
+	for (; w > 0; w -= 32) {
+		int ww = w;
+		if (ww > 32) ww = 32;
+		Util_SetRect(&r, 256 + (fine % 32), 4288 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
+		Renderer_DrawBitmap(x+xoff-ww, y, &r, 0, RENDERER_LIGHT);
+		xoff -= 32;
+	}
+}
+static void DrawDurabilityBar(int x, int y, int w) {
+	CNM_RECT r;
+
+	int fine = (Game_GetFrame() / 3), coarse = (Game_GetFrame() / 10), ccoarse = (Game_GetFrame() / 5);
+	int offsets[4] = {
+		0, 11, 22, 11
+	};
+	int xoff = 0;
+	for (; w > 0; w -= 32) {
+		int ww = w;
+		if (ww > 32) ww = 32;
+		Util_SetRect(&r, 256 + (fine % 32), 3936 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
+		Renderer_DrawBitmap(x+xoff-ww, y, &r, 0, RENDERER_LIGHT);
+		xoff -= 32;
+	}
+}
 static void DrawHealthBar(int x, int y, int w) {
 	CNM_RECT r;
 
@@ -1538,7 +1738,31 @@ void Player_DrawHUD(WOBJ *player) {
 			}
 		}
 	}
-	
+
+	Util_SetRect(&r, 160, 4304, 96, 32);
+	Renderer_DrawBitmap(RENDERER_WIDTH - 96, 0, &r, 2, RENDERER_LIGHT);
+	// Upgrade Health
+	if (local_data->upgradehp > 0.0f && local_data->upgrade_state != PLAYER_UPGRADE_NONE) {
+		DrawUpgradeHPBar(RENDERER_WIDTH - 96 + 91, 5+16, (int)(81.0f * (local_data->upgradehp / 100.0f)));
+	}
+	// Item Durability
+	int visible_width = 81;
+	if (!player->item) visible_width = 0;
+	if (player->item && item_types[player->item].max_durability <= 0.1f) {
+		visible_width = 81;
+	}
+	if (player->item && item_types[player->item].max_durability > 0.1f) {
+		visible_width = (int)(Item_GetCurrentItem()->durability / item_types[player->item].max_durability * 81.0f); 
+	}
+
+	//Console_Print("%f",Item_GetCurrentItem()->durability);
+	DrawDurabilityBar(RENDERER_WIDTH - 96 + 91, 6, visible_width);
+	Util_SetRect(&r, 64+96, 4320-32, 96, 16);
+	Renderer_DrawBitmap(RENDERER_WIDTH - 96, 16, &r, 2, RENDERER_LIGHT);
+	Util_SetRect(&r, 64, 4320, 96, 16);
+	Renderer_DrawBitmap(RENDERER_WIDTH - 96, 0, &r, 2, RENDERER_LIGHT);
+
+
 	Util_SetRect(&r, 192, 4224+6+9, 96, 64-6-9);
 	Renderer_DrawBitmap(0, RENDERER_HEIGHT - 64 + 6 + 9, &r, 2, RENDERER_LIGHT);
 	

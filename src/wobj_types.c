@@ -310,12 +310,15 @@ static void WobjDroppedItem_Create(WOBJ *wobj)
 	wobj->hitbox.h = 32.0f;
 
 	// This is poisonous potion stuff
-	/*if (wobj->item == ITEM_TYPE_STRENGTH_POTION && Util_RandInt(0, 1000) >= 900)
+	if (wobj->item == ITEM_TYPE_STRENGTH_POTION && Util_RandInt(0, 1000) >= 999)
 		wobj->item = ITEM_TYPE_POISIONUS_STRENGTH_POTION;
-	if (wobj->item == ITEM_TYPE_SPEED_POTION && Util_RandInt(0, 1000) >= 900)
+	if (wobj->item == ITEM_TYPE_SPEED_POTION && Util_RandInt(0, 1000) >= 999)
 		wobj->item = ITEM_TYPE_POISIONUS_SPEED_POTION;
-	if (wobj->item == ITEM_TYPE_JUMP_POTION && Util_RandInt(0, 1000) >= 900)
-		wobj->item = ITEM_TYPE_POISIONUS_JUMP_POTION;*/
+	if (wobj->item == ITEM_TYPE_JUMP_POTION && Util_RandInt(0, 1000) >= 999)
+		wobj->item = ITEM_TYPE_POISIONUS_JUMP_POTION;
+
+	// Setting the durability
+	wobj->custom_floats[0] = item_types[wobj->item].max_durability;
 }
 static void WobjDroppedItem_Update(WOBJ *wobj) {
 	Wobj_TryTeleportWobj(wobj);
@@ -1129,18 +1132,19 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 	wobj->flags = WOBJ_IS_SOLID | WOBJ_IS_MOVESTAND;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 
-	unsigned int converted;
+	int converted;
 	float fconverted, fpart;
-	converted = wobj->custom_ints[0] >> 16 & 0xff;
+	converted = (int)wobj->custom_ints[0] >> 16 & 0xff;
 	fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
 	fpart = 0.25f * (float)(converted & 0x3);
 	fconverted += fconverted < 0 ? -fpart : fpart;
 	wobj->vel_x = fconverted;
-	converted = wobj->custom_ints[0] >> 24 & 0xff;
+	converted = (int)wobj->custom_ints[0] >> 24 & 0xff;
 	fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
 	fpart = 0.25f * (float)(converted & 0x3);
 	fconverted += fconverted < 0 ? -fpart : fpart;
 	wobj->vel_y = fconverted;
+	//Console_Print("%f %f %u", wobj->vel_x, wobj->vel_y, wobj->custom_ints[0]);
 
 	if (wobj->custom_floats[0] < 0.0f)
 	{
@@ -1674,6 +1678,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 			{192, 480, 32, 32},	// Unused
 			{224, 480, 32, 32},	// Unused
 			{128, 736, 32, 32}, // 1-Up box
+			{160, 2048, 32, 32}, // Wrench
 		},
 		0.0f,				  // Strength Reward
 		0,					  // Money Reward

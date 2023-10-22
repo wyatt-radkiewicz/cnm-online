@@ -82,6 +82,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int created_vortexes_id;
 	unsigned int score;
 	int offhand_item;
+	float offhand_durability;
 	int finish_timer;
 	float grav, grav_add;
 	int is_sliding;
@@ -91,6 +92,12 @@ typedef struct _PLAYER_LOCAL_DATA
 	float control_mul;
 	int sliding_cap_landing_speed;
 	int final_time_forscore;
+	int lock_controls;
+	//float flap_spdadd, flap_accadd;
+	int isflying;
+	int numflaps, isdiving, saved_diving_vel;
+	float upgradehp;
+	//float item_durability;
 	//float stored_yvel;
 } PLAYER_LOCAL_DATA;
 

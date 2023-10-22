@@ -74,9 +74,10 @@ int Util_StringPrintF(char *buffer, int buffer_size, const char *format, va_list
 				}
 				break;
 
-			case 'd': case 'i':
+			case 'd': case 'i': case 'u':
 				memset(frmt_buf, 0, sizeof(frmt_buf));
-				sprintf(frmt_buf, "%d", va_arg(args, int));
+				if (*(cur-1) == 'u') sprintf(frmt_buf, "%u", va_arg(args, int));
+				else sprintf(frmt_buf, "%d", va_arg(args, int));
 				count += (int)strlen(frmt_buf);
 				if (count >= buffer_size)
 				{
