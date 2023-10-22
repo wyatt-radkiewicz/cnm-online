@@ -12,6 +12,7 @@
 #include "obj_grid.h"
 #include "fadeout.h"
 #include "world.h"
+#include "audio.h"
 
 static int connected_to_server;
 static int downloading_files;
@@ -48,6 +49,7 @@ void Client_Create(NET_ADDR addr)
 	CONNECTION_REQUEST con_req;
 	strcpy(con_req.player_name, Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string);
 	strcpy(con_req.version, CNM_VERSION_STRING);
+	con_req.has_supervirus = Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer;
 	p = Net_CreatePacket(NET_CONNECTION_REQUEST, CNM_TRUE, &addr, sizeof(con_req), &con_req);
 	Net_Send(p);
 	_level_transition_timer = -1;
@@ -91,6 +93,10 @@ void Client_Update(NET_PACKET *packet)
 			strcpy(NetGame_GetNode(info->node_id)->name, info->name);
 			NetGame_GetNode(info->node_id)->current_audio_uuid = 0;
 			NetGame_GetNode(info->node_id)->nodes_first_update = CNM_TRUE;
+		}
+		if (info->has_supervirus && !Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) {
+			Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer = 1;
+			Audio_PlayMusic(AUDIO_MAX_IDS - 1, CNM_TRUE);
 		}
 		Console_Print("Player %s connected with node id %d!", info->name, info->node_id);
 	}

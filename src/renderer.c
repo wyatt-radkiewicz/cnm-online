@@ -99,9 +99,10 @@ void Renderer_Update(void)
 		for (i = 0; i < 256; i++)
 		{
 			j = (i % 2) * 255;
-			colors[i] = (SDL_Color) {j, 0, 0};
+			colors[i] = (SDL_Color) {j, 0, 0, 255};
 		}
-		SDL_SetPaletteColors(renderer_gfx->format->palette, colors, 0, 0x100);
+		//SDL_SetPaletteColors(renderer_gfx->format->palette, colors, 0, 0x100);
+		//SDL_SetPaletteColors(renderer_scr->format->palette, colors, 0, 0x100);
 		SDL_SetPaletteColors(renderer_scr->format->palette, colors, 0, 0x100);
 
 		for (i = 0; i < MAX_SVBIN; i++) {

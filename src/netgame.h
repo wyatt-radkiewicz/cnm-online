@@ -18,6 +18,7 @@ typedef struct _CONNECTION_REQUEST
 {
 	char version[UTIL_MAX_TEXT_WIDTH + 1];
 	char player_name[UTIL_MAX_TEXT_WIDTH + 1];
+	unsigned char has_supervirus;
 } CONNECTION_REQUEST;
 
 typedef struct _NEW_CONNECTION_INFO
@@ -29,6 +30,7 @@ typedef struct _NEW_CONNECTION_INFO
 	NET_ADDR node_addr;
 	char name[UTIL_MAX_TEXT_WIDTH + 1];
 	char level[UTIL_MAX_TEXT_WIDTH + 1];
+	unsigned char has_supervirus;
 } NEW_CONNECTION_INFO;
 
 typedef struct _NET_OWNED_OBJECTS_BUFFER

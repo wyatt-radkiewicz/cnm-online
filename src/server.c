@@ -9,6 +9,7 @@
 #include "ending_text.h"
 #include "fadeout.h"
 #include "world.h"
+#include "audio.h"
 
 static int _players_finished[NETGAME_MAX_NODES];
 static int _num_finished, _level_transition_timer;
@@ -48,6 +49,11 @@ void Server_Update(NET_PACKET *packet)
 			return;
 		}
 
+		if (con_req->has_supervirus && !Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) {
+			Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer = 1;
+			Audio_PlayMusic(AUDIO_MAX_IDS - 1, CNM_TRUE);
+		}
+
 		// Now add the new player
 		NEW_CONNECTION_INFO info;
 		new_node = NetGame_GetFreeNode();
@@ -64,6 +70,7 @@ void Server_Update(NET_PACKET *packet)
 		info.node_addr = new_node->addr;
 		info.enable_pvp = Game_GetVar(GAME_VAR_ENABLE_SERVER_PVP)->data.integer;
 		info.sv_cheats = Game_GetVar(GAME_VAR_SV_CHEATS)->data.integer;
+		info.has_supervirus = con_req->has_supervirus || Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer;
 		strcpy(info.level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
 		strcpy(info.name, con_req->player_name);
 		strcpy(new_node->name, con_req->player_name);
@@ -92,6 +99,7 @@ void Server_Update(NET_PACKET *packet)
 					info2.enable_pvp = Game_GetVar(GAME_VAR_ENABLE_SERVER_PVP)->data.integer;
 					info2.sv_cheats = Game_GetVar(GAME_VAR_SV_CHEATS)->data.integer;
 					info2.node_addr = node_iter2->addr;
+					info2.has_supervirus = Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer;
 					if (node_iter2 == new_node)
 					{
 						NetGame_Iterate(&node_iter2);

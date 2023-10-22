@@ -122,14 +122,14 @@ void Audio_AddSoundEntry(int sound_id, const char *sound_file)
 }
 void Audio_PlayMusic(int index, int loop)
 {
-	if (Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) index = 18;
+	if (Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) index = AUDIO_MAX_IDS - 1;
 	if (audio_current_mus == index)
 		return;
 	audio_current_mus = index;
 	if (!audio_initialized)
 		return;
 	if (Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) {
-		Mix_PlayMusic(audio_musics[18], -1);
+		Mix_PlayMusic(audio_musics[AUDIO_MAX_IDS - 1], -1);
 		return;
 	}
 	if (audio_no_audio)
