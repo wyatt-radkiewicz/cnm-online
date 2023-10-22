@@ -126,6 +126,10 @@ void Server_Update(NET_PACKET *packet)
 		node_iter = NULL;
 		int node = *((int *)packet->data);
 		Console_Print("Player %s disconnected with node id %d.", NetGame_GetNode(node)->name, NetGame_GetNode(node)->id);
+		if (_players_finished[NetGame_GetNode(node)->id] > -1) {
+			_players_finished[NetGame_GetNode(node)->id] = -1;
+			_num_finished--;
+		}
 		NetGame_ConvertClientItemsToServer(node, CNM_TRUE);
 		for (i = 0; i < NETGAME_MAX_OBJECTS && NetGame_GetNode(node)->client_wobjs[i] != NULL; i++)
 		{
@@ -406,6 +410,10 @@ void Server_Tick(void)
 		node_iter2 = NULL;
 		int node = node_iter->id;
 		Console_Print("Player %s timed out node id %d.", NetGame_GetNode(node)->name, NetGame_GetNode(node)->id);
+		if (_players_finished[NetGame_GetNode(node)->id] > -1) {
+			_players_finished[NetGame_GetNode(node)->id] = -1;
+			_num_finished--;
+		}
 		NetGame_ConvertClientItemsToServer(node, CNM_TRUE);
 		NetGame_GetNode(node)->active = CNM_FALSE;
 		NetGame_GetNode(node)->addr.host = NET_IP_NULL;
