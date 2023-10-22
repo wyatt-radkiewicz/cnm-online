@@ -104,6 +104,15 @@ typedef struct _NETGAME_DAMAGE_ENTRY
 	float damage_dealt;
 } NETGAME_DAMAGE_ENTRY;
 
+typedef struct netgame_playerfinish {
+	int node;
+	int ending_text_line;
+} netgame_playerfinish_t;
+
+typedef struct netgame_changemap {
+	char level_name[32];
+} netgame_changemap_t;
+
 #define MAX_HISTORY_SIZE (NETGAME_MAX_OBJECTS * 5)
 typedef struct _NETGAME_NODE
 {

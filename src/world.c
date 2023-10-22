@@ -62,7 +62,7 @@ void World_Start(int mode)
 	EndingText_ResetYValue();
 	Dialoge_End();
 	TTBoss_ResetOnLevelLoad();
-	Fadeout_Setup();
+	//Fadeout_Setup();
 	BossBar_Init();
 	Player_ResetHUD();
 
@@ -137,7 +137,7 @@ void World_Stop(void)
 
 	// Setting global variables to NULL values
 	Game_GetVar(GAME_VAR_PLAYER)->data.pointer = NULL;
-	memset(Game_GetVar(GAME_VAR_LEVEL)->data.string, 0, UTIL_MAX_TEXT_WIDTH + 1);
+	//memset(Game_GetVar(GAME_VAR_LEVEL)->data.string, 0, UTIL_MAX_TEXT_WIDTH + 1);
 }
 void World_Update(int mode)
 {
@@ -196,6 +196,7 @@ void World_Update(int mode)
 
 	// Actually updating the objects
 	Wobj_UpdateOwnedWobjs();
+	Interaction_Tick();
 
 	// Camera and fadeout code, including bossbar code
 	Camera_Update((int)player->x + 16, (int)player->y + 16);

@@ -6,9 +6,18 @@
 #include "wobj.h"
 #include "player.h"
 #include "master_server.h"
+#include "ending_text.h"
+#include "fadeout.h"
+#include "world.h"
+
+static int _players_finished[NETGAME_MAX_NODES];
+static int _num_finished, _level_transition_timer;
+
+static void Server_ResetFinishedPlayers(void);
 
 void Server_Create(void)
 {
+	Server_ResetFinishedPlayers();
 	Net_AddPollingFunc(Server_Update);
 	NetGame_GetNode(0)->active = CNM_TRUE;
 	strcpy(NetGame_GetNode(0)->name, Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string);
@@ -266,6 +275,29 @@ void Server_Update(NET_PACKET *packet)
 		NET_CHAT_MESSAGE *msg = (void *)packet->data;
 		Server_SendChatMessage(msg->source_node, msg->messagebuf);
 	}
+
+	if (packet->hdr.type == NET_PLAYER_FINISHED)
+	{
+		NETGAME_NODE *n = NetGame_FindNodeFromAddr(packet->hdr.addr);
+		if (n != NULL) {
+			netgame_playerfinish_t *finish = (void *)packet->data;
+			//Console_Print("node %d finished using level: %s", finish->node, EndingText_GetLine(finish->ending_text_line));
+			Server_PlayerFinish(finish->node, finish->ending_text_line);
+		}
+	}
+}
+static void Server_ResetFinishedPlayers(void) {
+	memset(_players_finished, 0xff, sizeof(_players_finished));
+	_num_finished = 0;
+	_level_transition_timer = -1;
+}
+void Server_PlayerFinish(int node, int text_line) {
+	if (_players_finished[node] < 0) _num_finished++;
+	_players_finished[node] = text_line;
+	//char textbuf[32];
+	//strcpy(
+	//Util_StringPrintF(textbuf, 32, "finished!", 0);
+	Server_SendChatMessage(node, "finished!");
 }
 void Server_Tick(void)
 {
@@ -275,6 +307,49 @@ void Server_Tick(void)
 	NETGAME_NODE *node_iter = NULL, *node_iter2;
 	NET_PACKET *packet;
 	WOBJ *cplayer;
+
+	if (_num_finished >= NetGame_GetNumActiveNodes()) {
+		int num_got_there[ENDING_TEXT_MAX_LINES] = { 0 };
+		for (int i = 0; i < NETGAME_MAX_NODES; i++) {
+			if (_players_finished[i] != -1) num_got_there[_players_finished[i]]++;
+		}
+		int winning_line = 0, most = 0;
+		for (int i = 0; i < ENDING_TEXT_MAX_LINES; i++) {
+			if (num_got_there[i] > most) {
+				most = num_got_there[i];
+				winning_line = i;
+			}
+		}
+		netgame_changemap_t changemap;
+		strcpy(changemap.level_name, EndingText_GetLine(winning_line));
+		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/");
+		strcat(Game_GetVar(GAME_VAR_LEVEL)->data.string, EndingText_GetLine(winning_line));
+		NetGame_Iterate(&node_iter);
+		while (node_iter != NULL)
+		{
+			if (node_iter == NetGame_GetNode(0))
+			{
+				NetGame_Iterate(&node_iter);
+				continue;
+			}
+			NET_PACKET *packet = Net_CreatePacket(
+				NET_CHANGE_MAP,
+				1,
+				&node_iter->addr, sizeof(changemap), &changemap);
+			Net_Send(packet);
+			NetGame_Iterate(&node_iter);
+		}
+		Fadeout_FadeToBlack(30, 20, 30);
+		Server_ResetFinishedPlayers();
+		_level_transition_timer = 40;
+	}
+	if (_level_transition_timer > -1) _level_transition_timer--;
+	if (_level_transition_timer == 0) {
+		World_Stop();
+		//Console_Print(Game_GetVar(GAME_VAR_LEVEL)->data.string);
+		World_Start(WORLD_MODE_HOSTED_SERVER);
+		return;
+	}
 
 	if (Game_GetFrame() % 20 == 0)
 		NetGame_ServerSendDamages();

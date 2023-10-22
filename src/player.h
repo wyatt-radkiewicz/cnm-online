@@ -97,6 +97,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int isflying;
 	int numflaps, isdiving, saved_diving_vel;
 	float upgradehp;
+	int next_level_line;
 	//float item_durability;
 	//float stored_yvel;
 } PLAYER_LOCAL_DATA;

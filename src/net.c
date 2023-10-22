@@ -9,6 +9,7 @@
 
 static int net_initialized = CNM_FALSE;
 #define NET_MAX_POLLING_FUNCS 8
+#define NET_MAX_FAKEDPINGERS 2048
 
 typedef struct _NET_SAFE
 {
@@ -16,8 +17,14 @@ typedef struct _NET_SAFE
 	int times_sent;
 	struct _NET_SAFE *next, *last;
 } NET_SAFE;
+typedef struct fakedpinger {
+	int frames_left;
+	NET_PACKET *packet;
+} fakedpinger_t;
 static NET_SAFE *net_head;
 static int net_fake_loss;
+static fakedpinger_t _pingers[NET_MAX_FAKEDPINGERS];
+static int _pingframes, _total_pingframes, _num_pingers;
 static uint32_t net_avg_incoming[30];
 static uint32_t net_avg_outgoing[30];
 static int net_id;
@@ -31,7 +38,8 @@ static NET_POLL_FUNC polling_funcs[NET_MAX_POLLING_FUNCS];
 static UDPsocket net_socket;
 static UDPpacket *net_packet;
 
-static void Net_Send2(const NET_PACKET *packet, int is_new);
+static NET_PACKET *Net_Recv2(int get_packet);
+static void Net_Send2(const NET_PACKET *packet, int is_new, int do_send, int delay);
 static void Net_DestroySafe(NET_SAFE *s);
 
 void Net_Init(void)
@@ -73,6 +81,9 @@ void Net_Init(void)
 
 	net_head = NULL;
 	net_fake_loss = 0;
+	_pingframes = 0;
+	_total_pingframes = 0;
+	_num_pingers = 0;
 	memset(net_avg_incoming, 0, sizeof(net_avg_incoming));
 	memset(net_avg_outgoing, 0, sizeof(net_avg_outgoing));
 	//net_pool = Pool_Create(sizeof(NET_SAFE));
@@ -80,6 +91,16 @@ void Net_Init(void)
 void Net_Quit(void)
 {
 	//Pool_Destroy(net_pool);
+	for (int i = 0; i < _num_pingers; i++) {
+		Net_DestroyPacket(_pingers[i].packet);
+	}
+	NET_SAFE *s = net_head, *n;
+	while (s) {
+		n = s->next;
+		Net_DestroySafe(s);
+		s = n;
+	}
+	net_head = NULL;
 	SDLNet_FreePacket(net_packet);
 	SDLNet_UDP_Close(net_socket);
 	net_socket = NULL;
@@ -89,6 +110,13 @@ void Net_Quit(void)
 
 void Net_FakeLoss(int percent) {
 	net_fake_loss = percent;
+}
+void Net_FakeSenderPing(int ms) {
+	if (ms == 0) {
+		_pingframes = 0;
+	} else {
+		_pingframes = ms/33+1;
+	}
 }
 
 NetU32 Net_HostToNetU32(NetU32 host)
@@ -141,24 +169,36 @@ const char *Net_GetStringFromIp(NET_ADDR *addr)
 void Net_Send(NET_PACKET *packet)
 {
 	if (net_fake_loss == 0) {
-		Net_Send2(packet, CNM_TRUE);
+		Net_Send2(packet, CNM_TRUE, CNM_TRUE, CNM_TRUE);
 	}
 	else if (rand() % 101 >= net_fake_loss) {
-		Net_Send2(packet, CNM_TRUE);
+		Net_Send2(packet, CNM_TRUE, CNM_TRUE, CNM_TRUE);
+	} else {
+		Net_Send2(packet, CNM_TRUE, CNM_FALSE, CNM_TRUE);
 	}
 	Net_DestroyPacket(packet);
 }
-static void Net_Send2(const NET_PACKET *packet, int is_new)
+static void Net_Send2(const NET_PACKET *packet, int is_new, int do_send, int delay)
 {
 	IPaddress addr;
 	NET_SAFE *s;
-	memcpy(net_packet->data, packet, sizeof(NET_PACKET));
-	addr.host = packet->hdr.addr.host;
-	addr.port = packet->hdr.addr.port;
-	net_packet->address = addr;
-	net_packet->len = sizeof(NET_PACKET_HEADER) + packet->hdr.size;
-	SDLNet_UDP_Send(net_socket, -1, net_packet);
-	net_avg_outgoing[Game_GetFrame() % 30] += packet->hdr.size;
+	if (_pingframes == 0 || !delay) {
+		memcpy(net_packet->data, packet, sizeof(NET_PACKET));
+		addr.host = packet->hdr.addr.host;
+		addr.port = packet->hdr.addr.port;
+		net_packet->address = addr;
+		net_packet->len = sizeof(NET_PACKET_HEADER) + packet->hdr.size;
+		if (do_send) {
+			SDLNet_UDP_Send(net_socket, -1, net_packet);
+		}
+		net_avg_outgoing[Game_GetFrame() % 30] += packet->hdr.size;
+	} else if (_num_pingers < NET_MAX_FAKEDPINGERS) {
+		fakedpinger_t *pinger = _pingers + _num_pingers++;
+		pinger->frames_left = _pingframes - _total_pingframes;
+		_total_pingframes += pinger->frames_left;
+		pinger->packet = malloc(sizeof(NET_PACKET));
+		memcpy(pinger->packet, packet, sizeof(*packet));
+	}
 
 	if (packet->hdr.safe && is_new)
 	{
@@ -170,9 +210,13 @@ static void Net_Send2(const NET_PACKET *packet, int is_new)
 			net_head->last = s;
 		net_head = s;
 		memcpy(&s->packet, packet, sizeof(NET_PACKET));
+		//Console_Print("Sending Safe id: %d", packet->hdr.id);
 	}
 }
-NET_PACKET *Net_Recv(void)
+NET_PACKET *Net_Recv(void) {
+	return Net_Recv2(1);
+}
+NET_PACKET *Net_Recv2(int get_packet)
 {
 	NET_SAFE *s;
 	NET_PACKET *packet, *ack;
@@ -183,6 +227,11 @@ NET_PACKET *Net_Recv(void)
 	packet->hdr.addr.host = net_packet->address.host;
 	packet->hdr.addr.port = net_packet->address.port;
 
+	if (!get_packet) {
+		free(packet);
+		return NULL;
+	}
+
 	if (packet->hdr.safe)
 	{
 		if (packet->hdr.type != NET_ACK)
@@ -190,7 +239,8 @@ NET_PACKET *Net_Recv(void)
 			// Send an ack back
 			ack = Net_CreatePacket(NET_ACK, 1, &packet->hdr.addr, 0, NULL);
 			ack->hdr.id = packet->hdr.id;
-			Net_Send2(ack, CNM_FALSE);
+			//Console_Print("Sending Ack for %d", ack->hdr.id);
+			Net_Send2(ack, CNM_FALSE, CNM_TRUE, CNM_TRUE);
 			Net_DestroyPacket(ack);
 		}
 		else
@@ -201,6 +251,7 @@ NET_PACKET *Net_Recv(void)
 			{
 				if (s->packet.hdr.id == packet->hdr.id)
 				{
+					//Console_Print("Got Ack for %d", packet->hdr.id);
 					Net_DestroySafe(s);
 					return packet;
 				}
@@ -213,6 +264,21 @@ NET_PACKET *Net_Recv(void)
 }
 void Net_Update(void)
 {
+	if (_pingframes) {
+		if (_total_pingframes > 0) _total_pingframes--;
+		if (_num_pingers) {
+			_pingers[0].frames_left--;
+			int i = 0;
+			while (_pingers[i].frames_left <= 0 && i < _num_pingers) {
+				Net_Send2(_pingers[i].packet, CNM_FALSE, CNM_TRUE, CNM_FALSE);
+				Net_DestroyPacket(_pingers[i].packet);
+				i++;
+			}
+			memmove(_pingers, _pingers + i, (_num_pingers - i) * sizeof(*_pingers));
+			_num_pingers -= i;
+		}
+	}
+
 	NET_SAFE *s, *n;
 	s = net_head;
 	while (s != NULL)
@@ -220,7 +286,7 @@ void Net_Update(void)
 		n = s->next;
 		s->times_sent++;
 		if (s->times_sent % 10 == 0)
-			Net_Send2(&s->packet, CNM_FALSE);
+			Net_Send2(&s->packet, CNM_FALSE, CNM_TRUE, CNM_TRUE);
 		if (s->times_sent >= 600)
 			Net_DestroySafe(s);
 		s = n;
@@ -250,13 +316,13 @@ void Net_PollPackets(int max_num)
 
 	for (i = 0; i < max_num; i++)
 	{
-		packet = Net_Recv();
+		packet = Net_Recv2(use_packet);
 		if (packet != NULL)
 		{
 			net_avg_incoming[Game_GetFrame() % 30] += packet->hdr.size;
 			for (j = 0; j < NET_MAX_POLLING_FUNCS; j++)
 			{
-				if (polling_funcs[j] != NULL && use_packet)
+				if (polling_funcs[j] != NULL)
 					polling_funcs[j](packet);
 			}
 			Net_DestroyPacket(packet);
@@ -266,7 +332,7 @@ void Net_PollPackets(int max_num)
 		{
 			for (j = 0; j < NET_MAX_POLLING_FUNCS; j++)
 			{
-				if (polling_funcs[j] != NULL && use_packet)
+				if (polling_funcs[j] != NULL)
 					polling_funcs[j](packet);
 			}
 			Net_DestroyPacket(packet);

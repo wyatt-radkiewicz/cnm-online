@@ -802,6 +802,9 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 			}
 		}
 		Interaction_DestroyWobj(wobj);
+		if (player->item) {
+			Item_GetCurrentItem()->durability -= 1.0f;
+		}
 		//((PLAYER_LOCAL_DATA *)player->local_data)->has_hammer_jumped = CNM_FALSE;
 	}
 }

@@ -10,6 +10,8 @@
 #include "packet.h"
 #include "renderer.h"
 #include "obj_grid.h"
+#include "fadeout.h"
+#include "world.h"
 
 static int connected_to_server;
 static int downloading_files;
@@ -19,6 +21,7 @@ static int *camx;
 static int *camy;
 static int last_server_objects_frame = -1;
 static int self_timeout = 0;
+static int _level_transition_timer = -1;
 
 NETGAME_NODE *Client_GetNode(void)
 {
@@ -45,8 +48,9 @@ void Client_Create(NET_ADDR addr)
 	CONNECTION_REQUEST con_req;
 	strcpy(con_req.player_name, Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string);
 	strcpy(con_req.version, CNM_VERSION_STRING);
-	p = Net_CreatePacket(NET_CONNECTION_REQUEST, 1, &addr, sizeof(con_req), &con_req);
+	p = Net_CreatePacket(NET_CONNECTION_REQUEST, CNM_TRUE, &addr, sizeof(con_req), &con_req);
 	Net_Send(p);
+	_level_transition_timer = -1;
 }
 void Client_Destory(void)
 {
@@ -224,6 +228,15 @@ void Client_Update(NET_PACKET *packet)
 		NET_CHAT_MESSAGE *msg = (void *)packet->data;
 		NetGame_PrintChatMessage(msg);
 	}
+
+	if (packet->hdr.type == NET_CHANGE_MAP)
+	{
+		Fadeout_FadeToBlack(10, 40, 30);
+		netgame_changemap_t *changemap = (void *)packet->data;
+		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/");
+		strcat(Game_GetVar(GAME_VAR_LEVEL)->data.string, changemap->level_name);
+		_level_transition_timer = 40;
+	}
 }
 void Client_OnLevelStart(void)
 {
@@ -233,6 +246,15 @@ void Client_OnLevelStart(void)
 }
 void Client_Tick(void)
 {
+	if (_level_transition_timer > -1) _level_transition_timer--;
+	if (_level_transition_timer == 0) {
+		World_Stop();
+		//Console_Print(Game_GetVar(GAME_VAR_LEVEL)->data.string);
+		World_Start(WORLD_MODE_CLIENT);
+		Client_OnLevelStart();
+		return;
+	}
+
 	if (Game_GetFrame() % 20 == 0)
 		NetGame_ClientSendDamages();
 

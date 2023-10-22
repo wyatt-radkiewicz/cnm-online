@@ -183,6 +183,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 	// Finishing and noclipping
 	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
 		local_data->finish_timer++;
+		if (local_data->finish_timer == PLAYER_FINISH_TIMER + 60) {
+			Interaction_FinishLevel(local_data->next_level_line);
+		}
 		//if (local_data->finish_timer > PLAYER_FINISH_TIMER) {
 		//	//local_data->currframe = 0;
 		//	//wobj->anim_frame = 0;
@@ -315,10 +318,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 	}
 	if (Wobj_IsGrouneded(wobj) && local_data->isdiving && local_data->upgrade_state != PLAYER_UPGRADE_CRYSTAL_WINGS) {
-		local_data->isdiving = CNM_FALSE;
-		local_data->saved_diving_vel = 0.0f;
 		if (wobj->vel_x > wobj->speed * 1.5f) wobj->vel_x = wobj->speed * 1.5f;
 		if (wobj->vel_x < wobj->speed * -1.5f) wobj->vel_x = wobj->speed * -1.5f;
+	}
+	if (Wobj_IsGrouneded(wobj)) {
+		local_data->isdiving = CNM_FALSE;
+		local_data->saved_diving_vel = 0.0f;
 	}
 	//final_speed -= local_data->flap_spdadd;
 	//local_data->flap_spdadd -= 0.05f;
@@ -492,7 +497,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if ((Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
 			Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING)) &&
 			(!Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) &&
-			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding && !local_data->lock_controls) {
+			 !Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding) {
 			//wobj->vel_x = 0.0f;
 			if (wobj->vel_x > dec) {
 				wobj->vel_x -= dec * cmul;
@@ -524,7 +529,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			if (!Wobj_IsGrouneded(wobj))
 			{
-				if (!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls)
+				if (!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->lock_controls)
 				{
 					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocks(wobj, 0.0f, 32.0f); i++)
 						wobj->y += 24.0f;
@@ -871,6 +876,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (other != NULL) {
 		Audio_PlayMusic(2, CNM_FALSE);
 		local_data->final_time_forscore = Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer;
+		//Console_Print(EndingText_GetLine(other->custom_ints[0]));
+		//strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/");
+		//strcat(Game_GetVar(GAME_VAR_LEVEL)->data.string, EndingText_GetLine(other->custom_ints[0]));
+		local_data->next_level_line = other->custom_ints[0];
 		wobj->flags |= WOBJ_HAS_PLAYER_FINISHED;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BGSPEED_X);

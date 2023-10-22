@@ -37,6 +37,8 @@ typedef enum _NET_PACKET_TYPE
 	NET_MASTER_SERVER_PAGE_DATA,
 	NET_CONNECTION_REQUEST,
 	NET_CONNECTION_DENIED,
+	NET_PLAYER_FINISHED,
+	NET_CHANGE_MAP,
 	NET_PACKET_TYPE_MAX
 } NET_PACKET_TYPE;
 
@@ -80,6 +82,7 @@ void Net_Init(void);
 void Net_Quit(void);
 
 void Net_FakeLoss(int percent);
+void Net_FakeSenderPing(int ms);
 
 NetU32 Net_HostToNetU32(NetU32 host);
 NetU16 Net_HostToNetU16(NetU16 host);

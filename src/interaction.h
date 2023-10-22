@@ -21,6 +21,8 @@ int Interaction_PlayerRecieveDamage(void);
 int Interaction_WobjReceiveBlockDamage(WOBJ *wobj);
 void Interaction_DestroyWobj(WOBJ *wobj);
 WOBJ *Interaction_CreateWobj(int type, float x, float y, int ci, float cf);
+void Interaction_FinishLevel(int ending_text_line);
+void Interaction_Tick(void);
 //void Interaction_SendWobjHurtPackets(int to_node);
 //void Interaction_ApplyHurtPacketsToWobj(WOBJ *wobj);
 void Interaction_ClearDestroyedWobjsBuffer(void);

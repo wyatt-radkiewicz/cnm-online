@@ -11,6 +11,8 @@
 #include "blocks.h"
 #include "game.h"
 #include "renderer.h"
+#include "ending_text.h"
+#include "fadeout.h"
 
 #define NETGAME_MAX_WOBJ_UPDATES 64
 
@@ -29,6 +31,7 @@ static WOBJ *destroyed_wobjs[NETGAME_MAX_WOBJ_UPDATES];
 static WOBJ_HURT_ENTRY hurt_wobjs[NETGAME_MAX_WOBJ_UPDATES];
 static int destroyed_wobjs_allocater = 0;
 static int audio_uuid = -1;
+static int _next_level_timer = -1;
 static WOBJ *victims[WOBJ_MAX_COLLISIONS];
 
 static int Interaction_IsUnownedWobjInDestoryed(WOBJ *wobj);
@@ -37,6 +40,7 @@ static int Interaction_GetHurtIndex(WOBJ *wobj);
 
 void Interaction_Init(void)
 {
+	//_next_level_timer = -1;
 	memset(destroyed_wobjs, 0, sizeof(destroyed_wobjs));
 	memset(hurt_wobjs, 0, sizeof(hurt_wobjs));
 	audio_uuid = 0;
@@ -48,6 +52,36 @@ void Interaction_SetMode(int mode)
 void Interaction_SetClientPlayerWObj(WOBJ *player)
 {
 	interaction_player = player;
+}
+void Interaction_FinishLevel(int ending_text_line) {
+	netgame_playerfinish_t finish;
+	NET_PACKET *p;
+	switch (interaction_mode) {
+	case INTERACTION_MODE_SINGLEPLAYER:
+		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/");
+		strcat(Game_GetVar(GAME_VAR_LEVEL)->data.string, EndingText_GetLine(ending_text_line));
+		_next_level_timer = 40;
+		Fadeout_FadeToBlack(30, 20, 30);
+		break;
+	case INTERACTION_MODE_CLIENT:
+		finish.node = Client_GetNode()->id;
+		finish.ending_text_line = ending_text_line;
+		p = Net_CreatePacket(
+			NET_PLAYER_FINISHED, CNM_TRUE, &NetGame_GetNode(0)->addr, sizeof(finish), &finish);
+		Net_Send(p);
+		break;
+	case INTERACTION_MODE_HOSTED_SERVER:
+	case INTERACTION_MODE_DEDICATED_SERVER:
+		Server_PlayerFinish(0, ending_text_line);
+		break;
+	}
+}
+void Interaction_Tick(void) {
+	if (_next_level_timer > -1) _next_level_timer--;
+	if (_next_level_timer == 0 && interaction_mode == INTERACTION_MODE_SINGLEPLAYER) {
+		Game_PopState();
+		Game_PushState(GAME_STATE_SINGLEPLAYER);
+	}
 }
 WOBJ *Interaction_GetVictim(WOBJ *inflictor, int flags)
 {

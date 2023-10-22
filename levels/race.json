@@ -73,7 +73,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "race starts in 5 seconds"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -142,7 +142,7 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
-          "dist": 384.0,
+          "dist": 380.0,
           "speed": 5.0
         }
       },
@@ -161,7 +161,7 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
-          "dist": 384.0,
+          "dist": 380.0,
           "speed": 5.0
         }
       },
@@ -180,7 +180,7 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
-          "dist": 384.0,
+          "dist": 380.0,
           "speed": 5.0
         }
       },
@@ -199,7 +199,7 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
-          "dist": 384.0,
+          "dist": 380.0,
           "speed": 5.0
         }
       },
@@ -237,7 +237,11 @@
         7360.0,
         1696.4384
       ],
-      "type_data": "FinishTrigger",
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "race starts in 5 seconds"
+        }
+      },
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
@@ -356,7 +360,7 @@
       ],
       "type_data": {
         "BreakablePlatform": {
-          "time_till_fall": 0.25
+          "time_till_fall": 0.23333333
         }
       },
       "spawning_criteria": {
@@ -373,7 +377,7 @@
       ],
       "type_data": {
         "BreakablePlatform": {
-          "time_till_fall": 0.25
+          "time_till_fall": 0.23333333
         }
       },
       "spawning_criteria": {
@@ -410,7 +414,7 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
-          "dist": 145.0,
+          "dist": 144.0,
           "speed": 2.0
         }
       },
@@ -429,7 +433,7 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": true,
-          "dist": 145.0,
+          "dist": -144.0,
           "speed": -2.0
         }
       },
@@ -448,7 +452,7 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
-          "dist": 145.0,
+          "dist": -144.0,
           "speed": -2.0
         }
       },
@@ -807,7 +811,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1268,7 +1272,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1287,7 +1291,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1306,7 +1310,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1323,9 +1327,9 @@
       ],
       "type_data": {
         "DisapearingPlatform": {
-          "time_on": 1.5,
+          "time_on": 1.0,
           "time_off": 1.5,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1342,9 +1346,9 @@
       ],
       "type_data": {
         "DisapearingPlatform": {
-          "time_on": 1.5,
+          "time_on": 1.0,
           "time_off": 1.5,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1361,9 +1365,9 @@
       ],
       "type_data": {
         "DisapearingPlatform": {
-          "time_on": 1.5,
+          "time_on": 1.0,
           "time_off": 1.5,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1380,9 +1384,9 @@
       ],
       "type_data": {
         "DisapearingPlatform": {
-          "time_on": 1.5,
+          "time_on": 1.0,
           "time_off": 1.5,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1399,9 +1403,9 @@
       ],
       "type_data": {
         "DisapearingPlatform": {
-          "time_on": 1.5,
+          "time_on": 1.0,
           "time_off": 1.5,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1418,9 +1422,9 @@
       ],
       "type_data": {
         "DisapearingPlatform": {
-          "time_on": 0.5,
+          "time_on": 0.0,
           "time_off": 1.5,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -2704,7 +2708,7 @@
     {
       "origin": [
         0.0,
-        596.0
+        612.0
       ],
       "scroll_speed": [
         3.0,
@@ -2721,9 +2725,9 @@
       "image": {
         "Bitmap": {
           "x": 0,
-          "y": 4328,
+          "y": 4336,
           "w": 320,
-          "h": 88
+          "h": 80
         }
       },
       "transparency": 0,

@@ -79,6 +79,7 @@ static void Command_ActivateSupervirus(const char *args);
 static void Command_NetFakeLoss(const char *args);
 static void Command_NetShowBandwidth(const char *args);
 static void Command_WobjReport(const char *args);
+static void Command_NetFakePing(const char *args);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -133,7 +134,8 @@ static const char *const command_names[] =
 	"DONT_LOOK",
 	"net_fake_loss",
 	"net_show_bandwidth",
-	"wobj_report"
+	"wobj_report",
+	"net_fake_ping",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -189,7 +191,8 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_ActivateSupervirus,
 	Command_NetFakeLoss,
 	Command_NetShowBandwidth,
-	Command_WobjReport
+	Command_WobjReport,
+	Command_NetFakePing,
 };
 
 static const char *Command_ExtractArg(const char *args, int arg);
@@ -646,4 +649,7 @@ static void Command_WobjReport(const char *args) {
 		debug_print_wobj(wobj);
 		Wobj_IterateOverOwned(&wobj);
 	}
+}
+static void Command_NetFakePing(const char *args) {
+	Net_FakeSenderPing(atoi(Command_ExtractArg(args, 0)));
 }
