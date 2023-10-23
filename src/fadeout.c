@@ -34,6 +34,24 @@ void Fadeout_FadeToBlack(int fadein, int fade, int fadeout)
 	fade_out = fadeout;
 	fade_total = fadein + fade + fadeout;
 }
+void Fadeout_FadeFromBlack(int init, int fadefrom)
+{
+	fade_type = TYPE_BLACK;
+	fade_counter = 0;
+	fade_in = 0;
+	fade_time = init;
+	fade_out = fadefrom;
+	fade_total = fade_in + init + fade_out;
+}
+void Fadeout_FadeFromWhite(int init, int fadefrom)
+{
+	fade_type = TYPE_WHITE;
+	fade_counter = 0;
+	fade_in = 0;
+	fade_time = init;
+	fade_out = fadefrom;
+	fade_total = fade_in + init + fade_out;
+}
 void Fadeout_FadeDeath(int fadein, int fade, int fadeout)
 {
 	fade_type = TYPE_DEATH;
