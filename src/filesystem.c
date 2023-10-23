@@ -19,6 +19,7 @@ static int level_order[FILESYSTEM_MAX_LEVELS];
 static int level_diffs[FILESYSTEM_MAX_LEVELS];
 static int level_pars[FILESYSTEM_MAX_LEVELS];
 static int num_levels;
+static int num_title_levels;
 
 static FILESYSTEM_REGISTERED_FILE bmp_file, cnma_file, cnmb_file, cnms_file;
 static FILESYSTEM_REGISTERED_FILE mid_file[FILESYSTEM_MAX_MIDIS], wav_file[FILESYSTEM_MAX_WAVS];
@@ -284,6 +285,22 @@ void FileSystem_SearchForLevels(int clear_level_list)
         }
         closedir(d);
     }
+
+	num_title_levels = 0;
+    d = opendir("./titlelvls");
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {
+            period = strchr(dir->d_name, '.');
+            if (period != NULL && strcmp(period, ".cnmb") == 0) {
+				num_title_levels++;
+            }
+        }
+        closedir(d);
+    }
+}
+
+int Filesystem_GetNumTitleLevels(void) {
+	return num_title_levels;
 }
 
 #else

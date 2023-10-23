@@ -17,15 +17,16 @@
 #include "filesystem.h"
 #include "master_server.h"
 #include "fadeout.h"
+#include "background.h"
 
 #define SB_START 4
 
 extern int skin_bases[10][2];
-static CNM_RECT clouds;
+//static CNM_RECT clouds;
 static CNM_RECT title_card;
 static CNM_RECT player;
 static CNM_RECT wings[4];
-static int cloudsx[2];
+//static int cloudsx[2];
 static float pos[2];
 static float vel[2];
 static int controlling;
@@ -298,9 +299,9 @@ void GameState_MainMenu_Init(void)
 	//Util_SetRect(&title_card, 320, 832, 192, 32);
 	Util_SetRect(&title_card, 0, 7104, 304, 96);
 	//Util_SetRect(&clouds, 0, 832, 320, 240);
-	Util_SetRect(&clouds, 0, 7200, 256, 320);
-	cloudsx[0] = 0;
-	cloudsx[1] = 320;
+	//Util_SetRect(&clouds, 0, 7200, 256, 320);
+	//cloudsx[0] = 0;
+	//cloudsx[1] = 320;
 	pos[0] = 120.0f;
 	pos[1] = 96.0f;
 	vel[0] = 10.0f;
@@ -465,9 +466,21 @@ void GameState_MainMenu_Init(void)
 	Net_AddPollingFunc(MainMenu_OnPacket);
 
 	Audio_PlayMusic(2, CNM_FALSE);
+	
+	int num_title_levels = Filesystem_GetNumTitleLevels();
+	if (!num_title_levels) {
+		Console_Print("No title background levels!");
+		Game_PopState();
+		Game_Stop();
+		return;
+	}
+	int title_level = Util_RandInt(0, num_title_levels);
+	char pathbuf[32];
 
-	Serial_LoadBlocks("levels/title.cnmb");
-	Serial_LoadSpawners("levels/title.cnms");
+	sprintf(pathbuf, "titlelvls/%d.cnmb", title_level);
+	Serial_LoadBlocks(pathbuf);
+	sprintf(pathbuf, "titlelvls/%d.cnms", title_level);
+	Serial_LoadSpawners(pathbuf);
 
 	_cam_list_len = 0;
 	_next_cam_target = 1;
@@ -640,13 +653,13 @@ void GameState_MainMenu_Update(void)
 
 	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING))
 		Gui_Focus();
-	cloudsx[0] -= 1;
-	cloudsx[1] -= 1;
-	if (cloudsx[0] <= 0 - 256)
-	{
-		cloudsx[0] = 0;
-		cloudsx[1] = 256;
-	}
+	//cloudsx[0] -= 1;
+	//cloudsx[1] -= 1;
+	//if (cloudsx[0] <= 0 - 256)
+	//{
+	//	cloudsx[0] = 0;
+	//	cloudsx[1] = 256;
+	//}
 
 	if (Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING))
 	{
@@ -840,12 +853,16 @@ void GameState_MainMenu_Draw(void)
 	//Renderer_StartDrawing();
 	if (!Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer)
 	{
-		Renderer_Clear(Renderer_MakeColor(128, 128, 255));
+		Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS);
+		for (int i = 0; i < BACKGROUND_MAX_LAYERS; i++) {
+			Background_Draw(i, (int)_camx, (int)_camy);
+		}
+		//Renderer_Clear(Renderer_MakeColor(128, 128, 255));
 		//Renderer_DrawBitmap(cloudsx[0], 0, &clouds, 0, RENDERER_LIGHT);
 		//Renderer_DrawBitmap(cloudsx[1], 0, &clouds, 0, RENDERER_LIGHT);
-		Renderer_DrawBitmap(cloudsx[0], 0, &clouds, 0, RENDERER_LIGHT);
-		Renderer_DrawBitmap(cloudsx[0]+256, 0, &clouds, 0, RENDERER_LIGHT);
-		Renderer_DrawBitmap(cloudsx[0]+512, 0, &clouds, 0, RENDERER_LIGHT);
+		//Renderer_DrawBitmap(cloudsx[0], 0, &clouds, 0, RENDERER_LIGHT);
+		//Renderer_DrawBitmap(cloudsx[0]+256, 0, &clouds, 0, RENDERER_LIGHT);
+		//Renderer_DrawBitmap(cloudsx[0]+512, 0, &clouds, 0, RENDERER_LIGHT);
 	}
 	else
 	{
