@@ -561,7 +561,8 @@ void NetGame_ConvertClientItemsToServer(int _node, int for_disconnect) {
 	for (i = 0; i < node->num_client_wobjs; i++) {
 		wobj = node->client_wobjs[i];
 		if (wobj->type == WOBJ_DROPPED_ITEM) {
-			Wobj_CreateOwned(WOBJ_DROPPED_ITEM, wobj->x, wobj->y, wobj->custom_ints[0], 0.0f);
+			WOBJ *new_item = Wobj_CreateOwned(WOBJ_DROPPED_ITEM, wobj->x, wobj->y, wobj->custom_ints[0], 0.0f);
+			new_item->custom_floats[0] = wobj->custom_floats[0];
 			if (!for_disconnect) {
 				CLIENT_WOBJ_UPDATE_REQUEST req;
 				req.node = 0;

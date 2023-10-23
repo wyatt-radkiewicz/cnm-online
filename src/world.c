@@ -100,6 +100,9 @@ void World_Start(int mode)
 	// Load in the new player position
 	PlayerSpawn_SetWobjLoc(&player->x);
 	Camera_Setup((int)player->x, (int)player->y); // Initializing camera values
+	
+	// Load player state
+	Player_LoadFromSave(player, &g_current_save);
 
 	// Supervirus stuff
 	if (Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) {
@@ -127,6 +130,9 @@ void World_Start(int mode)
 }
 void World_Stop(void)
 {
+	// Save player state
+	Player_SaveData(player, &g_current_save);
+
 	// General cleanup
 	Wobj_DestroyOwnedWobjs();
 	Wobj_DestroyUnownedWobjs();

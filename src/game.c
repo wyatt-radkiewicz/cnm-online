@@ -230,6 +230,7 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_ADVERTISE_SERVER].data.integer = dgame_info.advertise;
 	game_vars[GAME_VAR_FANCY_LEVEL_NAME].data.string[0] = '\0';
 	game_vars[GAME_VAR_LEVEL_TIMER].data.integer = 0;
+	game_vars[GAME_VAR_SAVE_SLOT].data.integer = 0;
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);

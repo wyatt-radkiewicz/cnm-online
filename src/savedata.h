@@ -2,7 +2,12 @@
 #define _savedata_h_
 
 typedef struct savedata {
-	int level, lives, hp, strength, speed, jump;
+	int lives, hp, strength;
+	char level[32];
+	int item, offhand;
+	float itemhp, offhandhp;
+	int upgrade_state;
+	float upgradehp;
 } savedata_t;
 
 #define SAVE_SLOTS 10

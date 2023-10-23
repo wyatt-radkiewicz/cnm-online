@@ -320,6 +320,7 @@ void Server_Tick(void)
 	NET_PACKET *packet;
 	WOBJ *cplayer;
 
+	// Stuff to do with finishing the level
 	if (_num_finished >= NetGame_GetNumActiveNodes()) {
 		int num_got_there[ENDING_TEXT_MAX_LINES] = { 0 };
 		for (int i = 0; i < NETGAME_MAX_NODES; i++) {
@@ -396,6 +397,7 @@ void Server_Tick(void)
 		Net_Send(packet);
 	}
 
+	// For when a player times out
 	NetGame_Iterate(&node_iter);
 	while (node_iter != NULL)
 	{

@@ -509,7 +509,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 
 		if (!(Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
-			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding && !local_data->lock_controls)
+			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding)
 		{
 			if (wobj->vel_x > dec)
 				wobj->vel_x -= dec * cmul;
@@ -793,25 +793,25 @@ void WobjPlayer_Update(WOBJ *wobj)
 		Background_SetVisibleLayers(other->custom_ints[0], other->custom_ints[1]);
 	int old_upgrade_state = local_data->upgrade_state;
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_SHOES);
-	if (other != NULL) {
+	if (other != NULL && local_data->finish_timer <= 0) {
 		local_data->upgrade_state = PLAYER_UPGRADE_SHOES;
 		local_data->upgradehp = 100.0f;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_WINGS);
-	if (other != NULL) {
+	if (other != NULL && local_data->finish_timer <= 0) {
 		local_data->upgrade_state = PLAYER_UPGRADE_WINGS;
 		local_data->upgradehp = 100.0f;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_CRYSTAL_WINGS);
-	if (other != NULL) {
+	if (other != NULL && local_data->finish_timer <= 0) {
 		local_data->upgrade_state = PLAYER_UPGRADE_CRYSTAL_WINGS;
 		local_data->upgradehp = 50.0f;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_NOUPGRADE_TRIGGER);
-	if (other != NULL)
+	if (other != NULL && local_data->finish_timer <= 0)
 		local_data->upgrade_state = PLAYER_UPGRADE_NONE;
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_MAXPOWER_RUNE);
-	if (other != NULL)
+	if (other != NULL && local_data->finish_timer <= 0)
 	{
 		if (other->custom_ints[0] != 0)
 			local_data->mpoverride = other->custom_ints[0] - 1;
@@ -823,7 +823,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_VORTEX_UPGRADE_TRIGGER);
-	if (other != NULL) {
+	if (other != NULL && local_data->finish_timer <= 0) {
 		local_data->upgrade_state = PLAYER_UPGRADE_VORTEX;
 		local_data->upgradehp = 100.0f;
 	}
@@ -1086,7 +1086,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->health -= maxpowerinfos[local_data->mpoverride].hpcost / 30.0f;
 	}
 
-	Item_TryPickupAndDrop(wobj);
+	if (!local_data->lock_controls && local_data->finish_timer <= 0) {
+		Item_TryPickupAndDrop(wobj);
+	}
 	Item_Update(wobj);
 	Item_TryUse(wobj);
 
@@ -1878,7 +1880,7 @@ void Player_DrawHUD(WOBJ *player) {
 		} else {
 			r.y += rank * 32;
 		}
-		Renderer_DrawBitmap(bx + 80, by + 32, &r, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(bx + 80, by + 32, &r, 2, RENDERER_LIGHT);
 		Util_SetRect(&r, 0, 2432, 128, 80);
 		Renderer_DrawBitmap(bx, by, &r, 0, RENDERER_LIGHT);
 		Renderer_DrawText(bx + 4, by + 8, 0, RENDERER_LIGHT, "SCORE: %d", score);
@@ -1886,4 +1888,27 @@ void Player_DrawHUD(WOBJ *player) {
 		Renderer_DrawText(bx + 4, by + 24, 0, RENDERER_LIGHT, "TOTAL: %d", score + time_score);
 		Renderer_DrawText(bx + 4, by + 32, 0, RENDERER_LIGHT, "A-RANK: %d", par);
 	}
+}
+void Player_SaveData(WOBJ *player, savedata_t *data) {
+	PLAYER_LOCAL_DATA *local_data = player->local_data;
+	data->hp = player->health;
+	data->strength = (int)(player->strength * 100.0f);
+	//strcpy(data->level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
+	data->item = player->item;
+	data->offhand = local_data->offhand_item;
+	data->itemhp = Item_GetCurrentItem()->durability;
+	data->offhandhp = local_data->offhand_durability;
+	data->upgrade_state = local_data->upgrade_state;
+	data->upgradehp = local_data->upgradehp;
+}
+void Player_LoadFromSave(WOBJ *player, const savedata_t *data) {
+	PLAYER_LOCAL_DATA *local_data = player->local_data;
+	local_data->offhand_item = data->offhand;
+	local_data->offhand_durability = data->offhandhp;
+	local_data->upgradehp = data->upgradehp;
+	local_data->upgrade_state = data->upgrade_state;
+	Item_PickupByType(player, data->item, data->itemhp);
+	player->health = data->hp;
+	player->strength = (float)data->strength / 100.0f;
+	//strcpy();
 }

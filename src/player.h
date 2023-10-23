@@ -1,6 +1,7 @@
 #ifndef _player_h_
 #define _player_h_
 #include "wobj.h"
+#include "savedata.h"
 
 #define PLAYER_ANIM_STANDING 0
 #define PLAYER_ANIM_WALKING 1
@@ -111,5 +112,7 @@ void Player_PlayMeleeAnim(WOBJ *player);
 void Player_OnRecievePVPDamage(WOBJ *player);
 void Player_ResetHUD(void);
 void Player_DrawHUD(WOBJ *player);
+void Player_SaveData(WOBJ *player, savedata_t *data);
+void Player_LoadFromSave(WOBJ *player, const savedata_t *data);
 
 #endif
