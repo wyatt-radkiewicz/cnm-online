@@ -479,6 +479,7 @@ void GameState_MainMenu_Init(void)
 
 	sprintf(pathbuf, "titlelvls/%d.cnmb", title_level);
 	Serial_LoadBlocks(pathbuf);
+	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS);
 	sprintf(pathbuf, "titlelvls/%d.cnms", title_level);
 	Serial_LoadSpawners(pathbuf);
 
@@ -853,10 +854,7 @@ void GameState_MainMenu_Draw(void)
 	//Renderer_StartDrawing();
 	if (!Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer)
 	{
-		Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS);
-		for (int i = 0; i < BACKGROUND_MAX_LAYERS; i++) {
-			Background_Draw(i, (int)_camx, (int)_camy);
-		}
+		Background_Draw(0, (int)_camx, (int)_camy);
 		//Renderer_Clear(Renderer_MakeColor(128, 128, 255));
 		//Renderer_DrawBitmap(cloudsx[0], 0, &clouds, 0, RENDERER_LIGHT);
 		//Renderer_DrawBitmap(cloudsx[1], 0, &clouds, 0, RENDERER_LIGHT);
@@ -902,6 +900,8 @@ void GameState_MainMenu_Draw(void)
 		Renderer_DrawBitmap2((int)pos[0] - 8, (int)pos[1] - 8, wings + (Game_GetFrame() / 10 % 2), 2, RENDERER_LIGHT, hflip, 0);
 	}
 	Renderer_DrawBitmap2((int)pos[0], (int)pos[1], &player, 0, RENDERER_LIGHT, hflip, 0.0f);
+	
+	Background_Draw(1, (int)_camx, (int)_camy);
 
 	const int frame = Game_GetFrame() / 2;
 	float color_spd = sinf((float)frame / 50.0f) / 10.0f;
