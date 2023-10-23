@@ -477,10 +477,10 @@ void GameState_MainMenu_Init(void)
 	int title_level = Util_RandInt(0, num_title_levels);
 	char pathbuf[32];
 
-	sprintf(pathbuf, "titlelvls/%d.cnmb", title_level);
+	sprintf(pathbuf, "levels/_title%d.cnmb", title_level);
 	Serial_LoadBlocks(pathbuf);
 	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS);
-	sprintf(pathbuf, "titlelvls/%d.cnms", title_level);
+	sprintf(pathbuf, "levels/_title%d.cnms", title_level);
 	Serial_LoadSpawners(pathbuf);
 
 	_cam_list_len = 0;

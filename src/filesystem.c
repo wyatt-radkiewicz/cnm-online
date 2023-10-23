@@ -247,6 +247,7 @@ void FileSystem_SearchForLevels(int clear_level_list)
 void FileSystem_SearchForLevels(int clear_level_list)
 {
     num_levels = 0;
+	num_title_levels = 0;
     if (clear_level_list)
     {
         for (int i = 0; i < FILESYSTEM_MAX_LEVELS; i++)
@@ -266,6 +267,10 @@ void FileSystem_SearchForLevels(int clear_level_list)
         while ((dir = readdir(d)) != NULL) {
             period = strchr(dir->d_name, '.');
             if (period != NULL && strcmp(period, ".cnmb") == 0) {
+				if (strncmp(dir->d_name, "_title", 6) == 0) {
+					num_title_levels++;
+					continue;
+				}
                 char cnms_level_name_path[FILESYSTEM_MAX_LENGTH + 1];
                 int l;
                 strcpy(levels[num_levels], "levels/");
@@ -281,18 +286,6 @@ void FileSystem_SearchForLevels(int clear_level_list)
                 Serial_LoadSpawnersLevelName(cnms_level_name_path, level_names[l]);
                 if (strcmp(level_names[l], "") == 0)
                     strcpy(level_names[l], levels[l]);
-            }
-        }
-        closedir(d);
-    }
-
-	num_title_levels = 0;
-    d = opendir("./titlelvls");
-    if (d) {
-        while ((dir = readdir(d)) != NULL) {
-            period = strchr(dir->d_name, '.');
-            if (period != NULL && strcmp(period, ".cnmb") == 0) {
-				num_title_levels++;
             }
         }
         closedir(d);
