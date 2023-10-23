@@ -1880,9 +1880,9 @@ void Player_DrawHUD(WOBJ *player) {
 		} else {
 			r.y += rank * 32;
 		}
-		Renderer_DrawBitmap(bx + 80, by + 32, &r, 2, RENDERER_LIGHT);
+		Renderer_DrawBitmap(bx + 80, by + 32, &r, 0, RENDERER_LIGHT);
 		Util_SetRect(&r, 0, 2432, 128, 80);
-		Renderer_DrawBitmap(bx, by, &r, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(bx, by, &r, 2, RENDERER_LIGHT);
 		Renderer_DrawText(bx + 4, by + 8, 0, RENDERER_LIGHT, "SCORE: %d", score);
 		Renderer_DrawText(bx + 4, by + 16, 0, RENDERER_LIGHT, "TIME BONUS: %d", time_score);
 		Renderer_DrawText(bx + 4, by + 24, 0, RENDERER_LIGHT, "TOTAL: %d", score + time_score);
