@@ -1064,8 +1064,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//WOBJ *tempitem;
 			int itemtype = Item_GetCurrentItem()->type;
-			float durability = Item_GetCurrentItem()->durability;
 			Item_GetCurrentItem()->durability -= 7.5f;
+			float durability = Item_GetCurrentItem()->durability;
 			Item_DestroyCurrentItem(wobj);
 			if (durability > 0.0f) Item_PickupByType(wobj, itemtype, durability);
 			//tempitem = Wobj_CreateOwned(WOBJ_DROPPED_ITEM, wobj->x, wobj->y, itemtype, 0.0f);
