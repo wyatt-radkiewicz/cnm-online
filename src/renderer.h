@@ -22,6 +22,11 @@ int Renderer_MakeColor(int r, int g, int b);
 int Renderer_GetBitmapHeight(void);
 int Renderer_GetBitmapPixel(int x, int y);
 
+void Renderer_SaveToEffectsBuffer(void);
+void Renderer_DrawVertRippleEffect(const CNM_RECT *rect, float period, float amp, float spd);
+void Renderer_DrawHorzRippleEffect(const CNM_RECT *rect, float period, float amp, float spd);
+void Renderer_DrawStetchedSpan(int x, int y, int w, int srcx, int srcy, int srcw, int trans);
+
 void Renderer_Clear(int color);
 void Renderer_DrawEmptyRect(const CNM_RECT *rect, int color, int trans, int light);
 //#ifndef CNM_NO_X86ASSEMBLY

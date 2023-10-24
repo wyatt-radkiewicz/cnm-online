@@ -231,9 +231,13 @@ void World_Draw(int mode)
 
 	// Draw the high priority layer of blocks
 	Blocks_DrawBlocks(BLOCKS_FG, camx, camy);
+	Renderer_SaveToEffectsBuffer();
+	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS, camx, camy);
 
 	// High priority background
 	Background_Draw(1, camx, camy);
+
+	//Renderer_DrawHorzRippleEffect(&(CNM_RECT){ .x = 0, .y = 50, .w = 150, .h = 100}, 10.f, 2.f, 0.1f);
 
 	// Player HUD
 	Player_DrawHUD(player);

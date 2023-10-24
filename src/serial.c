@@ -82,6 +82,19 @@ void Serial_LoadBlocks(const char *cnmb_file)
 		}
 	}
 	else for (i = 0; i < BACKGROUND_MAX_LAYERS; i++) Background_GetLayer(i)->transparency = 0;
+	e = lparse_get_entry(lp, "BG_RATIO3D");
+	if (e != NULL) {
+		for (i = 0; i < BACKGROUND_MAX_LAYERS; i++) {
+			lparse_get_data(lp, e, i*3+0, 1, &Background_GetLayer(i)->top3d);
+			lparse_get_data(lp, e, i*3+1, 1, &Background_GetLayer(i)->bottom3d);
+			lparse_get_data(lp, e, i*3+2, 1, &Background_GetLayer(i)->height3d);
+		}
+	}
+	else for (i = 0; i < BACKGROUND_MAX_LAYERS; i++) {
+		Background_GetLayer(i)->top3d = 0;
+		Background_GetLayer(i)->bottom3d = 0;
+		Background_GetLayer(i)->height3d = 0;
+	}
 
 	e = lparse_get_entry(lp, "BLOCKS_HEADER");
 	lparse_get_data(lp, e, 0, 1, &w);
@@ -208,6 +221,12 @@ void Serial_SaveBlocks(const char *cnmb_file)
 	for (i = 0; i < BACKGROUND_MAX_LAYERS; i++) {
 		tmp1 = (unsigned char)Background_GetLayer(i)->transparency;
 		lparse_set_data(lp, e, i, 1, &tmp1);
+	}
+	e = lparse_make_entry(lp, "BG_RATIO3D", lparse_i32, BACKGROUND_MAX_LAYERS * 3);
+	for (i = 0; i < BACKGROUND_MAX_LAYERS; i++) {
+		lparse_set_data(lp, e, i*3+0, 1, &Background_GetLayer(i)->top3d);
+		lparse_set_data(lp, e, i*3+1, 1, &Background_GetLayer(i)->bottom3d);
+		lparse_set_data(lp, e, i*3+2, 1, &Background_GetLayer(i)->height3d);
 	}
 
 	e = lparse_make_entry(lp, "BLOCKS_HEADER", lparse_i32, 3);

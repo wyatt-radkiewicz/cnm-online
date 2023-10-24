@@ -24,6 +24,7 @@ typedef struct _BACKGROUND_LAYER
 	int clear_color;
 	int high;
 	int transparency;
+	int top3d, bottom3d, height3d;
 } BACKGROUND_LAYER;
 
 void Background_ResetBackgrounds(void);

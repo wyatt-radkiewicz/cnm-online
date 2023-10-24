@@ -6,6 +6,7 @@
 
 #define BLOCKS_FG 1
 #define BLOCKS_BG 0
+#define BLOCKS_DUMMY_EFFECTS 2
 
 #define BLOCKS_COLL_BOX		0
 #define BLOCKS_COLL_HEIGHT	1

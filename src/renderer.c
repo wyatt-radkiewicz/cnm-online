@@ -14,6 +14,7 @@ static SDL_Window *renderer_win;
 static SDL_Surface *renderer_scr;
 static SDL_Surface *renderer_gfx;
 static SDL_Surface *renderer_hires_temp;
+static SDL_Surface *renderer_effects_buf;
 static unsigned char renderer_conv[1<<RENDERER_DEPTH][1<<RENDERER_DEPTH][1<<RENDERER_DEPTH];
 static unsigned char renderer_trans[256][256][RENDERER_LEVELS]; /* Source color, Destination Color, Transparency level */
 static unsigned char renderer_light[256][RENDERER_LEVELS]; /* Color, Light level */
@@ -65,6 +66,7 @@ void Renderer_Init(int start_fullscreen, int hi_res)
 }
 void Renderer_Quit(void)
 {
+	SDL_FreeSurface(renderer_effects_buf);
 	SDL_FreeSurface(renderer_hires_temp);
 	SDL_FreeSurface(renderer_gfx);
 	SDL_FreeSurface(renderer_scr);
@@ -294,12 +296,117 @@ void Renderer_LoadBitmap(const char *gfx_file)
 		SDL_FreeSurface(renderer_gfx);
 		return;
 	}
-	SDL_FreeSurface(renderer_scr);
+	if (renderer_scr) SDL_FreeSurface(renderer_scr);
+	if (renderer_effects_buf) SDL_FreeSurface(renderer_effects_buf);
 	renderer_scr = SDL_CreateRGBSurfaceWithFormat(0, RENDERER_WIDTH, RENDERER_HEIGHT, 8, SDL_PIXELFORMAT_INDEX8);
 	SDL_SetPaletteColors(renderer_scr->format->palette, renderer_gfx->format->palette->colors, 0, 0x100);
+	renderer_effects_buf = SDL_CreateRGBSurfaceWithFormat(0, RENDERER_WIDTH, RENDERER_HEIGHT, 8, SDL_PIXELFORMAT_INDEX8);
+	SDL_SetPaletteColors(renderer_effects_buf->format->palette, renderer_gfx->format->palette->colors, 0, 0x100);
 	//_renderer_asm_gfx_pixels = renderer_gfx->pixels;
 	//_renderer_asm_scr_pixels = renderer_scr->pixels;
 }
+void Renderer_SaveToEffectsBuffer(void) {
+	SDL_BlitSurface(renderer_scr, NULL, renderer_effects_buf, NULL);
+}
+void Renderer_DrawVertRippleEffect(const CNM_RECT *rect, float period, float amp, float spd) {
+	CNM_RECT r = (CNM_RECT) {
+		.w = RENDERER_WIDTH, .h = RENDERER_HEIGHT,
+		.x = 0, .y = 0,
+	};
+	if (rect != NULL) r = *rect;
+	if (r.x > RENDERER_WIDTH || r.x + r.w < 0 ||
+		r.y > RENDERER_HEIGHT || r.y + r.h < 0) return;
+	if (r.x + r.w > RENDERER_WIDTH) r.w = RENDERER_WIDTH - r.x;
+	if (r.y + r.h > RENDERER_HEIGHT) r.h = RENDERER_HEIGHT - r.y;
+	if (r.x < 0) {
+		r.w += r.x;
+		r.x = 0;
+	}
+	if (r.y < 0) {
+		r.h += r.y;
+		r.y = 0;
+	}
+
+	for (int y = r.y; y < r.y + r.h; y++) {
+		int ys = y + (int)(sinf((y + ((float)Game_GetFrame() * spd)) * CNM_PI / period) * amp);
+		if (ys < 0) ys = 0;
+		if (ys > RENDERER_HEIGHT - 1) ys = RENDERER_HEIGHT - 1;
+
+		const unsigned char *srcptr = ((unsigned char *)renderer_effects_buf->pixels) + (r.x + ys * RENDERER_WIDTH);
+		unsigned char *dstptr = ((unsigned char *)renderer_scr->pixels) + (r.x + y * RENDERER_WIDTH);
+
+		for (int x = 0; x < r.w; x++) {
+			*(dstptr++) = *(srcptr++);
+		}
+	}
+}
+void Renderer_DrawHorzRippleEffect(const CNM_RECT *rect, float period, float amp, float spd) {
+	CNM_RECT r = (CNM_RECT) {
+		.w = RENDERER_WIDTH, .h = RENDERER_HEIGHT,
+		.x = 0, .y = 0,
+	};
+	if (rect != NULL) r = *rect;
+	if (r.x > RENDERER_WIDTH || r.x + r.w < 0 ||
+		r.y > RENDERER_HEIGHT || r.y + r.h < 0) return;
+	if (r.x + r.w > RENDERER_WIDTH) r.w = RENDERER_WIDTH - r.x;
+	if (r.y + r.h > RENDERER_HEIGHT) r.h = RENDERER_HEIGHT - r.y;
+	if (r.x < 0) {
+		r.w += r.x;
+		r.x = 0;
+	}
+	if (r.y < 0) {
+		r.h += r.y;
+		r.y = 0;
+	}
+
+	for (int y = r.y; y < r.y + r.h; y++) {
+		int xs = r.x + (int)(sinf((y + ((float)Game_GetFrame() * spd)) * (2.0f * CNM_PI) / period) * amp);
+
+		const unsigned char *srcptr = ((unsigned char *)renderer_effects_buf->pixels) + (xs + y * RENDERER_WIDTH);
+		unsigned char *dstptr = ((unsigned char *)renderer_scr->pixels) + (r.x + y * RENDERER_WIDTH);
+		
+		for (int x = 0; x < r.w; x++) {
+			*(dstptr++) = *(srcptr++);
+		}
+	}
+}
+void Renderer_DrawStetchedSpan(int x, int y, int w, int srcx, int srcy, int srcw, int trans) {
+	float src_xstep = (float)srcw / (float)w;
+	if (y < 0 || y >= RENDERER_HEIGHT || x + w < 0) return;
+	if (x < 0) {
+		srcx -= (int)((float)x * src_xstep);
+		w += x;
+		x = 0;
+	}
+
+	float srcx_real = srcx;
+	const unsigned char *srcptr_base = ((unsigned char *)renderer_gfx->pixels) + (srcy * renderer_gfx->w);
+	unsigned char *dstptr = ((unsigned char *)renderer_scr->pixels) + (x + y * RENDERER_WIDTH);
+
+	if (trans == 0) {
+		while (w > 0 && x < RENDERER_WIDTH) {
+			unsigned char src = *(srcptr_base + (int)srcx_real);
+			if (src) *dstptr = src;
+			srcx_real += src_xstep;
+			dstptr++;
+			x++;
+			w--;
+		}
+	} else {
+		while (w > 0 && x < RENDERER_WIDTH) {
+			unsigned char dst = *dstptr;
+			unsigned char src = *(srcptr_base + (int)srcx_real);
+			if (src) *dstptr = renderer_trans[src][dst][trans];
+			dstptr++;
+			srcx_real += src_xstep;
+			x++;
+			w--;
+		}
+	}
+}
+
+
+
 void Renderer_BuildTables(void)
 {
 	int s, d, l;

@@ -299,7 +299,8 @@ BLOCK_PROPS *Blocks_IsCollidingWithDamage(const CNM_BOX *b)
 				block.h = (float)BLOCK_SIZE;
 				if (Util_AABBCollision(b, &block))
 				{
-					if (Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x, y))->dmg_type != BLOCK_DMG_TYPE_NONE)
+					BLOCK_PROPS *props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x, y));
+					if (props->dmg_type != BLOCK_DMG_TYPE_NONE && props->dmg != 0)
 						return Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x, y));
 					else
 						return Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, x, y));
@@ -474,12 +475,26 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 }
 void Blocks_DrawBlocks(int layer, int camx, int camy)
 {
-	int x, y;
+	int x, y, block, sx, sy, light, is_effects;
+	if (layer == BLOCKS_DUMMY_EFFECTS) {
+		is_effects = CNM_TRUE;
+		layer = BLOCKS_FG;
+	} else {
+		is_effects = CNM_FALSE;
+	}
 	for (y = camy / BLOCK_SIZE - 1; y < (camy + RENDERER_HEIGHT) / BLOCK_SIZE + 1; y++)
 	{
 		for (x = camx / BLOCK_SIZE - 1; x < (camx + RENDERER_WIDTH) / BLOCK_SIZE + 1; x++)
 		{
-			Blocks_DrawBlock(x * BLOCK_SIZE - camx, y * BLOCK_SIZE - camy, Blocks_GetBlock(layer, x, y), Blocks_GetCalculatedBlockLight(x, y));
+			block = Blocks_GetBlock(layer, x, y);
+			light = Blocks_GetCalculatedBlockLight(x, y);
+			sx = x * BLOCK_SIZE - camx;
+			sy = y * BLOCK_SIZE - camy;
+			if (!is_effects) {
+				Blocks_DrawBlock(sx, sy, block, light);
+			} else if (blocks_props[block].dmg_type == BLOCK_DMG_TYPE_LAVA) {
+				Renderer_DrawVertRippleEffect(&(CNM_RECT){ .x = sx, .y = sy, .w = 32, .h = 32}, 10.f, 2.5f, 0.1f);
+			}
 		}
 	}
 }

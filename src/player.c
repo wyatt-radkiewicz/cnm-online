@@ -1059,17 +1059,15 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->vel_x = 0.0f;
 		wobj->vel_y = 0.0f;
 		local_data->upgradehp -= 15.0f;
-		if (wobj->item) {
-			Item_GetCurrentItem()->durability -= 7.5f;
-		}
 		//local_data->item_durability -= 10.0f;
 		wobj->flags |= WOBJ_PLAYER_IS_RESPAWNING;
 		{
 			//WOBJ *tempitem;
 			int itemtype = Item_GetCurrentItem()->type;
 			float durability = Item_GetCurrentItem()->durability;
+			Item_GetCurrentItem()->durability -= 7.5f;
 			Item_DestroyCurrentItem(wobj);
-			Item_PickupByType(wobj, itemtype, durability);
+			if (durability > 0.0f) Item_PickupByType(wobj, itemtype, durability);
 			//tempitem = Wobj_CreateOwned(WOBJ_DROPPED_ITEM, wobj->x, wobj->y, itemtype, 0.0f);
 			//Item_Pickup(wobj, tempitem);
 		}
