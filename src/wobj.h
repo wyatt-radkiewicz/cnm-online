@@ -205,13 +205,13 @@ typedef enum _WOBJ_TYPES
 		int type; \
 		int item; \
 		int flags; \
-		int last_sound_played : 8; \
-		int last_sound_uuid : 24; \
-		unsigned int link_node : 8; \
-		unsigned int link_uuid : 24; \
+		int last_sound_played; \
+		int last_sound_uuid; \
+		unsigned char link_node; \
+		int link_uuid; \
 		CNM_BOX hitbox; \
-		unsigned int node_id : 8; \
-		unsigned int uuid : 24; \
+		unsigned char node_id; \
+		int uuid; \
 	};
 
 

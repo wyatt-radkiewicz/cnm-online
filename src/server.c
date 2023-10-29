@@ -216,10 +216,12 @@ void Server_Update(NET_PACKET *packet)
 			}
 			NetGame_SetHistoryWobjFromNode(node->id, header.frame, (struct wobjdata *)&wobj_data);
 
-			memcpy(rbuf->wobjs + rbuf->num_objects, (struct wobjdata *)&wobj_data, sizeof(struct wobjdata));
-			rbuf->num_objects++;
-			if (rbuf->num_objects >= sizeof(rbuf->wobjs) / sizeof(struct wobjdata))
-				break;
+			if (netgame_should_create_unowned(wobj_data.node_id, wobj_data.uuid)) {
+				memcpy(rbuf->wobjs + rbuf->num_objects, (struct wobjdata *)&wobj_data, sizeof(struct wobjdata));
+				rbuf->num_objects++;
+				if (rbuf->num_objects >= sizeof(rbuf->wobjs) / sizeof(struct wobjdata))
+					break;
+			}
 		}
 		NetGame_RemoveAndAddNewUnownedServerWobjs(node->id);
 		node->nodes_first_update = CNM_FALSE;

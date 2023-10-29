@@ -6,7 +6,8 @@
 #include "lparse.h"
 #include "savedata.h"
 
-savedata_t g_current_save;
+int g_current_save;
+savedata_t g_saves[SAVE_SLOTS];
 
 void new_save(savedata_t *data) {
 	data->hp = 100;
@@ -43,7 +44,8 @@ void load_game(int slot, savedata_t *data) {
 	sprintf(filename, SAVE_DIR"save%d.lps", slot);
 	FILE *fp = fopen(filename, "rb");
 	if (!fp) {
-		Console_Print("Can't open the save file: %s! ERROR", filename);
+		//Console_Print("Can't open the save file: %s! ERROR", filename);
+		data->level[0] = '\0';
 		return;
 	}
 	LParse *lp = lparse_open_from_file(fp, lparse_read);

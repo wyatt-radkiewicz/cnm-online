@@ -18,29 +18,29 @@
 #include "master_server.h"
 #include "fadeout.h"
 #include "background.h"
+#include "savedata.h"
+#include "titlebg.h"
 
 #define SB_START 4
 
 extern int skin_bases[10][2];
 //static CNM_RECT clouds;
-static CNM_RECT title_card;
-static CNM_RECT player;
-static CNM_RECT wings[4];
-//static int cloudsx[2];
-static float pos[2];
-static float vel[2];
-static int controlling;
-static int ai_xdir;
-static int ai_ydir;
-static int ai_timer;
-static int ai_same_speed;
 static int editor_cheat = CNM_FALSE;
+//static int pressed_start;
+static int gui_state, last_gui_state;
 
-static float _camx = 0.0f, _camy = 0.0f, _camx_coarse = 0.0f, _camy_coarse = 0.0f, _camx_spd = 0.0f, _camy_spd = 0.0f;
-static float *_camx_list, *_camy_list;
-static int _cam_list_len, _next_cam_target;
-#define MAX_TITLE_CARDS 4
-static int _title_card_ticker, _title_card_y[MAX_TITLE_CARDS];
+enum gui_state {
+	GUI_PRESS_START,
+	GUI_MAIN_STATE,
+	GUI_PLAYER_SETUP,
+	GUI_OPTIONS_STATE,
+	GUI_JOIN_STATE,
+	GUI_HOST_STATE,
+	GUI_BROWSE_STATE,
+	GUI_PLAY_STATE,
+	GUI_QUIT_STATE,
+};
+
 
 static const char *mission_difs[] =
 {
@@ -56,6 +56,8 @@ static const char *mission_difs[] =
 	"********** - ULTRA DEATH!"
 };
 static GUI_FRAME *options, *root, *startnewgame, *joingame_ip, *hostgame, *playersetup, *serverbrowser;
+
+static int cleanup_bg;
 
 #define NUM_SNOWFLAKES 512
 typedef struct _XMAS_SNOWFLAKE
@@ -297,26 +299,11 @@ void GameState_MainMenu_Init(void)
 	Fadeout_FadeFromWhite(10, 25);
 
 	//Util_SetRect(&title_card, 320, 832, 192, 32);
-	Util_SetRect(&title_card, 0, 7104, 304, 96);
 	//Util_SetRect(&clouds, 0, 832, 320, 240);
 	//Util_SetRect(&clouds, 0, 7200, 256, 320);
 	//cloudsx[0] = 0;
 	//cloudsx[1] = 320;
-	pos[0] = 120.0f;
-	pos[1] = 96.0f;
-	vel[0] = 10.0f;
-	vel[1] = -2.0f;
-	Util_SetRect(&player, 0, 288, 32, 32);
-	Util_SetRect(wings + 0, 256, 3088, 48, 48);
-	Util_SetRect(wings + 1, 256+48, 3088, 48, 48);
-	Util_SetRect(wings + 2, 0,  7056, 48, 48);
-	Util_SetRect(wings + 3, 48, 7056, 48, 48);
-	controlling = 0;
 	Util_RandSetSeed(0);
-	ai_xdir = Util_RandInt(0, 1) * 2 - 1;
-	ai_ydir = Util_RandInt(0, 1) * 2 - 1;
-	ai_timer = Util_RandInt(5, 60);
-	ai_same_speed = 0;
 
 	/* Set up the GUI */
 	props.top = RENDERER_HEIGHT - 8*6 - 16;
@@ -338,7 +325,7 @@ void GameState_MainMenu_Init(void)
 	joingame_ip = Gui_CreateFrame(3, 20, root, &props, 0);
 	hostgame = Gui_CreateFrame(14, 20, root, &props, 0);
 	playersetup = Gui_CreateFrame(3, 20, root, &props, 0);
-	serverbrowser = Gui_CreateFrame(SB_START+MSPAGE_SIZE*4+3, 100, root, &props, 0);
+	serverbrowser = Gui_CreateFrame(SB_START+MSPAGE_SIZE*4+3, 100, NULL, &props, 0);
 	Gui_InitSetElement(options, 0, FullscreenGuiFunc, "FULLSCREEN");
 	Gui_AddItemToSet(options, 0, "NO");
 	Gui_AddItemToSet(options, 0, "YES");
@@ -461,7 +448,7 @@ void GameState_MainMenu_Init(void)
 	Gui_InitButtonElement(root, 10, LightEditorButton, "LIGHT EDITOR", NULL, CNM_FALSE);
 	Gui_InitButtonElement(root, 11, EndingTextEditorButton, "ENDING TEXT EDITOR", NULL, CNM_FALSE);
 	Gui_InitButtonElement(root, 12, BackgroundEditorButton, "BACKGROUND EDITOR", NULL, CNM_FALSE);
-	Gui_Focus();
+	//Gui_Focus();
 
 	Net_AddPollingFunc(MainMenu_OnPacket);
 
@@ -483,39 +470,12 @@ void GameState_MainMenu_Init(void)
 	sprintf(pathbuf, "levels/_title%d.cnms", title_level);
 	Serial_LoadSpawners(pathbuf);
 
-	_cam_list_len = 0;
-	_next_cam_target = 1;
-	SPAWNER *spawner = NULL;
-	spawner = Spawners_Iterate(spawner);
-	while (spawner) {
-		if (spawner->wobj_type == TT_BOSS_WAYPOINT) _cam_list_len++;
-		spawner = Spawners_Iterate(spawner);
-	}
-	if (!_cam_list_len) _cam_list_len = 2;
-	_camx_list = malloc(sizeof(*_camx_list) * _cam_list_len);
-	_camy_list = malloc(sizeof(*_camy_list) * _cam_list_len);
-	spawner = Spawners_Iterate(NULL);
-	while (spawner) {
-		if (spawner->wobj_type == TT_BOSS_WAYPOINT)	{
-			//Console_Print("asdf");
-			_camx_list[spawner->custom_int] = spawner->x;
-			_camy_list[spawner->custom_int] = spawner->y;
-		}
-		spawner = Spawners_Iterate(spawner);
-	}
-	int start_idx = Util_RandInt(0, _cam_list_len - 2);
-	_camx = _camx_list[start_idx];
-	_camy = _camy_list[start_idx];
-	_next_cam_target = start_idx + 1;
-	_camx_coarse = _camx;
-	_camy_coarse = _camy;
-	_camx_spd = 0.0f;
-	_camy_spd = 0.0f;
+	gui_state = GUI_PRESS_START;
+	last_gui_state = GUI_PRESS_START;
 
-	_title_card_ticker = 0;
-	for (int i = 0; i < MAX_TITLE_CARDS; i++) {
-		_title_card_y[i] = -title_card.h;
-	}
+	titlebg_init();
+	cleanup_bg = CNM_TRUE;
+	//pressed_start = CNM_FALSE;
 
 	// XMAS mode stuff
 	memset(xmas_static_snow, 0, sizeof(xmas_static_snow));
@@ -543,9 +503,8 @@ void GameState_MainMenu_Init(void)
 }
 void GameState_MainMenu_Quit(void)
 {
-	free(_camx_list);
-	free(_camy_list);
-
+	if (cleanup_bg) titlebg_cleanup();
+	
 	Net_RemovePollingFunc(MainMenu_OnPacket);
 
 	Gui_Reset();
@@ -630,8 +589,6 @@ static void MainMenu_OnPacket(NET_PACKET *packet)
 }
 void GameState_MainMenu_Update(void)
 {
-	int last_ydir = ai_ydir;
-
 	Net_PollPackets(64);
 	Net_Update();
 	Input_Update();
@@ -652,133 +609,9 @@ void GameState_MainMenu_Update(void)
 		serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
 	}
 
-	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING))
-		Gui_Focus();
-	//cloudsx[0] -= 1;
-	//cloudsx[1] -= 1;
-	//if (cloudsx[0] <= 0 - 256)
-	//{
-	//	cloudsx[0] = 0;
-	//	cloudsx[1] = 256;
-	//}
+	titlebg_update();
 
-	if (Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING))
-	{
-		controlling = 45;
-		if (vel[1] >= -14.0f)
-			vel[1] -= 1.0f;
-	}
-	if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING))
-	{
-		controlling = 45;
-		if (vel[1] <= 0.0f)
-			vel[1] += 1.0f;
-	}
-	if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING))
-	{
-		controlling = 45;
-		if (vel[0] <= 12.0f)
-			vel[0] += 2.0f;
-	}
-	if (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING))
-	{
-		controlling = 45;
-		if (vel[0] >= -12.0f)
-			vel[0] -= 2.0f;
-	}
 
-	controlling--;
-	ai_timer--;
-
-	if (controlling <= 0)
-	{
-		if (ai_timer <= 0)
-		{
-			ai_timer = Util_RandInt(5, 30);
-			if (pos[0] < 140.0f)
-				ai_xdir = 1;
-			if (pos[0] > 180.0f)
-				ai_xdir = -1;
-
-			if (ai_same_speed >= 60)
-			{
-				if (ai_ydir)
-					ai_ydir = 0;
-				else
-					ai_ydir = Util_RandInt(0, 1) * 2 - 1;
-			}
-			else
-			{
-				if (pos[1] < 100.0f)
-					ai_ydir = 1;
-				else if (pos[1] > 140.0f)
-					ai_ydir = -1;
-				else
-					ai_ydir = 0;
-			}
-		}
-
-		if (ai_ydir <= -9.0f || ai_ydir >= 1.0f)
-			ai_same_speed++;
-		else
-			ai_same_speed = 0;
-
-		if (ai_xdir == 1 && vel[0] <= 12.0f)
-			vel[0] += 2.0f;
-		if (ai_xdir == -1 && vel[0] >= -12.0f)
-			vel[0] -= 2.0f;
-		if (ai_ydir == 1 && vel[0] <= 0.0f)
-			vel[1] += 1.0f;
-		if (ai_ydir == -1 && vel[0] >= -10.0f)
-			vel[1] -= 1.0f;
-	}
-
-	vel[0] = vel[0] * 0.9f;
-	vel[1] += 0.3f;
-	pos[0] += vel[0];
-	pos[1] += vel[1];
-	if (vel[1] >= 16.0f && controlling)
-		vel[1] = 16.0f;
-	else if (vel[1] >= 10.0f && !controlling)
-		vel[1] = 10.0f;
-	if (pos[1] >= 280.0f)
-		pos[1] = -33.0f;
-	if (pos[1] <= -64.0f)
-		pos[1] = 260.0f;
-	if (pos[0] >= 360.0f)
-		pos[0] = -33.0f;
-	if (pos[0] <= -64.0f)
-		pos[0] = 350.0f;
-
-	// Camera shit
-	if (fabsf(_camx_coarse - _camx_list[_next_cam_target]) < 2.5f &&
-		fabsf(_camy_coarse - _camy_list[_next_cam_target]) < 2.5f) {
-		_next_cam_target++;
-		if (_next_cam_target == _cam_list_len) {
-			_camx_coarse = _camx_list[0];
-			_camy_coarse = _camy_list[0];
-			_camx = _camx_coarse;
-			_next_cam_target = 1;
-		}
-	}
-	const float cam_speed = 1.5f, cam_accel = 0.02f;
-	if (_camx_coarse < _camx_list[_next_cam_target] - cam_speed * 0.75f) _camx_coarse += cam_speed;
-	if (_camx_coarse > _camx_list[_next_cam_target] + cam_speed * 0.75f) _camx_coarse -= cam_speed;
-	if (_camy_coarse < _camy_list[_next_cam_target] - cam_speed * 0.75f) _camy_coarse += cam_speed;
-	if (_camy_coarse > _camy_list[_next_cam_target] + cam_speed * 0.75f) _camy_coarse -= cam_speed;
-	const float deccel_distx = (-1.0f * _camx_spd * _camx_spd)/(-2.0f * cam_accel);
-	const float deccel_disty = (-1.0f * _camy_spd * _camy_spd)/(-2.0f * cam_accel);
-	if (_camx < _camx_coarse && _camx_spd < cam_speed) _camx_spd += cam_accel;
-	if (_camx > _camx_coarse && _camx_spd > -cam_speed) _camx_spd -= cam_accel;
-	if (_camy < _camy_coarse && _camy_spd < cam_speed) _camy_spd += cam_accel;
-	if (_camy > _camy_coarse && _camy_spd > -cam_speed) _camy_spd -= cam_accel;
-	_camx += _camx_spd;
-	_camy += _camy_spd;
-
-	if (_camx > _camx_coarse - deccel_distx && _camx < _camx_coarse &&  _camx_spd > 0.0f) _camx_spd -= cam_accel * 2.0f;
-	if (_camx < _camx_coarse + deccel_distx && _camx > _camx_coarse &&  _camx_spd < 0.0f) _camx_spd += cam_accel * 2.0f;
-	if (_camy > _camy_coarse - deccel_disty && _camy < _camy_coarse &&  _camy_spd > 0.0f) _camy_spd -= cam_accel * 2.0f;
-	if (_camy < _camy_coarse + deccel_disty && _camy > _camy_coarse &&  _camy_spd < 0.0f) _camy_spd += cam_accel * 2.0f;
 
 	// XMAS MODE!
 	if (!Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) return;
@@ -839,38 +672,971 @@ void GameState_MainMenu_Update(void)
 		}
 	}
 }
-static const int bar_colors[] = {
-	195, 196, 197, 198, 199, 200, 201, 202, 203, 204,
-	205,
-	204, 203, 202, 201, 200, 199, 198, 197, 196, 195
+static int gui_timer;
+static int side_blob_x;
+static int side_xstart;
+static int left_disp;
+static int options_num;
+
+static const char *option_names[] = {
+	"PLAYER SETUP",
+	"PLAY",
+	"OPTIONS",
+	"JOIN GAME",
+	"HOST GAME",
+	"BROWSE GAME",
+	"SEE YA MAN",
 };
-static const int bar_trans[] = {
-	7, 6, 5, 4, 3, 2, 1, 0,
-	1, 2, 3, 4, 5, 6, 7
+static int help_text_lines[] = {
+	4, 4, 4, 3, 3, 4, 2,
 };
-static float _colors_pos = 0.0f, _trans_pos = 0.0f;
+static const char *help_text[][4] = {
+	{
+		"CUSTOMIZE",
+		"YOUR PLAYER",
+		"NAME AND",
+		"SKIN!"
+	},
+	{
+		"START A",
+		"NEW GAME OR",
+		"LOAD A PRE-",
+		"VIOUS ONE",
+	},
+	{
+		"EDIT GFX,",
+		"AUDIO, AND",
+		"OTHER MISC",
+		"SETTINGS",
+	},
+	{
+		"JOIN A",
+		"MULTIPLAYER",
+		"GAME BY IP",
+		"",
+	},
+	{
+		"HOST A GAME",
+		"ON YOUR",
+		"COMPUTER",
+		"",
+	},
+	{
+		"BROWSE THE",
+		"MASTER",
+		"SERVER FOR",
+		"GAMES",
+	},
+	{
+		"EXIT THE",
+		"GAME",
+		"",
+		"",
+	},
+};
+
+struct gui_text_box {
+	char *buf;
+	int buflen;
+	int ps_text_cursor;
+};
+
+struct gui_text_box gui_text_box_init(char *buf, int len) {
+	return (struct gui_text_box) {
+		.buf = buf,
+		.buflen = len,
+		.ps_text_cursor = strlen(buf),
+	};
+}
+
+void gui_text_box_draw(struct gui_text_box *text, int editing, int x, int y, int trans) {
+	char *pname = text->buf;
+	char name[64] = { 0 };
+	strncpy(name, pname, text->ps_text_cursor);
+	if ((Game_GetFrame() / 10) % 2 == 0 && editing) strcat(name, "_");
+	else strcat(name, " ");
+	strcat(name, pname + text->ps_text_cursor);
+	Renderer_DrawText(x, y, trans, RENDERER_LIGHT, name);
+}
+
+void gui_text_box_update(struct gui_text_box *text, int editing) {
+	char *pname = text->buf;
+	int len = strlen(pname);
+	if (!editing) {
+		text->ps_text_cursor = len;
+		return;
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_BACKSPACE, INPUT_STATE_PLAYING) && text->ps_text_cursor > 0) {
+		if (text->ps_text_cursor == len) {
+			pname[len - 1] = '\0';
+			text->ps_text_cursor--;
+		} else {
+			memmove(pname + text->ps_text_cursor - 1, pname + text->ps_text_cursor, len - text->ps_text_cursor + 1);
+			text->ps_text_cursor--;
+		}
+	}
+	if (Input_GetCharPressed(INPUT_STATE_PLAYING) && len < text->buflen - 1) {
+		if (text->ps_text_cursor == len) {
+			pname[len] = Input_GetCharPressed(INPUT_STATE_PLAYING);
+			pname[len + 1] = '\0';
+			text->ps_text_cursor++;
+		} else {
+			memmove(pname + text->ps_text_cursor + 1, pname + text->ps_text_cursor, len - text->ps_text_cursor + 1);
+			pname[text->ps_text_cursor] = Input_GetCharPressed(INPUT_STATE_PLAYING);
+			text->ps_text_cursor++;
+		}
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING) && text->ps_text_cursor < len) {
+		text->ps_text_cursor++;
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING) && text->ps_text_cursor > 0) {
+		text->ps_text_cursor--;
+	}
+}
+
+void draw_main_gui_bars(void) {
+	CNM_RECT r;
+
+	const int start = 160;
+	int idx = options_num - 5;
+	//Console_Print("%d", options_num);
+	for (int i = -1; i < start/r.h+2; i++) {
+		Util_SetRect(&r, 384, 7104, 128, 32);
+		Renderer_DrawBitmap(-r.w + side_xstart + i*32 + left_disp, RENDERER_HEIGHT-start + i*32 + left_disp, &r, 2, RENDERER_LIGHT);
+		if (idx >= 0 && idx < sizeof(option_names)/sizeof(*option_names)) {
+			int center = strlen(option_names[idx]) * 8 / 2;
+			if (idx != options_num) Renderer_SetFont(384, 1264, 8, 8);
+			else Renderer_SetFont(384, 448, 8, 8);
+			Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx]);
+			if (idx == options_num) {
+				int w = r.w;
+				Util_SetRect(&r, 376-24, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+				Renderer_DrawBitmap(-w + side_xstart + i*32 + left_disp + (w / 2 - center) - 12, RENDERER_HEIGHT - start + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT);
+				Util_SetRect(&r, 376-24, 1264 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
+				Renderer_DrawBitmap2(-w + side_xstart + i*32 + left_disp + (w / 2 + center) , RENDERER_HEIGHT - start + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+			}
+		}
+		idx++;
+	}
+
+	Util_SetRect(&r, 400, 7136, 112, 48);
+	Renderer_SetFont(384, 448, 8, 8);
+	Renderer_DrawBitmap2(side_blob_x, RENDERER_HEIGHT-48, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+	int text_off = 12;
+	if (help_text_lines[options_num] == 3) text_off += 6;
+	if (help_text_lines[options_num] == 2) text_off += 6;
+	for (int i = 0; i < 4; i++) {
+		int align_right = (12 - strlen(help_text[options_num][i])) * 8;
+		Renderer_DrawText(side_blob_x + 8 + align_right, RENDERER_HEIGHT-48+text_off+i*8, 0, RENDERER_LIGHT, help_text[options_num][i]);
+	}
+
+	int target = gui_state == GUI_MAIN_STATE ? 0 : -192;
+	side_xstart += (target - side_xstart) * 0.25f;
+	target = gui_state == GUI_MAIN_STATE ? RENDERER_WIDTH - r.w : RENDERER_WIDTH + 8;
+	side_blob_x += (target - side_blob_x) * 0.25f;
+	left_disp += (0 - left_disp) * 0.25f;
+}
+
+static int ps_trans;
+static int ps_selected;
+static int ps_selected_pos;
+static int ps_pos, ps_pos_target;
+static int ps_pos_target_add;
+static struct gui_text_box ps_player_name, options_mserv;
+static int host_game_level_idx;
+
+static void DrawHealthBar(int x, int y, int w, int trans2) {
+	CNM_RECT r;
+
+	int fine = (Game_GetFrame() / 3), coarse = (Game_GetFrame() / 10), ccoarse = (Game_GetFrame() / 5);
+	int offsets[4] = {
+		0, 11, 22, 11
+	};
+	int xoff = 0;
+	for (; w > 0; w -= 32) {
+		int ww = w;
+		if (ww > 32) ww = 32;
+		Util_SetRect(&r, 256 + (fine % 32), 3936 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
+		Renderer_DrawBitmap(x+xoff, y, &r, trans2, RENDERER_LIGHT);
+		xoff += 32;
+	}
+}
+
+static float curr_audio = 0.0f;
+static char joingame_buf[32];
+static int return_rect, quit_rect;
+static int return_rects[][2] = {
+	{ 6, 4616 }, { 0, 6368, }, { 288, 6368, }, { 192, 6368, }, { 224, 6368, },
+	{ 256, 3392, }, { 96, 448, }, { 160, 736, },
+};
+static int quit_rects[][2] = {
+	{ 416, 2208 }, { 288, 1536, }, { 416, 1456, }, { 327, 1088, }, { 384, 416, },
+	{ 64, 256, }, { 256, 416, }, { 192, 736, },
+	{ 384, 2208, }, { 173, 2443, }, { 52, 6469, },
+};
+
+void draw_player_setup(void) {
+	CNM_RECT r, r2;
+	static int quit_posx = RENDERER_WIDTH / 2 - 112 + 20 - 10;
+
+	int trans = 7 - ps_trans / 2;
+	if (trans < 2) trans = 2;
+	if (ps_trans < 0) return;
+	int trans2 = 7 - ps_trans / 2;
+	if (trans2 < 0) trans2 = 0;
+
+	int ystart = 16;
+	int height = 0;
+	if (last_gui_state == GUI_HOST_STATE || gui_state == GUI_HOST_STATE) {
+		ystart = -48;
+		height = 4;
+	}
+	Util_SetRect(&r, 400, 7136, 112, 48);
+	Util_SetRect(&r2, 400, 7168, 112, 16);
+	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
+	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+	for (int i = 0; i < height; i++) {
+		Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, RENDERER_HEIGHT / 2 + ystart + i*r2.h + r.h, &r2, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+		Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + ystart + i*r2.h + r.h, &r2, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
+	}
+	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + ystart + height*r2.h + r.h, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
+	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, RENDERER_HEIGHT / 2 + ystart + height*r2.h + r.h, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
+	gui_timer++;
+	
+	int target_selected = ps_selected * 12;
+	if ((last_gui_state == GUI_HOST_STATE || gui_state == GUI_HOST_STATE) && ps_selected == 4) {
+		target_selected = 10*12-1;
+	}
+	ps_selected_pos += (target_selected - ps_selected_pos) * 0.75f;
+	if (ps_pos_target_add > 0) ps_pos_target_add--;
+	if (ps_pos_target_add < 0) ps_pos_target_add++;
+	ps_pos += ((ps_pos_target + ps_pos_target_add) - ps_pos) * 0.33f;
+
+	if (last_gui_state == GUI_PLAYER_SETUP || gui_state == GUI_PLAYER_SETUP) {
+		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*6, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "PLAYER SETUP");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+12, trans2, RENDERER_LIGHT, "NAME: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - 16, RENDERER_HEIGHT / 2 + 16 + 12+12+12, trans2, RENDERER_LIGHT, "SKIN");
+		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
+		int ralign = r.w - 20 - 16 * 8;
+		gui_text_box_draw(&ps_player_name, ps_selected == 0, RENDERER_WIDTH / 2 + ralign, RENDERER_HEIGHT / 2 + 40, trans2);
+
+		int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
+		for (int i = -1; i <= 10; i++) {
+			if (i < 0 || i > 9) Util_SetRect(&r2, 0, 352, 32, 32);
+			else memcpy(&r2, skin_bases[i], sizeof(CNM_RECT));
+			r2.w = 32; r2.h = 32;
+			int pos = i*(32+16) - ps_pos;
+			int t = trans2;
+			if (pos < -(32+16)) t = trans2 + (-pos - (32+16)) / 3;
+			if (pos > 32+16) t = trans2 + (pos - (32+16)) / 3;
+			if (t > 7) t = 7;
+			Renderer_DrawBitmap(
+				RENDERER_WIDTH / 2 - 16 + pos,
+				RENDERER_HEIGHT / 2 + 48 + 16 + (i == *skin ? 0 : 4),
+				&r2,
+				t,
+				i == *skin ? RENDERER_LIGHT : RENDERER_LIGHT + 2
+			);
+		}
+	}
+
+	if (last_gui_state == GUI_OPTIONS_STATE || gui_state == GUI_OPTIONS_STATE) {
+		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*3 - 4, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "OPTIONS");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+12, trans2, RENDERER_LIGHT, "FULLSCREEN: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - 3*8, RENDERER_HEIGHT / 2 + 16 + 12+12, trans2, RENDERER_LIGHT,
+			(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer ? "YES" : " NO"));
+
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*2), trans2, RENDERER_LIGHT, "HI-RES MODE: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - 3*8, RENDERER_HEIGHT / 2 + 16 + 12+(12*2), trans2, RENDERER_LIGHT,
+			(Game_GetVar(GAME_VAR_HIRESMODE)->data.integer ? "YES" : " NO"));
+
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*3), trans2, RENDERER_LIGHT, "VOLUME: ");
+		Util_SetRect(&r2, 72, 4324, 85, 9);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 + r.w - 20 - r2.w, RENDERER_HEIGHT / 2 + 16 + 12+(12*3) - 1, &r2, trans2, RENDERER_LIGHT);
+		curr_audio += (Audio_GetGlobalVolume() - curr_audio) * 0.5f;
+		DrawHealthBar(RENDERER_WIDTH / 2 + r.w - 20 - r2.w + 2, RENDERER_HEIGHT / 2 + 16 + 12+(12*3) + 1, 81.0f * curr_audio, trans2);
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*4), trans2, RENDERER_LIGHT, "MS. IP: ");
+		gui_text_box_draw(&options_mserv, ps_selected == 3, RENDERER_WIDTH / 2 + r.w - 20 - (14 * 8), RENDERER_HEIGHT / 2 + 16 + 12+(12*4), trans2);
+		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
+	}
+
+	if (last_gui_state == GUI_JOIN_STATE || gui_state == GUI_JOIN_STATE) {
+		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*11-4, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "JOIN GAME BY IP ADDRESS");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*2), trans2, RENDERER_LIGHT, "IP: ");
+		gui_text_box_draw(&options_mserv, ps_selected == 0, RENDERER_WIDTH / 2 + r.w - 20 - (14 * 8), RENDERER_HEIGHT / 2 + 16 + 12+(12*2), trans2);
+		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 12+(12*2) + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
+	}
+
+	if (last_gui_state == GUI_HOST_STATE || gui_state == GUI_HOST_STATE) {
+		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*11-4, RENDERER_HEIGHT / 2 - 48 + 12, trans2, RENDERER_LIGHT, "HOST A MULTIPLAYER GAME");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 48 + 12+12, trans2, RENDERER_LIGHT, "NAME: ");
+		gui_text_box_draw(&options_mserv, ps_selected == 0, RENDERER_WIDTH / 2 + r.w - 20 - (17 * 8), RENDERER_HEIGHT / 2 - 48 + 12+(12*1), trans2);
+		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		if (ps_selected >= 4) r2.x -= 24;
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 - 48 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
+		
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 48 + 12+(12*2), trans2, RENDERER_LIGHT, "ENABLE PVP: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - 3*8, RENDERER_HEIGHT / 2 - 48 + 12+(12*2), trans2, RENDERER_LIGHT,
+			(Game_GetVar(GAME_VAR_ENABLE_SERVER_PVP)->data.integer ? "YES" : " NO"));
+
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 48 + 12+(12*3), trans2, RENDERER_LIGHT, "ADVERTISE: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - 3*8, RENDERER_HEIGHT / 2 - 48 + 12+(12*3), trans2, RENDERER_LIGHT,
+			(Game_GetVar(GAME_VAR_ADVERTISE_SERVER)->data.integer ? "YES" : " NO"));
+
+		const char *lvlname = FileSystem_GetLevelName(FileSystem_GetLevelFromLevelOrder(host_game_level_idx));
+		//Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 48 + 12+(12*4), trans2, RENDERER_LIGHT, "[SELECT MAP]");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - (8*strlen(lvlname)) / 2, RENDERER_HEIGHT / 2 - 48 + 12+(12*4), trans2, RENDERER_LIGHT, lvlname);
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*5)+6, trans2, RENDERER_LIGHT, "[HOST SERVER]");
+
+		//int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
+		for (int i = -1; i <= FileSystem_NumLevels(); i++) {
+			if (i < 0 || i >= FileSystem_NumLevels()) Util_SetRect(&r2, 416, 7200, 96, 64);
+			else memcpy(&r2, FileSystem_GetLevelPreview(FileSystem_GetLevelFromLevelOrder(i)), sizeof(CNM_RECT));
+			//r2.w = 96; r2.h = 64;
+			int pos = i*(96+16) - ps_pos;
+			int t = trans2;
+			for (int slice = 0; slice < 96; slice += 8) {
+				int flip = (i < 0 || i >= FileSystem_NumLevels()) ? (Game_GetFrame() % 2) : CNM_FALSE;
+				int final_pos = flip ? (pos + 96 - slice - 8) : (pos + slice);
+				if (final_pos < -16) t = trans2 + (-final_pos - 16) / 4;
+				if (final_pos > 96+16) t = trans2 + (final_pos - (96+16)) / 4;
+				//if (i == host_game_level_idx) t = trans2;
+				if (t > 7) t = 7;
+				r2.w = 8;
+				Renderer_DrawBitmap2(
+					RENDERER_WIDTH / 2 - 48 + final_pos,
+					RENDERER_HEIGHT / 2 + 24 + (i == host_game_level_idx ? 0 : 4),
+					&r2,
+					t,
+					i == host_game_level_idx ? RENDERER_LIGHT : RENDERER_LIGHT + 2,
+					flip,
+					CNM_FALSE
+				);
+				r2.x += 8;
+			}
+		}
+	}
+
+	if (last_gui_state == GUI_QUIT_STATE || gui_state == GUI_QUIT_STATE) {
+		const int y = RENDERER_HEIGHT / 2 + 16 + 12*2;
+		Renderer_DrawText(RENDERER_WIDTH / 2 - (15*8)/2, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "YOU WANNA QUIT?");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, y, trans2, RENDERER_LIGHT, "RETURN");
+		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (8*6), y, trans2, RENDERER_LIGHT, "QUIT!?");
+
+		int posx = RENDERER_WIDTH / 2 - r.w + 20 - 10;
+		if (ps_selected == 1) posx = RENDERER_WIDTH / 2 + r.w - 20 - (8*6) - 10;
+		quit_posx += (posx - quit_posx) * 0.75f;
+
+		Util_SetRect(&r2, 376-24, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Renderer_DrawBitmap(quit_posx, y, &r2, trans2, RENDERER_LIGHT);
+		Util_SetRect(&r2, 376-24, 1264 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
+		Renderer_DrawBitmap2(quit_posx + (8*7) + 4, y, &r2, trans2, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+
+		Util_SetRect(&r2, 400, 7264, 32+8, 32+8);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 20 + (8*3) - 20, y + 16, &r2, trans2, RENDERER_LIGHT);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 + r.w - 20 - (8*3) - 20, y + 16, &r2, trans2, RENDERER_LIGHT);
+		r2.w = 32; r2.h = 32;
+		r2.x = return_rects[return_rect][0];
+		r2.y = return_rects[return_rect][1];
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 20 + (8*3) - 20 + 4, y + 16 + 4, &r2, trans2, RENDERER_LIGHT);
+		r2.x = quit_rects[quit_rect][0];
+		r2.y = quit_rects[quit_rect][1];
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 + r.w - 20 - (8*3) - 20 + 4, y + 16 + 4, &r2, trans2, RENDERER_LIGHT);
+	}
+}
+
+static int current_save_slot;
+static int save_slot_basey;
+static int completion_basey;
+static int playbit0_x, playbit1_x;
+static int ss_trans;
+static int delete_mode;
+static int joining_timer, is_joining;
+#define SAVE_SLOT_WIDTH 112
+#define SAVE_SLOT_PADDING 16
+#define SAVE_SLOT_EXTENT (SAVE_SLOT_WIDTH+SAVE_SLOT_PADDING)
+
+void draw_play_gui_nologic(void) {
+	CNM_RECT r, r2;
+
+	int trans = 7 - ss_trans / 2;
+	if (trans < 2) trans = 2;
+#define MOVEABLE(name, in, out) \
+	if (gui_state == GUI_PLAY_STATE) name += (in - name) * 0.33f; \
+	else name += (out - name) * 0.25f;
+	MOVEABLE(save_slot_basey, 88, -128)
+	MOVEABLE(completion_basey, 0, -50)
+	MOVEABLE(playbit0_x, RENDERER_WIDTH - 144, RENDERER_WIDTH + 2)
+	MOVEABLE(playbit1_x, 0, -112-2)
+	if (ss_trans < 0) return;
+	int trans2 = 7 - ss_trans / 2;
+	if (trans2 < 0) trans2 = 0;
+
+	//Util_SetRect(&r, 368, 7376, 144, 144);
+	//Renderer_DrawBitmap(playbit0_x, RENDERER_HEIGHT - r.h, &r, trans2, RENDERER_LIGHT);
+	//Util_SetRect(&r, 256, 7328, 112, 192);
+	//Renderer_DrawBitmap(playbit1_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
+
+	Util_SetRect(&r, 400-16, 7136, 128, 48);
+	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, completion_basey, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
+	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, completion_basey, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
+	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4, trans2, RENDERER_LIGHT, "TOTAL COMPLETION %%:");
+	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (2*8), completion_basey + 4, trans2, RENDERER_LIGHT, "0%%");
+	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4 + (8*1), trans2, RENDERER_LIGHT, "LEVELS FOUND:");
+	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (4*8), completion_basey + 4 + (8*1), trans2, RENDERER_LIGHT, "0/20");
+	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4 + (8*2), trans2, RENDERER_LIGHT, "NUM SAVES CREATED:");
+	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (1*8), completion_basey + 4 + (8*2), trans2, RENDERER_LIGHT, "1");
+	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4 + (8*3), trans2, RENDERER_LIGHT, "SECRETS FOUND:");
+	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (1*8), completion_basey + 4 + (8*3), trans2, RENDERER_LIGHT, "0");
+
+	for (int i = -2; i <= 2; i++) {
+		Util_SetRect(&r, 456, 7136, 56, 48);
+		Util_SetRect(&r2, 456, 7168, 56, 16);
+
+		int slot = current_save_slot + i;
+		if (slot < 0 || slot > SAVE_SLOTS) continue;
+		const int basey = save_slot_basey - (slot == current_save_slot ? 6 : 0);
+		const int basex = RENDERER_WIDTH / 2 + slot*SAVE_SLOT_EXTENT - ps_pos;
+		int light = RENDERER_LIGHT;
+		if (basex > RENDERER_WIDTH / 2 + 32 || basex < RENDERER_WIDTH / 2 - 32) light = RENDERER_LIGHT + 1;
+		if (basex > RENDERER_WIDTH / 2 + 128 || basex < RENDERER_WIDTH / 2 - 100) light = RENDERER_LIGHT + 2;
+
+		Renderer_DrawBitmap2(basex, basey, &r, trans, light, CNM_FALSE, CNM_FALSE);
+		Renderer_DrawBitmap2(basex - 56, basey, &r, trans, light, CNM_TRUE, CNM_FALSE);
+		for (int j = 0; j < 3; j++) {
+			Renderer_DrawBitmap2(basex, basey + r.h + j*r2.h, &r2, trans, light, CNM_FALSE, CNM_FALSE);
+			Renderer_DrawBitmap2(basex - 56, basey + r.h + j*r2.h, &r2, trans, light, CNM_TRUE, CNM_FALSE);
+		}
+		Renderer_DrawBitmap2(basex, basey + r.h + 3*r2.h, &r, trans, light, CNM_FALSE, CNM_TRUE);
+		Renderer_DrawBitmap2(basex - 56, basey + r.h + 3*r2.h, &r, trans, light, CNM_TRUE, CNM_TRUE);
+
+		char text[16];
+		if (slot != SAVE_SLOTS) sprintf(text, "SAVE %d", slot + 1);
+		else strcpy(text, "* DELETE *");
+		Renderer_DrawText(basex - (8*strlen(text)) / 2, basey + 12, trans2, light, text);
+
+		if ((delete_mode || gui_timer > 0) && slot == current_save_slot) {
+			int time_val = (!delete_mode && gui_timer) ? gui_timer : 10 - gui_timer;
+			int width = (float)SAVE_SLOT_WIDTH * ((float)time_val / 10.0f);
+			if (delete_mode && gui_timer <= 0) width = SAVE_SLOT_WIDTH;
+			int trans3 = trans2 + (7 - time_val);
+			if (trans3 < 0) trans3 = 0;
+
+			int x = basex - width / 2;
+			int yoff = (int)(sinf((float)Game_GetFrame() / 20)*3.0f);
+			Util_SetRect(&r2, 480, 7264, 4, 16);
+			Renderer_DrawBitmap2(x, basey - 8 - yoff, &r2, trans3, light, CNM_FALSE, CNM_FALSE);
+			Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r2, trans3, light, CNM_FALSE, CNM_TRUE);
+			CNM_RECT r3;
+			Util_SetRect(&r3, 496, 7264+((Game_GetFrame() / 2) % 7)*16, 16, 16);
+			x += r2.w;
+			int width_left = width - r2.w;
+			for (; width_left >= 16; width_left -= 16) {
+				Renderer_DrawBitmap(x, basey - 8 - yoff, &r3, trans3, light);
+				Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r3, trans3, light, CNM_FALSE, CNM_TRUE);
+				x += 16;
+			}
+			if (width_left > 0) {
+				r3.w = width_left;
+				Renderer_DrawBitmap(x, basey - 8 - yoff, &r3, trans3, light);
+				Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r3, trans3, light, CNM_FALSE, CNM_TRUE);
+			}
+			x = basex + width / 2;
+			Renderer_DrawBitmap2(x, basey - 8 - yoff, &r2, trans3, light, CNM_TRUE, CNM_FALSE);
+			Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r2, trans3, light, CNM_TRUE, CNM_TRUE);
+		}
+
+		if (slot == SAVE_SLOTS) {
+			Util_SetRect(&r2, 448, 7264, 32, 32);
+			Renderer_DrawBitmap2(
+				basex - 16,
+				basey + 88 - 16 + (int)(sinf((float)Game_GetFrame() / 10.0f)*4.0f),
+				&r2,
+				trans2, light,
+				Game_GetFrame() % 2 == 0,
+				CNM_FALSE
+			);
+			continue;
+		}
+
+		int id = Filesystem_GetLevelIdFromFileName(g_saves[slot].level);
+		int flip = id == -1 ? Game_GetFrame() % 2 == 0 : 0;
+		if (id == -1) Util_SetRect(&r2, 416, 7200, 96, 64);
+		else memcpy(&r2, FileSystem_GetLevelPreview(id), sizeof(r2));
+		const char *lvlname = id == -1 ? "NEW SAVE" : FileSystem_GetLevelName(id);
+		Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + (12*2), trans2, light, lvlname);
+		Renderer_DrawBitmap2(basex - r.w + 8, basey + (12*3), &r2, trans2, light, flip, CNM_FALSE);
+		memcpy(&r2, skin_bases[Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer], sizeof(int[2]));
+		r2.w = 32; r2.h = 32;
+		Renderer_DrawBitmap2(basex - r.w + 12, basey + 104, &r2, trans2, light, CNM_TRUE, CNM_FALSE);
+		sprintf(text, "X %d", g_saves[slot].lives);
+		Renderer_DrawText(basex - r.w + 12 + 32 + 8, basey + 104 + 12, trans2, light, text);
+	}
+
+	if (ps_pos_target_add > 0) ps_pos_target_add--;
+	if (ps_pos_target_add < 0) ps_pos_target_add++;
+	ps_pos += ((ps_pos_target + ps_pos_target_add) - ps_pos) * 0.25f;
+}
+
+void draw_play_gui(void) {
+	draw_main_gui_bars();
+	draw_play_gui_nologic();
+
+	ss_trans += 2;
+	gui_timer--;
+
+	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
+		if (current_save_slot < SAVE_SLOTS) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			current_save_slot++;
+		} else {
+			ps_pos_target_add = 12;
+		}
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING)) {
+		if (current_save_slot > 0) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			current_save_slot--;
+		} else {
+			ps_pos_target_add = -12;
+		}
+	}
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		if (current_save_slot == SAVE_SLOTS && !delete_mode) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			gui_timer = 10;
+			delete_mode = CNM_TRUE;
+		} else if (delete_mode) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			gui_timer = 10;
+			delete_mode = CNM_FALSE;
+		}
+	}
+	ps_pos_target = current_save_slot*SAVE_SLOT_EXTENT;
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {
+		if (delete_mode) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			gui_timer = 10;
+			delete_mode = CNM_FALSE;
+		} else {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			last_gui_state = gui_state;
+			gui_state = GUI_MAIN_STATE;
+			gui_timer = 0;
+			ss_trans = 7*2;
+			side_blob_x = RENDERER_WIDTH;
+			side_xstart = -192;
+			titlebg_set_card_movement(36, 0, CNM_FALSE);
+		}
+	}
+}
+
+void draw_main_gui(void) {
+	CNM_RECT r;
+
+	draw_player_setup();
+	draw_play_gui_nologic();
+	draw_main_gui_bars();
+
+	if (Input_GetButtonPressedRepeated(INPUT_DOWN, INPUT_STATE_PLAYING) && options_num + 1 < sizeof(option_names)/sizeof(*option_names)) {
+		left_disp = 32;
+		side_blob_x = RENDERER_WIDTH;
+		options_num++;
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_PLAYING) && options_num > 0) {
+		left_disp = -32;
+		side_blob_x = RENDERER_WIDTH;
+		options_num--;
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+	}
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		last_gui_state = gui_state;
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		switch (options_num) {
+		case 0:
+			gui_state = GUI_PLAYER_SETUP;
+			ps_selected = 0;
+			ps_trans = 0;
+			gui_timer = 0;
+			ps_pos = Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer * (32+16);
+			ps_pos_target = ps_pos;
+			ps_player_name = gui_text_box_init(Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string, 16);
+			break;
+		case 1:
+			gui_state = GUI_PLAY_STATE;
+			ps_selected = 0;
+			ss_trans = 0;
+			gui_timer = 0;
+			delete_mode = CNM_FALSE;
+			//save_slot_basey = -128;
+			if (current_save_slot == SAVE_SLOTS) current_save_slot = SAVE_SLOTS - 1;
+			ps_pos = current_save_slot * SAVE_SLOT_EXTENT;
+			ps_pos_target = ps_pos;
+			titlebg_set_card_movement(-96 - 10, 0, CNM_FALSE);
+			break;
+		case 2:
+			gui_state = GUI_OPTIONS_STATE;
+			ps_selected = 0;
+			ps_trans = 0;
+			gui_timer = 0;
+			options_mserv = gui_text_box_init(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string, 16);
+			break;
+		case 3:
+			gui_state = GUI_JOIN_STATE;
+			ps_selected = 0;
+			ps_trans = 0;
+			gui_timer = 0;
+			strcpy(joingame_buf, Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string);
+			options_mserv = gui_text_box_init(joingame_buf, 16);
+			break;
+		case 4:
+			gui_state = GUI_HOST_STATE;
+			ps_selected = 0;
+			ps_pos = host_game_level_idx * (96+16);
+			ps_pos_target = ps_pos;
+			ps_trans = 0;
+			gui_timer = 0;
+			options_mserv = gui_text_box_init(Game_GetVar(GAME_VAR_SERVER_NAME)->data.string, 18);
+			titlebg_set_card_movement(4, 0, CNM_FALSE);
+			break;
+		case 5:
+			msdata.num_pages = 0;
+			ServerBrowserLoadPage(0);
+			sprintf(serverbrowser->elements[1].name, "PAGE: %d/%d", 0, 0);
+			Gui_Focus();
+			Gui_SetRoot(serverbrowser);
+			gui_state = GUI_BROWSE_STATE;
+			gui_timer = 0;
+			titlebg_set_card_movement(4, 0, CNM_FALSE);
+			break;
+		case 6:
+			return_rect = Util_RandInt(0, sizeof(return_rects) / sizeof(*return_rects));
+			quit_rect = Util_RandInt(0, sizeof(quit_rects) / sizeof(*quit_rects));
+			gui_state = GUI_QUIT_STATE;
+			ps_selected = 0;
+			ps_trans = 0;
+			gui_timer = 0;
+			break;
+		default: break;
+		}
+		ps_selected_pos = ps_selected * 12;
+	}
+}
+
+void draw_quit_gui(void) {
+	draw_main_gui_bars();
+	draw_player_setup();
+
+	ps_trans += 2;
+
+	if (Input_GetButtonPressed(INPUT_RIGHT, INPUT_STATE_PLAYING) && ps_selected == 0) ps_selected = 1;
+	else if (Input_GetButtonPressed(INPUT_LEFT, INPUT_STATE_PLAYING) && ps_selected == 1) ps_selected = 0;
+
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING) && ps_selected == 1) Game_Stop();
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING) ||
+		(Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING) && ps_selected == 0)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+		ps_trans = 7*2;
+	}
+}
+
+void draw_press_start(void) {
+	CNM_RECT r;
+
+	gui_timer++;
+	if ((gui_timer / 15) % 2 == 0) {
+		Util_SetRect(&r, 432-32, 7184, 112, 16);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - (r.w/2), RENDERER_HEIGHT / 2 + 96, &r, 0, RENDERER_LIGHT);
+	}
+
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		ps_trans = 0;
+		joining_timer = 0;
+		is_joining = CNM_FALSE;
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		ss_trans = 0;
+		save_slot_basey = -256;
+		options_num = 1;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+	}
+}
+
+void draw_browser_game_gui(void) {
+	draw_main_gui_bars();
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_GUI)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+		ps_trans = 0;
+		titlebg_set_card_movement(36, 0, CNM_FALSE);
+	}
+}
+
+void draw_join_game_gui(void) {
+	draw_main_gui_bars();
+	gui_text_box_update(&options_mserv, CNM_TRUE);
+	draw_player_setup();
+
+	ps_trans += 2;
+
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		char buffer[64] = {'\0'};
+		strcpy(buffer, "connect ");
+		strcat(buffer, joingame_buf);
+		Console_Print(buffer);
+		cleanup_bg = CNM_FALSE;
+		Command_Execute(buffer);
+	}
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+		ps_trans = 7*2;
+	}
+}
+
+void draw_host_game_gui(void) {
+	draw_main_gui_bars();
+	gui_text_box_update(&options_mserv, ps_selected == 0 && !is_joining);
+	draw_player_setup();
+	ps_trans += 2;
+
+	if (is_joining) {
+		if (++joining_timer >= 30) {
+			Game_SwitchState(GAME_STATE_HOSTED_SERVER);
+		}
+		return;
+	}
+
+	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 4) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		ps_selected++;
+	}
+	if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && ps_selected > 0) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		ps_selected--;
+	}
+
+	int change_button = Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING) ||
+		Input_GetButtonPressed(INPUT_LEFT, INPUT_STATE_PLAYING) ||
+		Input_GetButtonPressed(INPUT_RIGHT, INPUT_STATE_PLAYING);
+	if (ps_selected == 1 && change_button) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		int *enable = &Game_GetVar(GAME_VAR_ENABLE_SERVER_PVP)->data.integer;
+		*enable = !(*enable);
+	}
+	if (ps_selected == 2 && change_button) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		int *enable = &Game_GetVar(GAME_VAR_ADVERTISE_SERVER)->data.integer;
+		*enable = !(*enable);
+	}
+	if (ps_selected == 4 && Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(FileSystem_GetLevelFromLevelOrder(host_game_level_idx)));
+		is_joining = CNM_TRUE;
+		joining_timer = 0;
+		Fadeout_FadeToWhite(20, 10, 20);
+		//Game_SwitchState(GAME_STATE_HOSTED_SERVER);
+	}
+	if (ps_selected == 3 && Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
+		if (host_game_level_idx + 1 < FileSystem_NumLevels()) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			host_game_level_idx++;
+			ps_pos_target += 96+16;
+		} else {
+			ps_pos_target_add = 8;
+		}
+	}
+	if (ps_selected == 3 && Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING)) {
+		if (host_game_level_idx > 0) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			host_game_level_idx--;
+			ps_pos_target -= 96+16;
+		} else {
+			ps_pos_target_add = -8;
+		}
+	}
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		titlebg_set_card_movement(36, 0, CNM_FALSE);
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+		ps_trans = 7*2;
+	}
+}
+
+void draw_player_setup_gui(void) {
+	CNM_RECT r;
+
+	draw_main_gui_bars();
+	gui_text_box_update(&ps_player_name, ps_selected == 0);
+	draw_player_setup();
+
+	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 1) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		ps_selected++;
+	}
+	if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && ps_selected > 0) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		ps_selected--;
+	}
+	if (ps_selected == 0) {
+	}
+	int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
+	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING) && ps_selected == 1) {
+		if (*skin < 9) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			(*skin)++;
+			ps_pos_target += 32+16;
+		} else {
+			ps_pos_target_add = 8;
+		}
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING) && ps_selected == 1) {
+		if (*skin > 0) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			(*skin)--;
+			ps_pos_target -= 32+16;
+		} else {
+			ps_pos_target_add = -8;
+		}
+	}
+
+	ps_trans += 2;
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+		ps_trans = 7*2;
+		Serial_SaveConfig();
+	}
+}
+
+void draw_options_gui(void) {
+	CNM_RECT r;
+
+	draw_main_gui_bars();
+	gui_text_box_update(&options_mserv, ps_selected == 3);
+	draw_player_setup();
+
+	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 3) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		ps_selected++;
+	}
+	if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && ps_selected > 0) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		ps_selected--;
+	}
+	int change_button = Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING) ||
+		Input_GetButtonPressed(INPUT_LEFT, INPUT_STATE_PLAYING) ||
+		Input_GetButtonPressed(INPUT_RIGHT, INPUT_STATE_PLAYING);
+	if (ps_selected == 0 && change_button) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		int *fullscreen = &Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer;
+		*fullscreen = !(*fullscreen);
+		Renderer_SetFullscreen(*fullscreen);
+	}
+	if (ps_selected == 1 && change_button) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		int *hires = &Game_GetVar(GAME_VAR_HIRESMODE)->data.integer;
+		*hires = !(*hires);
+		Renderer_SetHiResMode(*hires);
+	}
+	if (ps_selected == 2) {
+		if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING) && Audio_GetGlobalVolume() < 1.0f) {
+			Audio_SetGlobalVolume(Audio_GetGlobalVolume() + 0.02f);
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		}
+		if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING) && Audio_GetGlobalVolume() > 0.0f) {
+			Audio_SetGlobalVolume(Audio_GetGlobalVolume() - 0.02f);
+			if (Audio_GetGlobalVolume() < 0.05f) {
+				Audio_SetGlobalVolume(0.0f);
+			} else {
+				Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			}
+		}
+	}
+
+	ps_trans += 2;
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+		ps_trans = 7*2;
+		Serial_SaveConfig();
+	}
+}
+
+void draw_new_gui(void) {
+	ps_trans--;
+	ss_trans--;
+	switch (gui_state) {
+	case GUI_PRESS_START: draw_press_start(); break;
+	case GUI_PLAY_STATE: draw_play_gui(); break;
+	case GUI_MAIN_STATE: draw_main_gui(); break;
+	case GUI_PLAYER_SETUP: draw_player_setup_gui(); break;
+	case GUI_OPTIONS_STATE: draw_options_gui(); break;
+	case GUI_JOIN_STATE: draw_join_game_gui(); break;
+	case GUI_HOST_STATE: draw_host_game_gui(); break;
+	case GUI_BROWSE_STATE: draw_browser_game_gui(); break;
+	case GUI_QUIT_STATE: draw_quit_gui(); break;
+	}
+}
+void draw_play_gui_bg(void) {
+	CNM_RECT r;
+	int trans = 7 - ss_trans / 2;
+	if (trans < 3) trans = 3;
+	if (trans < 8) {
+		Util_SetRect(&r, 368, 7376, 144, 144);
+		Renderer_DrawBitmap(playbit0_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
+		Util_SetRect(&r, 256, 7328, 112, 192);
+		Renderer_DrawBitmap(playbit1_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
+	}
+}
 void GameState_MainMenu_Draw(void)
 {
-	//Renderer_StartDrawing();
-	if (!Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer)
-	{
-		Background_Draw(0, (int)_camx, (int)_camy);
-		//Renderer_Clear(Renderer_MakeColor(128, 128, 255));
-		//Renderer_DrawBitmap(cloudsx[0], 0, &clouds, 0, RENDERER_LIGHT);
-		//Renderer_DrawBitmap(cloudsx[1], 0, &clouds, 0, RENDERER_LIGHT);
-		//Renderer_DrawBitmap(cloudsx[0], 0, &clouds, 0, RENDERER_LIGHT);
-		//Renderer_DrawBitmap(cloudsx[0]+256, 0, &clouds, 0, RENDERER_LIGHT);
-		//Renderer_DrawBitmap(cloudsx[0]+512, 0, &clouds, 0, RENDERER_LIGHT);
-	}
-	else
-	{
+	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) {
 		int x, y, z;
 		Renderer_Clear(Renderer_MakeColor(0, 0, 0));
-		Renderer_DrawBitmap(160 - 96, 30, &title_card, 0, RENDERER_LIGHT);
-		Gui_Draw();
 		for (y = 0; y < RENDERER_HEIGHT; y++) {
 			for (x = 0; x < RENDERER_WIDTH; x++) {
-				xmas_obstacles[y][x] = (Renderer_GetPixel(x, y) != Renderer_MakeColor(0, 0, 0));
+				xmas_obstacles[y][x] = CNM_FALSE;//(Renderer_GetPixel(x, y) != Renderer_MakeColor(0, 0, 0));
 			}
 		}
 
@@ -889,51 +1655,10 @@ void GameState_MainMenu_Draw(void)
 		}
 	}
 
-	Blocks_DrawBlocks(BLOCKS_BG, (int)_camx, (int)(_camy - 0.5f));
-	Blocks_DrawBlocks(BLOCKS_FG, (int)_camx, (int)(_camy - 0.5f));
+	titlebg_draw(draw_play_gui_bg);
 
-	Util_SetRect(&player, 40 + ((Game_GetFrame() % 2) * 40), 4688, 40, 40);
-	int hflip = vel[0] < 0.0f;
-	if (vel[1] > 3.0f) {
-		Renderer_DrawBitmap2((int)pos[0] - 8, (int)pos[1] - 8, wings + 2 + (Game_GetFrame() / 3 % 2), 2, RENDERER_LIGHT, hflip, 0);
-	} else {
-		Renderer_DrawBitmap2((int)pos[0] - 8, (int)pos[1] - 8, wings + (Game_GetFrame() / 10 % 2), 2, RENDERER_LIGHT, hflip, 0);
-	}
-	Renderer_DrawBitmap2((int)pos[0], (int)pos[1], &player, 0, RENDERER_LIGHT, hflip, 0.0f);
-	
-	Background_Draw(1, (int)_camx, (int)_camy);
+	draw_new_gui();
 
-	const int frame = Game_GetFrame() / 2;
-	float color_spd = sinf((float)frame / 50.0f) / 10.0f;
-	float trans_spd = sinf((float)frame / 30.0f) / 50.0f;
-	const float color_spd_bar = sinf((float)frame / 40.0f) * 60.0f;
-	const float trans_spd_bar = sinf((float)frame / 20.0f) * 30.0f;
-	_colors_pos += cosf((float)frame / 50.0f) / 10.0f;
-	_trans_pos += cosf((float)frame / 30.0f) / 10.0f;
-	float cpos = _colors_pos, tpos = _trans_pos;
-	for (int i = 0; i < RENDERER_HEIGHT; i++) {
-		cpos += color_spd;
-		//color_spd += cosf((float)frame / 40.0f + (float)i / color_spd_bar) / 30.0f;
-		tpos += trans_spd;
-		//trans_spd += cosf((float)frame / 20.0f + (float)i / trans_spd_bar) / 30.0f;
-		int cidx = abs((int)cpos) % (sizeof(bar_colors) / sizeof(*bar_colors));
-		int tidx = abs((int)tpos) % (sizeof(bar_trans) / sizeof(*bar_trans));
-		CNM_RECT r;
-		Util_SetRect(&r, 0, i, RENDERER_WIDTH, 1);
-		Renderer_DrawRect(&r, bar_colors[cidx], bar_trans[tidx], RENDERER_LIGHT);
-	}
-
-	_title_card_ticker++;
-	for (int i = MAX_TITLE_CARDS - 1; i > -1; i--) {
-		if (_title_card_ticker > 30 + (MAX_TITLE_CARDS - i - 1) * 3) {
-			int ty = 36 + i * 2;
-			_title_card_y[i] += (ty - _title_card_y[i]) * 0.6f;
-		}
-	}
-	for (int i = MAX_TITLE_CARDS - 1; i > 0; i--) {
-		Renderer_DrawBitmap(160 - (304 / 2), _title_card_y[i], &title_card, 6, RENDERER_LIGHT);
-	}
-	Renderer_DrawBitmap(160 - (304 / 2), _title_card_y[0], &title_card, 0, RENDERER_LIGHT);
 	Gui_Draw();
 
 	Fadeout_StepFade();

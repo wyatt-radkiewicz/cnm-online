@@ -144,10 +144,10 @@ void Input_Update(void)
 	input_buttons[INPUT_CONSOLE] = keys[SDL_SCANCODE_GRAVE];
 	input_buttons[INPUT_BACKSPACE] = keys[SDL_SCANCODE_BACKSPACE];
 	if ((Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_CLIENT || Game_TopState() == GAME_STATE_DEDICATED_SERVER || Game_TopState() == GAME_STATE_HOSTED_SERVER) && Input_TopState() <= INPUT_STATE_PLAYING) {
-		input_buttons[INPUT_UP] = keys[SDL_SCANCODE_SPACE] || keys[SDL_SCANCODE_X] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W];
-		input_buttons[INPUT_DOWN] = keys[SDL_SCANCODE_DOWN]|| keys[SDL_SCANCODE_S];
-		input_buttons[INPUT_LEFT] = keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A];
-		input_buttons[INPUT_RIGHT] = keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D];
+		input_buttons[INPUT_UP] = keys[SDL_SCANCODE_SPACE] || keys[SDL_SCANCODE_X] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_K];
+		input_buttons[INPUT_DOWN] = keys[SDL_SCANCODE_DOWN]|| keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_J];
+		input_buttons[INPUT_LEFT] = keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_H];
+		input_buttons[INPUT_RIGHT] = keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_L];
 		input_buttons[INPUT_ENTER] = keys[SDL_SCANCODE_RETURN] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_C];
 		input_buttons[INPUT_DROP] = keys[SDL_SCANCODE_V] || keys[SDL_SCANCODE_E];
 	}

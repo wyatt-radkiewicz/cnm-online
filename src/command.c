@@ -80,6 +80,7 @@ static void Command_NetFakeLoss(const char *args);
 static void Command_NetShowBandwidth(const char *args);
 static void Command_WobjReport(const char *args);
 static void Command_NetFakePing(const char *args);
+static void Command_LocalMap(const char *args);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -136,6 +137,7 @@ static const char *const command_names[] =
 	"net_show_bandwidth",
 	"wobj_report",
 	"net_fake_ping",
+	"localmap",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -193,6 +195,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_NetShowBandwidth,
 	Command_WobjReport,
 	Command_NetFakePing,
+	Command_LocalMap,
 };
 
 static const char *Command_ExtractArg(const char *args, int arg);
@@ -397,7 +400,7 @@ static void Command_Connect(const char *args)
 	strcpy(Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string, Command_ExtractArg(args, 0));
 	if (!Game_GetVar(GAME_VAR_NODOWNLOAD)->data.integer)
 	{
-		Game_SwitchState(GAME_STATE_CLIENT_DOWNLOADING);
+		//Game_SwitchState(GAME_STATE_CLIENT_DOWNLOADING);
 	}
 	else
 	{
@@ -652,4 +655,10 @@ static void Command_WobjReport(const char *args) {
 }
 static void Command_NetFakePing(const char *args) {
 	Net_FakeSenderPing(atoi(Command_ExtractArg(args, 0)));
+}
+static void Command_LocalMap(const char *args) {
+	int id = Filesystem_GetLevelIdFromFileName(Command_ExtractArg(args, 0));
+	strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
+	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
+	Game_SwitchState(GAME_STATE_SINGLEPLAYER);
 }

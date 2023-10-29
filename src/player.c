@@ -22,6 +22,7 @@
 #include "camera.h"
 #include "fadeout.h"
 #include "savedata.h"
+#include "pausemenu.h"
 
 PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
 
@@ -136,7 +137,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	wobj->speed = 5.0f;
 	wobj->jump = 10.0f;
 	wobj->hitbox.x = 6.0f;
-	wobj->hitbox.y = 2.0f;
+	wobj->hitbox.y = 3.0f;
 	wobj->hitbox.w = 17.0f;
 	wobj->hitbox.h = 29.0f;
 	wobj->custom_floats[1] = 0.0f;
@@ -248,6 +249,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (local_data->death_limbo_counter == 0) {
 		Interaction_CreateWobj(WOBJ_TELE_PARTICLES, wobj->x, wobj->y, 0, 0.0f);
 		wobj->flags &= ~WOBJ_DONT_DRAW;
+		g_can_pause = CNM_TRUE;
 	}
 
 	float accel = 1.3f;
@@ -473,7 +475,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		}
 		if (Wobj_IsGrouneded(wobj) && !local_data->is_sliding) {
-			wobj->hitbox.y = 2.0f;
+			wobj->hitbox.y = 3.0f;
 			wobj->hitbox.h = 29.0f;
 		}
 		if (!Wobj_IsGrouneded(wobj)) local_data->sliding_crit_timer = 8;
@@ -1051,7 +1053,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->death_cam_timer = 45+20+2;
 		//Camera_TeleportPos((int)wobj->x + 16, (int)wobj->y + 16);
 		Fadeout_FadeDeath(45, 20, 20);
-		g_current_save.lives--;
+		g_saves[g_current_save].lives--;
 		wobj->flags |= WOBJ_INVULN;
 		local_data->death_limbo_counter = 20+20+45+20;
 		_hud_player_y = 0.0f;
@@ -1059,6 +1061,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->vel_x = 0.0f;
 		wobj->vel_y = 0.0f;
 		local_data->upgradehp -= 15.0f;
+		if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
+			g_can_pause = CNM_FALSE;
+		}
 		//local_data->item_durability -= 10.0f;
 		wobj->flags |= WOBJ_PLAYER_IS_RESPAWNING;
 		{
@@ -1842,7 +1847,7 @@ void Player_DrawHUD(WOBJ *player) {
 	Renderer_DrawBitmap2(bx+skinoffx, by+skinoffy, &r, 0, RENDERER_LIGHT, 1, 0);
 	Util_SetRect(&r, 0, 4288+32, 64, 16);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 16, &r, 0, RENDERER_LIGHT);
-	sprintf(temp_hud, "%d", g_current_save.lives);
+	sprintf(temp_hud, "%d", g_saves[g_current_save].lives);
 	Renderer_DrawText(RENDERER_WIDTH - 64+6, RENDERER_HEIGHT - 32+18, 0, RENDERER_LIGHT, temp_hud);
 	//sprintf(temp_hud, "%d%%%%", (int)ceilf(player->speed * 20.0f));
 	//Renderer_DrawText(bx+8, by+10, 0, RENDERER_LIGHT, "SP");

@@ -335,6 +335,16 @@ void Interaction_DestroyWobj(WOBJ *wobj)
 		break;
 	}
 }
+void Interaction_DestroyWobjInstant(WOBJ *wobj) {
+	if (interaction_mode != INTERACTION_MODE_SINGLEPLAYER) {
+		int unowned = !wobj->internal.owned;
+		if (unowned && netgame_should_create_unowned(wobj->node_id, wobj->uuid)) netgame_add_to_destroy_ringbuf(wobj->node_id, wobj->uuid);
+		Interaction_DestroyWobj(wobj);
+		if (unowned) Wobj_DestroyWobj(wobj);
+	} else {
+		Wobj_DestroyWobj(wobj);
+	}
+}
 WOBJ *Interaction_CreateWobj(int type, float x, float y, int ci, float cf)
 {
 	switch (interaction_mode)

@@ -28,6 +28,11 @@ static unsigned int sendframe;
 static int numwobj_bytes, numwobj_bytes2;
 static int numwobjs_for_bytes, numwobjs_for_bytes2;
 
+#define DRBUF_SZ 16
+static int _drbuf_node[DRBUF_SZ];
+static int _drbuf_uuid[DRBUF_SZ];
+static int _drbuf_idx;
+
 void NetGame_Init(void)
 {
 	int i;
@@ -48,6 +53,12 @@ void NetGame_Init(void)
 	numwobj_bytes = 0;
 	numwobjs_for_bytes = 0;
 	num_forced_changes = 0;
+
+	for (int i = 0; i < DRBUF_SZ; i++) {
+		_drbuf_node[i] = -1;
+		_drbuf_uuid[i] = -1;
+	}
+	_drbuf_idx = 0;
 	memset(forced_changes, 0, sizeof(forced_changes));
 }
 void NetGame_Quit(void)
@@ -760,4 +771,16 @@ NETGAME_DAMAGE_ENTRY *parse_damage_entry(const uint8_t *buf, int *head) {
 	e.obj_uuid = packet_read_u32(buf, head);
 	e.damage_dealt = packet_read_float(buf, head);
 	return &e;
+}
+
+void netgame_add_to_destroy_ringbuf(int node, int uuid) {
+	_drbuf_node[_drbuf_idx] = node;
+	_drbuf_uuid[_drbuf_idx] = uuid;
+	_drbuf_idx = (_drbuf_idx + 1) % DRBUF_SZ;
+}
+int netgame_should_create_unowned(int node, int uuid) {
+	for (int i = 0; i < DRBUF_SZ; i++) {
+		if (_drbuf_node[i] == node && _drbuf_uuid[i] == uuid) return CNM_FALSE;
+	}
+	return CNM_TRUE;
 }

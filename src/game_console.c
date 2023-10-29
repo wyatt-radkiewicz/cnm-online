@@ -179,7 +179,7 @@ void GameConsole_Update(void)
 		GameConsole_HandleInput(GAMECONSOLE_INPUT_ESC, '\0');
 	if (Input_GetButtonPressedRepeated(INPUT_BACKSPACE, INPUT_STATE_CONSOLE))
 		GameConsole_HandleInput(GAMECONSOLE_INPUT_BACKSPACE, '\0');
-	if (Input_GetButtonPressed(INPUT_TALK, INPUT_STATE_PLAYING) && !GameConsole_IsOpen() && Game_TopState() != GAME_STATE_BLOCKSEDIT)
+	if (Input_GetButtonPressed(INPUT_TALK, INPUT_STATE_PLAYING) && !GameConsole_IsOpen() && Game_TopState() != GAME_STATE_BLOCKSEDIT && Game_TopState() != GAME_STATE_MAINMENU)
 		GameConsole_HandleInput(GAMECONSOLE_INPUT_TALK, '\0');
 	else if (Util_IsSafePrintable(Input_GetCharPressed(INPUT_STATE_CONSOLE)))
 		GameConsole_HandleInput(GAMECONSOLE_INPUT_CHAR, Input_GetCharPressed(INPUT_STATE_CONSOLE));

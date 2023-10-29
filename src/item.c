@@ -544,7 +544,7 @@ void Item_Pickup(WOBJ *player, WOBJ *dropped_item)
 		item_current.durability = dropped_item->custom_floats[0];
 		if (item_types[dropped_item->item].on_pickup != NULL)
 			item_types[dropped_item->item].on_pickup(&item_current, player);
-		Interaction_DestroyWobj(dropped_item);
+		Interaction_DestroyWobjInstant(dropped_item);
 	}
 }
 void Item_PickupByType(WOBJ *player, int itemtype, float durability)
@@ -961,7 +961,7 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 		break;
 	case ITEM_TYPE_MEGA_POTION: player->health += 1000.0f; break;
 	case ITEM_TYPE_ULTRA_MEGA_POTION: player->health += 10000.0f; break;
-	case ITEM_TYPE_1UP_JUICE: g_current_save.lives++; break;
+	case ITEM_TYPE_1UP_JUICE: g_saves[g_current_save].lives++; break;
 	case ITEM_TYPE_WRENCH:
 		((PLAYER_LOCAL_DATA *)player->local_data)->offhand_durability =
 			item_types[((PLAYER_LOCAL_DATA *)player->local_data)->offhand_item].max_durability;

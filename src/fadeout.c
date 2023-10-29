@@ -97,6 +97,10 @@ void Fadeout_ApplyFade(void)
 		}
 		if (fade_counter < fade_in + fade_time + 1)
 		{
+			Util_SetRect(&r, 0, 2432, 128, 32);
+			Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - 64 + offsx, RENDERER_HEIGHT / 2 - 32 + offsy, &r, 3, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
+			Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - 64 + offsx, RENDERER_HEIGHT / 2 - 32 + offsy+32, &r, 3, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
+			Util_SetRect(&r, 128, 1888, 128, 64);
 			Renderer_DrawBitmap(RENDERER_WIDTH / 2 - 64 + offsx, RENDERER_HEIGHT / 2 - 32 + offsy, &r, 0, RENDERER_LIGHT);
 		}
 		Util_SetRect(&r, 0, 0, RENDERER_WIDTH, RENDERER_HEIGHT);

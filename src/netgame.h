@@ -193,5 +193,7 @@ void serialize_damage_packet(uint8_t *buf, uint32_t packet_num, uint32_t numentr
 void serialize_damage_entry(uint8_t *buf, NETGAME_DAMAGE_ENTRY *e, int *head);
 NETGAME_DAMAGE_PACKET *parse_damage_packet(const uint8_t *buf);
 NETGAME_DAMAGE_ENTRY *parse_damage_entry(const uint8_t *buf, int *head);
+void netgame_add_to_destroy_ringbuf(int node, int uuid);
+int netgame_should_create_unowned(int node, int uuid);
 
 #endif

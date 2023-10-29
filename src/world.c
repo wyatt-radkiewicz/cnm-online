@@ -102,7 +102,8 @@ void World_Start(int mode)
 	Camera_Setup((int)player->x, (int)player->y); // Initializing camera values
 	
 	// Load player state
-	Player_LoadFromSave(player, &g_current_save);
+	Player_LoadFromSave(player, g_saves + g_current_save);
+	strcpy(g_saves[g_current_save].level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
 
 	// Supervirus stuff
 	if (Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) {
@@ -131,7 +132,7 @@ void World_Start(int mode)
 void World_Stop(void)
 {
 	// Save player state
-	Player_SaveData(player, &g_current_save);
+	Player_SaveData(player, g_saves + g_current_save);
 
 	// General cleanup
 	Wobj_DestroyOwnedWobjs();
@@ -206,7 +207,7 @@ void World_Update(int mode)
 
 	// Camera and fadeout code, including bossbar code
 	Camera_Update((int)player->x + 16, (int)player->y + 16);
-	Fadeout_StepFade();
+	//Fadeout_StepFade();
 	BossBar_Update();
 }
 void World_Draw(int mode)
@@ -327,7 +328,7 @@ void World_Draw(int mode)
 
 	// Other MISC. Things to draw
 	Dialoge_Draw();
-	Fadeout_ApplyFade();
+	//Fadeout_ApplyFade();
 	EndingText_Draw();
 
 	// Ending Text

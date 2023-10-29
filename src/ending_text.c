@@ -23,6 +23,7 @@ static int draw_to_line = 0;
 static int draw_to_char = 0;
 static int done_drawing = CNM_FALSE;
 static int dialoge_push_cooldown = 0;
+static int dialoge_automatic_end_timer = 0;
 
 void EndingText_ResetYValue(void)
 {
@@ -35,6 +36,7 @@ void EndingText_ResetYValue(void)
 	dialoge_line_end = 0;
 	dialoge_current_line = 0;
 	dialoge_active = CNM_FALSE;
+	dialoge_automatic_end_timer = 0;
 }
 void EndingText_SetLine(int index, const char *line)
 {
@@ -100,7 +102,9 @@ void Dialoge_Update(void)
 	}
 	dialoge_cooldown = 45;
 	dialoge_push_cooldown--;
-	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING) && dialoge_push_cooldown < 0)
+	if (done_drawing) dialoge_automatic_end_timer++;
+	else dialoge_automatic_end_timer = 0;
+	if (dialoge_automatic_end_timer > 30 && dialoge_push_cooldown < 0)
 	{
 		dialoge_push_cooldown = 8;
 		if (done_drawing)
@@ -116,18 +120,19 @@ void Dialoge_Update(void)
 
 	if (draw_to_line < DIALOGE_PAGE_LINES && dialoge_current_line + draw_to_line <= dialoge_line_end && !done_drawing)
 	{
-		if (Game_GetFrame() % 2 == 0)
-		{
-			if (Game_GetFrame() % 4 == 0)
-				Audio_PlaySound(44, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		//if (Game_GetFrame() % 2 == 0)
+		//{
+			//if (Game_GetFrame() % 4 == 0)
+				//Audio_PlaySound(44, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			draw_to_char++;
 			if (ending_lines[dialoge_current_line + draw_to_line][draw_to_char] == '\0' ||
 				draw_to_char >= ENDING_TEXT_MAX_WIDTH)
 			{
 				draw_to_line++;
 				draw_to_char = 0;
+				Audio_PlaySound(44, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			}
-		}
+		//}
 	}
 	if (draw_to_line >= DIALOGE_PAGE_LINES || dialoge_current_line + draw_to_line > dialoge_line_end || ending_lines[dialoge_current_line + draw_to_line][0] == '\0')
 		done_drawing = CNM_TRUE;
@@ -167,9 +172,9 @@ void Dialoge_Draw(void)
 		strcpy(line_buf, ending_lines[dialoge_current_line + i]);
 		if (i == draw_to_line)
 			line_buf[draw_to_char + 1] = '\0';
-		Renderer_DrawText(8, (RENDERER_HEIGHT - (DIALOGE_PAGE_LINES + 2) * 8) + i*8, 0, RENDERER_LIGHT, line_buf);
+		Renderer_DrawText(8, (RENDERER_HEIGHT - (DIALOGE_PAGE_LINES + 2) * 8) + i*8 + 4, 0, RENDERER_LIGHT, line_buf);
 	}
-	Renderer_DrawText(8, (RENDERER_HEIGHT - 16), 0, RENDERER_LIGHT, "PRESS ENTER TO ESCAPE DIALOGE BOX");
+	//Renderer_DrawText(8, (RENDERER_HEIGHT - 16), 0, RENDERER_LIGHT, "PRESS ENTER TO ESCAPE DIALOGE BOX");
 }
 void Dialoge_End(void)
 {

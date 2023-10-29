@@ -67,6 +67,7 @@ void FileSystem_ResetLevelOrderBuffer(void);
 int FileSystem_AddLevelToLevelOrder(const char *levelname);
 int FileSystem_GetLevelFromLevelOrder(int level);
 int Filesystem_GetLevelIdFromName(const char *levelname);
+int Filesystem_GetLevelIdFromFileName(const char *level);
 int Filesystem_GetNumTitleLevels(void);
 
 void FileSystem_Init(void);

@@ -107,6 +107,16 @@ int Filesystem_GetLevelIdFromName(const char *levelname) {
 	}
 	return id;
 }
+int Filesystem_GetLevelIdFromFileName(const char *level) {
+	int id = -1;
+	if (strlen(level) == 0) return id;
+	for (int i = 0; i < FILESYSTEM_MAX_LEVELS; i++) {
+		if (strcmp(level, levels[i]) == 0) {
+			id = i;
+		}
+	}
+	return id;
+}
 
 void FileSystem_Init(void)
 {

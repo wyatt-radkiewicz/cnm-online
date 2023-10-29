@@ -82,8 +82,10 @@ void Client_Update(NET_PACKET *packet)
 			Game_GetVar(GAME_VAR_ENABLE_SERVER_PVP)->data.integer = info->enable_pvp;
 			Game_GetVar(GAME_VAR_SV_CHEATS)->data.integer = info->sv_cheats;
 			strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, info->level);
-			if (Game_TopState() != GAME_STATE_CLIENT)
+			if (Game_TopState() != GAME_STATE_CLIENT) {
+				Fadeout_FadeToWhite(5, 10, 15);
 				Game_SwitchState(GAME_STATE_CLIENT);
+			}
 		}
 		else
 		{
@@ -165,12 +167,14 @@ void Client_Update(NET_PACKET *packet)
 			}
 			NetGame_SetHistoryWobjFromNode(0, header.frame, (struct wobjdata *)&wobj_data);
 			//memcpy(&wobj_data, packet->data + ptr, WOBJ_NET_SIZE);
- 			WOBJ *new_wobj = Wobj_CreateUnowned(wobj_data.type, wobj_data.x, wobj_data.y, wobj_data.anim_frame, wobj_data.flags, 0, 0.0f, wobj_data.node_id, wobj_data.uuid);
-			memcpy(new_wobj, &wobj_data, WOBJ_NET_SIZE);
-			new_wobj->interpolate = CNM_FALSE;
-			NetGame_TryToApplyInterpToUnownedWobj(0, new_wobj);
-			//Interaction_ApplyHurtPacketsToWobj(new_wobj);
-			NetGame_AttemptWobjAudioPlayback(new_wobj);
+			if (netgame_should_create_unowned(wobj_data.node_id, wobj_data.uuid)) {
+				WOBJ *new_wobj = Wobj_CreateUnowned(wobj_data.type, wobj_data.x, wobj_data.y, wobj_data.anim_frame, wobj_data.flags, 0, 0.0f, wobj_data.node_id, wobj_data.uuid);
+				memcpy(new_wobj, &wobj_data, WOBJ_NET_SIZE);
+				new_wobj->interpolate = CNM_FALSE;
+				NetGame_TryToApplyInterpToUnownedWobj(0, new_wobj);
+				//Interaction_ApplyHurtPacketsToWobj(new_wobj);
+				NetGame_AttemptWobjAudioPlayback(new_wobj);
+			}
 			ptr += WOBJ_NET_SIZE;
 			//Debug_PrintUnowneds();
 		}
