@@ -1657,7 +1657,7 @@ void draw_play_gui_bg(void) {
 	if (trans < 8) {
 		Util_SetRect(&r, 368, 7376, 144, 144);
 		Renderer_DrawBitmap(playbit0_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
-		Util_SetRect(&r, 256, 7328, 112, 192);
+		Util_SetRect(&r, 256, 7360, 112, 160);
 		Renderer_DrawBitmap(playbit1_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
 	}
 }

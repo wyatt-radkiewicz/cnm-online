@@ -531,3 +531,16 @@ void Interaction_ForceWobjPosition(WOBJ *wobj, float x, float y)
 		break;
 	}
 }
+void Interaction_GameOver(void) {
+	switch (interaction_mode)
+	{
+	case INTERACTION_MODE_HOSTED_SERVER:
+	case INTERACTION_MODE_CLIENT:
+		break;
+	case INTERACTION_MODE_SINGLEPLAYER:
+		new_save(g_saves + g_current_save);
+		save_game(g_current_save, g_saves + g_current_save);
+		Game_SwitchState(GAME_STATE_MAINMENU);
+		break;
+	}
+}

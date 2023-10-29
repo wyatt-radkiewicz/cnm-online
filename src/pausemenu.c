@@ -8,6 +8,7 @@
 #include "input.h"
 #include "audio.h"
 #include "fadeout.h"
+#include "savedata.h"
 
 static int gui_timer;
 static int side_blob_x;
@@ -89,7 +90,8 @@ void pause_menu_update(void) {
 		options_num++;
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 	}
-	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_GUI) && options_num > 0) {
+	int minopt = (g_saves[g_current_save].lives > 1 ? 0 : 1);
+	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_GUI) && options_num > minopt) {
 		left_disp = -32;
 		side_blob_x = RENDERER_WIDTH;
 		options_num--;
@@ -133,7 +135,7 @@ void pause_menu_draw(void) {
 			int center = strlen(option_names[idx]) * 8 / 2;
 			if (idx != options_num) Renderer_SetFont(384, 1264, 8, 8);
 			else Renderer_SetFont(384, 448, 8, 8);
-			Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx]);
+			if (!(g_saves[g_current_save].lives <= 1 && idx == 0)) Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx]);
 			if (idx == options_num) {
 				int w = r.w;
 				Util_SetRect(&r, 376-24, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);

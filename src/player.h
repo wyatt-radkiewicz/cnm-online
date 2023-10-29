@@ -99,6 +99,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int numflaps, isdiving, saved_diving_vel;
 	float upgradehp;
 	int next_level_line;
+	//int game_over_active//, game_over_timer;
 	//float item_durability;
 	//float stored_yvel;
 } PLAYER_LOCAL_DATA;

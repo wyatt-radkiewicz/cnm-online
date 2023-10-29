@@ -218,9 +218,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 	local_data->pvp_damage_indicator_timer--;
 	if (local_data->death_cam_timer-- == 0)
 	{
-		Camera_SetForced(CNM_FALSE);
-		Camera_TeleportPos((int)wobj->x + 16, (int)wobj->y + 16);
-		wobj->flags &= ~WOBJ_INVULN;
+		if (g_saves[g_current_save].lives > 0) {
+			Camera_SetForced(CNM_FALSE);
+			Camera_TeleportPos((int)wobj->x + 16, (int)wobj->y + 16);
+			wobj->flags &= ~WOBJ_INVULN;
+		} else {
+			Interaction_GameOver();
+			return;
+		}
 	}
 	local_data->in_teleport--;
 	if (local_data->in_teleport == 0)
@@ -1050,12 +1055,18 @@ void WobjPlayer_Update(WOBJ *wobj)
 			wobj->y = PlayerSpawn_GetSpawnLocY(local_data->checkpoint);
 		}
 		Camera_SetForced(CNM_TRUE);
-		local_data->death_cam_timer = 45+20+2;
 		//Camera_TeleportPos((int)wobj->x + 16, (int)wobj->y + 16);
-		Fadeout_FadeDeath(45, 20, 20);
 		g_saves[g_current_save].lives--;
+		if (g_saves[g_current_save].lives > 0) {
+			local_data->death_cam_timer = 45+20+2;
+			local_data->death_limbo_counter = 20+20+45+20;
+			Fadeout_FadeDeath(45, 20, 20);
+		} else {
+			local_data->death_cam_timer = 45+30*4+20+2;
+			local_data->death_limbo_counter = 45+30*4+20+20;
+			Fadeout_FadeGameOver(45, 30*4, 20, 20);
+		}
 		wobj->flags |= WOBJ_INVULN;
-		local_data->death_limbo_counter = 20+20+45+20;
 		_hud_player_y = 0.0f;
 		_hud_player_yvel = -5.0f;
 		wobj->vel_x = 0.0f;
