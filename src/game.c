@@ -286,7 +286,10 @@ void GameState_Base_Init(void)
 	FileSystem_SearchForLevels(CNM_FALSE);
 	Serial_LoadAudioCfg("audio.cnma");
 	g_current_save = 0;
-	new_save(g_saves + g_current_save);
+	for (int i = 0; i < SAVE_SLOTS; i++) {
+		new_save(g_saves + i);
+		load_game(i, g_saves + i);
+	}
 	Console_Print("WELCOME TO CNM ONLINE "CNM_VERSION_STRING"!");
 	
 	strcpy(game_vars[GAME_VAR_LEVEL].data.string, dgame_info.lvl);

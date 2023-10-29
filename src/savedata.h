@@ -11,11 +11,17 @@ typedef struct savedata {
 	float upgradehp;
 } savedata_t;
 
+struct globalsave {
+	int saves_created;
+	char levels_found[64][32];
+};
+
 #define SAVE_SLOTS 10
 #define SAVE_DIR "saves/"
 
 extern int g_current_save;
 extern savedata_t g_saves[SAVE_SLOTS];
+extern struct globalsave g_globalsave;
 
 void new_save(savedata_t *data);
 void save_game(int slot, const savedata_t *data);

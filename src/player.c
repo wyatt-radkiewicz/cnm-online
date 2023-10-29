@@ -137,7 +137,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	wobj->speed = 5.0f;
 	wobj->jump = 10.0f;
 	wobj->hitbox.x = 6.0f;
-	wobj->hitbox.y = 3.0f;
+	wobj->hitbox.y = 2.0f;
 	wobj->hitbox.w = 17.0f;
 	wobj->hitbox.h = 29.0f;
 	wobj->custom_floats[1] = 0.0f;
@@ -475,7 +475,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		}
 		if (Wobj_IsGrouneded(wobj) && !local_data->is_sliding) {
-			wobj->hitbox.y = 3.0f;
+			wobj->hitbox.y = 2.0f;
 			wobj->hitbox.h = 29.0f;
 		}
 		if (!Wobj_IsGrouneded(wobj)) local_data->sliding_crit_timer = 8;

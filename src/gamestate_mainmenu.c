@@ -1057,6 +1057,7 @@ static int completion_basey;
 static int ss_trans;
 static int delete_mode;
 static int joining_timer, is_joining;
+static int is_loading_save, loading_save_timer;
 #define SAVE_SLOT_WIDTH 112
 #define SAVE_SLOT_PADDING 16
 #define SAVE_SLOT_EXTENT (SAVE_SLOT_WIDTH+SAVE_SLOT_PADDING)
@@ -1100,11 +1101,11 @@ void draw_play_gui_nologic(void) {
 
 		int slot = current_save_slot + i;
 		if (slot < 0 || slot > SAVE_SLOTS) continue;
-		const int basey = save_slot_basey - (slot == current_save_slot ? 6 : 0);
+		const int basey = save_slot_basey - (slot == current_save_slot ? 6 + loading_save_timer : 0);
 		const int basex = RENDERER_WIDTH / 2 + slot*SAVE_SLOT_EXTENT - ps_pos;
 		int light = RENDERER_LIGHT;
 		if (basex > RENDERER_WIDTH / 2 + 32 || basex < RENDERER_WIDTH / 2 - 32) light = RENDERER_LIGHT + 1;
-		if (basex > RENDERER_WIDTH / 2 + 128 || basex < RENDERER_WIDTH / 2 - 100) light = RENDERER_LIGHT + 2;
+		if (basex > RENDERER_WIDTH / 2 + 100 || basex < RENDERER_WIDTH / 2 - 100) light = RENDERER_LIGHT + 2;
 
 		Renderer_DrawBitmap2(basex, basey, &r, trans, light, CNM_FALSE, CNM_FALSE);
 		Renderer_DrawBitmap2(basex - 56, basey, &r, trans, light, CNM_TRUE, CNM_FALSE);
@@ -1190,6 +1191,16 @@ void draw_play_gui(void) {
 	ss_trans += 2;
 	gui_timer--;
 
+	if (is_loading_save) {
+		loading_save_timer++;
+		if (loading_save_timer == 30) {
+			char cmdbuf[64];
+			sprintf(cmdbuf, "localmap %s", g_saves[g_current_save].level);
+			Command_Execute(cmdbuf);
+		}
+		return;
+	}
+
 	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
 		if (current_save_slot < SAVE_SLOTS) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
@@ -1207,6 +1218,15 @@ void draw_play_gui(void) {
 		}
 	}
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		if (!delete_mode && current_save_slot != SAVE_SLOTS) {
+			Fadeout_FadeToWhite(20, 15, 20);
+			is_loading_save = CNM_TRUE;
+			loading_save_timer = 0;
+			g_current_save = current_save_slot;
+			if (Filesystem_GetLevelIdFromFileName(g_saves[g_current_save].level) == -1) {
+				strcpy(g_saves[g_current_save].level, FileSystem_GetLevel(FileSystem_GetLevelFromLevelOrder(0)));
+			}
+		}
 		if (current_save_slot == SAVE_SLOTS && !delete_mode) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			gui_timer = 10;
@@ -1215,6 +1235,11 @@ void draw_play_gui(void) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			gui_timer = 10;
 			delete_mode = CNM_FALSE;
+			if (current_save_slot != SAVE_SLOTS) {
+				new_save(g_saves + current_save_slot);
+				save_game(current_save_slot, g_saves + current_save_slot);
+				FileSystem_SearchForLevels(CNM_TRUE);
+			}
 		}
 	}
 	ps_pos_target = current_save_slot*SAVE_SLOT_EXTENT;
@@ -1275,6 +1300,8 @@ void draw_main_gui(void) {
 			ss_trans = 0;
 			gui_timer = 0;
 			delete_mode = CNM_FALSE;
+			is_loading_save = CNM_FALSE;
+			loading_save_timer = 0;
 			//save_slot_basey = -128;
 			if (current_save_slot == SAVE_SLOTS) current_save_slot = SAVE_SLOTS - 1;
 			ps_pos = current_save_slot * SAVE_SLOT_EXTENT;

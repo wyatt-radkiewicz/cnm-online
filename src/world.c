@@ -104,6 +104,7 @@ void World_Start(int mode)
 	// Load player state
 	Player_LoadFromSave(player, g_saves + g_current_save);
 	strcpy(g_saves[g_current_save].level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
+	save_game(g_current_save, g_saves + g_current_save);
 
 	// Supervirus stuff
 	if (Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) {

@@ -12,6 +12,8 @@
 #include "world.h"
 #include "pausemenu.h"
 #include "fadeout.h"
+#include "savedata.h"
+#include "player.h"
 
 static void GoBackToPlaying(void)
 {
@@ -19,6 +21,8 @@ static void GoBackToPlaying(void)
 }
 static void GoBackToMainMenu(void)
 {
+	Player_SaveData(Game_GetVar(GAME_VAR_PLAYER)->data.pointer, g_saves + g_current_save);
+	save_game(g_current_save, g_saves + g_current_save);
 	Game_SwitchState(GAME_STATE_MAINMENU);
 }
 static void Respawn(void)
