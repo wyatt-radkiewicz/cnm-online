@@ -58,6 +58,7 @@ static const char *mission_difs[] =
 static GUI_FRAME *options, *root, *startnewgame, *joingame_ip, *hostgame, *playersetup, *serverbrowser;
 
 static int cleanup_bg;
+static int playbit0_x, playbit1_x;
 
 #define NUM_SNOWFLAKES 512
 typedef struct _XMAS_SNOWFLAKE
@@ -285,6 +286,7 @@ static void JoinGameBrowserCallback(GUI_ELEMENT *elem, int index)
 	strcpy(buffer, "connect ");
 	strcat(buffer, Net_GetStringFromIp(&msdata.servers[elem->custom_hint].addr));
 	Console_Print(buffer);
+	cleanup_bg = CNM_FALSE;
 	Command_Execute(buffer);
 }
 
@@ -475,6 +477,7 @@ void GameState_MainMenu_Init(void)
 
 	titlebg_init();
 	cleanup_bg = CNM_TRUE;
+	playbit0_x = playbit1_x = -1000;
 	//pressed_start = CNM_FALSE;
 
 	// XMAS mode stuff
@@ -1051,7 +1054,6 @@ void draw_player_setup(void) {
 static int current_save_slot;
 static int save_slot_basey;
 static int completion_basey;
-static int playbit0_x, playbit1_x;
 static int ss_trans;
 static int delete_mode;
 static int joining_timer, is_joining;
@@ -1359,6 +1361,9 @@ void draw_press_start(void) {
 		Util_SetRect(&r, 432-32, 7184, 112, 16);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - (r.w/2), RENDERER_HEIGHT / 2 + 96, &r, 0, RENDERER_LIGHT);
 	}
+
+	playbit1_x = -112-2;
+	playbit0_x = RENDERER_WIDTH + 2;
 
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
