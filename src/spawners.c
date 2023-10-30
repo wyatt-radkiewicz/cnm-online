@@ -103,6 +103,39 @@ SPAWNER *Spawners_GetSpawnerWithinBox(float x, float y, float w, float h)
 
 	return NULL;
 }
+int Spawners_GetSpawnersWithinBox(SPAWNER **buf, int buflen, float x, float y, float w, float h) {
+	OBJGRID_ITER iter;
+	SPAWNER *spawner;
+	CNM_BOX a, b;
+	int cx, cy, len = 0;
+	for (cx = (int)(x / OBJGRID_SIZE) - 1; cx <= (int)((x + w) / OBJGRID_SIZE) + 1; cx++)
+	{
+		for (cy = (int)(y / OBJGRID_SIZE) - 1; cy <= (int)((y + h) / OBJGRID_SIZE) + 1; cy++)
+		{
+			ObjGrid_MakeIter(spawners_grid, cx, cy, &iter);
+			while (iter != NULL)
+			{
+				spawner = GET_SPAWNER(iter);
+				if (spawner->wobj_type)
+				{
+					Util_SetBox(&a, x, y, w, h);
+					b.x = spawner->x;
+					b.y = spawner->y;
+					b.w = (float)wobj_types[spawner->wobj_type].frames[0].w;
+					b.h = (float)wobj_types[spawner->wobj_type].frames[0].h;
+					if (Util_AABBCollision(&a, &b))
+					{
+						buf[len++] = spawner;
+						if (len >= buflen) return len;
+					}
+				}
+				ObjGrid_AdvanceIter(&iter);
+			}
+		}
+	}
+
+	return len;
+}
 void Spawners_MoveSpawner(SPAWNER *spawner, float newx, float newy)
 {
 	ObjGrid_MoveObject(spawners_grid, &spawner->grid_object, newx, newy);
@@ -243,6 +276,8 @@ void Spawners_CreateWobjsFromSpawners(int gridx, int gridy)
 				goto skip;
 		}
 		spawner->timer--;
+		if (SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_NOSPAWN)
+			goto skip;
 		if (SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_MULTIPLAYER_ONLY &&
 			spawners_mode == SPAWNER_SINGLEPLAYER)
 			goto skip;

@@ -7815,9 +7815,9 @@
       "image": {
         "Bitmap": {
           "x": 0,
-          "y": 4496,
-          "w": 128,
-          "h": 16
+          "y": 4480,
+          "w": 64,
+          "h": 64
         }
       },
       "transparency": 0,
@@ -7826,7 +7826,7 @@
       "repeat_horizontally": true,
       "in_foreground": false,
       "bottom3d": 128,
-      "top3d": 16,
+      "top3d": 6,
       "height3d": 64
     },
     {

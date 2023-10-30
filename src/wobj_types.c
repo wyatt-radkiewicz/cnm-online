@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "renderer.h"
+#include "spawners.h"
 #include "wobj.h"
 #include "input.h"
 #include "blocks.h"
