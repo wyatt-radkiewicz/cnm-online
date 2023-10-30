@@ -342,15 +342,24 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (local_data->animforce_cooldown_timer-- <= 0)
 		local_data->animforce_cooldown = CNM_FALSE;
 
+	int touching_ice = CNM_FALSE;
+	float ice_friction = 1.0f;
+
 	// Water things
 	if (!local_data->vortexed_mode)
 	{
-		BLOCK_PROPS *ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
-		if (ice_props->dmg_type != BLOCK_DMG_TYPE_ICE)
-			ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
-		if (ice_props->dmg_type == BLOCK_DMG_TYPE_ICE) {
-			accel *= (float)ice_props->dmg / 100.0f;
-			dec *= (float)ice_props->dmg / 100.0f;
+		for (int icex = 0; icex <= 32; icex += 16) {
+			BLOCK_PROPS *ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, ((int)wobj->x + icex) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
+			if (ice_props->dmg_type != BLOCK_DMG_TYPE_ICE)
+				ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, ((int)wobj->x + icex) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
+			if (ice_props->dmg_type == BLOCK_DMG_TYPE_ICE) {
+				//local_data->control_mul = (float)ice_props->dmg / 100.0f;
+				ice_friction = (float)ice_props->dmg / 100.0f;
+				dec *= ice_friction;
+				accel *= ice_friction;
+				touching_ice = CNM_TRUE;
+				//Console_Print("%f", (float)ice_props->dmg / 100.0f);
+			}
 		}
 		local_data->last_in_water = local_data->in_water;
 		BLOCK_PROPS *water_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE));
@@ -675,6 +684,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 			if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls)
 			{
+				if (touching_ice) local_data->control_mul = ice_friction;
 				float jmp_speed = final_jmp;
 				if (local_data->in_water)
 					jmp_speed /= 1.5f;
