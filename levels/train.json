@@ -3824,7 +3824,8 @@
       0,
       125
     ],
-    "difficulty_rating": "Easy"
+    "difficulty_rating": "Easy",
+    "level_type": "Normal"
   },
   "background_layers": [
     {
@@ -3851,7 +3852,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -3882,7 +3886,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -3913,7 +3920,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -3944,7 +3954,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -3975,7 +3988,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4006,7 +4022,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4037,7 +4056,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4068,7 +4090,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4099,7 +4124,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4130,7 +4158,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4161,7 +4192,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4192,7 +4226,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4223,7 +4260,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4254,7 +4294,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4285,7 +4328,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4316,7 +4362,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4347,7 +4396,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4378,7 +4430,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4409,7 +4464,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4440,7 +4498,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4471,7 +4532,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4502,7 +4566,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4533,7 +4600,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4564,7 +4634,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4595,7 +4668,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4626,7 +4702,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4657,7 +4736,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4688,7 +4770,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4719,7 +4804,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4750,7 +4838,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4781,7 +4872,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4812,7 +4906,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     }
   ]
 }

@@ -500,10 +500,12 @@ ITEM_TYPE item_types[] =
 };
 
 ITEM item_current;
+static int _pickup_cooldown;
 
 void Item_Init(void)
 {
 	memset(&item_current, 0, sizeof(item_current));
+	_pickup_cooldown = 0;
 }
 void Item_Reset(void) {
 	memset(&item_current, 0, sizeof(item_current));
@@ -524,6 +526,7 @@ void Item_TryPickupAndDrop(WOBJ *player)
 {
 	WOBJ *other_item = Wobj_GetWobjColliding(player, WOBJ_IS_ITEM);
 	PLAYER_LOCAL_DATA *plr_local = player->local_data;
+	if (_pickup_cooldown > 0) --_pickup_cooldown;
 	int pressed_drop = Input_GetButtonPressed(INPUT_DROP, INPUT_STATE_PLAYING) && !plr_local->lock_controls;
 	if (other_item != NULL && pressed_drop && player->item == ITEM_TYPE_NOITEM)
 	{
@@ -536,8 +539,9 @@ void Item_TryPickupAndDrop(WOBJ *player)
 }
 void Item_Pickup(WOBJ *player, WOBJ *dropped_item)
 {
-	if (player->item == ITEM_TYPE_NOITEM)
+	if (player->item == ITEM_TYPE_NOITEM && _pickup_cooldown <= 0)
 	{
+		_pickup_cooldown = 10;
 		memset(&item_current, 0, sizeof(item_current));
 		player->item = dropped_item->item;
 		item_current.type = dropped_item->item;

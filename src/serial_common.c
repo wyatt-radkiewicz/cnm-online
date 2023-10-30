@@ -58,7 +58,7 @@ void Serial_LoadAudioCfg(const char *cnma_file)
 				}
 				else if (strcmp(filename, "LUA_AUTORUN") == 0) {
 					mode = 0x8000;
-					Console_Print("Game lua scripts are deprecated...");
+					//Console_Print("Game lua scripts are deprecated...");
 					//AutorunLua_ClearPrgm();
 					while (1) {
 						Util_GetLine(lualine, sizeof(lualine), fp);

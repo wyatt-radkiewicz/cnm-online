@@ -20,11 +20,18 @@ struct globalsave {
 #define SAVE_DIR "saves/"
 
 extern int g_current_save;
-extern savedata_t g_saves[SAVE_SLOTS];
+extern savedata_t g_saves[SAVE_SLOTS+1];
 extern struct globalsave g_globalsave;
 
 void new_save(savedata_t *data);
 void save_game(int slot, const savedata_t *data);
 void load_game(int slot, savedata_t *data);
+
+void globalsave_clear(struct globalsave *gs);
+int globalsave_visit_level(struct globalsave *gs, const char *level);
+void globalsave_load(struct globalsave *gs);
+void globalsave_save(const struct globalsave *gs);
+int globalsave_get_num_secrets(const struct globalsave *gs);
+int globalsave_get_num_levels(const struct globalsave *gs);
 
 #endif

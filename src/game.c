@@ -231,6 +231,8 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_FANCY_LEVEL_NAME].data.string[0] = '\0';
 	game_vars[GAME_VAR_LEVEL_TIMER].data.integer = 0;
 	game_vars[GAME_VAR_SAVE_SLOT].data.integer = 0;
+	game_vars[GAME_VAR_LEVEL_SELECT_MODE].data.integer = CNM_FALSE;
+	game_vars[GAME_VAR_NOSAVE].data.integer = CNM_FALSE;
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
@@ -262,7 +264,8 @@ void GameState_Base_Init(void)
 	Net_Init();
 	NetGame_Init();
 	Interaction_Init();
-	Console_Print("WELCOME TO CNM ONLINE!");
+	//Console_Print("WELCOME TO CNM ONLINE!");
+	Console_Print("WELCOME TO CNM ONLINE "CNM_VERSION_STRING"!");
 	Serial_LoadConfig();
 	if (!dgame_info.dedicated && !dgame_info.master_server)
 	{
@@ -286,11 +289,11 @@ void GameState_Base_Init(void)
 	FileSystem_SearchForLevels(CNM_FALSE);
 	Serial_LoadAudioCfg("audio.cnma");
 	g_current_save = 0;
+	globalsave_load(&g_globalsave);
 	for (int i = 0; i < SAVE_SLOTS; i++) {
 		new_save(g_saves + i);
 		load_game(i, g_saves + i);
 	}
-	Console_Print("WELCOME TO CNM ONLINE "CNM_VERSION_STRING"!");
 	
 	strcpy(game_vars[GAME_VAR_LEVEL].data.string, dgame_info.lvl);
 	game_vars[GAME_VAR_ENABLE_SERVER_PVP].data.integer = dgame_info.enable_pvp;
@@ -299,7 +302,19 @@ void GameState_Base_Init(void)
 		return;
 	}
 	if (!dgame_info.dedicated) {
-		Game_PushState(GAME_STATE_MAINMENU);
+		if (dgame_info.warp) {
+			Game_GetVar(GAME_VAR_NOSAVE)->data.integer = CNM_TRUE;
+			if (Filesystem_GetLevelIdFromFileName(dgame_info.lvl) != -1) {
+				int id = Filesystem_GetLevelIdFromFileName(dgame_info.lvl);
+				strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
+				Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
+				Game_PushState(GAME_STATE_SINGLEPLAYER);
+			} else {
+				Game_PushState(GAME_STATE_MAINMENU);
+			}
+		} else {
+			Game_PushState(GAME_STATE_MAINMENU);
+		}
 	}
 	else {
 		strcpy(game_vars[GAME_VAR_PLAYER_NAME].data.string, "DEDICATEDSERVER");

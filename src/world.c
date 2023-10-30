@@ -71,6 +71,9 @@ void World_Start(int mode)
 	Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer = 0;
 	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(Filesystem_GetLevelIdFromName(Game_GetVar(GAME_VAR_LEVEL)->data.string));
 
+	// Force unused save slot if in nosave mode
+	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) g_current_save = SAVE_SLOTS;
+
 	// Make sure the player is the first thing created as some other entities might depend on it for creation
 	PlayerSpawns_SetMode(PLAYER_SPAWN_TYPE_NORMAL_MODES);
 	player = Wobj_CreateOwned(WOBJ_PLAYER, 0.0f, 0.0f, Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer, 0.0f);
@@ -102,9 +105,16 @@ void World_Start(int mode)
 	Camera_Setup((int)player->x, (int)player->y); // Initializing camera values
 	
 	// Load player state
-	Player_LoadFromSave(player, g_saves + g_current_save);
-	strcpy(g_saves[g_current_save].level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
-	save_game(g_current_save, g_saves + g_current_save);
+	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_NOSAVE)->data.integer) {
+		Player_LoadFromSave(player, g_saves + g_current_save);
+		strcpy(g_saves[g_current_save].level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
+		save_game(g_current_save, g_saves + g_current_save);
+		globalsave_visit_level(&g_globalsave, g_saves[g_current_save].level);
+	} else {
+		g_current_save = SAVE_SLOTS;
+		new_save(g_saves + g_current_save);
+		Player_LoadFromSave(player, g_saves + g_current_save);
+	}
 
 	// Supervirus stuff
 	if (Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) {
@@ -133,7 +143,7 @@ void World_Start(int mode)
 void World_Stop(void)
 {
 	// Save player state
-	Player_SaveData(player, g_saves + g_current_save);
+	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_NOSAVE)->data.integer) Player_SaveData(player, g_saves + g_current_save);
 
 	// General cleanup
 	Wobj_DestroyOwnedWobjs();

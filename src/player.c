@@ -1056,8 +1056,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		Camera_SetForced(CNM_TRUE);
 		//Camera_TeleportPos((int)wobj->x + 16, (int)wobj->y + 16);
-		g_saves[g_current_save].lives--;
-		if (g_saves[g_current_save].lives > 0) {
+		if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) g_saves[g_current_save].lives--;
+		if (g_saves[g_current_save].lives > 0 || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) {
 			local_data->death_cam_timer = 45+20+2;
 			local_data->death_limbo_counter = 20+20+45+20;
 			Fadeout_FadeDeath(45, 20, 20);
@@ -1858,8 +1858,13 @@ void Player_DrawHUD(WOBJ *player) {
 	Renderer_DrawBitmap2(bx+skinoffx, by+skinoffy, &r, 0, RENDERER_LIGHT, 1, 0);
 	Util_SetRect(&r, 0, 4288+32, 64, 16);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 16, &r, 0, RENDERER_LIGHT);
-	sprintf(temp_hud, "%d", g_saves[g_current_save].lives);
-	Renderer_DrawText(RENDERER_WIDTH - 64+6, RENDERER_HEIGHT - 32+18, 0, RENDERER_LIGHT, temp_hud);
+	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
+		sprintf(temp_hud, "%d", g_saves[g_current_save].lives);
+		Renderer_DrawText(RENDERER_WIDTH - 64+6, RENDERER_HEIGHT - 32+18, 0, RENDERER_LIGHT, temp_hud);
+	} else {
+		Util_SetRect(&r, 384, 456, 8, 8);
+		Renderer_DrawBitmap(RENDERER_WIDTH - 64+6+2, RENDERER_HEIGHT - 32+18, &r, 0, RENDERER_LIGHT);
+	}
 	//sprintf(temp_hud, "%d%%%%", (int)ceilf(player->speed * 20.0f));
 	//Renderer_DrawText(bx+8, by+10, 0, RENDERER_LIGHT, "SP");
 	//Renderer_DrawText(bx+62 - (strlen(temp_hud)-1) * 8, by+10, 0, RENDERER_LIGHT, temp_hud);

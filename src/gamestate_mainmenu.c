@@ -478,6 +478,7 @@ void GameState_MainMenu_Init(void)
 	titlebg_init();
 	cleanup_bg = CNM_TRUE;
 	playbit0_x = playbit1_x = -1000;
+	globalsave_save(&g_globalsave);
 	//pressed_start = CNM_FALSE;
 
 	// XMAS mode stuff
@@ -989,20 +990,22 @@ void draw_player_setup(void) {
 		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - 3*8, RENDERER_HEIGHT / 2 - 48 + 12+(12*3), trans2, RENDERER_LIGHT,
 			(Game_GetVar(GAME_VAR_ADVERTISE_SERVER)->data.integer ? "YES" : " NO"));
 
-		const char *lvlname = FileSystem_GetLevelName(FileSystem_GetLevelFromLevelOrder(host_game_level_idx));
+		int num_lvls = globalsave_get_num_levels(&g_globalsave);
+		const char *lvlname = num_lvls ? g_globalsave.levels_found[host_game_level_idx] : "";
+		const char *fancyname = FileSystem_GetLevelName(Filesystem_GetLevelIdFromFileName(lvlname));
 		//Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 48 + 12+(12*4), trans2, RENDERER_LIGHT, "[SELECT MAP]");
-		Renderer_DrawText(RENDERER_WIDTH / 2 - (8*strlen(lvlname)) / 2, RENDERER_HEIGHT / 2 - 48 + 12+(12*4), trans2, RENDERER_LIGHT, lvlname);
+		Renderer_DrawText(RENDERER_WIDTH / 2 - (8*strlen(fancyname)) / 2, RENDERER_HEIGHT / 2 - 48 + 12+(12*4), trans2, RENDERER_LIGHT, fancyname);
 		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*5)+6, trans2, RENDERER_LIGHT, "[HOST SERVER]");
 
 		//int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
-		for (int i = -1; i <= FileSystem_NumLevels(); i++) {
-			if (i < 0 || i >= FileSystem_NumLevels()) Util_SetRect(&r2, 416, 7200, 96, 64);
-			else memcpy(&r2, FileSystem_GetLevelPreview(FileSystem_GetLevelFromLevelOrder(i)), sizeof(CNM_RECT));
+		for (int i = -1; i <= num_lvls+1; i++) {
+			if (i < 0 || i >= num_lvls) Util_SetRect(&r2, 416, 7200, 96, 64);
+			else memcpy(&r2, FileSystem_GetLevelPreview(Filesystem_GetLevelIdFromFileName(lvlname)), sizeof(CNM_RECT));
 			//r2.w = 96; r2.h = 64;
 			int pos = i*(96+16) - ps_pos;
 			int t = trans2;
 			for (int slice = 0; slice < 96; slice += 8) {
-				int flip = (i < 0 || i >= FileSystem_NumLevels()) ? (Game_GetFrame() % 2) : CNM_FALSE;
+				int flip = (i < 0 || i >= num_lvls) ? (Game_GetFrame() % 2) : CNM_FALSE;
 				int final_pos = flip ? (pos + 96 - slice - 8) : (pos + slice);
 				if (final_pos < -16) t = trans2 + (-final_pos - 16) / 4;
 				if (final_pos > 96+16) t = trans2 + (final_pos - (96+16)) / 4;
@@ -1058,6 +1061,7 @@ static int ss_trans;
 static int delete_mode;
 static int joining_timer, is_joining;
 static int is_loading_save, loading_save_timer;
+static int num_secrets_cached, num_found_cached;
 #define SAVE_SLOT_WIDTH 112
 #define SAVE_SLOT_PADDING 16
 #define SAVE_SLOT_EXTENT (SAVE_SLOT_WIDTH+SAVE_SLOT_PADDING)
@@ -1084,23 +1088,30 @@ void draw_play_gui_nologic(void) {
 	//Renderer_DrawBitmap(playbit1_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
 
 	Util_SetRect(&r, 400-16, 7136, 128, 48);
+	char text[16];
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, completion_basey, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, completion_basey, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
 	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4, trans2, RENDERER_LIGHT, "TOTAL COMPLETION %%:");
-	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (2*8), completion_basey + 4, trans2, RENDERER_LIGHT, "0%%");
+	sprintf(text, "%d%%", (int)((float)num_found_cached / (float)FileSystem_NumLevels() * 100.0f));
+	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (strlen(text)*8), completion_basey + 4, trans2, RENDERER_LIGHT, "%s", text);
 	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4 + (8*1), trans2, RENDERER_LIGHT, "LEVELS FOUND:");
-	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (4*8), completion_basey + 4 + (8*1), trans2, RENDERER_LIGHT, "0/20");
+	sprintf(text, "%d/%d", num_found_cached, FileSystem_NumLevels());
+	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (strlen(text)*8), completion_basey + 4 + (8*1), trans2, RENDERER_LIGHT, text);
 	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4 + (8*2), trans2, RENDERER_LIGHT, "NUM SAVES CREATED:");
-	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (1*8), completion_basey + 4 + (8*2), trans2, RENDERER_LIGHT, "1");
+	sprintf(text, "%d", g_globalsave.saves_created);
+	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (strlen(text)*8), completion_basey + 4 + (8*2), trans2, RENDERER_LIGHT, text);
 	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4 + (8*3), trans2, RENDERER_LIGHT, "SECRETS FOUND:");
-	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (1*8), completion_basey + 4 + (8*3), trans2, RENDERER_LIGHT, "0");
+	sprintf(text, "%d", num_secrets_cached);
+	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (strlen(text)*8), completion_basey + 4 + (8*3), trans2, RENDERER_LIGHT, text);
 
+	int gs_numlvls = globalsave_get_num_levels(&g_globalsave);
 	for (int i = -2; i <= 2; i++) {
 		Util_SetRect(&r, 456, 7136, 56, 48);
 		Util_SetRect(&r2, 456, 7168, 56, 16);
 
 		int slot = current_save_slot + i;
-		if (slot < 0 || slot > SAVE_SLOTS) continue;
+		if (slot < -1 || slot > SAVE_SLOTS) continue;
+		if (slot == -1 && !gs_numlvls) continue;
 		const int basey = save_slot_basey - (slot == current_save_slot ? 6 + loading_save_timer : 0);
 		const int basex = RENDERER_WIDTH / 2 + slot*SAVE_SLOT_EXTENT - ps_pos;
 		int light = RENDERER_LIGHT;
@@ -1118,7 +1129,8 @@ void draw_play_gui_nologic(void) {
 
 		char text[16];
 		if (slot != SAVE_SLOTS) sprintf(text, "SAVE %d", slot + 1);
-		else strcpy(text, "* DELETE *");
+		else strcpy(text, "[DELETE]");
+		if (slot == -1) strcpy(text, "[LEVEL SELECT]");
 		Renderer_DrawText(basex - (8*strlen(text)) / 2, basey + 12, trans2, light, text);
 
 		if ((delete_mode || gui_timer > 0) && slot == current_save_slot) {
@@ -1165,18 +1177,18 @@ void draw_play_gui_nologic(void) {
 			continue;
 		}
 
-		int id = Filesystem_GetLevelIdFromFileName(g_saves[slot].level);
+		int id = Filesystem_GetLevelIdFromFileName(slot != -1 ? g_saves[slot].level : g_globalsave.levels_found[(Game_GetFrame() / 15) % gs_numlvls]);
 		int flip = id == -1 ? Game_GetFrame() % 2 == 0 : 0;
 		if (id == -1) Util_SetRect(&r2, 416, 7200, 96, 64);
 		else memcpy(&r2, FileSystem_GetLevelPreview(id), sizeof(r2));
 		const char *lvlname = id == -1 ? "NEW SAVE" : FileSystem_GetLevelName(id);
-		Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + (12*2), trans2, light, lvlname);
+		if (slot != -1) Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + (12*2), trans2, light, lvlname);
 		Renderer_DrawBitmap2(basex - r.w + 8, basey + (12*3), &r2, trans2, light, flip, CNM_FALSE);
 		memcpy(&r2, skin_bases[Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer], sizeof(int[2]));
 		r2.w = 32; r2.h = 32;
-		Renderer_DrawBitmap2(basex - r.w + 12, basey + 104, &r2, trans2, light, CNM_TRUE, CNM_FALSE);
+		if (slot != -1) Renderer_DrawBitmap2(basex - r.w + 12, basey + 104, &r2, trans2, light, CNM_TRUE, CNM_FALSE);
 		sprintf(text, "X %d", g_saves[slot].lives);
-		Renderer_DrawText(basex - r.w + 12 + 32 + 8, basey + 104 + 12, trans2, light, text);
+		if (slot != -1) Renderer_DrawText(basex - r.w + 12 + 32 + 8, basey + 104 + 12, trans2, light, text);
 	}
 
 	if (ps_pos_target_add > 0) ps_pos_target_add--;
@@ -1201,6 +1213,7 @@ void draw_play_gui(void) {
 		return;
 	}
 
+	int num_lvls = globalsave_get_num_levels(&g_globalsave);
 	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
 		if (current_save_slot < SAVE_SLOTS) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
@@ -1210,7 +1223,7 @@ void draw_play_gui(void) {
 		}
 	}
 	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING)) {
-		if (current_save_slot > 0) {
+		if (current_save_slot > (num_lvls ? -1 : 0)) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			current_save_slot--;
 		} else {
@@ -1218,14 +1231,18 @@ void draw_play_gui(void) {
 		}
 	}
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
-		if (!delete_mode && current_save_slot != SAVE_SLOTS) {
+		if (!delete_mode && (current_save_slot != SAVE_SLOTS && current_save_slot != -1)) {
 			Fadeout_FadeToWhite(20, 15, 20);
 			is_loading_save = CNM_TRUE;
 			loading_save_timer = 0;
 			g_current_save = current_save_slot;
 			if (Filesystem_GetLevelIdFromFileName(g_saves[g_current_save].level) == -1) {
 				strcpy(g_saves[g_current_save].level, FileSystem_GetLevel(FileSystem_GetLevelFromLevelOrder(0)));
+				g_globalsave.saves_created++;
 			}
+		}
+		if (!delete_mode && current_save_slot == -1) {
+			Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = !Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer;
 		}
 		if (current_save_slot == SAVE_SLOTS && !delete_mode) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
@@ -1235,7 +1252,7 @@ void draw_play_gui(void) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			gui_timer = 10;
 			delete_mode = CNM_FALSE;
-			if (current_save_slot != SAVE_SLOTS) {
+			if (current_save_slot != SAVE_SLOTS && current_save_slot != -1) {
 				new_save(g_saves + current_save_slot);
 				save_game(current_save_slot, g_saves + current_save_slot);
 				FileSystem_SearchForLevels(CNM_TRUE);
@@ -1302,7 +1319,11 @@ void draw_main_gui(void) {
 			delete_mode = CNM_FALSE;
 			is_loading_save = CNM_FALSE;
 			loading_save_timer = 0;
+			Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = CNM_FALSE;
 			//save_slot_basey = -128;
+			num_secrets_cached = globalsave_get_num_secrets(&g_globalsave);
+			num_found_cached = globalsave_get_num_levels(&g_globalsave);
+			if (!num_found_cached && current_save_slot == -1) current_save_slot = 0;
 			if (current_save_slot == SAVE_SLOTS) current_save_slot = SAVE_SLOTS - 1;
 			ps_pos = current_save_slot * SAVE_SLOT_EXTENT;
 			ps_pos_target = ps_pos;
@@ -1326,6 +1347,7 @@ void draw_main_gui(void) {
 		case 4:
 			gui_state = GUI_HOST_STATE;
 			ps_selected = 0;
+			host_game_level_idx = 0;
 			ps_pos = host_game_level_idx * (96+16);
 			ps_pos_target = ps_pos;
 			ps_trans = 0;
@@ -1464,7 +1486,8 @@ void draw_host_game_gui(void) {
 		return;
 	}
 
-	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 4) {
+	int num_lvls = globalsave_get_num_levels(&g_globalsave);
+	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < (num_lvls ? 4 : 3)) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected++;
 	}
@@ -1488,14 +1511,14 @@ void draw_host_game_gui(void) {
 	}
 	if (ps_selected == 4 && Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
-		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(FileSystem_GetLevelFromLevelOrder(host_game_level_idx)));
+		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(Filesystem_GetLevelIdFromFileName(g_globalsave.levels_found[host_game_level_idx])));
 		is_joining = CNM_TRUE;
 		joining_timer = 0;
 		Fadeout_FadeToWhite(20, 10, 20);
 		//Game_SwitchState(GAME_STATE_HOSTED_SERVER);
 	}
 	if (ps_selected == 3 && Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
-		if (host_game_level_idx + 1 < FileSystem_NumLevels()) {
+		if (host_game_level_idx + 1 < num_lvls) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			host_game_level_idx++;
 			ps_pos_target += 96+16;

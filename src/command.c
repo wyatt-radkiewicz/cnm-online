@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "command.h"
+#include "world.h"
 #include "game_console.h"
 #include "console.h"
 #include "blocks.h"
@@ -81,6 +82,7 @@ static void Command_NetShowBandwidth(const char *args);
 static void Command_WobjReport(const char *args);
 static void Command_NetFakePing(const char *args);
 static void Command_LocalMap(const char *args);
+static void Command_NoSave(const char *args);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -138,6 +140,7 @@ static const char *const command_names[] =
 	"wobj_report",
 	"net_fake_ping",
 	"localmap",
+	"nosave",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -196,6 +199,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_WobjReport,
 	Command_NetFakePing,
 	Command_LocalMap,
+	Command_NoSave,
 };
 
 static const char *Command_ExtractArg(const char *args, int arg);
@@ -657,8 +661,41 @@ static void Command_NetFakePing(const char *args) {
 	Net_FakeSenderPing(atoi(Command_ExtractArg(args, 0)));
 }
 static void Command_LocalMap(const char *args) {
-	int id = Filesystem_GetLevelIdFromFileName(Command_ExtractArg(args, 0));
-	strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
-	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
-	Game_SwitchState(GAME_STATE_SINGLEPLAYER);
+	if (Game_TopState() == GAME_STATE_CLIENT) return;
+	if (Game_TopState() == GAME_STATE_HOSTED_SERVER || Game_TopState() == GAME_STATE_DEDICATED_SERVER) {
+		NETGAME_NODE *node_iter = NULL;
+		netgame_changemap_t changemap;
+		const char *level_stripped = Command_ExtractArg(args, 0);
+		if (strrchr(level_stripped, '/') != NULL) {
+			level_stripped = strrchr(level_stripped, '/') + 1;
+		}
+		strcpy(changemap.level_name, level_stripped);
+		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, Command_ExtractArg(args, 0));
+		NetGame_Iterate(&node_iter);
+		while (node_iter != NULL)
+		{
+			if (node_iter == NetGame_GetNode(0))
+			{
+				NetGame_Iterate(&node_iter);
+				continue;
+			}
+			NET_PACKET *packet = Net_CreatePacket(
+				NET_CHANGE_MAP,
+				1,
+				&node_iter->addr, sizeof(changemap), &changemap);
+			Net_Send(packet);
+			NetGame_Iterate(&node_iter);
+		}
+		World_Stop();
+		World_Start(WORLD_MODE_HOSTED_SERVER);
+	} else {
+		int id = Filesystem_GetLevelIdFromFileName(Command_ExtractArg(args, 0));
+		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
+		Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
+		Game_SwitchState(GAME_STATE_SINGLEPLAYER);
+	}
 }
+static void Command_NoSave(const char *args) {
+	Game_GetVar(GAME_VAR_NOSAVE)->data.integer = CNM_TRUE;
+}
+

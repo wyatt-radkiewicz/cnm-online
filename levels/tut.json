@@ -417,7 +417,7 @@
         "mode": "PlayerCountBased",
         "max_concurrent_spawns": 0
       },
-      "dropped_item": "KeyBlue"
+      "dropped_item": null
     },
     {
       "pos": [
@@ -515,7 +515,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "Welcome to the CNM corperation.\nThis is a high security \nclearance area. Stay\nalert recruit."
+          "text": "Welcome to the CNM corperation.\nThis is a high security\nclearance area. Stay\nalert recuit."
         }
       },
       "spawning_criteria": {
@@ -533,7 +533,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "Welcome to our artificail testing\ngrounds, here you will learn\nhow to use powerups."
+          "text": "Welcome to our artificail testin\ngrounds, here you will learn\nhow to use upgrades and \nother things."
         }
       },
       "spawning_criteria": {
@@ -551,7 +551,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "You need to use momentum to\nuse the vortex. If you stay in it\ntoo\nlong though, you will die."
+          "text": "You need to use momentum to\nuse the vortex. If you stay in i\ntoo\nlong you will die.\n"
         }
       },
       "spawning_criteria": {
@@ -569,7 +569,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "You passed our first rounds of\ntests. Good job recruit. Report\nto your first mission immediatly."
+          "text": "You passed our first rounds of\ntests. Good job recruit. Report\nto duty immediatly!"
         }
       },
       "spawning_criteria": {
@@ -1874,7 +1874,8 @@
       0,
       142
     ],
-    "difficulty_rating": "Tutorial"
+    "difficulty_rating": "Tutorial",
+    "level_type": "Normal"
   },
   "background_layers": [
     {
@@ -1901,7 +1902,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -1932,7 +1936,10 @@
       "repeat_up": true,
       "repeat_down": true,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -1963,7 +1970,10 @@
       "repeat_up": true,
       "repeat_down": true,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -1994,7 +2004,10 @@
       "repeat_up": true,
       "repeat_down": true,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2025,7 +2038,10 @@
       "repeat_up": true,
       "repeat_down": true,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2056,7 +2072,10 @@
       "repeat_up": true,
       "repeat_down": true,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2087,7 +2106,10 @@
       "repeat_up": true,
       "repeat_down": true,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2118,7 +2140,10 @@
       "repeat_up": true,
       "repeat_down": true,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2149,7 +2174,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2180,7 +2208,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2211,7 +2242,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2242,7 +2276,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2273,7 +2310,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2304,7 +2344,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2335,7 +2378,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2366,7 +2412,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2397,7 +2446,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2428,7 +2480,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2459,7 +2514,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2490,7 +2548,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2521,7 +2582,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2552,7 +2616,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2583,7 +2650,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2614,7 +2684,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2645,7 +2718,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2676,7 +2752,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2707,7 +2786,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2738,7 +2820,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2769,7 +2854,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2800,7 +2888,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2831,7 +2922,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -2862,7 +2956,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     }
   ]
 }

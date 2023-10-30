@@ -47,6 +47,10 @@ static void Parse_Args(int argc, char **argv) {
 		{
 			gi.xmasmode = CNM_TRUE;
 		}
+		if (strcmp(argv[i], "-editorwarp") == 0)
+		{
+			gi.warp = CNM_TRUE;
+		}
 		if (strcmp(argv[i], "-advertise") == 0)
 		{
 			gi.advertise = CNM_TRUE;

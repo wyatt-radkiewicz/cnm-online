@@ -3,11 +3,15 @@
 #include <stdint.h>
 #include <string.h>
 #include "console.h"
+#include "utility.h"
+#include "filesystem.h"
 #include "lparse.h"
 #include "savedata.h"
+#include "game.h"
 
 int g_current_save;
-savedata_t g_saves[SAVE_SLOTS];
+savedata_t g_saves[SAVE_SLOTS+1];
+struct globalsave g_globalsave;
 
 void new_save(savedata_t *data) {
 	data->hp = 100;
@@ -25,6 +29,7 @@ void new_save(savedata_t *data) {
 static void save_data(LParse *lp, const savedata_t *data);
 static void load_data(LParse *lp, savedata_t *data);
 void save_game(int slot, const savedata_t *data) {
+	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return;
 	assert(slot > -1 && slot < SAVE_SLOTS);
 	char filename[32] = { '\0' };
 	sprintf(filename, SAVE_DIR"save%d.lps", slot);
@@ -43,9 +48,11 @@ void load_game(int slot, savedata_t *data) {
 	char filename[32] = { '\0' };
 	sprintf(filename, SAVE_DIR"save%d.lps", slot);
 	FILE *fp = fopen(filename, "rb");
-	if (!fp) {
+	if (!fp || Game_GetVar(GAME_VAR_NOSAVE)->data.integer) {
+		if (fp) fclose(fp);
 		//Console_Print("Can't open the save file: %s! ERROR", filename);
-		data->level[0] = '\0';
+		//data->level[0] = '\0';
+		new_save(data);
 		return;
 	}
 	LParse *lp = lparse_open_from_file(fp, lparse_read);
@@ -118,5 +125,86 @@ static void load_data(LParse *lp, savedata_t *data) {
 	LOAD_VAR(UPHP, upgradehp, float_data)
 	//LOAD_INT(SPD, speed)
 	//LOAD_INT(JMP, jump)
+}
+
+void globalsave_clear(struct globalsave *gs) {
+	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return;
+	memset(gs->levels_found, 0, sizeof(gs->levels_found));
+	gs->saves_created = 0;
+}
+int globalsave_visit_level(struct globalsave *gs, const char *level) {
+	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return CNM_TRUE;
+	for (int i = 0; i < sizeof(gs->levels_found) / sizeof(gs->levels_found[0]); i++) {
+		if (strcmp(gs->levels_found[i], level) == 0) return CNM_FALSE;
+	}
+
+	for (int i = 0; i < sizeof(gs->levels_found) / sizeof(gs->levels_found[0]); i++) {
+		if (strlen(gs->levels_found[i]) == 0) {
+			strcpy(gs->levels_found[i], level);
+			return CNM_TRUE;
+		}
+	}
+	return CNM_FALSE;
+}
+void globalsave_load(struct globalsave *gs) {
+	FILE *fp = fopen(SAVE_DIR"gameinfo.lps", "rb");
+	if (!fp || Game_GetVar(GAME_VAR_NOSAVE)->data.integer) {
+		if (fp) fclose(fp);
+		globalsave_clear(gs);
+		return;
+	}
+	LParse *lp = lparse_open_from_file(fp, lparse_read);
+	if (!lp) {
+		fclose(fp);
+		return;
+	}
+
+	LParseEntry *entry;
+	entry = lparse_get_entry(lp, "NUMSAVES");
+	if (entry) lparse_get_data(lp, entry, 0, 1, &gs->saves_created);
+	entry = lparse_get_entry(lp, "LVLSFOUND");
+	if (entry) lparse_get_data(lp, entry, 0, sizeof(gs->levels_found), &gs->levels_found);
+
+	lparse_close(lp);
+	fclose(fp);
+}
+void globalsave_save(const struct globalsave *gs) {
+	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return;
+	FILE *fp = fopen(SAVE_DIR"gameinfo.lps", "wb");
+	if (!fp) {
+		Console_Print("Can't open the game info file: "SAVE_DIR"gameinfo.lps""! ERROR");
+		return;
+	}
+	LParse *lp = lparse_open_from_file(fp, lparse_write);
+	if (!lp) {
+		fclose(fp);
+		return;
+	}
+
+	LParseEntry *entry;
+	entry = lparse_make_entry(lp, "NUMSAVES", lparse_i32, 1);
+	lparse_set_data(lp, entry, 0, 1, &gs->saves_created);
+	entry = lparse_make_entry(lp, "LVLSFOUND", lparse_u8, sizeof(gs->levels_found));
+	lparse_set_data(lp, entry, 0, sizeof(gs->levels_found), &gs->levels_found);
+
+	lparse_close(lp);
+	fclose(fp);
+}
+int globalsave_get_num_secrets(const struct globalsave *gs) {
+	int num = 0;
+	for (int i = 0; i < sizeof(gs->levels_found) / sizeof(gs->levels_found[0]); i++) {
+		if (strlen(gs->levels_found[i]) != 0 &&
+			Filesystem_IsLevelSecret(Filesystem_GetLevelIdFromFileName(gs->levels_found[i]))) {
+			num++;
+		}
+	}
+	return num;
+}
+int globalsave_get_num_levels(const struct globalsave *gs) {
+	int num = 0;
+	for (int i = 0; i < sizeof(gs->levels_found) / sizeof(gs->levels_found[0]); i++) {
+		if (strlen(gs->levels_found[i]) != 0) num++;
+	}
+	return num;
 }
 

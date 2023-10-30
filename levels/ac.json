@@ -2037,7 +2037,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -2056,7 +2056,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3498,7 +3498,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "I see a gun at the end\n"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -3879,7 +3879,11 @@
         16056.0,
         3848.0
       ],
-      "type_data": "FinishTrigger",
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "MEGA DRAGON"
+        }
+      },
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
@@ -4682,7 +4686,8 @@
       12,
       93
     ],
-    "difficulty_rating": "UltraDeath"
+    "difficulty_rating": "UltraDeath",
+    "level_type": "Normal"
   },
   "background_layers": [
     {
@@ -4709,7 +4714,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4740,7 +4748,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4771,7 +4782,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4802,7 +4816,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4833,7 +4850,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4864,7 +4884,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4895,7 +4918,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4926,7 +4952,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4957,7 +4986,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -4988,7 +5020,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5019,7 +5054,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5050,7 +5088,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5081,7 +5122,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5112,7 +5156,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5143,7 +5190,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5174,7 +5224,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5205,7 +5258,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5236,7 +5292,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5267,7 +5326,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5298,7 +5360,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5329,7 +5394,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5360,7 +5428,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5391,7 +5462,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5422,7 +5496,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5453,7 +5530,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5484,7 +5564,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5515,7 +5598,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5546,7 +5632,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5577,7 +5666,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5608,7 +5700,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5639,7 +5734,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -5670,7 +5768,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     }
   ]
 }

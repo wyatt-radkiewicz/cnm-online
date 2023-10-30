@@ -5,6 +5,7 @@
 #include "serial.h"
 #include "console.h"
 #include "xmacro_impl.h"
+//#include "blocks.h"
 
 // due to new.h's making fopen deprecated
 #undef fopen
@@ -18,6 +19,7 @@ CNM_RECT level_previews[FILESYSTEM_MAX_LEVELS];
 static int level_order[FILESYSTEM_MAX_LEVELS];
 static int level_diffs[FILESYSTEM_MAX_LEVELS];
 static int level_pars[FILESYSTEM_MAX_LEVELS];
+static int level_secrets[FILESYSTEM_MAX_LEVELS];
 static int num_levels;
 static int num_title_levels;
 
@@ -285,8 +287,10 @@ void FileSystem_SearchForLevels(int clear_level_list)
                 int l;
                 strcpy(levels[num_levels], "levels/");
                 strcat(levels[num_levels], dir->d_name);
-                
-                Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels]);
+               
+				int level_type;
+                Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels], &level_type);
+				level_secrets[num_levels] = level_type != LEVEL_TYPE_NORMAL;
                 
                 *strrchr(levels[num_levels++], '.') = '\0';
                 
@@ -304,6 +308,9 @@ void FileSystem_SearchForLevels(int clear_level_list)
 
 int Filesystem_GetNumTitleLevels(void) {
 	return num_title_levels;
+}
+int Filesystem_IsLevelSecret(int level) {
+	return level_secrets[level];
 }
 
 #else

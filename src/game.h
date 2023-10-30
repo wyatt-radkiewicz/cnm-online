@@ -12,6 +12,7 @@ typedef struct _DEDICATED_GAME_INFO
 	char lvl[256];
 	int dedicated;
 	int enable_pvp;
+	int warp;
 	int xmasmode;
 	int master_server;
 	int advertise;
@@ -64,6 +65,8 @@ typedef enum _GAME_VARS
 	GAME_VAR_LEVEL_TIMER,
 	GAME_VAR_PAR_SCORE,
 	GAME_VAR_SAVE_SLOT,
+	GAME_VAR_LEVEL_SELECT_MODE, // Use in conjunction with nosave
+	GAME_VAR_NOSAVE,
 	GAME_VAR_MAX
 } GAME_VARS;
 

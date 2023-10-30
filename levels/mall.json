@@ -394,7 +394,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "kinda yeah, kinda does"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -473,7 +473,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "WHYD YOU DO THAT\nARRGGHHHHHH"
+          "text": "WHYD YOU DO THAT\n"
         }
       },
       "spawning_criteria": {
@@ -491,7 +491,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "WELCOME TO THE MALL"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -509,7 +509,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "buy today"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -527,7 +527,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "elevator OUT OF ORDER"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -1419,7 +1419,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "AMOGUS ROOM"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -1579,7 +1579,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "WELCOME TO THE PET SHOP"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -2503,7 +2503,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": false,
-          "text": "RUN"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -2565,7 +2565,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "CRAPCRAPCRAPCRAPCRAP"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -2874,7 +2874,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "GET SWOOLLLEEEEE"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -4525,9 +4525,9 @@
           ],
           "target_relative": [
             0.0,
-            45.0
+            112.5
           ],
-          "speed": 0.6,
+          "speed": 1.5,
           "start_paused": true,
           "one_way": true
         }
@@ -4574,9 +4574,9 @@
           ],
           "target_relative": [
             0.0,
-            45.0
+            112.5
           ],
-          "speed": 0.6,
+          "speed": 1.5,
           "start_paused": true,
           "one_way": true
         }
@@ -4636,9 +4636,9 @@
           ],
           "target_relative": [
             0.0,
-            32.0
+            96.0
           ],
-          "speed": 0.5,
+          "speed": 1.5,
           "start_paused": true,
           "one_way": false
         }
@@ -4720,9 +4720,9 @@
           ],
           "target_relative": [
             0.0,
-            45.0
+            112.5
           ],
-          "speed": 0.6,
+          "speed": 1.5,
           "start_paused": true,
           "one_way": true
         }
@@ -4747,9 +4747,9 @@
           ],
           "target_relative": [
             0.0,
-            45.0
+            112.5
           ],
-          "speed": 0.6,
+          "speed": 1.5,
           "start_paused": true,
           "one_way": true
         }
@@ -4814,9 +4814,9 @@
           ],
           "target_relative": [
             0.0,
-            45.0
+            112.5
           ],
-          "speed": 0.6,
+          "speed": 1.5,
           "start_paused": true,
           "one_way": true
         }
@@ -6250,7 +6250,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "huoh getting a little drafty"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -9078,7 +9078,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "GOODDUCK"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -10365,7 +10365,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10382,7 +10382,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10399,7 +10399,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10416,7 +10416,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10433,7 +10433,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10450,7 +10450,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10467,7 +10467,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10484,7 +10484,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10501,7 +10501,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -10518,7 +10518,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12388,7 +12388,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12405,7 +12405,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12422,7 +12422,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12439,7 +12439,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12456,7 +12456,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12473,7 +12473,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12490,7 +12490,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12507,7 +12507,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12524,7 +12524,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12541,7 +12541,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12558,7 +12558,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12575,7 +12575,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12592,7 +12592,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12609,7 +12609,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12626,7 +12626,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12643,7 +12643,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12660,7 +12660,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12677,7 +12677,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12694,7 +12694,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12711,7 +12711,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12728,7 +12728,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -12745,7 +12745,7 @@
       ],
       "type_data": {
         "TtMinion": {
-          "small": true
+          "small": false
         }
       },
       "spawning_criteria": {
@@ -18888,7 +18888,8 @@
       13,
       201
     ],
-    "difficulty_rating": "Normal"
+    "difficulty_rating": "Normal",
+    "level_type": "Normal"
   },
   "background_layers": [
     {
@@ -18920,7 +18921,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -18951,7 +18955,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -18982,7 +18989,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": true,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19013,7 +19023,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19044,7 +19057,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19075,7 +19091,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19106,7 +19125,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19137,7 +19159,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19168,7 +19193,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19199,7 +19227,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19230,7 +19261,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19261,7 +19295,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19292,7 +19329,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19323,7 +19363,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19354,7 +19397,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19385,7 +19431,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19416,7 +19465,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19447,7 +19499,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19478,7 +19533,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19509,7 +19567,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19540,7 +19601,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19571,7 +19635,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19602,7 +19669,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19633,7 +19703,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19664,7 +19737,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19695,7 +19771,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19726,7 +19805,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19757,7 +19839,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19788,7 +19873,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19819,7 +19907,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19850,7 +19941,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     },
     {
       "origin": [
@@ -19881,7 +19975,10 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-      "in_foreground": false
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
     }
   ]
 }

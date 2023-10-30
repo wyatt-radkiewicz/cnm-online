@@ -284,12 +284,16 @@ void Serial_SaveBlocks(const char *cnmb_file)
 
 	lparse_close(lp);
 }
-void Serial_LoadBlocksLevelPreview(const char *cnmb_file, CNM_RECT *r, int *dif)
+void Serial_LoadBlocksLevelPreview(const char *cnmb_file, CNM_RECT *r, int *dif, int *type)
 {
 	LParse *lp;
 	LParseEntry *e;
 
-	if (Serial_GetLParser(cnmb_file, &lp) == -1) Serial_LoadBlocksLevelPreview_Old(cnmb_file, r, dif); if (lp == NULL) return;
+	if (Serial_GetLParser(cnmb_file, &lp) == -1) {
+		Serial_LoadBlocksLevelPreview_Old(cnmb_file, r, dif);
+		if (*type) *type = LEVEL_TYPE_NORMAL;
+	}
+	if (lp == NULL) return;
 	e = lparse_get_entry(lp, "BP_FRAMESX");
 	lparse_get_data(lp, e, 256*BLOCKS_MAX_FRAMES, 1, &r->x);
 	r->x *= BLOCK_SIZE;
@@ -300,6 +304,8 @@ void Serial_LoadBlocksLevelPreview(const char *cnmb_file, CNM_RECT *r, int *dif)
 	r->h = BLOCK_SIZE * 2;
 	e = lparse_get_entry(lp, "BP_DMG");
 	lparse_get_data(lp, e, 256, 1, dif);
+	e = lparse_get_entry(lp, "BP_ANIM_SPEED");
+	lparse_get_data(lp, e, 256, 1, type);
 	lparse_close(lp);
 }
 void Serial_LoadSpawnersLevelName(const char *cnms_file, char *name_buf)

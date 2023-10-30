@@ -159,7 +159,7 @@ void Dialoge_Draw(void)
 		}
 
 		for (int x = 0; x < RENDERER_WIDTH; x += 32)
-			Renderer_DrawBitmap(x, RENDERER_HEIGHT - (y+1)*8, &r, 0, RENDERER_LIGHT);
+			Renderer_DrawBitmap(x, RENDERER_HEIGHT - (y+1)*8, &r, 3, RENDERER_LIGHT);
 	}
 
 	// Draw the dialoge
