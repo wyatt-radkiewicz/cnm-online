@@ -233,6 +233,7 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_SAVE_SLOT].data.integer = 0;
 	game_vars[GAME_VAR_LEVEL_SELECT_MODE].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_NOSAVE].data.integer = CNM_FALSE;
+	game_vars[GAME_VAR_FORCE_NOSAVE].data.integer = CNM_FALSE;
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
@@ -304,6 +305,7 @@ void GameState_Base_Init(void)
 	if (!dgame_info.dedicated) {
 		if (dgame_info.warp) {
 			Game_GetVar(GAME_VAR_NOSAVE)->data.integer = CNM_TRUE;
+			Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer = CNM_TRUE;
 			if (Filesystem_GetLevelIdFromFileName(dgame_info.lvl) != -1) {
 				int id = Filesystem_GetLevelIdFromFileName(dgame_info.lvl);
 				strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));

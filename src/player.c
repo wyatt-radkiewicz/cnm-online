@@ -1056,8 +1056,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		Camera_SetForced(CNM_TRUE);
 		//Camera_TeleportPos((int)wobj->x + 16, (int)wobj->y + 16);
-		if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) g_saves[g_current_save].lives--;
-		if (g_saves[g_current_save].lives > 0 || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) {
+		if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+			g_saves[g_current_save].lives--;
+		}
+		if (g_saves[g_current_save].lives > 0 || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER || Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
 			local_data->death_cam_timer = 45+20+2;
 			local_data->death_limbo_counter = 20+20+45+20;
 			Fadeout_FadeDeath(45, 20, 20);
@@ -1858,7 +1860,7 @@ void Player_DrawHUD(WOBJ *player) {
 	Renderer_DrawBitmap2(bx+skinoffx, by+skinoffy, &r, 0, RENDERER_LIGHT, 1, 0);
 	Util_SetRect(&r, 0, 4288+32, 64, 16);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 16, &r, 0, RENDERER_LIGHT);
-	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
+	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
 		sprintf(temp_hud, "%d", g_saves[g_current_save].lives);
 		Renderer_DrawText(RENDERER_WIDTH - 64+6, RENDERER_HEIGHT - 32+18, 0, RENDERER_LIGHT, temp_hud);
 	} else {

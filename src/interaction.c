@@ -61,7 +61,8 @@ void Interaction_FinishLevel(int ending_text_line) {
 		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/");
 		strcat(Game_GetVar(GAME_VAR_LEVEL)->data.string, EndingText_GetLine(ending_text_line));
 		_next_level_timer = 40;
-		Fadeout_FadeToBlack(30, 20, 30);
+		if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) Fadeout_FadeToWhite(30, 20, 30);
+		else Fadeout_FadeToBlack(30, 20, 30);
 		break;
 	case INTERACTION_MODE_CLIENT:
 		finish.node = Client_GetNode()->id;
@@ -79,8 +80,12 @@ void Interaction_FinishLevel(int ending_text_line) {
 void Interaction_Tick(void) {
 	if (_next_level_timer > -1) _next_level_timer--;
 	if (_next_level_timer == 0 && interaction_mode == INTERACTION_MODE_SINGLEPLAYER) {
-		Game_PopState();
-		Game_PushState(GAME_STATE_SINGLEPLAYER);
+		if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+			Game_SwitchState(GAME_STATE_MAINMENU);
+		} else {
+			Game_PopState();
+			Game_PushState(GAME_STATE_SINGLEPLAYER);
+		}
 	}
 }
 WOBJ *Interaction_GetVictim(WOBJ *inflictor, int flags)

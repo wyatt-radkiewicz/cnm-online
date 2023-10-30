@@ -1062,9 +1062,82 @@ static int delete_mode;
 static int joining_timer, is_joining;
 static int is_loading_save, loading_save_timer;
 static int num_secrets_cached, num_found_cached;
+static int saves_add_y, levels_add_y;
 #define SAVE_SLOT_WIDTH 112
 #define SAVE_SLOT_PADDING 16
 #define SAVE_SLOT_EXTENT (SAVE_SLOT_WIDTH+SAVE_SLOT_PADDING)
+
+static void draw_save_card(int slotx, int basey, int trans, int *out_light, int *out_basex) {
+	CNM_RECT r, r2;
+
+	Util_SetRect(&r, 456, 7136, 56, 48);
+	Util_SetRect(&r2, 456, 7168, 56, 16);
+
+	const int basex = RENDERER_WIDTH / 2 + slotx*SAVE_SLOT_EXTENT - ps_pos;
+	int light = RENDERER_LIGHT;
+	if (basex > RENDERER_WIDTH / 2 + 32 || basex < RENDERER_WIDTH / 2 - 32) light = RENDERER_LIGHT + 1;
+	if (basex > RENDERER_WIDTH / 2 + 100 || basex < RENDERER_WIDTH / 2 - 100) light = RENDERER_LIGHT + 2;
+
+	Renderer_DrawBitmap2(basex, basey, &r, trans, light, CNM_FALSE, CNM_FALSE);
+	Renderer_DrawBitmap2(basex - 56, basey, &r, trans, light, CNM_TRUE, CNM_FALSE);
+	for (int j = 0; j < 3; j++) {
+		Renderer_DrawBitmap2(basex, basey + r.h + j*r2.h, &r2, trans, light, CNM_FALSE, CNM_FALSE);
+		Renderer_DrawBitmap2(basex - 56, basey + r.h + j*r2.h, &r2, trans, light, CNM_TRUE, CNM_FALSE);
+	}
+	Renderer_DrawBitmap2(basex, basey + r.h + 3*r2.h, &r, trans, light, CNM_FALSE, CNM_TRUE);
+	Renderer_DrawBitmap2(basex - 56, basey + r.h + 3*r2.h, &r, trans, light, CNM_TRUE, CNM_TRUE);
+
+	if (out_light) *out_light = light;
+	if (out_basex) *out_basex = basex;
+}
+
+static void draw_delete_bars(int basex, int basey, int trans2) {
+	CNM_RECT r2;
+
+	int time_val = (!delete_mode && gui_timer) ? gui_timer : 10 - gui_timer;
+	int width = (float)SAVE_SLOT_WIDTH * ((float)time_val / 10.0f);
+	if (delete_mode && gui_timer <= 0) width = SAVE_SLOT_WIDTH;
+	int trans3 = trans2 + (7 - time_val);
+	if (trans3 < 0) trans3 = 0;
+	const int light = RENDERER_LIGHT;
+
+	int x = basex - width / 2;
+	int yoff = (int)(sinf((float)Game_GetFrame() / 20)*3.0f);
+	Util_SetRect(&r2, 480, 7264, 4, 16);
+	Renderer_DrawBitmap2(x, basey - 8 - yoff, &r2, trans3, light, CNM_FALSE, CNM_FALSE);
+	Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r2, trans3, light, CNM_FALSE, CNM_TRUE);
+	CNM_RECT r3;
+	Util_SetRect(&r3, 496, 7264+((Game_GetFrame() / 2) % 7)*16, 16, 16);
+	x += r2.w;
+	int width_left = width - r2.w;
+	for (; width_left >= 16; width_left -= 16) {
+		Renderer_DrawBitmap(x, basey - 8 - yoff, &r3, trans3, light);
+		Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r3, trans3, light, CNM_FALSE, CNM_TRUE);
+		x += 16;
+	}
+	if (width_left > 0) {
+		r3.w = width_left;
+		Renderer_DrawBitmap(x, basey - 8 - yoff, &r3, trans3, light);
+		Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r3, trans3, light, CNM_FALSE, CNM_TRUE);
+	}
+	x = basex + width / 2;
+	Renderer_DrawBitmap2(x, basey - 8 - yoff, &r2, trans3, light, CNM_TRUE, CNM_FALSE);
+	Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r2, trans3, light, CNM_TRUE, CNM_TRUE);
+}
+
+static const char *difmsgs[] =
+{
+	"BABY",
+	"REALLY EASY",
+	"EASY",
+	"NORMAL",
+	"KINDA HARD",
+	"HARD",
+	"ULTRA",
+	"EXTREME",
+	"DEATH!!!",
+	"NIGHTMARE"
+};
 
 void draw_play_gui_nologic(void) {
 	CNM_RECT r, r2;
@@ -1081,6 +1154,8 @@ void draw_play_gui_nologic(void) {
 	if (ss_trans < 0) return;
 	int trans2 = 7 - ss_trans / 2;
 	if (trans2 < 0) trans2 = 0;
+
+	const int lvlselect_mode = Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer;
 
 	//Util_SetRect(&r, 368, 7376, 144, 144);
 	//Renderer_DrawBitmap(playbit0_x, RENDERER_HEIGHT - r.h, &r, trans2, RENDERER_LIGHT);
@@ -1104,64 +1179,56 @@ void draw_play_gui_nologic(void) {
 	sprintf(text, "%d", num_secrets_cached);
 	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (strlen(text)*8), completion_basey + 4 + (8*3), trans2, RENDERER_LIGHT, text);
 
-	int gs_numlvls = globalsave_get_num_levels(&g_globalsave);
-	for (int i = -2; i <= 2; i++) {
-		Util_SetRect(&r, 456, 7136, 56, 48);
-		Util_SetRect(&r2, 456, 7168, 56, 16);
+	const int gs_numlvls = globalsave_get_num_levels(&g_globalsave);
 
-		int slot = current_save_slot + i;
-		if (slot < -1 || slot > SAVE_SLOTS) continue;
-		if (slot == -1 && !gs_numlvls) continue;
-		const int basey = save_slot_basey - (slot == current_save_slot ? 6 + loading_save_timer : 0);
-		const int basex = RENDERER_WIDTH / 2 + slot*SAVE_SLOT_EXTENT - ps_pos;
-		int light = RENDERER_LIGHT;
-		if (basex > RENDERER_WIDTH / 2 + 32 || basex < RENDERER_WIDTH / 2 - 32) light = RENDERER_LIGHT + 1;
-		if (basex > RENDERER_WIDTH / 2 + 100 || basex < RENDERER_WIDTH / 2 - 100) light = RENDERER_LIGHT + 2;
-
-		Renderer_DrawBitmap2(basex, basey, &r, trans, light, CNM_FALSE, CNM_FALSE);
-		Renderer_DrawBitmap2(basex - 56, basey, &r, trans, light, CNM_TRUE, CNM_FALSE);
-		for (int j = 0; j < 3; j++) {
-			Renderer_DrawBitmap2(basex, basey + r.h + j*r2.h, &r2, trans, light, CNM_FALSE, CNM_FALSE);
-			Renderer_DrawBitmap2(basex - 56, basey + r.h + j*r2.h, &r2, trans, light, CNM_TRUE, CNM_FALSE);
+	// Draw the first card (if its on screen)
+	if (current_save_slot < 2) {
+		const int basey = save_slot_basey - (current_save_slot == -1 ? 6 + loading_save_timer : 0);
+		int basex, light;
+		draw_save_card(-1, basey, trans, &light, &basex);
+		if ((delete_mode || gui_timer > 0) && current_save_slot == -1) {
+			draw_delete_bars(basex, basey, trans2);
 		}
-		Renderer_DrawBitmap2(basex, basey + r.h + 3*r2.h, &r, trans, light, CNM_FALSE, CNM_TRUE);
-		Renderer_DrawBitmap2(basex - 56, basey + r.h + 3*r2.h, &r, trans, light, CNM_TRUE, CNM_TRUE);
+		if (gs_numlvls) {
+			if (!lvlselect_mode) strcpy(text, "[LEVEL SELECT]");
+			else strcpy(text, "[SAVE GAMES]");
+			Renderer_DrawText(basex - (8*strlen(text)) / 2, basey + (12*2), trans2, light, text);
+			int id = Filesystem_GetLevelIdFromFileName(g_globalsave.levels_found[(Game_GetFrame() / 15) % gs_numlvls]);
+			if (lvlselect_mode) id = -1;
+			int flip = (id == -1) ? Game_GetFrame() % 2 == 0 : 0;
+			if (id == -1) Util_SetRect(&r2, 416, 7200, 96, 64);
+			else memcpy(&r2, FileSystem_GetLevelPreview(id), sizeof(r2));
+			Renderer_DrawBitmap2(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + (12*3), &r2, trans2, light, flip, CNM_FALSE);
+			if (lvlselect_mode) {
+				Util_SetRect(&r2, 448, 7296, 32, 32);
+				Renderer_DrawBitmap2(
+					basex - SAVE_SLOT_WIDTH / 2 + 8 + 48 - 16,
+					basey + (12*3) + 32 - 16 + (int)(sinf((float)Game_GetFrame() / 10.0f)*4.0f),
+					&r2,
+					trans2, light,
+					CNM_FALSE,
+					CNM_FALSE
+				);
+			}
+		}
+	}
+
+	// Draw the save games
+	for (int i = -2; i <= 2; i++) {
+		int slot = current_save_slot + i;
+		if (slot < 0 || slot > SAVE_SLOTS) continue;
+		const int basey = save_slot_basey + saves_add_y - (slot == current_save_slot ? 6 + loading_save_timer : 0);
+		if (basey < -RENDERER_HEIGHT / 2 || basey > RENDERER_HEIGHT) continue;
+		int basex, light;
+		draw_save_card(slot, basey, trans, &light, &basex);
 
 		char text[16];
 		if (slot != SAVE_SLOTS) sprintf(text, "SAVE %d", slot + 1);
 		else strcpy(text, "[DELETE]");
-		if (slot == -1) strcpy(text, "[LEVEL SELECT]");
 		Renderer_DrawText(basex - (8*strlen(text)) / 2, basey + 12, trans2, light, text);
 
 		if ((delete_mode || gui_timer > 0) && slot == current_save_slot) {
-			int time_val = (!delete_mode && gui_timer) ? gui_timer : 10 - gui_timer;
-			int width = (float)SAVE_SLOT_WIDTH * ((float)time_val / 10.0f);
-			if (delete_mode && gui_timer <= 0) width = SAVE_SLOT_WIDTH;
-			int trans3 = trans2 + (7 - time_val);
-			if (trans3 < 0) trans3 = 0;
-
-			int x = basex - width / 2;
-			int yoff = (int)(sinf((float)Game_GetFrame() / 20)*3.0f);
-			Util_SetRect(&r2, 480, 7264, 4, 16);
-			Renderer_DrawBitmap2(x, basey - 8 - yoff, &r2, trans3, light, CNM_FALSE, CNM_FALSE);
-			Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r2, trans3, light, CNM_FALSE, CNM_TRUE);
-			CNM_RECT r3;
-			Util_SetRect(&r3, 496, 7264+((Game_GetFrame() / 2) % 7)*16, 16, 16);
-			x += r2.w;
-			int width_left = width - r2.w;
-			for (; width_left >= 16; width_left -= 16) {
-				Renderer_DrawBitmap(x, basey - 8 - yoff, &r3, trans3, light);
-				Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r3, trans3, light, CNM_FALSE, CNM_TRUE);
-				x += 16;
-			}
-			if (width_left > 0) {
-				r3.w = width_left;
-				Renderer_DrawBitmap(x, basey - 8 - yoff, &r3, trans3, light);
-				Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r3, trans3, light, CNM_FALSE, CNM_TRUE);
-			}
-			x = basex + width / 2;
-			Renderer_DrawBitmap2(x, basey - 8 - yoff, &r2, trans3, light, CNM_TRUE, CNM_FALSE);
-			Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r2, trans3, light, CNM_TRUE, CNM_TRUE);
+			draw_delete_bars(basex, basey, trans2);
 		}
 
 		if (slot == SAVE_SLOTS) {
@@ -1177,23 +1244,55 @@ void draw_play_gui_nologic(void) {
 			continue;
 		}
 
-		int id = Filesystem_GetLevelIdFromFileName(slot != -1 ? g_saves[slot].level : g_globalsave.levels_found[(Game_GetFrame() / 15) % gs_numlvls]);
-		int flip = id == -1 ? Game_GetFrame() % 2 == 0 : 0;
+		int id = Filesystem_GetLevelIdFromFileName(g_saves[slot].level);
+		int flip = (id == -1) ? Game_GetFrame() % 2 == 0 : 0;
 		if (id == -1) Util_SetRect(&r2, 416, 7200, 96, 64);
 		else memcpy(&r2, FileSystem_GetLevelPreview(id), sizeof(r2));
 		const char *lvlname = id == -1 ? "NEW SAVE" : FileSystem_GetLevelName(id);
-		if (slot != -1) Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + (12*2), trans2, light, lvlname);
-		Renderer_DrawBitmap2(basex - r.w + 8, basey + (12*3), &r2, trans2, light, flip, CNM_FALSE);
+		Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + (12*2), trans2, light, lvlname);
+		Renderer_DrawBitmap2(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + (12*3), &r2, trans2, light, flip, CNM_FALSE);
 		memcpy(&r2, skin_bases[Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer], sizeof(int[2]));
 		r2.w = 32; r2.h = 32;
-		if (slot != -1) Renderer_DrawBitmap2(basex - r.w + 12, basey + 104, &r2, trans2, light, CNM_TRUE, CNM_FALSE);
+		Renderer_DrawBitmap2(basex - SAVE_SLOT_WIDTH / 2 + 12, basey + 104, &r2, trans2, light, CNM_TRUE, CNM_FALSE);
 		sprintf(text, "X %d", g_saves[slot].lives);
-		if (slot != -1) Renderer_DrawText(basex - r.w + 12 + 32 + 8, basey + 104 + 12, trans2, light, text);
+		Renderer_DrawText(basex - SAVE_SLOT_WIDTH / 2 + 12 + 32 + 8, basey + 104 + 12, trans2, light, text);
+	}
+
+	// Draw the levels from the selection menu 
+	for (int i = -2; i <= 2; i++) {
+		int slot = current_save_slot + i;
+		if (slot < 0 || slot >= gs_numlvls) continue;
+		const int basey = save_slot_basey + levels_add_y - (slot == current_save_slot ? 6 + loading_save_timer : 0);
+		if (basey < -RENDERER_HEIGHT / 2 || basey > RENDERER_HEIGHT) continue;
+		int basex, light;
+		draw_save_card(slot, basey, trans, &light, &basex);
+
+		char text[32];
+		int id = Filesystem_GetLevelIdFromFileName(g_globalsave.levels_found[slot]);
+		if (id == -1) continue;
+		const char *lvlname = FileSystem_GetLevelName(id);
+		Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + 12, trans2, light, lvlname);
+		memcpy(&r2, FileSystem_GetLevelPreview(id), sizeof(r2));
+		Renderer_DrawBitmap(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + (12*2), &r2, trans2, light);
+		Renderer_DrawText(basex - (9*8) / 2, basey + 92 + (12*0), trans2, light, "- DIFF. -");
+		const char *dif = difmsgs[FileSystem_GetLevelDifficulty(id)];
+		Renderer_DrawText(basex - (8*strlen(dif))/2, basey + 92 + (12*1), trans2, light, dif);
+		Renderer_DrawText(basex - (7*8) / 2, basey + 92 + (12*2), trans2, light, "- PAR -");
+		sprintf(text, "%d", FileSystem_GetLevelParScore(id));
+		Renderer_DrawText(basex - (8*strlen(text))/2, basey + 92 + (12*3), trans2, light, text);
 	}
 
 	if (ps_pos_target_add > 0) ps_pos_target_add--;
 	if (ps_pos_target_add < 0) ps_pos_target_add++;
 	ps_pos += ((ps_pos_target + ps_pos_target_add) - ps_pos) * 0.25f;
+
+	if (lvlselect_mode) {
+		saves_add_y += (-RENDERER_HEIGHT - saves_add_y) * 0.25f;
+		levels_add_y += (0 - levels_add_y) * 0.25f;
+	} else {
+		levels_add_y += (-RENDERER_HEIGHT - levels_add_y) * 0.25f;
+		saves_add_y += (0 - saves_add_y) * 0.25f;
+	}
 }
 
 void draw_play_gui(void) {
@@ -1214,8 +1313,10 @@ void draw_play_gui(void) {
 	}
 
 	int num_lvls = globalsave_get_num_levels(&g_globalsave);
+	int *lvlselect = &Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer;
+	int right = *lvlselect ? (num_lvls - 1) : SAVE_SLOTS;
 	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
-		if (current_save_slot < SAVE_SLOTS) {
+		if (current_save_slot < right) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			current_save_slot++;
 		} else {
@@ -1236,13 +1337,25 @@ void draw_play_gui(void) {
 			is_loading_save = CNM_TRUE;
 			loading_save_timer = 0;
 			g_current_save = current_save_slot;
-			if (Filesystem_GetLevelIdFromFileName(g_saves[g_current_save].level) == -1) {
+			if (*lvlselect) {
+				Game_GetVar(GAME_VAR_NOSAVE)->data.integer = CNM_TRUE;
+				g_current_save = SAVE_SLOTS;
+				strcpy(g_saves[g_current_save].level, g_globalsave.levels_found[current_save_slot]);
+			}
+			if (Filesystem_GetLevelIdFromFileName(g_saves[g_current_save].level) == -1 && !(*lvlselect)) {
 				strcpy(g_saves[g_current_save].level, FileSystem_GetLevel(FileSystem_GetLevelFromLevelOrder(0)));
 				g_globalsave.saves_created++;
 			}
 		}
 		if (!delete_mode && current_save_slot == -1) {
-			Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = !Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer;
+			if (!(*lvlselect)) {
+				saves_add_y = 0;
+				levels_add_y = RENDERER_HEIGHT / 2;
+			} else {
+				levels_add_y = 0;
+				saves_add_y = RENDERER_HEIGHT / 2;
+			}
+			*lvlselect = !(*lvlselect);
 		}
 		if (current_save_slot == SAVE_SLOTS && !delete_mode) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
@@ -1301,6 +1414,7 @@ void draw_main_gui(void) {
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
 		last_gui_state = gui_state;
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = CNM_FALSE;
 		switch (options_num) {
 		case 0:
 			gui_state = GUI_PLAYER_SETUP;
@@ -1319,6 +1433,8 @@ void draw_main_gui(void) {
 			delete_mode = CNM_FALSE;
 			is_loading_save = CNM_FALSE;
 			loading_save_timer = 0;
+			saves_add_y = 0;
+			levels_add_y = -RENDERER_HEIGHT+128;
 			Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = CNM_FALSE;
 			//save_slot_basey = -128;
 			num_secrets_cached = globalsave_get_num_secrets(&g_globalsave);
@@ -1409,6 +1525,11 @@ void draw_press_start(void) {
 	if ((gui_timer / 15) % 2 == 0) {
 		Util_SetRect(&r, 432-32, 7184, 112, 16);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - (r.w/2), RENDERER_HEIGHT / 2 + 96, &r, 0, RENDERER_LIGHT);
+	}
+
+	if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer && !Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer) {
+		Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = CNM_FALSE;
+		Game_GetVar(GAME_VAR_NOSAVE)->data.integer = CNM_FALSE;
 	}
 
 	playbit1_x = -112-2;

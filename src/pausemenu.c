@@ -21,32 +21,93 @@ static int exit_timer, is_exiting;
 
 static pause_menu_func_t funcs[3];
 
-static const char *option_names[] = {
-	"RESPAWN",
-	"CONTINUE",
-	"EXIT",
+// Singleplayer, Server, Client, Level Select
+static const char *option_names[][4] = {
+	{ "RESPAWN", "RESPAWN", "RESPAWN", "RESPAWN" },
+	{ "CONTINUE", "CONTINUE", "CONTINUE", "CONTINUE" },
+	{ "EXIT", "STOP SERVER", "LEAVE", "EXIT" },
 };
-static int help_text_lines[] = {
-	4, 2, 3,
+static int help_text_lines[][4] = {
+	{ 4, 4, 4, 4, }, { 2, 2, 2, 2, }, { 3, 4, 3, 2 },
 };
-static const char *help_text[][4] = {
+static const char *help_text[][4][4] = {
 	{
-		"DIE AND",
-		"RESPAWN",
-		"AT YOUT LAST",
-		"CHECKPOINT!"
+		{
+			"DIE AND",
+			"RESPAWN",
+			"AT YOUT LAST",
+			"CHECKPOINT!"
+		},
+		{
+			"DIE AND",
+			"RESPAWN",
+			"AT YOUT LAST",
+			"CHECKPOINT!"
+		},
+		{
+			"DIE AND",
+			"RESPAWN",
+			"AT YOUT LAST",
+			"CHECKPOINT!"
+		},
+		{
+			"DIE AND",
+			"RESPAWN",
+			"AT YOUT LAST",
+			"CHECKPOINT!"
+		},
 	},
 	{
-		"CONTINUE",
-		"THE GAME",
-		"",
-		""
+		{
+			"CONTINUE",
+			"THE GAME",
+			"",
+			""
+		},
+		{
+			"CONTINUE",
+			"THE GAME",
+			"",
+			""
+		},
+		{
+			"CONTINUE",
+			"THE GAME",
+			"",
+			""
+		},
+		{
+			"CONTINUE",
+			"THE GAME",
+			"",
+			""
+		},
 	},
 	{
-		"RETURN TO",
-		"MAIN MENU",
-		"AND SAVE",
-		"",
+		{
+			"RETURN TO",
+			"MAIN MENU",
+			"AND SAVE",
+			"",
+		},
+		{
+			"STOP THE",
+			"SERVER AND",
+			"KICK EVERY-",
+			"ONE OFF",
+		},
+		{
+			"LEAVE THE",
+			"SERVER",
+			"(WONT SAVE)",
+			"",
+		},
+		{
+			"RETURN TO",
+			"MAIN MENU",
+			"",
+			"",
+		},
 	},
 };
 
@@ -91,7 +152,11 @@ void pause_menu_update(void) {
 		options_num++;
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 	}
-	int minopt = (g_saves[g_current_save].lives > 1 || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER ? 0 : 1);
+	int minopt = (
+			(g_saves[g_current_save].lives > 1 ||
+			 Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER ||
+			 Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer)
+			? 0 : 1);
 	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_GUI) && options_num > minopt) {
 		left_disp = -32;
 		side_blob_x = RENDERER_WIDTH;
@@ -126,6 +191,21 @@ void pause_menu_draw(void) {
 	Util_SetRect(&r, 0, 0, RENDERER_WIDTH, RENDERER_HEIGHT);
 	Renderer_DrawRect(&r, Renderer_MakeColor(0, 32, 64), trans, RENDERER_LIGHT);
 
+	int text_mode;
+	switch (Interaction_GetMode()) {
+	case INTERACTION_MODE_SINGLEPLAYER:
+		text_mode = 0;
+		break;
+	case INTERACTION_MODE_CLIENT:
+		text_mode = 2;
+		break;
+	case INTERACTION_MODE_HOSTED_SERVER:
+	case INTERACTION_MODE_DEDICATED_SERVER:
+		text_mode = 1;
+		break;
+	}
+	if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) text_mode = 3;
+
 	const int start = 160;
 	int idx = options_num - 5;
 	//Console_Print("%d", options_num);
@@ -133,10 +213,10 @@ void pause_menu_draw(void) {
 		Util_SetRect(&r, 384, 7104, 128, 32);
 		Renderer_DrawBitmap(-r.w + side_xstart + i*32 + left_disp, RENDERER_HEIGHT-start + i*32 + left_disp, &r, 2, RENDERER_LIGHT);
 		if (idx >= 0 && idx < sizeof(option_names)/sizeof(*option_names)) {
-			int center = strlen(option_names[idx]) * 8 / 2;
+			int center = strlen(option_names[idx][text_mode]) * 8 / 2;
 			if (idx != options_num) Renderer_SetFont(384, 1264, 8, 8);
 			else Renderer_SetFont(384, 448, 8, 8);
-			if (!(g_saves[g_current_save].lives <= 1 && idx == 0) || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx]);
+			if (!(g_saves[g_current_save].lives <= 1 && idx == 0) || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx][text_mode]);
 			if (idx == options_num) {
 				int w = r.w;
 				Util_SetRect(&r, 376-24, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
@@ -152,11 +232,11 @@ void pause_menu_draw(void) {
 	Renderer_SetFont(384, 448, 8, 8);
 	Renderer_DrawBitmap2(side_blob_x, RENDERER_HEIGHT-48, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 	int text_off = 12;
-	if (help_text_lines[options_num] == 3) text_off += 6;
-	if (help_text_lines[options_num] == 2) text_off += 6;
+	if (help_text_lines[options_num][text_mode] == 3) text_off += 6;
+	if (help_text_lines[options_num][text_mode] == 2) text_off += 6;
 	for (int i = 0; i < 4; i++) {
-		int align_right = (12 - strlen(help_text[options_num][i])) * 8;
-		Renderer_DrawText(side_blob_x + 8 + align_right, RENDERER_HEIGHT-48+text_off+i*8, 0, RENDERER_LIGHT, help_text[options_num][i]);
+		int align_right = (12 - strlen(help_text[options_num][text_mode][i])) * 8;
+		Renderer_DrawText(side_blob_x + 8 + align_right, RENDERER_HEIGHT-48+text_off+i*8, 0, RENDERER_LIGHT, help_text[options_num][text_mode][i]);
 	}
 
 	int target = is_focused ? 0 : -192;
