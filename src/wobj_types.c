@@ -1156,14 +1156,14 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 	if (wobj->custom_floats[0] < 0.0f)
 	{
 		wobj->money |= CMPF_STOP_ON_TURN; // Stop on turn flag and only start moving once player touched this
-		wobj->custom_ints[1] = (int)wobj->custom_floats[0] * -1;
+		wobj->custom_ints[1] = (int)floorf(wobj->custom_floats[0]) * -1;
 
 		// If timer has a fraciontal component, then dont let player hop back on and go back up, else go back up
 		if (fractional_comp < 0.1f)
 			wobj->money |= CMPF_HOP_ON; // Let player hop back on
 	}
 	else
-		wobj->custom_ints[1] = (int)wobj->custom_floats[0];
+		wobj->custom_ints[1] = (int)floorf(wobj->custom_floats[0]);
 	if (fractional_comp > 0.1f && fractional_comp < 0.3f)
 		wobj->money |= CMPF_DESPAWN;
 
@@ -2997,7 +2997,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		0, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_FALSE // Can respawn?
+		CNM_TRUE // Can respawn?
 	},
 	{ // 108: Dialoge Box Trigger Object
 		WobjEndingTextTrigger_Create, // Create
