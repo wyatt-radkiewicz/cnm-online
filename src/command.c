@@ -83,6 +83,7 @@ static void Command_WobjReport(const char *args);
 static void Command_NetFakePing(const char *args);
 static void Command_LocalMap(const char *args);
 static void Command_NoSave(const char *args);
+static void Command_SetLives(const char *args);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -141,6 +142,7 @@ static const char *const command_names[] =
 	"net_fake_ping",
 	"localmap",
 	"nosave",
+	"setlives"
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -200,6 +202,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_NetFakePing,
 	Command_LocalMap,
 	Command_NoSave,
+	Command_SetLives,
 };
 
 static const char *Command_ExtractArg(const char *args, int arg);
@@ -697,5 +700,8 @@ static void Command_LocalMap(const char *args) {
 }
 static void Command_NoSave(const char *args) {
 	Game_GetVar(GAME_VAR_NOSAVE)->data.integer = CNM_TRUE;
+}
+static void Command_SetLives(const char *args) {
+	g_saves[g_current_save].lives = atoi(Command_ExtractArg(args, 0));
 }
 

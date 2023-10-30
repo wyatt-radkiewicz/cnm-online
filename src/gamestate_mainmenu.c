@@ -1000,7 +1000,7 @@ void draw_player_setup(void) {
 		//int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
 		for (int i = -1; i <= num_lvls+1; i++) {
 			if (i < 0 || i >= num_lvls) Util_SetRect(&r2, 416, 7200, 96, 64);
-			else memcpy(&r2, FileSystem_GetLevelPreview(Filesystem_GetLevelIdFromFileName(lvlname)), sizeof(CNM_RECT));
+			else memcpy(&r2, FileSystem_GetLevelPreview(Filesystem_GetLevelIdFromFileName(g_globalsave.levels_found[i])), sizeof(CNM_RECT));
 			//r2.w = 96; r2.h = 64;
 			int pos = i*(96+16) - ps_pos;
 			int t = trans2;
