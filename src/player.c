@@ -552,12 +552,15 @@ void WobjPlayer_Update(WOBJ *wobj)
 					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocks(wobj, 0.0f, 4.0f); i++)
 						wobj->y += 1.0f;
 
+					local_data->slide_jump_cooldown = 5;
+
 					WOBJ *w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
 													 wobj->x + 16.0f, wobj->y, 0, 1.0f);
 					w->speed = 9.0f;
 					w->strength = wobj->strength + 0.1f;
 					w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
 													 wobj->x + 16.0f, wobj->y, 0, -1.0f);
+					w->flags |= WOBJ_HFLIP;
 					w->speed = 9.0f;
 					w->strength = wobj->strength + 0.1f;
 
