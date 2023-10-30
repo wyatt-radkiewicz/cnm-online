@@ -1332,7 +1332,8 @@ void draw_play_gui(void) {
 		}
 	}
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
-		if (!delete_mode && (current_save_slot != SAVE_SLOTS && current_save_slot != -1)) {
+		if ((!delete_mode && (current_save_slot != SAVE_SLOTS && current_save_slot != -1)) ||
+			*lvlselect && current_save_slot != -1) {
 			Fadeout_FadeToWhite(20, 15, 20);
 			is_loading_save = CNM_TRUE;
 			loading_save_timer = 0;
@@ -1357,11 +1358,11 @@ void draw_play_gui(void) {
 			}
 			*lvlselect = !(*lvlselect);
 		}
-		if (current_save_slot == SAVE_SLOTS && !delete_mode) {
+		if (current_save_slot == SAVE_SLOTS && !delete_mode && !(*lvlselect)) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			gui_timer = 10;
 			delete_mode = CNM_TRUE;
-		} else if (delete_mode) {
+		} else if (delete_mode && !(*lvlselect)) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			gui_timer = 10;
 			delete_mode = CNM_FALSE;
