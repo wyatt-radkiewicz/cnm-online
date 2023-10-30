@@ -1538,6 +1538,7 @@ void draw_press_start(void) {
 
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		current_save_slot = 0;
 		ps_trans = 0;
 		joining_timer = 0;
 		is_joining = CNM_FALSE;
