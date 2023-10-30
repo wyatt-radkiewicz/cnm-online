@@ -106,7 +106,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "I SEE A STONE\n"
+          "text": ""
         }
       },
       "spawning_criteria": {
@@ -766,7 +766,7 @@
         "mode": "NoSpawn",
         "max_concurrent_spawns": 0
       },
-      "dropped_item": "KeyGreen"
+      "dropped_item": null
     },
     {
       "pos": [
@@ -1924,7 +1924,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1943,7 +1943,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3588,22 +3588,22 @@
     },
     {
       "pos": [
-        520.0,
+        480.0,
         928.0
       ],
       "type_data": {
         "CustomizeableMoveablePlatform": {
           "bitmap_x32": [
-            2,
-            10
+            14,
+            82
           ],
           "target_relative": [
-            94.0,
+            420.0,
             0.0
           ],
-          "speed": 2.0,
+          "speed": 3.0,
           "start_paused": false,
-          "one_way": true
+          "ty": "Despawn"
         }
       },
       "spawning_criteria": {

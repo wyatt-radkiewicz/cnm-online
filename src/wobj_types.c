@@ -1130,6 +1130,7 @@ static void WobjVortex_Update(WOBJ *wobj)
 #define CMPF_HOP_ON 2
 #define CMPF_FIRST_GO 4
 #define CMPF_WAS_ON 8
+#define CMPF_DESPAWN 16
 
 static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 {
@@ -1150,6 +1151,7 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 	fconverted += fconverted < 0 ? -fpart : fpart;
 	wobj->vel_y = fconverted;
 	//Console_Print("%f %f %u", wobj->vel_x, wobj->vel_y, wobj->custom_ints[0]);
+	const float fractional_comp = wobj->custom_floats[0] - floorf(wobj->custom_floats[0]);
 
 	if (wobj->custom_floats[0] < 0.0f)
 	{
@@ -1157,11 +1159,13 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 		wobj->custom_ints[1] = (int)wobj->custom_floats[0] * -1;
 
 		// If timer has a fraciontal component, then dont let player hop back on and go back up, else go back up
-		if (wobj->custom_floats[0] == roundf(wobj->custom_floats[0]))
+		if (fractional_comp < 0.1f)
 			wobj->money |= CMPF_HOP_ON; // Let player hop back on
 	}
 	else
 		wobj->custom_ints[1] = (int)wobj->custom_floats[0];
+	if (fractional_comp > 0.1f && fractional_comp < 0.3f)
+		wobj->money |= CMPF_DESPAWN;
 
 	wobj->money |= CMPF_FIRST_GO;
 	if (wobj->money & CMPF_STOP_ON_TURN)
@@ -1183,6 +1187,8 @@ static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 	}
 	else
 	{
+		if ((wobj->money & CMPF_DESPAWN) && (~wobj->money & CMPF_FIRST_GO))
+			Interaction_DestroyWobj(wobj);
 		if (~wobj->money & CMPF_FIRST_GO) {
 			if (wobj->vel_x != 0.0f) {
 				wobj->custom_floats[0] = -wobj->vel_x;
