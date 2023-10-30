@@ -321,7 +321,7 @@ static void WobjDroppedItem_Create(WOBJ *wobj)
 	wobj->custom_floats[0] = item_types[wobj->item].max_durability;
 }
 static void WobjDroppedItem_Update(WOBJ *wobj) {
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 static void WobjIceRune_Create(WOBJ *wobj)
@@ -1137,14 +1137,15 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 
 	int converted;
 	float fconverted, fpart;
+	//Console_Print("%d %d %d %d %d %d", CMPF_INT_BITS, CMPF_FRAC_BITS, CMPF_INT_MASK, CMPF_FRAC_MASK, CMPF_INT_MID, CMPF_NUM_FRACS);
 	converted = (int)wobj->custom_ints[0] >> 16 & 0xff;
-	fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
-	fpart = 0.25f * (float)(converted & 0x3);
+	fconverted = (float)((int)(converted >> 4 & 0xf) - 8);
+	fpart = (1.0f / 16.0f) * (float)(converted & 0xf);
 	fconverted += fconverted < 0 ? -fpart : fpart;
 	wobj->vel_x = fconverted;
 	converted = (int)wobj->custom_ints[0] >> 24 & 0xff;
-	fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
-	fpart = 0.25f * (float)(converted & 0x3);
+	fconverted = (float)((int)(converted >> 4 & 0xf) - 8);
+	fpart = (1.0f / 16.0f) * (float)(converted & 0xf);
 	fconverted += fconverted < 0 ? -fpart : fpart;
 	wobj->vel_y = fconverted;
 	//Console_Print("%f %f %u", wobj->vel_x, wobj->vel_y, wobj->custom_ints[0]);

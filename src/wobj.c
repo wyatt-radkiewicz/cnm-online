@@ -805,7 +805,7 @@ WOBJ *Wobj_GetAnyWOBJFromUUIDAndNode(int node, int uuid)
 	else
 		return Wobj_GetUnownedWobjFromUUID(node, uuid);*/
 }
-int Wobj_TryTeleportWobj(WOBJ *wobj)
+int Wobj_TryTeleportWobj(WOBJ *wobj, int only_teleareas)
 {
 	int i = 0, tryed = CNM_FALSE;
 	TELEPORT_INFO *info;
@@ -813,7 +813,7 @@ int Wobj_TryTeleportWobj(WOBJ *wobj)
 	Wobj_GetCollision(wobj, collisions);
 	while (i < WOBJ_MAX_COLLISIONS && collisions[i] != NULL)
 	{
-		if (collisions[i]->type == WOBJ_TELEPORT || 
+		if ((collisions[i]->type == WOBJ_TELEPORT && !only_teleareas) || 
 			(collisions[i]->type == WOBJ_TELEAREA1 && collisions[i]->custom_ints[1]))
 		{
 			tryed = CNM_TRUE;

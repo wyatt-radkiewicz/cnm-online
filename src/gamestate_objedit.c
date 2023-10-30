@@ -611,14 +611,14 @@ static void EditSpawnElementCI(GUI_ELEMENT *elem, int index)
 		Gui_SetNumberElementInt(elem->frame, 10, current_spawner->custom_int >> 4 & 0xfff);
 
 		converted = current_spawner->custom_int >> 16 & 0xff;
-		fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
-		fpart = 0.25f * (float)(converted & 0x3);
+		fconverted = (float)((int)(converted >> 4 & 0xf) - 8);
+		fpart = (1.0f / 16.0f) * (float)(converted & 0xf);
 		fconverted += fconverted < 0 ? -fpart : fpart;
 		Gui_SetFloatElementFloat(elem->frame, 11, fconverted);
 
 		converted = current_spawner->custom_int >> 24 & 0xff;
-		fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
-		fpart = 0.25f * (float)(converted & 0x3);
+		fconverted = (float)((int)(converted >> 4 & 0xf) - 8);
+		fpart = (1.0f / 16.0f) * (float)(converted & 0xf);
 		fconverted += fconverted < 0 ? -fpart : fpart;
 		Gui_SetFloatElementFloat(elem->frame, 12, fconverted);
 	}

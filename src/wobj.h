@@ -295,7 +295,7 @@ void WobjPhysics_ApplyWindForces(WOBJ *wobj);
 void Wobj_ResolveObjectsCollision(WOBJ *obj);
 WOBJ *Wobj_GetOwnedWobjFromUUID(int uuid);
 WOBJ *Wobj_GetAnyWOBJFromUUIDAndNode(int node, int uuid);
-int Wobj_TryTeleportWobj(WOBJ *wobj);
+int Wobj_TryTeleportWobj(WOBJ *wobj, int only_teleareas);
 WOBJ *Wobj_GetWobjColliding(WOBJ *wobj, int flags);
 WOBJ *Wobj_GetWobjCollidingWithType(WOBJ *wobj, int type);
 int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y);

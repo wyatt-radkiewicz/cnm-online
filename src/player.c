@@ -197,6 +197,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		float spd = wobj->speed * 2.0f;
 		if (Input_GetButton(INPUT_DROP, INPUT_STATE_PLAYING) && local_data->finish_timer <= 0)
 			spd *= 3.0f;
+		if (Input_GetButton(INPUT_FIRE, INPUT_STATE_PLAYING) && local_data->finish_timer <= 0)
+			spd *= 3.0f;
 		if (local_data->finish_timer == 0 || local_data->finish_timer > PLAYER_FINISH_TIMER) {
 			if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING))
 				wobj->x += spd;
@@ -348,6 +350,21 @@ void WobjPlayer_Update(WOBJ *wobj)
 	// Water things
 	if (!local_data->vortexed_mode)
 	{
+		for (float icep = 0.1f; icep <= 0.9f; icep = (icep < 0.3f ? 0.5f : (icep < 0.8f ? 0.9f : 100.0f))) {
+			int icex = (int)(wobj->hitbox.w * icep + wobj->hitbox.x);
+			BLOCK_PROPS *ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, ((int)wobj->x + icex) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
+			if (ice_props->dmg_type != BLOCK_DMG_TYPE_ICE)
+				ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, ((int)wobj->x + icex) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
+			if (ice_props->dmg_type == BLOCK_DMG_TYPE_ICE) {
+				//local_data->control_mul = (float)ice_props->dmg / 100.0f;
+				ice_friction = (float)ice_props->dmg / 100.0f;
+				local_data->control_mul = ice_friction / 10.0f;
+				dec *= ice_friction;
+				accel *= ice_friction;
+				touching_ice = CNM_TRUE;
+				//Console_Print("%f", (float)ice_props->dmg / 100.0f);
+			}
+		}
 		for (int icex = 0; icex <= 32; icex += 16) {
 			BLOCK_PROPS *ice_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, ((int)wobj->x + icex) / BLOCK_SIZE, (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h + 3.0f) / BLOCK_SIZE));
 			if (ice_props->dmg_type != BLOCK_DMG_TYPE_ICE)
@@ -355,8 +372,6 @@ void WobjPlayer_Update(WOBJ *wobj)
 			if (ice_props->dmg_type == BLOCK_DMG_TYPE_ICE) {
 				//local_data->control_mul = (float)ice_props->dmg / 100.0f;
 				ice_friction = (float)ice_props->dmg / 100.0f;
-				dec *= ice_friction;
-				accel *= ice_friction;
 				touching_ice = CNM_TRUE;
 				//Console_Print("%f", (float)ice_props->dmg / 100.0f);
 			}
@@ -390,7 +405,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		} else {
 			local_data->grav_add = 0.0f;
 			if (wobj->vel_y >= -1.0f) {
-				local_data->control_mul = 1.0f;
+				if (!touching_ice) local_data->control_mul = 1.0f;
 				if (local_data->sliding_cap_landing_speed) {
 					if (wobj->vel_x > final_speed) wobj->vel_x = final_speed;
 					if (wobj->vel_x < -final_speed) wobj->vel_x = -final_speed;
@@ -405,6 +420,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (local_data->control_mul < 1.0f) local_data->control_mul += 0.01f;
 		if (local_data->control_mul > 1.0f) local_data->control_mul -= 0.01f;
 		if (fabsf(local_data->control_mul - 1.0f) < 0.08f) local_data->control_mul = 1.0f;
+		//Console_Print("%f", cmul);
 		//local_data->control_mul += local_data->flap_accadd;
 
 		if (Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) && wobj->vel_x < final_speed && !local_data->lock_controls)
@@ -687,7 +703,6 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 			if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls)
 			{
-				if (touching_ice) local_data->control_mul = ice_friction;
 				float jmp_speed = final_jmp;
 				if (local_data->in_water)
 					jmp_speed /= 1.5f;
@@ -1032,7 +1047,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (!local_data->vortexed_mode)
 	{
 		float old_tele_pos[2] = {wobj->x, wobj->y}, new_tele_pos[2];
-		if (Wobj_TryTeleportWobj(wobj))
+		if (Wobj_TryTeleportWobj(wobj, CNM_FALSE))
 		{
 			local_data->in_teleport = 8;
 			Camera_SetForced(CNM_TRUE);

@@ -63,7 +63,7 @@ void WobjSlime_Update(WOBJ *wobj)
 
 	wobj->y += wobj->vel_y;
 	wobj->anim_frame = Game_GetFrame() / 10 % 2;
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_ResolveBlocksCollision(wobj);
 
 	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 2.0f))
@@ -112,7 +112,7 @@ void WobjFlyingSlime_Update(WOBJ *wobj)
 		wobj->custom_ints[1]--;
 		Interaction_CreateWobj(WOBJ_SLIME, wobj->x, wobj->y, 0, 0.0f);
 	}
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 void WobjHeavySheildBox_Create(WOBJ *wobj) {
@@ -289,7 +289,7 @@ void WobjDragon_Update(WOBJ *wobj)
 			WOBJ *fireball = Interaction_CreateWobj(WOBJ_FIREBALL, cx, cy, 0, ang);
 		}
 	}
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 void WobjFireball_Create(WOBJ *wobj)
@@ -364,7 +364,7 @@ void WobjBozoPin_Update(WOBJ *wobj)
 
 	if (Game_GetFrame() % 25 == 0)
 		Interaction_PlaySound(wobj, 17);
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 void WobjBozoPin_Draw(WOBJ *wobj, int camx, int camy)
 {
@@ -457,7 +457,7 @@ void WobjBozo_Update(WOBJ *wobj)
 			WOBJ *bozo_pin = Interaction_CreateWobj(WOBJ_BOZO_PIN, wobj->x + 32.0f, wobj->y + 64.0f, 0, 5.5f);
 		}
 	}
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 void WobjBozoFireball_Create(WOBJ *wobj) {
 	wobj->custom_ints[0] = 30*10;
@@ -551,7 +551,7 @@ void WobjLavaMonster_Update(WOBJ *wobj)
 		);
 		fireball->speed = 7.0f;
 	}
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 void WobjTTMinionSmall_Create(WOBJ *wobj)
@@ -613,7 +613,7 @@ void WobjTTMinionSmall_Update(WOBJ *wobj)
 				wobj->x -= 7.0f;
 		}
 	}
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 void WobjTTMinionBig_Create(WOBJ *wobj)
@@ -672,7 +672,7 @@ void WobjTTMinionBig_Update(WOBJ *wobj)
 			);
 		}
 	}
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 void WobjWolf_Create(WOBJ *wobj) {
@@ -751,7 +751,7 @@ void WobjSlimeWalker_Update(WOBJ *wobj)
 
 	wobj->x += wobj->custom_floats[0];
 	wobj->y += wobj->vel_y;
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_ResolveBlocksCollision(wobj);
 	float grav = Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
 	if (wobj->type == SLIME_WALKER)
@@ -803,7 +803,7 @@ void WobjMegaFish_Update(WOBJ *wobj)
 	WobjPhysics_EndUpdate(wobj);
 	if (Wobj_IsCollidingWithBlocks(wobj, wobj->vel_x * 2.0f, wobj->vel_y * 2.0f) || wobj->y < (float)wobj->custom_ints[0])
 		wobj->custom_floats[1] -= 180.0f;
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 // Lava Dragon Code
@@ -1079,7 +1079,7 @@ void WobjLavaDragonHead_Update(WOBJ *wobj)
 	if (show_ang < 126 && show_ang >= 90)
 		wobj->anim_frame = 2;
 
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 void WobjLavaDragonBody_Create(WOBJ *wobj)
 {
@@ -1244,7 +1244,7 @@ void WobjTTBoss_Update(WOBJ *wobj)
 		}
 	}
 
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 void WobjEaterBug_Create(WOBJ *wobj)
@@ -1289,7 +1289,7 @@ void WobjEaterBug_Update(WOBJ *wobj)
 		}
 	}
 
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 // Spider Walker
@@ -1334,7 +1334,7 @@ void WobjSpiderWalker_Update(WOBJ *wobj)
 
 	wobj->x += wobj->custom_floats[0] * wobj->speed;
 
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 void WobjSpiderWalkerWeb_Create(WOBJ *wobj)
 {
@@ -1640,7 +1640,7 @@ void WobjSuperDragonBoss_Update(WOBJ *wobj)
 		}
 	}
 
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 void WobjSuperDragonLandingZone_Create(WOBJ *wobj)
 {
@@ -1732,7 +1732,7 @@ void WobjBozoLaserMinion_Update(WOBJ *wobj)
 		}
 	}
 
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 void WobjBozoLaserLockon_Create(WOBJ *wobj)
 {
@@ -1970,7 +1970,7 @@ void WobjSpikeGuy_Update(WOBJ *wobj)
 		}
 	}
 
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 void WobjSpikeGuySpike_Create(WOBJ *wobj)
 {
@@ -2053,7 +2053,7 @@ void WobjBanditGuy_Update(WOBJ *wobj)
 			Interaction_DestroyWobj(item);
 	}
 
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
 void WobjKamakaziSlime_Create(WOBJ *wobj)
@@ -2068,7 +2068,7 @@ void WobjKamakaziSlime_Create(WOBJ *wobj)
 }
 void WobjKamakaziSlime_Update(WOBJ *wobj)
 {
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
 	wobj->custom_ints[0]--;
 
@@ -2198,7 +2198,7 @@ void WobjRockGuyMedium_Create(WOBJ *wobj)
 }
 void WobjRockGuyMedium_Update(WOBJ *wobj)
 {
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
 	WobjPhysics_BeginUpdate(wobj);
 
@@ -2246,7 +2246,7 @@ void WobjRockGuyMedium_Update(WOBJ *wobj)
 
 static void WobjRockGuySmall_AI(WOBJ *wobj, float spd, float jmp)
 {
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
 	WobjPhysics_BeginUpdate(wobj);
 
@@ -2356,7 +2356,7 @@ void WobjRockGuySlider_Create(WOBJ *wobj)
 }
 void WobjRockGuySlider_Update(WOBJ *wobj)
 {
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
 	WobjPhysics_BeginUpdate(wobj);
 
@@ -2403,7 +2403,7 @@ void WobjRockGuySmasher_Create(WOBJ *wobj)
 }
 void WobjRockGuySmasher_Update(WOBJ *wobj)
 {
-	Wobj_TryTeleportWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
 	WobjPhysics_BeginUpdate(wobj);
 

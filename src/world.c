@@ -113,6 +113,7 @@ void World_Start(int mode)
 	} else {
 		g_current_save = SAVE_SLOTS;
 		new_save(g_saves + g_current_save);
+		if (Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer) g_saves[g_current_save].lives = 50;
 		Player_LoadFromSave(player, g_saves + g_current_save);
 	}
 
