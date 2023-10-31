@@ -208,51 +208,14 @@ int FileSystem_DoesFileExist(const char *file_name, unsigned int checksum)
 	}
 }
 
-#ifdef _WIN32
-
-#include <windows.h>
-void FileSystem_SearchForLevels(int clear_level_list)
-{
-	num_levels = 0;
-	if (clear_level_list)
-	{
-		for (int i = 0; i < FILESYSTEM_MAX_LEVELS; i++)
-		{
-			level_names[i][0] = '\0';
-			levels[i][0] = '\0';
-			memset(level_previews + i, 0, sizeof(CNM_RECT));
-		}
-	}
-	
-	HANDLE find_handle;
-	WIN32_FIND_DATAA find_data;
-
-	find_handle = FindFirstFileA(".\\levels\\*", &find_data);
-	do
-	{
-		if (!(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
-			(strrchr(find_data.cFileName, '.') != NULL) &&
-			(strcmp(strrchr(find_data.cFileName, '.'), ".cnmb") == 0))
-		{
-			char cnms_level_name_path[FILESYSTEM_MAX_LENGTH + 1];
-			int l;
-			strcpy(levels[num_levels], "levels/");
-			strcat(levels[num_levels], find_data.cFileName);
-
-			Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels]);
-			
-			*strrchr(levels[num_levels++], '.') = '\0';
-			
-			l = num_levels - 1;
-			strcpy(cnms_level_name_path, levels[l]);
-			strcat(cnms_level_name_path, ".cnms");
-			Serial_LoadSpawnersLevelName(cnms_level_name_path, level_names[l]);
-			if (strcmp(level_names[l], "") == 0)
-				strcpy(level_names[l], levels[l]);
-		}
-	} while (FindNextFileA(find_handle, &find_data) != 0);
+int Filesystem_GetNumTitleLevels(void) {
+	return num_title_levels;
 }
-#elif defined(__APPLE__)
+int Filesystem_IsLevelSecret(int level) {
+	return level_secrets[level];
+}
+
+#if defined(__unix__) || defined(__APPLE__) || defined(__MINGW32__)
 
 #include <dirent.h>
 
@@ -306,11 +269,56 @@ void FileSystem_SearchForLevels(int clear_level_list)
     }
 }
 
-int Filesystem_GetNumTitleLevels(void) {
-	return num_title_levels;
-}
-int Filesystem_IsLevelSecret(int level) {
-	return level_secrets[level];
+#elif defined(_WIN32)
+
+#include <windows.h>
+void FileSystem_SearchForLevels(int clear_level_list)
+{
+	num_levels = 0;
+	num_title_levels = 0;
+	if (clear_level_list)
+	{
+		for (int i = 0; i < FILESYSTEM_MAX_LEVELS; i++)
+		{
+			level_names[i][0] = '\0';
+			levels[i][0] = '\0';
+			memset(level_previews + i, 0, sizeof(CNM_RECT));
+		}
+	}
+	
+	HANDLE find_handle;
+	WIN32_FIND_DATAA find_data;
+
+	find_handle = FindFirstFileA(".\\levels\\*", &find_data);
+	do
+	{
+		if (!(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
+			(strrchr(find_data.cFileName, '.') != NULL) &&
+			(strcmp(strrchr(find_data.cFileName, '.'), ".cnmb") == 0))
+		{
+			if (strncmp(find_data.cFileName, "_title", 6) == 0) {
+				num_title_levels++;
+				continue;
+			}
+			char cnms_level_name_path[FILESYSTEM_MAX_LENGTH + 1];
+			int l;
+			strcpy(levels[num_levels], "levels/");
+			strcat(levels[num_levels], find_data.cFileName);
+
+			int level_type;
+            Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels], &level_type);
+			level_secrets[num_levels] = level_type != LEVEL_TYPE_NORMAL;
+			
+			*strrchr(levels[num_levels++], '.') = '\0';
+			
+			l = num_levels - 1;
+			strcpy(cnms_level_name_path, levels[l]);
+			strcat(cnms_level_name_path, ".cnms");
+			Serial_LoadSpawnersLevelName(cnms_level_name_path, level_names[l]);
+			if (strcmp(level_names[l], "") == 0)
+				strcpy(level_names[l], levels[l]);
+		}
+	} while (FindNextFileA(find_handle, &find_data) != 0);
 }
 
 #else
@@ -320,6 +328,7 @@ void FileSystem_SearchForLevels(int clear_level_list)
 	Console_Print("No filesystem functions, loading hardcoded levels");
 	
 	num_levels = 0;
+	num_title_levels = 0;
 	if (clear_level_list)
 	{
 		for (int i = 0; i < FILESYSTEM_MAX_LEVELS; i++)
@@ -342,15 +351,22 @@ void FileSystem_SearchForLevels(int clear_level_list)
 		"sc.cnmb",
 		"themine.cnmb",
 		"train.cnmb",
-		"tt.cnmb"
+		"tt.cnmb",
+		"_title0.cnmb",
 	};
 	for (int i = 0; i < sizeof(hardcoded_levels)/sizeof(const char *); i++) {
+		if (strncmp(hardcoded_levels[i], "_title", 6) == 0) {
+			num_title_levels++;
+			continue;
+		}
         char cnms_level_name_path[FILESYSTEM_MAX_LENGTH + 1];
         int l;
         strcpy(levels[num_levels], "levels/");
         strcat(levels[num_levels], hardcoded_levels[i]);
         
-        Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels]);
+		int level_type;
+        Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels], &level_type);
+		level_secrets[num_levels] = level_type != LEVEL_TYPE_NORMAL;
         
         *strrchr(levels[num_levels++], '.') = '\0';
         
