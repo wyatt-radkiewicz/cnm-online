@@ -173,6 +173,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->isdiving = CNM_FALSE;
 	local_data->saved_diving_vel = 0.0f;
 	local_data->upgradehp = 100.0f;
+	local_data->jump_init_yspd = 0.0f;
 	//local_data->item_durability = 100.0f;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
@@ -707,9 +708,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 				if (local_data->in_water)
 					jmp_speed /= 1.5f;
 				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+				local_data->jump_init_yspd = 0.0f;
 				if (plat != NULL && plat->flags & WOBJ_IS_MOVESTAND)
 				{
 					jmp_speed -= plat->vel_y;
+					local_data->jump_init_yspd = plat->vel_y;
 				}
 				wobj->vel_y = -jmp_speed;
 				local_data->jumped = 5;
@@ -780,7 +783,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		if (local_data->jumped > 0 && !Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && wobj->vel_y < (final_jmp / -2.0f && !local_data->lock_controls))
 		{
-			wobj->vel_y = final_jmp / -2.0f;
+			wobj->vel_y = (final_jmp - local_data->jump_init_yspd) / -2.0f;
 		}
 	}
 	//wobj->y -= 1.0f;
