@@ -961,7 +961,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		//local_data->level_end_found_secret = Filesystem_IsLevelSecret(Filesystem_GetLevelIdFromFileName(lvlbuf));
 		local_data->level_end_found_secret = other->custom_ints[0] & 0xf00;
 		if (local_data->level_end_unlockable > -1 || local_data->level_end_found_secret) {
-			if (local_data->level_end_unlockable > -1) {
+			if (local_data->level_end_unlockable > -1 && !Game_GetVar(GAME_VAR_NOSAVE)->data.integer && !Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
 				sprintf(lvlbuf, "levels/%s", EndingText_GetLine(local_data->level_end_unlockable));
 				globalsave_visit_level(&g_globalsave, lvlbuf);
 			}
@@ -2003,13 +2003,17 @@ void Player_DrawHUD(WOBJ *player) {
 		Util_SetRect(&r, 400-16, 7136, 128, 48);
 		Renderer_DrawBitmap2(RENDERER_WIDTH / 2, level_end_unlockable_y, &r, 2, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
 		Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, level_end_unlockable_y, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
-		int unlock_start = 0, secret_start = local_data->level_end_found_secret && local_data->level_end_unlockable > -1 ? 2 : 0;
+		int unlock_start = 0, secret_start = local_data->level_end_found_secret && local_data->level_end_unlockable > -1 ? 2 : 1;
 		if (local_data->level_end_found_secret) {
 			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*23) / 2, level_end_unlockable_y + 4+(12*(0+secret_start)), 0, RENDERER_LIGHT, "FOUND A SECRET EXIT!!!!");
 		}
 		if (local_data->level_end_unlockable > -1) {
 			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*22) / 2, level_end_unlockable_y + 4+(12*(0+unlock_start)), 0, RENDERER_LIGHT, "FOUND UNLOCKABLE EXIT!");
-			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*28) / 2, level_end_unlockable_y + 4+(12*(1+unlock_start)), 0, RENDERER_LIGHT, "FIND IT IN THE LEVEL SELECT!");
+			if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer || Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+				Renderer_DrawText(RENDERER_WIDTH / 2 - (8*32) / 2, level_end_unlockable_y + 4+(12*(1+unlock_start)), 0, RENDERER_LIGHT, "NOT UNLOCKED DUE TO LEVEL SELECT");
+			} else {
+				Renderer_DrawText(RENDERER_WIDTH / 2 - (8*28) / 2, level_end_unlockable_y + 4+(12*(1+unlock_start)), 0, RENDERER_LIGHT, "FIND IT IN THE LEVEL SELECT!");
+			}
 		}
 		int target = local_data->finish_timer > PLAYER_FINISH_TIMER / 3 * 2 ? -64 : 0;
 		level_end_unlockable_y += (target - level_end_unlockable_y) * 0.25f;

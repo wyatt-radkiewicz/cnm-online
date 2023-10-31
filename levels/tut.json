@@ -319,7 +319,7 @@
       },
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
-        "mode": "PlayerCountBased",
+        "mode": "NoSpawn",
         "max_concurrent_spawns": 0
       },
       "dropped_item": null,
@@ -559,7 +559,7 @@
       "type_data": {
         "FinishTrigger": {
           "next_level": "lc",
-          "extra_unlocked_level": "deephaus",
+          "extra_unlocked_level": "arena",
           "is_secret": true
         }
       },
