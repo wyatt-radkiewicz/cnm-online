@@ -19,7 +19,7 @@ CNM_RECT level_previews[FILESYSTEM_MAX_LEVELS];
 static int level_order[FILESYSTEM_MAX_LEVELS];
 static int level_diffs[FILESYSTEM_MAX_LEVELS];
 static int level_pars[FILESYSTEM_MAX_LEVELS];
-static int level_secrets[FILESYSTEM_MAX_LEVELS];
+static int level_types[FILESYSTEM_MAX_LEVELS];
 static int num_levels;
 static int num_title_levels;
 
@@ -212,7 +212,10 @@ int Filesystem_GetNumTitleLevels(void) {
 	return num_title_levels;
 }
 int Filesystem_IsLevelSecret(int level) {
-	return level_secrets[level];
+	return level_types[level] == LEVEL_TYPE_SECRET;
+}
+int Filesystem_GetLevelType(int level) {
+	return level_types[level];
 }
 
 #if defined(__unix__) || defined(__APPLE__) || defined(__MINGW32__)
@@ -253,7 +256,7 @@ void FileSystem_SearchForLevels(int clear_level_list)
                
 				int level_type;
                 Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels], &level_type);
-				level_secrets[num_levels] = level_type != LEVEL_TYPE_NORMAL;
+				level_types[num_levels] = level_type;
                 
                 *strrchr(levels[num_levels++], '.') = '\0';
                 
@@ -307,7 +310,7 @@ void FileSystem_SearchForLevels(int clear_level_list)
 
 			int level_type;
             Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels], &level_type);
-			level_secrets[num_levels] = level_type != LEVEL_TYPE_NORMAL;
+			level_types[num_levels] = level_type;
 			
 			*strrchr(levels[num_levels++], '.') = '\0';
 			
@@ -366,7 +369,7 @@ void FileSystem_SearchForLevels(int clear_level_list)
         
 		int level_type;
         Serial_LoadBlocksLevelPreview(levels[num_levels], &level_previews[num_levels], &level_diffs[num_levels], &level_type);
-		level_secrets[num_levels] = level_type != LEVEL_TYPE_NORMAL;
+		level_types[num_levels] = level_type;
         
         *strrchr(levels[num_levels++], '.') = '\0';
         

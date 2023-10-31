@@ -23,6 +23,7 @@
 #include "fadeout.h"
 #include "savedata.h"
 #include "pausemenu.h"
+#include "serial.h"
 
 PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
 
@@ -90,6 +91,8 @@ int skin_bases[10][2] =
 
 // For when the player dies and respawns
 static float _hud_player_y = 0.0f, _hud_player_yvel = 0.0f;
+static int level_end_unlockable_y = 0, unlockable_show = CNM_FALSE;
+static int level_end_rank_y = 0;
 
 static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame);
 static void StepPlayerAnimation(WOBJ *player);
@@ -174,6 +177,15 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->saved_diving_vel = 0.0f;
 	local_data->upgradehp = 100.0f;
 	local_data->jump_init_yspd = 0.0f;
+	local_data->level_end_unlockable = -1;
+	local_data->level_end_found_secret = CNM_FALSE;
+	local_data->level_end_rank = 0;
+	local_data->level_end_score = 0;
+	local_data->level_end_time_score = 0;
+	local_data->level_end_norank = CNM_FALSE;
+	unlockable_show = CNM_FALSE;
+	level_end_unlockable_y = -128;
+	level_end_rank_y = RENDERER_HEIGHT;
 	//local_data->item_durability = 100.0f;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
@@ -185,7 +197,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 	// Finishing and noclipping
 	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
 		local_data->finish_timer++;
-		if (local_data->finish_timer == PLAYER_FINISH_TIMER + 60) {
+		if ((!local_data->level_end_norank && local_data->finish_timer == PLAYER_FINISH_TIMER + 60) ||
+			(local_data->level_end_norank && local_data->finish_timer == PLAYER_FINISH_TIMER)) {
 			Interaction_FinishLevel(local_data->next_level_line);
 		}
 		//if (local_data->finish_timer > PLAYER_FINISH_TIMER) {
@@ -212,12 +225,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		return;
 	}
-	if (local_data->finish_timer == 0 || local_data->finish_timer > PLAYER_FINISH_TIMER) {
+	if (local_data->finish_timer == 0 || local_data->finish_timer > PLAYER_FINISH_TIMER || local_data->level_end_norank) {
 		local_data->lock_controls = CNM_FALSE;
 	} else {
 		local_data->lock_controls = CNM_TRUE;
 	}
-	if (local_data->finish_timer == 1 && wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
+	if (local_data->finish_timer == 1 && (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) && !local_data->level_end_norank) {
 		int par = Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer;
 		local_data->level_end_score = local_data->score;
 		local_data->level_end_time_score = 20 - (local_data->final_time_forscore / (30 * 60));
@@ -931,12 +944,34 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_FINISH_TRIGGER);
 	if (other != NULL && !(wobj->flags & WOBJ_HAS_PLAYER_FINISHED)) {
 		Audio_PlayMusic(2, CNM_FALSE);
+		if (Filesystem_GetLevelType(Filesystem_GetLevelIdFromFileName(Game_GetVar(GAME_VAR_LEVEL)->data.string)) == LEVEL_TYPE_NORANK) {
+			local_data->level_end_norank = CNM_TRUE;
+		} else {
+			local_data->level_end_norank = CNM_FALSE;
+		}
 		local_data->final_time_forscore = Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer;
 		//Console_Print(EndingText_GetLine(other->custom_ints[0]));
 		//strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/");
 		//strcat(Game_GetVar(GAME_VAR_LEVEL)->data.string, EndingText_GetLine(other->custom_ints[0]));
-		local_data->next_level_line = other->custom_ints[0];
+		local_data->next_level_line = other->custom_ints[0] & 0xff;
 		local_data->finish_timer = 0;
+		local_data->level_end_unlockable = (int)other->custom_floats[0] > 0 ? (int)other->custom_floats[0] - 1 : -1;
+		char lvlbuf[48];
+		//sprintf(lvlbuf, "levels/%s", EndingText_GetLine(local_data->next_level_line));
+		//local_data->level_end_found_secret = Filesystem_IsLevelSecret(Filesystem_GetLevelIdFromFileName(lvlbuf));
+		local_data->level_end_found_secret = other->custom_ints[0] & 0xf00;
+		if (local_data->level_end_unlockable > -1 || local_data->level_end_found_secret) {
+			if (local_data->level_end_unlockable > -1) {
+				sprintf(lvlbuf, "levels/%s", EndingText_GetLine(local_data->level_end_unlockable));
+				globalsave_visit_level(&g_globalsave, lvlbuf);
+			}
+			level_end_unlockable_y = -64;
+			unlockable_show = CNM_TRUE;
+		} else {
+			level_end_unlockable_y = -64;
+			unlockable_show = CNM_FALSE;
+		}
+		level_end_rank_y = RENDERER_HEIGHT;
 		wobj->flags |= WOBJ_HAS_PLAYER_FINISHED;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BGSPEED_X);
@@ -1936,21 +1971,48 @@ void Player_DrawHUD(WOBJ *player) {
 	StepAndDrawParticles();
 
 	// draw finish hud
-	if (player->flags & WOBJ_HAS_PLAYER_FINISHED && local_data->finish_timer < PLAYER_FINISH_TIMER) {
-		bx = RENDERER_WIDTH / 2 - 64, by = RENDERER_HEIGHT / 2 - 40;
+	if ((player->flags & WOBJ_HAS_PLAYER_FINISHED) && local_data->finish_timer < PLAYER_FINISH_TIMER + 3 && !local_data->level_end_norank) {
+		int trans = 7 - local_data->finish_timer;
+		if (local_data->finish_timer > PLAYER_FINISH_TIMER - 7) trans = PLAYER_FINISH_TIMER - local_data->finish_timer;
+		int trans2 = trans - 2;
+		if (trans2 < 0) trans2 = 0;
+		if (trans2 > 7) trans2 = 7;
+		if (trans < 2) trans = 2;
+		if (trans > 7) trans = 7;
+		bx = RENDERER_WIDTH / 2 - 64, by = level_end_rank_y;
 		Util_SetRect(&r, 128, 2432, 32, 32);
 		if (local_data->finish_timer < PLAYER_FINISH_TIMER / 4) {
 			r.y += Util_RandInt(0, 4) * 32;
 		} else {
 			r.y += local_data->level_end_rank * 32;
 		}
-		Renderer_DrawBitmap(bx + 80, by + 32, &r, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(bx + 80, by + 32, &r, trans2, RENDERER_LIGHT);
 		Util_SetRect(&r, 0, 2432, 128, 80);
-		Renderer_DrawBitmap(bx, by, &r, 2, RENDERER_LIGHT);
-		Renderer_DrawText(bx + 4, by + 8, 0, RENDERER_LIGHT, "SCORE: %d", local_data->level_end_score);
-		Renderer_DrawText(bx + 4, by + 16, 0, RENDERER_LIGHT, "TIME BONUS: %d", local_data->level_end_time_score);
-		Renderer_DrawText(bx + 4, by + 24, 0, RENDERER_LIGHT, "TOTAL: %d", local_data->level_end_score + local_data->level_end_time_score);
-		Renderer_DrawText(bx + 4, by + 32, 0, RENDERER_LIGHT, "A-RANK: %d", Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer);
+		Renderer_DrawBitmap(bx, by, &r, trans, RENDERER_LIGHT);
+		Renderer_DrawText(bx + 4, by + 8, trans2, RENDERER_LIGHT, "SCORE: %d", local_data->level_end_score);
+		Renderer_DrawText(bx + 4, by + 16, trans2, RENDERER_LIGHT, "TIME BONUS: %d", local_data->level_end_time_score);
+		Renderer_DrawText(bx + 4, by + 24, trans2, RENDERER_LIGHT, "TOTAL: %d", local_data->level_end_score + local_data->level_end_time_score);
+		Renderer_DrawText(bx + 4, by + 32, trans2, RENDERER_LIGHT, "A-RANK: %d", Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer);
+
+		int target = local_data->finish_timer > PLAYER_FINISH_TIMER - 3 ? RENDERER_HEIGHT : RENDERER_HEIGHT / 2 - 40;
+		level_end_rank_y += (target - level_end_rank_y) * 0.25f;
+	}
+
+	// draw unlocked level thing
+	if (unlockable_show) {
+		Util_SetRect(&r, 400-16, 7136, 128, 48);
+		Renderer_DrawBitmap2(RENDERER_WIDTH / 2, level_end_unlockable_y, &r, 2, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
+		Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, level_end_unlockable_y, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
+		int unlock_start = 0, secret_start = local_data->level_end_found_secret && local_data->level_end_unlockable > -1 ? 2 : 0;
+		if (local_data->level_end_found_secret) {
+			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*23) / 2, level_end_unlockable_y + 4+(12*(0+secret_start)), 0, RENDERER_LIGHT, "FOUND A SECRET EXIT!!!!");
+		}
+		if (local_data->level_end_unlockable > -1) {
+			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*22) / 2, level_end_unlockable_y + 4+(12*(0+unlock_start)), 0, RENDERER_LIGHT, "FOUND UNLOCKABLE EXIT!");
+			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*28) / 2, level_end_unlockable_y + 4+(12*(1+unlock_start)), 0, RENDERER_LIGHT, "FIND IT IN THE LEVEL SELECT!");
+		}
+		int target = local_data->finish_timer > PLAYER_FINISH_TIMER / 3 * 2 ? -64 : 0;
+		level_end_unlockable_y += (target - level_end_unlockable_y) * 0.25f;
 	}
 }
 void Player_SaveData(WOBJ *player, savedata_t *data) {

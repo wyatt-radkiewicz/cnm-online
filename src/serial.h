@@ -9,6 +9,7 @@ enum level_type {
 	LEVEL_TYPE_NORMAL,
 	LEVEL_TYPE_SECRET,
 	LEVEL_TYPE_UNLOCKABLE,
+	LEVEL_TYPE_NORANK,
 };
 
 void Serial_CondenceBlockFileAndSave(const char *cnmb_file);

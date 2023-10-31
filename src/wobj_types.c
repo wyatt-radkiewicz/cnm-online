@@ -204,6 +204,11 @@ static void WobjScMovingPlatform_Create(WOBJ *wobj)
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
+	if (wobj->custom_ints[0] < 0) {
+		wobj->x += wobj->custom_ints[0];
+		wobj->custom_ints[0] *= -1;
+		wobj->custom_floats[0] *= -1.0f;
+	}
 	wobj->custom_ints[1] = wobj->custom_ints[0];
 	wobj->vel_x = wobj->custom_floats[0];
 	wobj->vel_y = 0.0f;
@@ -230,6 +235,11 @@ static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
+	if (wobj->custom_ints[0] < 0) {
+		wobj->y += wobj->custom_ints[0];
+		wobj->custom_ints[0] *= -1;
+		wobj->custom_floats[0] *= -1.0f;
+	}
 	wobj->custom_ints[1] = wobj->custom_ints[0];
 	wobj->vel_y = wobj->custom_floats[0];
 	wobj->vel_x = 0.0f;
