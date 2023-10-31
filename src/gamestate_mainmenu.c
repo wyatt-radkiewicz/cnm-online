@@ -801,23 +801,24 @@ void gui_text_box_update(struct gui_text_box *text, int editing) {
 void draw_main_gui_bars(void) {
 	CNM_RECT r;
 
-	const int start = 160;
+	const int yheight = 160;
 	int idx = options_num - 5;
 	//Console_Print("%d", options_num);
-	for (int i = -1; i < start/r.h+2; i++) {
+	Util_SetRect(&r, 384, 7104, 128, 32);
+	for (int i = -1; i < yheight/r.h+2; i++) {
 		Util_SetRect(&r, 384, 7104, 128, 32);
-		Renderer_DrawBitmap(-r.w + side_xstart + i*32 + left_disp, RENDERER_HEIGHT-start + i*32 + left_disp, &r, 2, RENDERER_LIGHT);
+		Renderer_DrawBitmap(-r.w + side_xstart + i*32 + left_disp, RENDERER_HEIGHT-yheight + i*32 + left_disp, &r, 2, RENDERER_LIGHT);
 		if (idx >= 0 && idx < sizeof(option_names)/sizeof(*option_names)) {
 			int center = strlen(option_names[idx]) * 8 / 2;
 			if (idx != options_num) Renderer_SetFont(384, 1264, 8, 8);
 			else Renderer_SetFont(384, 448, 8, 8);
-			Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx]);
+			Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - yheight + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx]);
 			if (idx == options_num) {
 				int w = r.w;
 				Util_SetRect(&r, 376-24, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
-				Renderer_DrawBitmap(-w + side_xstart + i*32 + left_disp + (w / 2 - center) - 12, RENDERER_HEIGHT - start + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT);
+				Renderer_DrawBitmap(-w + side_xstart + i*32 + left_disp + (w / 2 - center) - 12, RENDERER_HEIGHT - yheight + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT);
 				Util_SetRect(&r, 376-24, 1264 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
-				Renderer_DrawBitmap2(-w + side_xstart + i*32 + left_disp + (w / 2 + center) , RENDERER_HEIGHT - start + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+				Renderer_DrawBitmap2(-w + side_xstart + i*32 + left_disp + (w / 2 + center) , RENDERER_HEIGHT - yheight + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 			}
 		}
 		idx++;
