@@ -943,7 +943,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->grav = other->custom_floats[0];
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_FINISH_TRIGGER);
 	if (other != NULL && !(wobj->flags & WOBJ_HAS_PLAYER_FINISHED)) {
-		Audio_PlayMusic(2, CNM_FALSE);
+		Audio_PlayMusic(26, CNM_FALSE);
 		if (!Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer && Filesystem_GetLevelType(Filesystem_GetLevelIdFromFileName(Game_GetVar(GAME_VAR_LEVEL)->data.string)) == LEVEL_TYPE_NORANK) {
 			local_data->level_end_norank = CNM_TRUE;
 		} else {
@@ -1151,6 +1151,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		} else {
 			local_data->death_cam_timer = 45+30*4+20+2;
 			local_data->death_limbo_counter = 45+30*4+20+20;
+			Audio_PlayMusic(27, CNM_FALSE);
 			Fadeout_FadeGameOver(45, 30*4, 20, 20);
 		}
 		wobj->flags |= WOBJ_INVULN;

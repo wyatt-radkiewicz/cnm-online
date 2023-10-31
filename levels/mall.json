@@ -413,7 +413,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "kinda yeah, kinda does\n"
         }
       },
       "spawning_criteria": {
@@ -496,7 +496,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": "WHYD YOU DO THAT\n"
+          "text": "WHYD YOU DO THAT\nARRGGHHHHHH\n"
         }
       },
       "spawning_criteria": {
@@ -509,13 +509,13 @@
     },
     {
       "pos": [
-        12872.0,
+        12880.0,
         3824.0
       ],
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "WELCOME TO THE MALL\n"
         }
       },
       "spawning_criteria": {
@@ -534,7 +534,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "buy today\n"
         }
       },
       "spawning_criteria": {
@@ -553,7 +553,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "elevator OUT OF ORDER\n"
         }
       },
       "spawning_criteria": {
@@ -1500,7 +1500,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "AMOGUS ROOM\n"
         }
       },
       "spawning_criteria": {
@@ -1669,7 +1669,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "WELCOME TO THE PET SHOP\n"
         }
       },
       "spawning_criteria": {
@@ -2663,7 +2663,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": false,
-          "text": ""
+          "text": "RUN\n"
         }
       },
       "spawning_criteria": {
@@ -2728,7 +2728,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "CRAPCRAPCRAPCRAPCRAP\n"
         }
       },
       "spawning_criteria": {
@@ -3059,7 +3059,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "GET SWOOLLLEEEEE\n"
         }
       },
       "spawning_criteria": {
@@ -4805,9 +4805,9 @@
           ],
           "target_relative": [
             0.0,
-            46.875
+            28.125
           ],
-          "speed": 0.625,
+          "speed": 0.375,
           "start_paused": true,
           "ty": "OneWay"
         }
@@ -4856,9 +4856,9 @@
           ],
           "target_relative": [
             0.0,
-            46.875
+            28.125
           ],
-          "speed": 0.625,
+          "speed": 0.375,
           "start_paused": true,
           "ty": "OneWay"
         }
@@ -4921,9 +4921,9 @@
           ],
           "target_relative": [
             0.0,
-            40.0
+            24.0
           ],
-          "speed": 0.625,
+          "speed": 0.375,
           "start_paused": true,
           "ty": "Normal"
         }
@@ -5009,9 +5009,9 @@
           ],
           "target_relative": [
             0.0,
-            46.875
+            28.125
           ],
-          "speed": 0.625,
+          "speed": 0.375,
           "start_paused": true,
           "ty": "OneWay"
         }
@@ -5037,9 +5037,9 @@
           ],
           "target_relative": [
             0.0,
-            46.875
+            28.125
           ],
-          "speed": 0.625,
+          "speed": 0.375,
           "start_paused": true,
           "ty": "OneWay"
         }
@@ -5107,9 +5107,9 @@
           ],
           "target_relative": [
             0.0,
-            46.875
+            28.125
           ],
-          "speed": 0.625,
+          "speed": 0.375,
           "start_paused": true,
           "ty": "OneWay"
         }
@@ -6623,7 +6623,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "huoh getting a little drafty\n"
         }
       },
       "spawning_criteria": {
@@ -9610,7 +9610,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
-          "text": ""
+          "text": "GOODDUCK\n"
         }
       },
       "spawning_criteria": {
@@ -19756,16 +19756,16 @@
       201
     ],
     "difficulty_rating": "Normal",
-    "level_type": "Normal"
+    "level_type": "Secret"
   },
   "background_layers": [
     {
       "origin": [
         4.0,
-        -0.0
+        -60.0
       ],
       "scroll_speed": [
-        15.0,
+        30.0,
         0.0
       ],
       "speed": [
@@ -19779,9 +19779,77 @@
       "image": {
         "Bitmap": {
           "x": 0,
-          "y": 832,
-          "w": 320,
-          "h": 240
+          "y": 7200,
+          "w": 256,
+          "h": 320
+        }
+      },
+      "transparency": 0,
+      "repeat_up": false,
+      "repeat_down": false,
+      "repeat_horizontally": true,
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
+    },
+    {
+      "origin": [
+        120.0,
+        168.0
+      ],
+      "scroll_speed": [
+        20.0,
+        0.0
+      ],
+      "speed": [
+        0.0,
+        0.0
+      ],
+      "spacing": [
+        0,
+        0
+      ],
+      "image": {
+        "Bitmap": {
+          "x": 320,
+          "y": 1680,
+          "w": 38,
+          "h": 128
+        }
+      },
+      "transparency": 0,
+      "repeat_up": false,
+      "repeat_down": false,
+      "repeat_horizontally": true,
+      "in_foreground": false,
+      "bottom3d": 0,
+      "top3d": 0,
+      "height3d": 0
+    },
+    {
+      "origin": [
+        120.0,
+        192.0
+      ],
+      "scroll_speed": [
+        10.0,
+        0.0
+      ],
+      "speed": [
+        0.0,
+        0.0
+      ],
+      "spacing": [
+        0,
+        0
+      ],
+      "image": {
+        "Bitmap": {
+          "x": 320,
+          "y": 1704,
+          "w": 38,
+          "h": 104
         }
       },
       "transparency": 0,
@@ -19799,7 +19867,7 @@
         108.0
       ],
       "scroll_speed": [
-        0.0,
+        20.0,
         0.0
       ],
       "speed": [
@@ -19833,7 +19901,7 @@
         84.0
       ],
       "scroll_speed": [
-        0.0,
+        15.0,
         0.0
       ],
       "speed": [
@@ -19901,7 +19969,7 @@
         16.0
       ],
       "scroll_speed": [
-        0.0,
+        10.0,
         0.0
       ],
       "speed": [
@@ -19909,7 +19977,7 @@
         0.0
       ],
       "spacing": [
-        0,
+        214,
         0
       ],
       "image": {
@@ -19923,75 +19991,7 @@
       "transparency": 0,
       "repeat_up": false,
       "repeat_down": false,
-      "repeat_horizontally": false,
-      "in_foreground": false,
-      "bottom3d": 0,
-      "top3d": 0,
-      "height3d": 0
-    },
-    {
-      "origin": [
-        0.0,
-        0.0
-      ],
-      "scroll_speed": [
-        0.0,
-        0.0
-      ],
-      "speed": [
-        0.0,
-        0.0
-      ],
-      "spacing": [
-        0,
-        0
-      ],
-      "image": {
-        "Bitmap": {
-          "x": 0,
-          "y": 0,
-          "w": 0,
-          "h": 0
-        }
-      },
-      "transparency": 0,
-      "repeat_up": false,
-      "repeat_down": false,
-      "repeat_horizontally": false,
-      "in_foreground": false,
-      "bottom3d": 0,
-      "top3d": 0,
-      "height3d": 0
-    },
-    {
-      "origin": [
-        0.0,
-        0.0
-      ],
-      "scroll_speed": [
-        0.0,
-        0.0
-      ],
-      "speed": [
-        0.0,
-        0.0
-      ],
-      "spacing": [
-        0,
-        0
-      ],
-      "image": {
-        "Bitmap": {
-          "x": 0,
-          "y": 0,
-          "w": 0,
-          "h": 0
-        }
-      },
-      "transparency": 0,
-      "repeat_up": false,
-      "repeat_down": false,
-      "repeat_horizontally": false,
+      "repeat_horizontally": true,
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,

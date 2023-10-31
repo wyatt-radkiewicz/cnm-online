@@ -22,6 +22,9 @@ MODE MUSIC
 22 music/bdsmain.wav
 23 music/gay.wav
 24 music/bonus2.wav
+25 music/cnmhq.wav
+26 music/mapfinish.wav
+27 music/gameover.wav
 MODE SOUNDS
 0 sounds/gun.wav
 1 sounds/hurt.wav
@@ -102,6 +105,7 @@ cm 1000
 lc 1100
 mall 0
 tut 1301
+hq 0
 MODE MAXPOWER0
 spd 2
 jmp 2

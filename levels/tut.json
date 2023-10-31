@@ -439,12 +439,12 @@
     },
     {
       "pos": [
-        5120.0,
-        432.0
+        5024.0,
+        448.0
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "lc",
+          "next_level": "hq",
           "extra_unlocked_level": null,
           "is_secret": false
         }
@@ -541,6 +541,226 @@
       "type_data": {
         "SpringBoard": {
           "jump_velocity": 13.0
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        5024.0,
+        416.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        5024.0,
+        384.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        5024.0,
+        352.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4992.0,
+        320.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4960.0,
+        320.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4928.0,
+        320.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4896.0,
+        320.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4864.0,
+        352.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4832.0,
+        384.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4832.0,
+        416.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4832.0,
+        448.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "hq",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
