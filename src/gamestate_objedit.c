@@ -902,7 +902,7 @@ void GameState_ObjEdit_Update(void)
 		if (Input_GetButtonPressed(INPUT_DROP, INPUT_STATE_PLAYING) && current_id != WOBJ_TELEPORT &&
 			current_id != WOBJ_TELEAREA1)
 		{
-			s = Spawners_CreateSpawner(cx, cy, current_id, last_duration, last_max);
+			s = Spawners_CreateSpawner(cx, cy, current_id, last_duration, last_max, -1);
 			s->custom_int = last_ci;
 			s->custom_float = last_cf;
 			SPAWNER_SET_SPAWN_MODE(s, last_spawn_mode);
@@ -944,7 +944,8 @@ void GameState_ObjEdit_Update(void)
 					tele_y,
 					current_id,
 					0,
-					0
+					0,
+					-1
 				);
 				s->custom_int = tele_info->index;
 				tele_state = 1;
@@ -1043,13 +1044,13 @@ void GameState_ObjEdit_Update(void)
 			converted = current_spawner->custom_int >> 4 & 0xfff;
 			Gui_InitNumberElement(eframe, 10, EditCMPElementBitmapY, "BITMAP Y (32 WIDTH): ", 0, 4095, converted);
 			converted = current_spawner->custom_int >> 16 & 0xff;
-			fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
-			fpart = 0.25f * (float)(converted & 0x3);
+			fconverted = (float)((int)(converted >> 4 & 0xf) - 8);
+			fpart = (1.0f / 16.0f) * (float)(converted & 0xf);
 			fconverted += fconverted < 0 ? -fpart : fpart;
 			Gui_InitFloatElement(eframe, 11, EditCMPElementSpeedX, "SPEED X: ", -32.0f, 31.75f, fconverted);
 			converted = current_spawner->custom_int >> 24 & 0xff;
-			fconverted = (float)((int)(converted >> 2 & 0x3f) - 32);
-			fpart = 0.25f * (float)(converted & 0x3);
+			fconverted = (float)((int)(converted >> 4 & 0xf) - 8);
+			fpart = (1.0f / 16.0f) * (float)(converted & 0xf);
 			fconverted += fconverted < 0 ? -fpart : fpart;
 			Gui_InitFloatElement(eframe, 12, EditCMPElementSpeedY, "SPEED Y: ", -32.0f, 31.75f, fconverted);
 		}

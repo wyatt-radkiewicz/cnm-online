@@ -169,7 +169,7 @@ void Serial_LoadSpawners_Old(const char *cnms_file)
 		for (i = 0; i < num_spawners; i++)
 		{
 			fread(&s, SPAWNER_SERIALIZATION_SIZE, 1, fp);
-			created = Spawners_CreateSpawner(s.x, s.y, s.wobj_type, s.duration, s.max);
+			created = Spawners_CreateSpawner(s.x, s.y, s.wobj_type, s.duration, s.max, -1);
 			created->custom_int = s.custom_int;
 			created->custom_float = s.custom_float;
 			created->dropped_item = s.dropped_item;

@@ -329,7 +329,7 @@ void Serial_LoadSpawnersLevelName(const char *cnms_file, char *name_buf)
 void Serial_LoadSpawners(const char *cnms_file)
 {
 	LParse *lp;
-	LParseEntry *e, *ee[7];
+	LParseEntry *e, *ee[8];
 	TELEPORT_INFO *ti;
 	char ending_text_line[ENDING_TEXT_MAX_WIDTH];
 	int num_spawners, i;
@@ -383,6 +383,7 @@ void Serial_LoadSpawners(const char *cnms_file)
 	ee[4] = lparse_get_entry(lp, "SP_CI");
 	ee[5] = lparse_get_entry(lp, "SP_CF");
 	ee[6] = lparse_get_entry(lp, "SP_DITEM");
+	ee[7] = lparse_get_entry(lp, "SP_GROUP");
 	Spawners_UnloadSpawners();
 	//Console_Print("LOADING!!!");
 	for (i = 0; i < num_spawners; i++) {
@@ -394,7 +395,10 @@ void Serial_LoadSpawners(const char *cnms_file)
 		//Console_Print("wobj type: %d", tmpspawner.wobj_type);
 		lparse_get_data(lp, ee[2], i, 1, &tmpspawner.duration);
 		lparse_get_data(lp, ee[3], i, 1, &tmpspawner.max);
-		created = Spawners_CreateSpawner(tmpspawner.x, tmpspawner.y, tmpspawner.wobj_type, tmpspawner.duration, tmpspawner.max);
+		if (ee[7]) lparse_get_data(lp, ee[7], i, 1, &tmpspawner.spawner_group);
+		else tmpspawner.spawner_group = -1;
+		//Console_Print("group: %d", tmpspawner.spawner_group);
+		created = Spawners_CreateSpawner(tmpspawner.x, tmpspawner.y, tmpspawner.wobj_type, tmpspawner.duration, tmpspawner.max, tmpspawner.spawner_group);
 		lparse_get_data(lp, ee[4], i, 1, &created->custom_int);
 		lparse_get_data(lp, ee[5], i, 1, &created->custom_float);
 		lparse_get_data(lp, ee[6], i, 1, &created->dropped_item);
@@ -414,7 +418,7 @@ void Serial_LoadSpawners(const char *cnms_file)
 void Serial_SaveSpawners(const char *cnms_file)
 {
 	LParse *lp;
-	LParseEntry *e, *ee[7];
+	LParseEntry *e, *ee[8];
 	TELEPORT_INFO *ti;
 	int num_spawners, i;
 	SPAWNER *iter;
@@ -468,6 +472,7 @@ void Serial_SaveSpawners(const char *cnms_file)
 	ee[4] = lparse_make_entry(lp, "SP_CI", lparse_i32, num_spawners);
 	ee[5] = lparse_make_entry(lp, "SP_CF", lparse_float, num_spawners);
 	ee[6] = lparse_make_entry(lp, "SP_DITEM", lparse_u32, num_spawners);
+	ee[7] = lparse_make_entry(lp, "SP_GROUP", lparse_u8, num_spawners);
 	i = 0;
 	iter = Spawners_Iterate(NULL);
 	while (iter != NULL)
@@ -480,6 +485,7 @@ void Serial_SaveSpawners(const char *cnms_file)
 		lparse_set_data(lp, ee[4], i, 1, &iter->custom_int);
 		lparse_set_data(lp, ee[5], i, 1, &iter->custom_float);
 		lparse_set_data(lp, ee[6], i, 1, &iter->dropped_item);
+		lparse_set_data(lp, ee[7], i, 1, &iter->spawner_group);
 		iter = Spawners_Iterate(iter);
 		i++;
 	}

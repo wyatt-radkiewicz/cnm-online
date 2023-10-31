@@ -22,6 +22,9 @@
 
 #define SPAWNER_SERIALIZATION_SIZE 76
 
+#define MAX_SPAWNER_GROUPS 32
+#define MAX_SPAWNERS_PER_GROUP 16
+
 typedef struct _SPAWNER
 {
 	float x, y;
@@ -34,6 +37,7 @@ typedef struct _SPAWNER
 	int curr_wobjs;
 	int has_respawned;
 	unsigned int dropped_item;
+	char spawner_group;
 
 	struct
 	{
@@ -45,7 +49,7 @@ typedef struct _SPAWNER
 void Spawners_Init(void);
 void Spawners_Quit(void);
 void Spawners_UnloadSpawners(void);
-SPAWNER *Spawners_CreateSpawner(float x, float y, int wobj_type, int duration, int max);
+SPAWNER *Spawners_CreateSpawner(float x, float y, int wobj_type, int duration, int max, char spawner_group);
 SPAWNER *Spawners_GetSpawnerWithinBox(float x, float y, float w, float h);
 int Spawners_GetSpawnersWithinBox(SPAWNER **buf, int buflen, float x, float y, float w, float h);
 void Spawners_MoveSpawner(SPAWNER *spawner, float newx, float newy);

@@ -264,7 +264,7 @@ void World_Draw(int mode)
 		{
 			for (y = camy / (int)OBJGRID_SIZE - 1; y < (camy + RENDERER_WIDTH) / (int)OBJGRID_SIZE + 1; y++)
 			{
-				if (x < 0 || y < 0 || x > 128 || y > 64)
+				if (x < 0 || y < 0 || x > 256 || y > 256)
 					continue;
 				Util_SetRect
 				(

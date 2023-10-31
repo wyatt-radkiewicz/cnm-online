@@ -1,7 +1,9 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include "spawners.h"
+#include "console.h"
 #include "renderer.h"
 #include "pool.h"
 #include "wobj.h"
@@ -12,6 +14,7 @@
 
 static OBJGRID *spawners_grid;
 static SPAWNER *spawners_head;
+static SPAWNER *spawner_groups[MAX_SPAWNER_GROUPS][MAX_SPAWNERS_PER_GROUP];
 //static POOL *spawners_pool;
 static int spawners_mode;
 static int spawners_last_num_players, spawners_num_players, spawners_count_change;
@@ -22,6 +25,7 @@ void Spawners_Init(void)
 	spawners_head = NULL;
 	spawners_grid = ObjGrid_Create(256, 256);
 	spawners_mode = SPAWNER_SINGLEPLAYER;
+	memset(spawner_groups, 0, sizeof(spawner_groups));
 
 	spawners_last_num_players = 0;
 	spawners_num_players = 0;
@@ -46,8 +50,9 @@ void Spawners_UnloadSpawners(void)
 		spawner = next;
 	}
 	spawners_head = NULL;
+	memset(spawner_groups, 0, sizeof(spawner_groups));
 }
-SPAWNER *Spawners_CreateSpawner(float x, float y, int wobj_type, int duration, int max)
+SPAWNER *Spawners_CreateSpawner(float x, float y, int wobj_type, int duration, int max, char spawner_group)
 {
 	//SPAWNER *spawner = Pool_Alloc(spawners_pool);
 	SPAWNER *spawner = malloc(sizeof(SPAWNER));
@@ -67,6 +72,18 @@ SPAWNER *Spawners_CreateSpawner(float x, float y, int wobj_type, int duration, i
 	spawner->has_respawned = CNM_FALSE;
 	spawner->grid_object.x = x + (float)wobj_types[wobj_type].frames[0].w / 2.0f;
 	spawner->grid_object.y = y + (float)wobj_types[wobj_type].frames[0].h / 2.0f;
+	assert(spawner_group >= -1 && spawner_group < MAX_SPAWNER_GROUPS);
+	spawner->spawner_group = spawner_group;
+	if (spawner->spawner_group > -1) {
+		for (int i = 0; i < MAX_SPAWNERS_PER_GROUP; i++) {
+			if (!spawner_groups[spawner_group][i]) {
+				//Console_Print("Adding spawner to group %d at id %d", spawner_group, i);
+				//Console_Print("Spawner type: %d", spawner->wobj_type);
+				spawner_groups[spawner_group][i] = spawner;
+				break;
+			}
+		}
+	}
 	ObjGrid_AddObject(spawners_grid, &spawner->grid_object);
 	return spawner;
 }
@@ -150,6 +167,14 @@ void Spawners_DestroySpawner(SPAWNER *spawner)
 		spawners_head = spawner->alloc.next;
 	if (spawner->alloc.next != NULL)
 		spawner->alloc.next->alloc.last = spawner->alloc.last;
+	if (spawner->spawner_group != -1) {
+		for (int i = 0; i < MAX_SPAWNERS_PER_GROUP; i++) {
+			if (spawner_groups[spawner->spawner_group][i] == spawner) {
+				spawner_groups[spawner->spawner_group][i] = NULL;
+				break;
+			}
+		}
+	}
 	ObjGrid_RemoveObject(spawners_grid, &spawner->grid_object);
 	//Pool_Free(spawners_pool, spawner);
 	free(spawner);
@@ -248,7 +273,56 @@ SPAWNER *Spawners_Iterate(SPAWNER *iter)
 		return iter->alloc.next;
 	}
 }
-//#include "console.h"
+static int spawner_spawn(SPAWNER *spawner, int spawn_grouped) {
+	if (spawner->spawner_group > -1 &&
+		spawner_groups[spawner->spawner_group][0] != spawner &&
+		!spawn_grouped) return CNM_FALSE;
+	int create_count = 1;
+	if (spawners_mode == SPAWNER_MULTIPLAYER && SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_PLAYER_COUNTED)
+	{
+		create_count = spawners_num_players;
+		if (spawn_grouped) goto skip_checks;
+		if (spawner->curr_wobjs + create_count > spawner->max*create_count && spawner->max != 0)
+			return CNM_FALSE;
+	}
+	else
+	{
+		if (spawn_grouped) goto skip_checks;
+		if (spawner->curr_wobjs >= spawner->max && spawner->max != 0)
+			return CNM_FALSE;
+	}
+	spawner->timer--;
+	if (SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_NOSPAWN)
+		return CNM_FALSE;
+	if (SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_MULTIPLAYER_ONLY &&
+		spawners_mode == SPAWNER_SINGLEPLAYER)
+		return CNM_FALSE;
+	if (SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_SINGLEPLAYER_ONLY &&
+		spawners_mode == SPAWNER_MULTIPLAYER)
+		return CNM_FALSE;
+	if (spawner->timer > 0)
+		return CNM_FALSE;
+	if (!wobj_types[spawner->wobj_type].respawnable && spawner->has_respawned)
+		return CNM_FALSE;
+	if (spawner->max == 0 && spawner->has_respawned)
+		return CNM_FALSE;
+
+	/* Spawn a thing */
+skip_checks:
+	for (int i = 0; i < create_count; i++)
+	{
+		//if (spawner->wobj_type == WOBJ_CUSTOMIZEABLE_MOVEABLE_PLATFORM) Console_Print("%u -> ci", spawner->custom_int);
+		WOBJ *created = Wobj_CreateOwned(spawner->wobj_type, spawner->x, spawner->y, spawner->custom_int, spawner->custom_float);
+		created->parent_spawner = spawner;
+		//created->dropped_death_item = spawner->dropped_item;
+		created->dropped_death_item = SPAWNER_GET_DROPPED_ITEM(spawner);
+		spawner->curr_wobjs++;
+		if (wobj_types[spawner->wobj_type].respawnable)
+			spawner->timer = spawner->duration;
+		spawner->has_respawned = CNM_TRUE;
+	}
+	return CNM_TRUE;
+}
 void Spawners_CreateWobjsFromSpawners(int gridx, int gridy)
 {
 	OBJGRID_ITER iter;
@@ -259,61 +333,26 @@ void Spawners_CreateWobjsFromSpawners(int gridx, int gridy)
 	while (iter != NULL)
 	{
 		spawner = GET_SPAWNER(iter);
-		//if (spawner->curr_wobjs < spawner->max || spawner->max == 0)// &&
-			//(!wobj_types[spawner->wobj_type].respawnable && spawner->has_respawned) &&
-			//(spawner->max == 0 && spawner->has_respawned))
-		//{
-		create_count = 1;
-		if (spawners_mode == SPAWNER_MULTIPLAYER && SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_PLAYER_COUNTED)
-		{
-			create_count = spawners_num_players;
-			if (spawner->curr_wobjs + create_count > spawner->max*create_count && spawner->max != 0)
-				goto skip;
+		if (spawner_spawn(spawner, CNM_FALSE) && spawner->spawner_group != -1) {
+			// follow groups
+			for (int i = 1; i < MAX_SPAWNERS_PER_GROUP; i++) {
+				SPAWNER *const grouped = spawner_groups[spawner->spawner_group][i];
+				//if (grouped == spawner) Console_Print("imposible spawn?");
+				if (grouped) {
+					spawner_spawn(grouped, CNM_TRUE);
+					//Console_Print("initiated group spawn");
+				}
+			}
 		}
-		else
-		{
-			if (spawner->curr_wobjs >= spawner->max && spawner->max != 0)
-				goto skip;
-		}
-		spawner->timer--;
-		if (SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_NOSPAWN)
-			goto skip;
-		if (SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_MULTIPLAYER_ONLY &&
-			spawners_mode == SPAWNER_SINGLEPLAYER)
-			goto skip;
-		if (SPAWNER_GET_SPAWN_MODE(spawner) == SPAWNER_MODE_SINGLEPLAYER_ONLY &&
-			spawners_mode == SPAWNER_MULTIPLAYER)
-			goto skip;
-		if (spawner->timer > 0)
-			goto skip;
-		if (!wobj_types[spawner->wobj_type].respawnable && spawner->has_respawned)
-			goto skip;
-		if (spawner->max == 0 && spawner->has_respawned)
-			goto skip;
-
-		/* Spawn a thing */
-		for (int i = 0; i < create_count; i++)
-		{
-			//if (spawner->wobj_type == WOBJ_CUSTOMIZEABLE_MOVEABLE_PLATFORM) Console_Print("%u -> ci", spawner->custom_int);
-			created = Wobj_CreateOwned(spawner->wobj_type, spawner->x, spawner->y, spawner->custom_int, spawner->custom_float);
-			created->parent_spawner = spawner;
-			//created->dropped_death_item = spawner->dropped_item;
-			created->dropped_death_item = SPAWNER_GET_DROPPED_ITEM(spawner);
-			spawner->curr_wobjs++;
-			if (wobj_types[spawner->wobj_type].respawnable)
-				spawner->timer = spawner->duration;
-			spawner->has_respawned = CNM_TRUE;
-		}
-skip:
 		ObjGrid_AdvanceIter(&iter);
 	}
 }
 void Spawners_CreateAllWobjsFromSpawners(void)
 {
 	int x, y;
-	for (x = 0; x < 128; x++)
+	for (x = 0; x < 256; x++)
 	{
-		for (y = 0; y < 128; y++)
+		for (y = 0; y < 256; y++)
 		{
 			Spawners_CreateWobjsFromSpawners(x, y);
 		}
