@@ -100,6 +100,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	float upgradehp;
 	int next_level_line;
 	float jump_init_yspd;
+	int level_end_rank, level_end_score, level_end_time_score;
 	//int game_over_active//, game_over_timer;
 	//float item_durability;
 	//float stored_yvel;

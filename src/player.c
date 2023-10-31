@@ -217,6 +217,24 @@ void WobjPlayer_Update(WOBJ *wobj)
 	} else {
 		local_data->lock_controls = CNM_TRUE;
 	}
+	if (local_data->finish_timer == 1 && wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
+		int par = Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer;
+		local_data->level_end_score = local_data->score;
+		local_data->level_end_time_score = 20 - (local_data->final_time_forscore / (30 * 60));
+		if (local_data->level_end_time_score < 0) local_data->level_end_time_score = 0;
+		local_data->level_end_time_score *= 100 * 12;
+		local_data->level_end_rank = (int)((float)(local_data->level_end_score + local_data->level_end_time_score) / (float)par * 4.0);
+		if (local_data->level_end_rank > 4) local_data->level_end_rank = 4;
+	}
+	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
+		const static int rank_lives[] = { 0, 0, 1, 5, 10 };
+		for (int i = 0; i < rank_lives[local_data->level_end_rank]; i++) {
+			if (local_data->finish_timer == PLAYER_FINISH_TIMER / 4 + 30 + i * 15) {
+				Interaction_PlaySound(wobj, 55);
+				g_saves[g_current_save].lives++;
+			}
+		}
+	}
 	
 	local_data->pvp_damage_indicator_timer--;
 	if (local_data->death_cam_timer-- == 0)
@@ -911,13 +929,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (other != NULL)
 		local_data->grav = other->custom_floats[0];
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_FINISH_TRIGGER);
-	if (other != NULL) {
+	if (other != NULL && !(wobj->flags & WOBJ_HAS_PLAYER_FINISHED)) {
 		Audio_PlayMusic(2, CNM_FALSE);
 		local_data->final_time_forscore = Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer;
 		//Console_Print(EndingText_GetLine(other->custom_ints[0]));
 		//strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/");
 		//strcat(Game_GetVar(GAME_VAR_LEVEL)->data.string, EndingText_GetLine(other->custom_ints[0]));
 		local_data->next_level_line = other->custom_ints[0];
+		local_data->finish_timer = 0;
 		wobj->flags |= WOBJ_HAS_PLAYER_FINISHED;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BGSPEED_X);
@@ -1918,27 +1937,20 @@ void Player_DrawHUD(WOBJ *player) {
 
 	// draw finish hud
 	if (player->flags & WOBJ_HAS_PLAYER_FINISHED && local_data->finish_timer < PLAYER_FINISH_TIMER) {
-		int par = Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer;
-		int score = local_data->score;
-		int time_score = 20 - (local_data->final_time_forscore / (30 * 60));
-		if (time_score < 0) time_score = 0;
-		time_score *= 100 * 12;
-		int rank = (int)((float)(score + time_score) / (float)par * 4.0);
-		if (rank > 4) rank = 4;
 		bx = RENDERER_WIDTH / 2 - 64, by = RENDERER_HEIGHT / 2 - 40;
 		Util_SetRect(&r, 128, 2432, 32, 32);
 		if (local_data->finish_timer < PLAYER_FINISH_TIMER / 4) {
 			r.y += Util_RandInt(0, 4) * 32;
 		} else {
-			r.y += rank * 32;
+			r.y += local_data->level_end_rank * 32;
 		}
 		Renderer_DrawBitmap(bx + 80, by + 32, &r, 0, RENDERER_LIGHT);
 		Util_SetRect(&r, 0, 2432, 128, 80);
 		Renderer_DrawBitmap(bx, by, &r, 2, RENDERER_LIGHT);
-		Renderer_DrawText(bx + 4, by + 8, 0, RENDERER_LIGHT, "SCORE: %d", score);
-		Renderer_DrawText(bx + 4, by + 16, 0, RENDERER_LIGHT, "TIME BONUS: %d", time_score);
-		Renderer_DrawText(bx + 4, by + 24, 0, RENDERER_LIGHT, "TOTAL: %d", score + time_score);
-		Renderer_DrawText(bx + 4, by + 32, 0, RENDERER_LIGHT, "A-RANK: %d", par);
+		Renderer_DrawText(bx + 4, by + 8, 0, RENDERER_LIGHT, "SCORE: %d", local_data->level_end_score);
+		Renderer_DrawText(bx + 4, by + 16, 0, RENDERER_LIGHT, "TIME BONUS: %d", local_data->level_end_time_score);
+		Renderer_DrawText(bx + 4, by + 24, 0, RENDERER_LIGHT, "TOTAL: %d", local_data->level_end_score + local_data->level_end_time_score);
+		Renderer_DrawText(bx + 4, by + 32, 0, RENDERER_LIGHT, "A-RANK: %d", Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer);
 	}
 }
 void Player_SaveData(WOBJ *player, savedata_t *data) {
