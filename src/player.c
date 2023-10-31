@@ -944,7 +944,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_FINISH_TRIGGER);
 	if (other != NULL && !(wobj->flags & WOBJ_HAS_PLAYER_FINISHED)) {
 		Audio_PlayMusic(2, CNM_FALSE);
-		if (Filesystem_GetLevelType(Filesystem_GetLevelIdFromFileName(Game_GetVar(GAME_VAR_LEVEL)->data.string)) == LEVEL_TYPE_NORANK) {
+		if (!Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer && Filesystem_GetLevelType(Filesystem_GetLevelIdFromFileName(Game_GetVar(GAME_VAR_LEVEL)->data.string)) == LEVEL_TYPE_NORANK) {
 			local_data->level_end_norank = CNM_TRUE;
 		} else {
 			local_data->level_end_norank = CNM_FALSE;
@@ -1973,7 +1973,7 @@ void Player_DrawHUD(WOBJ *player) {
 	// draw finish hud
 	if ((player->flags & WOBJ_HAS_PLAYER_FINISHED) && local_data->finish_timer < PLAYER_FINISH_TIMER + 3 && !local_data->level_end_norank) {
 		int trans = 7 - local_data->finish_timer;
-		if (local_data->finish_timer > PLAYER_FINISH_TIMER - 7) trans = PLAYER_FINISH_TIMER - local_data->finish_timer;
+		if (local_data->finish_timer > PLAYER_FINISH_TIMER - 7) trans = local_data->finish_timer - (PLAYER_FINISH_TIMER - 7);
 		int trans2 = trans - 2;
 		if (trans2 < 0) trans2 = 0;
 		if (trans2 > 7) trans2 = 7;
@@ -1990,7 +1990,7 @@ void Player_DrawHUD(WOBJ *player) {
 		Util_SetRect(&r, 0, 2432, 128, 80);
 		Renderer_DrawBitmap(bx, by, &r, trans, RENDERER_LIGHT);
 		Renderer_DrawText(bx + 4, by + 8, trans2, RENDERER_LIGHT, "SCORE: %d", local_data->level_end_score);
-		Renderer_DrawText(bx + 4, by + 16, trans2, RENDERER_LIGHT, "TIME BONUS: %d", local_data->level_end_time_score);
+		Renderer_DrawText(bx + 4, by + 16, trans2, RENDERER_LIGHT, "TIME: %d", local_data->level_end_time_score);
 		Renderer_DrawText(bx + 4, by + 24, trans2, RENDERER_LIGHT, "TOTAL: %d", local_data->level_end_score + local_data->level_end_time_score);
 		Renderer_DrawText(bx + 4, by + 32, trans2, RENDERER_LIGHT, "A-RANK: %d", Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer);
 
