@@ -2336,7 +2336,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		0, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_FALSE // Can respawn?
+		CNM_TRUE // Can respawn?
 	},
 	{ // 62: Moving Fire Horizontal Object
 		WobjMovingFireHorizontal_Create, // Create
@@ -2351,7 +2351,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		0, // Money reward
 		CNM_TRUE, // Does network interpolation?
-		CNM_FALSE // Can respawn?
+		CNM_TRUE // Can respawn?
 	},
 	{ // 63: Super Dragon Boss Object
 		WobjSuperDragonBoss_Create, // Create

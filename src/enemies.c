@@ -1427,11 +1427,15 @@ void WobjMovingFireVertical_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 25.0f;
-	wobj->speed = wobj->custom_floats[0];
+	wobj->money = wobj->custom_floats[0] < 0;
+	wobj->speed = fabsf(wobj->custom_floats[0]);
 	wobj->custom_floats[0] = wobj->y;
 	wobj->custom_floats[1] = wobj->y + (float)wobj->custom_ints[0];
-	if (wobj->speed < 0) {
-		wobj->y = wobj->custom_floats[1];
+	if (wobj->custom_floats[1] < wobj->custom_floats[0]) {
+		float tmp = wobj->custom_floats[1];
+		wobj->custom_floats[1] = wobj->custom_floats[0];
+		wobj->custom_floats[0] = tmp;
+		wobj->speed *= -1.f;
 	}
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
@@ -1442,18 +1446,29 @@ void WobjMovingFireVertical_Update(WOBJ *wobj)
 	{
 		wobj->speed *= -1.0f;
 		wobj->y += wobj->speed;
+		if (wobj->money) {
+			// Despawn after a while
+			Interaction_DestroyWobj(wobj);
+		}
 	}
 }
 void WobjMovingFireHorizontal_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 25.0f;
-	wobj->speed = wobj->custom_floats[0];
+	wobj->money = wobj->custom_floats[0] < 0;
+	wobj->speed = fabsf(wobj->custom_floats[0]);
 	wobj->custom_floats[0] = wobj->x;
 	wobj->custom_floats[1] = wobj->x + (float)wobj->custom_ints[0];
-	if (wobj->speed < 0) {
-		wobj->x = wobj->custom_floats[1];
+	if (wobj->custom_floats[1] < wobj->custom_floats[0]) {
+		float tmp = wobj->custom_floats[1];
+		wobj->custom_floats[1] = wobj->custom_floats[0];
+		wobj->custom_floats[0] = tmp;
+		wobj->speed *= -1.f;
 	}
+	//if (wobj->speed < 0) {
+		//wobj->x = wobj->custom_floats[1];
+	//}
 	//if (wobj->custom_floats[1] < wobj->custom_floats[0])
 	//	wobj->speed *= -1.0f;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
@@ -1464,7 +1479,11 @@ void WobjMovingFireHorizontal_Update(WOBJ *wobj)
 	if (wobj->x < wobj->custom_floats[0] || wobj->x > wobj->custom_floats[1])
 	{
 		wobj->speed *= -1.0f;
-		wobj->x += wobj->speed;
+		wobj->x += wobj->speed * 2.0f;
+		if (wobj->money) {
+			// Despawn after a while
+			Interaction_DestroyWobj(wobj);
+		}
 	}
 }
 
