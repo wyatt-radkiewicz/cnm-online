@@ -493,7 +493,7 @@ static void SaveSpawnersElementString(GUI_ELEMENT *elem, int index)
 		saving = CNM_TRUE;
 		strcpy(buffer, "save_spawners ");
 		strcat(buffer, elem->props.string);
-		Command_Execute(buffer);
+		Command_Execute(buffer, CNM_FALSE);
 		Gui_SwitchBack();
 		saving = CNM_FALSE;
 	}
@@ -507,7 +507,7 @@ static void LoadSpawnersElementString(GUI_ELEMENT *elem, int index)
 		loading = CNM_TRUE;
 		strcpy(buffer, "load_spawners ");
 		strcat(buffer, elem->props.string);
-		Command_Execute(buffer);
+		Command_Execute(buffer, CNM_FALSE);
 		strcpy(sframe->elements[0].props.string, elem->props.string);
 		memset(elem->props.string, 0, UTIL_MAX_TEXT_WIDTH + 1);
 		Gui_SwitchBack();
@@ -523,7 +523,7 @@ static void LoadBlocksElementString(GUI_ELEMENT *elem, int index)
 		loading = CNM_TRUE;
 		strcpy(buffer, "load_blocks ");
 		strcat(buffer, elem->props.string);
-		Command_Execute(buffer);
+		Command_Execute(buffer, CNM_FALSE);
 		Gui_SwitchBack();
 		loading = CNM_FALSE;
 	}

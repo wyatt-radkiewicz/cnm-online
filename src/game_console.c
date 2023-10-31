@@ -136,7 +136,7 @@ void GameConsole_HandleInput(int input, char c)
 		if (gameconsole_state == GAMECONSOLE_STATE_FRONT)
 		{
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
-			Command_Execute(gameconsole_back_buffer);
+			Command_Execute(gameconsole_back_buffer, CNM_TRUE);
 			gameconsole_didtype = CNM_TRUE;
 			memset(gameconsole_back_buffer, 0, sizeof(gameconsole_back_buffer));
 		}

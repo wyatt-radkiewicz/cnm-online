@@ -837,7 +837,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (strcmp(FileSystem_GetRegisteredGfxFile()->name, gct_file_path) != 0)
 		{
 			sprintf(gct_buff, "load_gfx_file %s", gct_file_path);
-			Command_Execute(gct_buff);
+			Command_Execute(gct_buff, CNM_FALSE);
 		}
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BACKGROUND_SWITCHER);

@@ -26,64 +26,64 @@
 
 #define COMMAND_COUNT (sizeof(command_names) / sizeof(*command_names))
 
-typedef void(*COMMAND_FUNC)(const char *args);
-static void Command_SaveBlocks(const char *args);
-static void Command_LoadBlocks(const char *args);
-static void Command_SetBlock(const char *args);
-static void Command_SetFullscreen(const char *args);
-static void Command_Say(const char *args);
-static void Command_Exit(const char *args);
-static void Command_StartBlockEdit(const char *args);
-static void Command_StartMainMenu(const char *args);
-static void Command_ClearAllBlocks(const char *args);
-static void Command_StartBPEdit(const char *args);
-static void Command_SaveSpawners(const char *args);
-static void Command_LoadSpawners(const char *args);
-static void Command_SetLight(const char *args);
-static void Command_DebugHitboxes(const char *args);
-static void Command_DebugShowObjgrid(const char *args);
-static void Command_DebugShowGridPoses(const char *args);
-static void Command_Connect(const char *args);
-static void Command_PrintConnectedPlayers(const char *args);
-static void Command_PrintWobjNetSize(const char *args);
-static void Command_HiRes(const char *args);
-static void Command_ClInterp(const char *args);
-static void Command_ShowPos(const char *args);
-static void Command_ClSmoothing(const char *args);
-static void Command_ClAvgFramesPerUpdate(const char *args);
-static void Command_Tunes(const char *args);
-static void Command_Kill(const char *args);
-static void Command_ShowNodeUUIDS(const char *args);
-static void Command_StartLightEdit(const char *args);
-static void Command_Noclip(const char *args);
-static void Command_GetChecksum(const char *args);
-static void Command_LoadGfxFile(const char *args);
-static void Command_LoadAudioFile(const char *args);
-static void Command_IsTcpServerConnected(const char *args);
-static void Command_SetStrength(const char *args);
-static void Command_SetHealth(const char *args);
-static void Command_Volume(const char *args);
-static void Command_SetSpeed(const char *args);
-static void Command_SetJump(const char *args);
-static void Command_SetItem(const char *args);
-static void Command_SetUpgrade(const char *args);
-static void Command_StartDialoge(const char *args);
-static void Command_DebugState(const char *args);
-static void Command_SetMoney(const char *args);
-static void Command_SvCheats(const char *args);
-static void Command_ShowUUIDS(const char *args);
-static void Command_SaveBCondenced(const char *args);
-static void Command_ResizeBlocks(const char *args);
-static void Command_GetBlocksSize(const char *args);
-static void Command_WobjPlayerPacketTest(const char *args);
-static void Command_ActivateSupervirus(const char *args);
-static void Command_NetFakeLoss(const char *args);
-static void Command_NetShowBandwidth(const char *args);
-static void Command_WobjReport(const char *args);
-static void Command_NetFakePing(const char *args);
-static void Command_LocalMap(const char *args);
-static void Command_NoSave(const char *args);
-static void Command_SetLives(const char *args);
+typedef void(*COMMAND_FUNC)(const char *args, int from_player);
+static void Command_SaveBlocks(const char *args, int from_player);
+static void Command_LoadBlocks(const char *args, int from_player);
+static void Command_SetBlock(const char *args, int from_player);
+static void Command_SetFullscreen(const char *args, int from_player);
+static void Command_Say(const char *args, int from_player);
+static void Command_Exit(const char *args, int from_player);
+static void Command_StartBlockEdit(const char *args, int from_player);
+static void Command_StartMainMenu(const char *args, int from_player);
+static void Command_ClearAllBlocks(const char *args, int from_player);
+static void Command_StartBPEdit(const char *args, int from_player);
+static void Command_SaveSpawners(const char *args, int from_player);
+static void Command_LoadSpawners(const char *args, int from_player);
+static void Command_SetLight(const char *args, int from_player);
+static void Command_DebugHitboxes(const char *args, int from_player);
+static void Command_DebugShowObjgrid(const char *args, int from_player);
+static void Command_DebugShowGridPoses(const char *args, int from_player);
+static void Command_Connect(const char *args, int from_player);
+static void Command_PrintConnectedPlayers(const char *args, int from_player);
+static void Command_PrintWobjNetSize(const char *args, int from_player);
+static void Command_HiRes(const char *args, int from_player);
+static void Command_ClInterp(const char *args, int from_player);
+static void Command_ShowPos(const char *args, int from_player);
+static void Command_ClSmoothing(const char *args, int from_player);
+static void Command_ClAvgFramesPerUpdate(const char *args, int from_player);
+static void Command_Tunes(const char *args, int from_player);
+static void Command_Kill(const char *args, int from_player);
+static void Command_ShowNodeUUIDS(const char *args, int from_player);
+static void Command_StartLightEdit(const char *args, int from_player);
+static void Command_Noclip(const char *args, int from_player);
+static void Command_GetChecksum(const char *args, int from_player);
+static void Command_LoadGfxFile(const char *args, int from_player);
+static void Command_LoadAudioFile(const char *args, int from_player);
+static void Command_IsTcpServerConnected(const char *args, int from_player);
+static void Command_SetStrength(const char *args, int from_player);
+static void Command_SetHealth(const char *args, int from_player);
+static void Command_Volume(const char *args, int from_player);
+static void Command_SetSpeed(const char *args, int from_player);
+static void Command_SetJump(const char *args, int from_player);
+static void Command_SetItem(const char *args, int from_player);
+static void Command_SetUpgrade(const char *args, int from_player);
+static void Command_StartDialoge(const char *args, int from_player);
+static void Command_DebugState(const char *args, int from_player);
+static void Command_SetMoney(const char *args, int from_player);
+static void Command_SvCheats(const char *args, int from_player);
+static void Command_ShowUUIDS(const char *args, int from_player);
+static void Command_SaveBCondenced(const char *args, int from_player);
+static void Command_ResizeBlocks(const char *args, int from_player);
+static void Command_GetBlocksSize(const char *args, int from_player);
+static void Command_WobjPlayerPacketTest(const char *args, int from_player);
+static void Command_ActivateSupervirus(const char *args, int from_player);
+static void Command_NetFakeLoss(const char *args, int from_player);
+static void Command_NetShowBandwidth(const char *args, int from_player);
+static void Command_WobjReport(const char *args, int from_player);
+static void Command_NetFakePing(const char *args, int from_player);
+static void Command_LocalMap(const char *args, int from_player);
+static void Command_NoSave(const char *args, int from_player);
+static void Command_SetLives(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -205,10 +205,34 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_SetLives,
 };
 
-static const char *Command_ExtractArg(const char *args, int arg);
-static int Command_CanExecuteCheat(void);
+static int can_run_cheat1(int from_player) {
+	if (!from_player) return CNM_TRUE;
+	if (Game_TopState() == GAME_STATE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer) Console_Print("Play from editor without saving to access cheats in singleplayer");
+	if (Game_TopState() != GAME_STATE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_SV_CHEATS)->data.integer) Console_Print("Try turning on sv_cheats");
+	return Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer || ((
+			Game_TopState() == GAME_STATE_HOSTED_SERVER ||
+			Game_TopState() == GAME_STATE_DEDICATED_SERVER ||
+			Game_TopState() == GAME_STATE_CLIENT ||
+			Game_TopState() == GAME_STATE_MAINMENU) &&
+			Game_GetVar(GAME_VAR_SV_CHEATS)->data.integer);
+}
+static int can_run_cheat2(int from_player) {
+	if (!from_player) return CNM_TRUE;
+	return Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer || (
+			Game_TopState() == GAME_STATE_HOSTED_SERVER ||
+			Game_TopState() == GAME_STATE_DEDICATED_SERVER ||
+			Game_TopState() == GAME_STATE_CLIENT ||
+			Game_TopState() == GAME_STATE_MAINMENU);
+}
+static int can_run_cheat3(int from_player) {
+	if (!from_player) return CNM_TRUE;
+	return Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer;
+}
 
-void Command_Execute(const char *command)
+static const char *Command_ExtractArg(const char *args, int arg);
+//static int Command_CanExecuteCheat(void);
+
+void Command_Execute(const char *command, int from_player)
 {
 	int i;
 	char name[UTIL_MAX_TEXT_WIDTH + 1], args[UTIL_MAX_TEXT_WIDTH + 1];
@@ -236,7 +260,7 @@ void Command_Execute(const char *command)
 			strncpy(args, strchr(command, ' ') + 1, sizeof(args) - 1);
 		if (strcmp(name, command_names[i]) == 0)
 		{
-			command_funcs[i](args);
+			command_funcs[i](args, from_player);
 			return;
 		}
 	}
@@ -257,18 +281,18 @@ static const char *Command_ExtractArg(const char *args, int arg)
 	}
 	return args;
 }
-static int Command_CanExecuteCheat(void)
-{
-	if (Game_TopState() == GAME_STATE_SINGLEPLAYER)
-		return 1;
-	if (Game_GetVar(GAME_VAR_SV_CHEATS)->data.integer && (Game_TopState() == GAME_STATE_HOSTED_SERVER ||
-														  Game_TopState() == GAME_STATE_DEDICATED_SERVER ||
-														  Game_TopState() == GAME_STATE_CLIENT))
-		return 1;
-	return 0;
-}
+//static int Command_CanExecuteCheat(void)
+//{
+//	if (Game_TopState() == GAME_STATE_SINGLEPLAYER)
+//		return 1;
+//	if (Game_GetVar(GAME_VAR_SV_CHEATS)->data.integer && (Game_TopState() == GAME_STATE_HOSTED_SERVER ||
+//														  Game_TopState() == GAME_STATE_DEDICATED_SERVER ||
+//														  Game_TopState() == GAME_STATE_CLIENT))
+//		return 1;
+//	return 0;
+//}
 
-static void Command_SaveBlocks(const char *args)
+static void Command_SaveBlocks(const char *args, int from_player)
 {
 	char pathbuf[128];
 
@@ -282,7 +306,7 @@ static void Command_SaveBlocks(const char *args)
 	strcat(pathbuf, Command_ExtractArg(args, 0));
 	Serial_SaveBlocks(pathbuf);
 }
-static void Command_LoadBlocks(const char *args)
+static void Command_LoadBlocks(const char *args, int from_player)
 {
 	char pathbuf[128];
 
@@ -297,7 +321,7 @@ static void Command_LoadBlocks(const char *args)
 		Serial_LoadBlocks(pathbuf);
 	}
 }
-static void Command_SetBlock(const char *args)
+static void Command_SetBlock(const char *args, int from_player)
 {
 	if (Game_TopState() != GAME_STATE_BLOCKSEDIT)
 		return;
@@ -308,33 +332,33 @@ static void Command_SetBlock(const char *args)
 	b = atoi(Command_ExtractArg(args, 2));
 	Blocks_SetBlock(BLOCKS_FG, x, y, b);
 }
-static void Command_SetFullscreen(const char *args)
+static void Command_SetFullscreen(const char *args, int from_player)
 {
 	Renderer_SetFullscreen(atoi(Command_ExtractArg(args, 0)));
 }
-static void Command_Say(const char *args)
+static void Command_Say(const char *args, int from_player)
 {
 	Console_Print(Command_ExtractArg(args, 0));
 }
-static void Command_Exit(const char *args)
+static void Command_Exit(const char *args, int from_player)
 {
 	Game_Stop();
 }
-static void Command_StartBlockEdit(const char *args)
+static void Command_StartBlockEdit(const char *args, int from_player)
 {
-	if (Game_TopState() == GAME_STATE_BLOCKSEDIT)
+	if (Game_TopState() == GAME_STATE_BLOCKSEDIT || Game_TopState() == GAME_STATE_SINGLEPLAYER)
 		return;
 
 	Game_SwitchState(GAME_STATE_BLOCKSEDIT);
 }
-static void Command_StartMainMenu(const char *args)
+static void Command_StartMainMenu(const char *args, int from_player)
 {
-	if (Game_TopState() == GAME_STATE_MAINMENU)
+	if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_SINGLEPLAYER)
 		return;
 
 	Game_SwitchState(GAME_STATE_MAINMENU);
 }
-static void Command_ClearAllBlocks(const char *args)
+static void Command_ClearAllBlocks(const char *args, int from_player)
 {
 	int x, y;
 	if (Game_TopState() != GAME_STATE_BLOCKSEDIT)
@@ -349,14 +373,14 @@ static void Command_ClearAllBlocks(const char *args)
 		}
 	}
 }
-static void Command_StartBPEdit(const char *args)
+static void Command_StartBPEdit(const char *args, int from_player)
 {
-	if (Game_TopState() == GAME_STATE_BLOCKPROPSEDIT)
+	if (Game_TopState() == GAME_STATE_BLOCKPROPSEDIT || Game_TopState() == GAME_STATE_SINGLEPLAYER)
 		return;
 
 	Game_SwitchState(GAME_STATE_BLOCKPROPSEDIT);
 }
-static void Command_SaveSpawners(const char *args)
+static void Command_SaveSpawners(const char *args, int from_player)
 {
 	char pathbuf[128];
 
@@ -368,7 +392,7 @@ static void Command_SaveSpawners(const char *args)
 	strcat(pathbuf, Command_ExtractArg(args, 0));
 	Serial_SaveSpawners(pathbuf);
 }
-static void Command_LoadSpawners(const char *args)
+static void Command_LoadSpawners(const char *args, int from_player)
 {
 	char pathbuf[128];
 	if (Game_TopState() != GAME_STATE_OBJEDIT &&
@@ -379,7 +403,7 @@ static void Command_LoadSpawners(const char *args)
 	strcat(pathbuf, Command_ExtractArg(args, 0));
 	Serial_LoadSpawners(pathbuf);
 }
-static void Command_SetLight(const char *args)
+static void Command_SetLight(const char *args, int from_player)
 {
 	if (Game_TopState() != GAME_STATE_BLOCKSEDIT)
 		return;
@@ -390,19 +414,19 @@ static void Command_SetLight(const char *args)
 	l = atoi(Command_ExtractArg(args, 2));
 	Blocks_SetBlockAmbientLight(x, y, l);
 }
-static void Command_DebugHitboxes(const char *args)
+static void Command_DebugHitboxes(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_DebugShowObjgrid(const char *args)
+static void Command_DebugShowObjgrid(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_SHOW_OBJGRID)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_DebugShowGridPoses(const char *args)
+static void Command_DebugShowGridPoses(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_SHOW_GRIDPOS)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_Connect(const char *args)
+static void Command_Connect(const char *args, int from_player)
 {
 	strcpy(Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string, Command_ExtractArg(args, 0));
 	if (!Game_GetVar(GAME_VAR_NODOWNLOAD)->data.integer)
@@ -414,7 +438,7 @@ static void Command_Connect(const char *args)
 		Game_SwitchState(GAME_STATE_CLIENT_CONNECTING);
 	}
 }
-static void Command_PrintConnectedPlayers(const char *args)
+static void Command_PrintConnectedPlayers(const char *args, int from_player)
 {
 	NETGAME_NODE *iter = NULL;
 	NetGame_Iterate(&iter);
@@ -424,55 +448,57 @@ static void Command_PrintConnectedPlayers(const char *args)
 		NetGame_Iterate(&iter);
 	}
 }
-static void Command_PrintWobjNetSize(const char *args)
+static void Command_PrintWobjNetSize(const char *args, int from_player)
 {
 	Console_Print("%d bytes", WOBJ_NET_SIZE);
 }
-static void Command_HiRes(const char *args)
+static void Command_HiRes(const char *args, int from_player)
 {
 	Renderer_SetHiResMode(atoi(Command_ExtractArg(args, 0)));
 }
-static void Command_ClInterp(const char *args)
+static void Command_ClInterp(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_CL_INTERP)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_ShowPos(const char *args)
+static void Command_ShowPos(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_SHOWPOS)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_ClSmoothing(const char *args)
+static void Command_ClSmoothing(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_CL_SMOOTHING)->data.decimal = (float)atof(Command_ExtractArg(args, 0));
 }
-static void Command_ClAvgFramesPerUpdate(const char *args)
+static void Command_ClAvgFramesPerUpdate(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_CL_TIME_BETWEEN_UPDATES)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_Tunes(const char *args)
+static void Command_Tunes(const char *args, int from_player)
 {
+	if (!can_run_cheat1(from_player)) return;
 	Audio_PlayMusic(atoi(Command_ExtractArg(args, 0)), CNM_TRUE);
 }
-static void Command_Kill(const char *args)
+static void Command_Kill(const char *args, int from_player)
 {
+	if (!can_run_cheat1(from_player)) return;
 	((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->health = -100.0f;
 }
-static void Command_ShowNodeUUIDS(const char *args)
+static void Command_ShowNodeUUIDS(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_CL_SHOW_NODEUUIDS)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_StartLightEdit(const char *args)
+static void Command_StartLightEdit(const char *args, int from_player)
 {
-	if (Game_TopState() == GAME_STATE_LIGHT_EDITOR)
+	if (Game_TopState() == GAME_STATE_LIGHT_EDITOR || Game_TopState() == GAME_STATE_SINGLEPLAYER)
 		return;
 
 	Game_SwitchState(GAME_STATE_LIGHT_EDITOR);
 }
-static void Command_Noclip(const char *args)
+static void Command_Noclip(const char *args, int from_player)
 {
-	if (Command_CanExecuteCheat())
+	if (can_run_cheat1(from_player))
 		Game_GetVar(GAME_VAR_NOCLIP)->data.integer = !Game_GetVar(GAME_VAR_NOCLIP)->data.integer;
 }
-static void Command_GetChecksum(const char *args)
+static void Command_GetChecksum(const char *args, int from_player)
 {
 	const char *file = Command_ExtractArg(args, 0);
 	int index = atoi(Command_ExtractArg(args, 1));
@@ -489,101 +515,103 @@ static void Command_GetChecksum(const char *args)
 	if (strncmp(file, "wav_file", strlen("wav_file")) == 0)
 		Console_Print("loaded wav_file[%d] checksum: %d", index, FileSystem_GetRegisteredSoundFile(index)->checksum);
 }
-static void Command_LoadGfxFile(const char *args)
+static void Command_LoadGfxFile(const char *args, int from_player)
 {
 	Renderer_LoadBitmap(Command_ExtractArg(args, 0));
 	Renderer_BuildTables();
 	//Renderer_RestartWindow();
 	FileSystem_RegisterGfx(Command_ExtractArg(args, 0));
 }
-static void Command_LoadAudioFile(const char *args)
+static void Command_LoadAudioFile(const char *args, int from_player)
 {
 	Serial_LoadAudioCfg(Command_ExtractArg(args, 0));
 }
-static void Command_IsTcpServerConnected(const char *args)
+static void Command_IsTcpServerConnected(const char *args, int from_player)
 {
 	if (NetTcp_HasConnection())
 		Console_Print("The TCP socket is connected");
 	else
 		Console_Print("The TCP socket has NO connection");
 }
-static void Command_SetStrength(const char *args)
+static void Command_SetStrength(const char *args, int from_player)
 {
-	if (!Command_CanExecuteCheat())
+	if (!can_run_cheat1(from_player))
 		return;
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	player->strength = (float)atoi(Command_ExtractArg(args, 0)) / 100.0f;
 }
-static void Command_SetHealth(const char *args)
+static void Command_SetHealth(const char *args, int from_player)
 {
-	if (!Command_CanExecuteCheat())
+	if (!can_run_cheat1(from_player))
 		return;
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	player->health = (float)atoi(Command_ExtractArg(args, 0));
 }
-static void Command_Volume(const char *args)
+static void Command_Volume(const char *args, int from_player)
 {
 	Audio_SetGlobalVolume((float)atoi(Command_ExtractArg(args, 0)) / 100.0f);
 	Console_Print("Set the new global audio volume to %f", (float)atoi(Command_ExtractArg(args, 0)) / 100.0f);
 }
-static void Command_SetSpeed(const char *args)
+static void Command_SetSpeed(const char *args, int from_player)
 {
-	if (!Command_CanExecuteCheat())
+	if (!can_run_cheat1(from_player))
 		return;
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	player->speed = (float)atoi(Command_ExtractArg(args, 0));
 }
-static void Command_SetJump(const char *args)
+static void Command_SetJump(const char *args, int from_player)
 {
-	if (!Command_CanExecuteCheat())
+	if (!can_run_cheat1(from_player))
 		return;
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	player->jump = (float)atoi(Command_ExtractArg(args, 0));
 }
-static void Command_SetItem(const char *args)
+static void Command_SetItem(const char *args, int from_player)
 {
-	if (!Command_CanExecuteCheat())
+	if (!can_run_cheat1(from_player))
 		return;
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	Item_Drop(player);
 	WOBJ *temp = Wobj_CreateOwned(WOBJ_DROPPED_ITEM, player->x, player->y, atoi(Command_ExtractArg(args, 0)), 0.0f);
 	Item_Pickup(player, temp);
 }
-static void Command_SetUpgrade(const char *args)
+static void Command_SetUpgrade(const char *args, int from_player)
 {
-	if (!Command_CanExecuteCheat())
+	if (!can_run_cheat1(from_player))
 		return;
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	((PLAYER_LOCAL_DATA *)player->local_data)->upgrade_state = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_StartDialoge(const char *args)
+static void Command_StartDialoge(const char *args, int from_player)
 {
 	Dialoge_Start(atoi(Command_ExtractArg(args, 0)), atoi(Command_ExtractArg(args, 1)));
 }
-static void Command_DebugState(const char *args)
+static void Command_DebugState(const char *args, int from_player)
 {
+	if (!can_run_cheat3(from_player)) return;
 	Game_SwitchState(atoi(Command_ExtractArg(args, 0)));
 }
-static void Command_SetMoney(const char *args)
+static void Command_SetMoney(const char *args, int from_player)
 {
-	if (!Command_CanExecuteCheat())
+	if (!can_run_cheat1(from_player))
 		return;
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	player->money = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_SvCheats(const char *args)
+static void Command_SvCheats(const char *args, int from_player)
 {
+	if (!can_run_cheat2(from_player)) return;
 	if (Game_TopState() == GAME_STATE_MAINMENU ||
 		Game_TopState() == GAME_STATE_HOSTED_SERVER ||
 		Game_TopState() == GAME_STATE_SINGLEPLAYER) {
 		Game_GetVar(GAME_VAR_SV_CHEATS)->data.integer = atoi(Command_ExtractArg(args, 0));
 	}
 }
-static void Command_ShowUUIDS(const char *args)
+static void Command_ShowUUIDS(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_CL_SHOW_NODEUUIDS)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
-static void Command_SaveBCondenced(const char *args)
+static void Command_SaveBCondenced(const char *args, int from_player)
 {
 	char pathbuf[128];
 	if (Game_TopState() != GAME_STATE_BLOCKSEDIT)
@@ -593,17 +621,17 @@ static void Command_SaveBCondenced(const char *args)
 	strcat(pathbuf, Command_ExtractArg(args, 0));
 	Serial_CondenceBlockFileAndSave(pathbuf);
 }
-static void Command_ResizeBlocks(const char *args)
+static void Command_ResizeBlocks(const char *args, int from_player)
 {
 	if (Game_TopState() != GAME_STATE_BLOCKSEDIT)
 		return;
 	Blocks_ResizeWorld(atoi(Command_ExtractArg(args, 0)), atoi(Command_ExtractArg(args, 1)));
 }
-static void Command_GetBlocksSize(const char *args)
+static void Command_GetBlocksSize(const char *args, int from_player)
 {
 	Console_Print("WORLD SIZE: (%d, %d)", Blocks_GetWorldWidth(), Blocks_GetWorldHeight());
 }
-static void Command_WobjPlayerPacketTest(const char *args)
+static void Command_WobjPlayerPacketTest(const char *args, int from_player)
 {
 	uint8_t bytes[128];
 	int head, numbytes;
@@ -615,7 +643,7 @@ static void Command_WobjPlayerPacketTest(const char *args)
 	head = 0;
 	parse_wobj_packet(Game_GetVar(GAME_VAR_PLAYER)->data.pointer, bytes, &head);
 }
-static void Command_ActivateSupervirus(const char *args)
+static void Command_ActivateSupervirus(const char *args, int from_player)
 {
 	if (Game_TopState() != GAME_STATE_SINGLEPLAYER)
 		return;
@@ -627,11 +655,12 @@ static void Command_ActivateSupervirus(const char *args)
 	Interaction_CreateWobj(WOBJ_SUPERVIRUS, p->x - 160.0f, p->y + 160.0f, 0, 0.0f);
 	Interaction_CreateWobj(WOBJ_SUPERVIRUS, p->x + 160.0f, p->y + 160.0f, 0, 0.0f);
 }
-static void Command_NetFakeLoss(const char *args)
+static void Command_NetFakeLoss(const char *args, int from_player)
 {
+	if (!can_run_cheat1(from_player)) return;
 	Net_FakeLoss(atoi(Command_ExtractArg(args, 0)));
 }
-static void Command_NetShowBandwidth(const char *args)
+static void Command_NetShowBandwidth(const char *args, int from_player)
 {
 	Game_GetVar(GAME_VAR_SHOW_BANDWIDTH)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
@@ -644,7 +673,7 @@ static void debug_print_wobj(WOBJ *w) {
 		Console_Print("history_frames[%d]: %d", i, w->history_frames[i]);
 	}
 }
-static void Command_WobjReport(const char *args) {
+static void Command_WobjReport(const char *args, int from_player) {
 	Console_Print("====== UNOWNED WOBJS ========");
 	WOBJ *wobj = NULL;
 	Wobj_IterateOverDebugUnowned(&wobj);
@@ -660,10 +689,12 @@ static void Command_WobjReport(const char *args) {
 		Wobj_IterateOverOwned(&wobj);
 	}
 }
-static void Command_NetFakePing(const char *args) {
+static void Command_NetFakePing(const char *args, int from_player) {
+	if (!can_run_cheat1(from_player)) return;
 	Net_FakeSenderPing(atoi(Command_ExtractArg(args, 0)));
 }
-static void Command_LocalMap(const char *args) {
+static void Command_LocalMap(const char *args, int from_player) {
+	if (!can_run_cheat1(from_player)) return;
 	if (Game_TopState() == GAME_STATE_CLIENT) return;
 	if (Game_TopState() == GAME_STATE_HOSTED_SERVER || Game_TopState() == GAME_STATE_DEDICATED_SERVER) {
 		NETGAME_NODE *node_iter = NULL;
@@ -698,10 +729,11 @@ static void Command_LocalMap(const char *args) {
 		Game_SwitchState(GAME_STATE_SINGLEPLAYER);
 	}
 }
-static void Command_NoSave(const char *args) {
+static void Command_NoSave(const char *args, int from_player) {
 	Game_GetVar(GAME_VAR_NOSAVE)->data.integer = CNM_TRUE;
 }
-static void Command_SetLives(const char *args) {
+static void Command_SetLives(const char *args, int from_player) {
+	if (!can_run_cheat1(from_player)) return;
 	g_saves[g_current_save].lives = atoi(Command_ExtractArg(args, 0));
 }
 

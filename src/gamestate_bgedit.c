@@ -46,7 +46,7 @@ static void LoadCallback(GUI_ELEMENT *elem, int index)
 		loading = CNM_TRUE;
 		strcpy(loaded_file, elem->props.string);
 		sprintf(command_buf, "load_blocks %s", loaded_file);
-		Command_Execute(command_buf);
+		Command_Execute(command_buf, CNM_FALSE);
 		Gui_SwitchBack();
 		strcpy(save_frame->elements[0].props.string, elem->props.string);
 		ReloadGui();
@@ -61,7 +61,7 @@ static void SaveCallback(GUI_ELEMENT *elem, int index)
 	{
 		saving = CNM_TRUE;
 		sprintf(command_buf, "save_blocks %s", elem->props.string);
-		Command_Execute(command_buf);
+		Command_Execute(command_buf, CNM_FALSE);
 		Gui_SwitchBack();
 		saving = CNM_FALSE;
 	}

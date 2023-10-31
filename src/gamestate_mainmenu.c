@@ -99,11 +99,11 @@ static void ChangeMainMenuSpecial(GUI_ELEMENT *elem, int index)
 }
 static void BlockEditorButton(GUI_ELEMENT *elem, int index)
 {
-	Command_Execute("start_blockedit");
+	Command_Execute("start_blockedit", CNM_FALSE);
 }
 static void LightEditorButton(GUI_ELEMENT *elem, int index)
 {
-	Command_Execute("start_lightedit");
+	Command_Execute("start_lightedit", CNM_FALSE);
 }
 static void BlockPropsEditorButton(GUI_ELEMENT *elem, int index)
 {
@@ -134,7 +134,7 @@ static void JoinGameIpCallback(GUI_ELEMENT *elem, int index)
 	strcpy(buffer, "connect ");
 	strcat(buffer, elem->frame->elements[index - 1].props.string);
 	Console_Print(buffer);
-	Command_Execute(buffer);
+	Command_Execute(buffer, CNM_FALSE);
 }
 static void HostGameCallback(GUI_ELEMENT *elem, int index)
 {
@@ -188,7 +188,7 @@ static void ChangeGameVolume(GUI_ELEMENT *elem, int index)
 {
 	char cmd[100];
 	sprintf(cmd, "volume %d", Gui_GetNumberElementInt(elem->frame, index));
-	Command_Execute(cmd);
+	Command_Execute(cmd, CNM_FALSE);
 	Serial_SaveConfig();
 	//Audio_SetGlobalVolume();
 }
@@ -287,7 +287,7 @@ static void JoinGameBrowserCallback(GUI_ELEMENT *elem, int index)
 	strcat(buffer, Net_GetStringFromIp(&msdata.servers[elem->custom_hint].addr));
 	Console_Print(buffer);
 	cleanup_bg = CNM_FALSE;
-	Command_Execute(buffer);
+	Command_Execute(buffer, CNM_FALSE);
 }
 
 static void MainMenu_OnPacket(NET_PACKET *packet);
@@ -1308,7 +1308,7 @@ void draw_play_gui(void) {
 		if (loading_save_timer == 30) {
 			char cmdbuf[64];
 			sprintf(cmdbuf, "localmap %s", g_saves[g_current_save].level);
-			Command_Execute(cmdbuf);
+			Command_Execute(cmdbuf, CNM_FALSE);
 		}
 		return;
 	}
@@ -1583,7 +1583,7 @@ void draw_join_game_gui(void) {
 		strcat(buffer, joingame_buf);
 		Console_Print(buffer);
 		cleanup_bg = CNM_FALSE;
-		Command_Execute(buffer);
+		Command_Execute(buffer, CNM_FALSE);
 	}
 
 	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {

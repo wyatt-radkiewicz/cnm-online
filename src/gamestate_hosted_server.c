@@ -26,7 +26,7 @@ static void GoBackToMainMenu(void)
 }
 static void Respawn()
 {
-	Command_Execute("kill");
+	Command_Execute("kill", CNM_FALSE);
 	pause_menu_unfocus();
 }
 
