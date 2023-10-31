@@ -13,8 +13,10 @@ LDFLAGS := $(LDFLAGS) $(SDL_LDFLAGS)
 # Build modes
 debug: CFLAGS += -DDEBUG -g -O0
 debug: $(BUILD_DIR)/$(TARGET_NAME)
-release: CFLAGS += -O2
+release: CFLAGS += -O1
 release: $(BUILD_DIR)/$(TARGET_NAME)
+release_with_debug: CFLAGS += -g -DDEBUG -O1
+release_with_debug: $(BUILD_DIR)/$(TARGET_NAME)
 
 # Build commands
 run: $(BUILD_DIR)/$(TARGET_NAME)
