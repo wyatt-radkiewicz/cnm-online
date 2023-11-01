@@ -245,7 +245,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->level_end_rank = (int)((float)(local_data->level_end_score + local_data->level_end_time_score) / (float)par * 4.0);
 		if (local_data->level_end_rank > 4) local_data->level_end_rank = 4;
 	}
-	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
+	// Give the player lives
+	if ((wobj->flags & WOBJ_HAS_PLAYER_FINISHED) &&
+		!Game_GetVar(GAME_VAR_NOSAVE)->data.integer &&
+		!Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer &&
+		!local_data->level_end_norank) {
 		const static int rank_lives[] = { 0, 0, 1, 5, 10 };
 		for (int i = 0; i < rank_lives[local_data->level_end_rank]; i++) {
 			if (local_data->finish_timer == PLAYER_FINISH_TIMER / 4 + 30 + i * 15) {

@@ -334,6 +334,31 @@ static void WobjDroppedItem_Create(WOBJ *wobj)
 static void WobjDroppedItem_Update(WOBJ *wobj) {
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
+static void WobjDroppedItem_Draw(WOBJ *wobj, int camx, int camy) {
+	CNM_RECT r;
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y - camy,
+		&wobj_types[WOBJ_DROPPED_ITEM].frames[wobj->item],
+		0,
+		Blocks_GetCalculatedBlockLight((int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
+	);
+	if (wobj->item == 40) {
+		Renderer_DrawBitmap
+		(
+			(int)wobj->x - camx,
+			(int)wobj->y - camy,
+			&(CNM_RECT) {
+				.x = 480, .y = 7520 + wobj->anim_frame * 32, .w = 32, .h = 32
+			},
+			2,
+			RENDERER_LIGHT
+		);
+	}
+}
 
 static void WobjIceRune_Create(WOBJ *wobj)
 {
@@ -1464,17 +1489,15 @@ static void WobjSkinUnlock_Draw(WOBJ *wobj, int camx, int camy) {
 		wobj->flags & WOBJ_HFLIP,
 		wobj->flags & WOBJ_VFLIP
 	);
-	Renderer_DrawBitmap2
+	Renderer_DrawBitmap
 	(
 		(int)wobj->x - camx,
 		(int)wobj->y - camy,
 		&(CNM_RECT) {
 			.x = 480, .y = 7520 + wobj->anim_frame * 32, .w = 32, .h = 32
 		},
-		0,
-		Blocks_GetCalculatedBlockLight(wobj->x / BLOCK_SIZE, wobj->y / BLOCK_SIZE),
-		wobj->flags & WOBJ_HFLIP,
-		wobj->flags & WOBJ_VFLIP
+		2,
+		RENDERER_LIGHT
 	);
 }
 
@@ -1683,7 +1706,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ /* 16: Dropped Item Object */
 		WobjDroppedItem_Create, // On Create
 		WobjDroppedItem_Update,	// On Update
-		WobjGeneric_Draw,	  // On Draw
+		WobjDroppedItem_Draw,	  // On Draw
 		NULL,				  // On Hurt
 		{					  // Animation Frames
 			{320, 1216, 32, 32}, // Null Item
