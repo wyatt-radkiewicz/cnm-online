@@ -93,6 +93,7 @@ int skin_bases[10][2] =
 static float _hud_player_y = 0.0f, _hud_player_yvel = 0.0f;
 static int level_end_unlockable_y = 0, unlockable_show = CNM_FALSE;
 static int level_end_rank_y = 0;
+static int skin_unlock_y = 0, skin_unlock_timer = 0;
 
 static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame);
 static void StepPlayerAnimation(WOBJ *player);
@@ -186,7 +187,12 @@ void WobjPlayer_Create(WOBJ *wobj)
 	unlockable_show = CNM_FALSE;
 	level_end_unlockable_y = -128;
 	level_end_rank_y = RENDERER_HEIGHT;
+
+	skin_unlock_y = -128;
+	skin_unlock_timer = 0;
+	local_data->last_touched_skin_unlock = -1;
 	//local_data->item_durability = 100.0f;
+	g_can_pause = CNM_TRUE;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
@@ -941,6 +947,20 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_GRAV_TRIGGER);
 	if (other != NULL)
 		local_data->grav = other->custom_floats[0];
+	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_SKIN_UNLOCK);
+	//Console_Print("%d", local_data->last_touched_skin_unlock);
+	if (other != NULL && !(wobj->flags & WOBJ_HAS_PLAYER_FINISHED) && Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
+		if (local_data->last_touched_skin_unlock != other->custom_ints[0]) {
+			local_data->last_touched_skin_unlock = other->custom_ints[0];
+			skin_unlock_y = -128;
+			skin_unlock_timer = 30*5;
+		}
+		if (!Game_GetVar(GAME_VAR_NOSAVE)->data.integer && !Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+			// save to globalsave
+			globalsave_visit_skin(&g_globalsave, other->custom_ints[0]);
+			globalsave_save(&g_globalsave);
+		}
+	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_FINISH_TRIGGER);
 	if (other != NULL && !(wobj->flags & WOBJ_HAS_PLAYER_FINISHED)) {
 		Audio_PlayMusic(26, CNM_FALSE);
@@ -950,6 +970,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			local_data->level_end_norank = CNM_FALSE;
 		}
 		local_data->final_time_forscore = Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer;
+		g_can_pause = CNM_FALSE;
 		//Console_Print(EndingText_GetLine(other->custom_ints[0]));
 		//strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/");
 		//strcat(Game_GetVar(GAME_VAR_LEVEL)->data.string, EndingText_GetLine(other->custom_ints[0]));
@@ -2018,6 +2039,21 @@ void Player_DrawHUD(WOBJ *player) {
 		}
 		int target = local_data->finish_timer > PLAYER_FINISH_TIMER / 3 * 2 ? -64 : 0;
 		level_end_unlockable_y += (target - level_end_unlockable_y) * 0.25f;
+	}
+
+	if (skin_unlock_timer > 0) {
+		Util_SetRect(&r, 400-16, 7136, 128, 48);
+		Renderer_DrawBitmap2(RENDERER_WIDTH / 2, skin_unlock_y, &r, 2, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
+		Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, skin_unlock_y, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
+		Renderer_DrawText(RENDERER_WIDTH / 2 - (8*13) / 2, skin_unlock_y + 4+(12*0), 0, RENDERER_LIGHT, "FOUND SKIN!!!");
+		if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer || Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*32) / 2, skin_unlock_y + 4+(12*1), 0, RENDERER_LIGHT, "NOT UNLOCKED DUE TO LEVEL SELECT");
+		} else {
+			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*28) / 2, skin_unlock_y + 4+(12*1), 0, RENDERER_LIGHT, "FIND IT IN THE PLAYER SETUP!");
+		}
+		int target = skin_unlock_timer < 10 ? -80 : 0;
+		skin_unlock_y += (target - skin_unlock_y) * 0.25f;
+		skin_unlock_timer--;
 	}
 }
 void Player_SaveData(WOBJ *player, savedata_t *data) {

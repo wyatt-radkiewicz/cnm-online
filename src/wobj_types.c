@@ -1449,6 +1449,34 @@ static void Wobj_SfxPoint_Draw(WOBJ *wobj, int camx, int camy) {
 	if (!Audio_IsSoundPlaying(wobj->custom_ints[0]))
 		Audio_PlaySoundscape(wobj->custom_ints[0], (int)wobj->x, (int)wobj->y);
 }
+static void WobjSkinUnlock_Create(WOBJ *wobj) {
+	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
+}
+static void WobjSkinUnlock_Draw(WOBJ *wobj, int camx, int camy) {
+	if (Game_GetFrame() % 2 == 0) wobj->anim_frame = (wobj->anim_frame + 1) % 8;
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y + (sinf((float)Game_GetFrame() / 10.0f + wobj->x + wobj->y) * 5.0f) - camy,
+		&wobj_types[WOBJ_SKIN_UNLOCK].frames[wobj->custom_ints[0]],
+		0,
+		Blocks_GetCalculatedBlockLight(wobj->x / BLOCK_SIZE, wobj->y / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
+	);
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y - camy,
+		&(CNM_RECT) {
+			.x = 480, .y = 7520 + wobj->anim_frame * 32, .w = 32, .h = 32
+		},
+		0,
+		Blocks_GetCalculatedBlockLight(wobj->x / BLOCK_SIZE, wobj->y / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
+	);
+}
 
 #define LUAOBJ_DEF {\
 	NULL,\
@@ -3363,5 +3391,28 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0, // Money reward
 		CNM_TRUE, // Does network interpolation?
 		CNM_FALSE // Can respawn?
+	},
+	{ // 148: Skin Unlock
+		WobjSkinUnlock_Create, // Create
+		NULL, // Update
+		WobjSkinUnlock_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{128, 1824, 32, 32},
+			{256, 1824, 32, 32},
+			{256, 1920-32, 32, 32},
+			{256, 3392, 32, 32},
+			{128, 1984, 32, 32},
+			{0, 1280, 32, 32},
+			{128, 1280, 32, 32},
+			{0, 768, 32, 32},
+			{128, 768, 32, 32},
+			{5, 4616, 32, 32}
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
 	},
 };

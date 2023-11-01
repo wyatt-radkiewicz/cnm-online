@@ -290,6 +290,7 @@ void GameState_Base_Init(void)
 	FileSystem_SearchForLevels(CNM_FALSE);
 	Serial_LoadAudioCfg("audio.cnma");
 	g_current_save = 0;
+	globalsave_clear(&g_globalsave);
 	globalsave_load(&g_globalsave);
 	for (int i = 0; i < SAVE_SLOTS; i++) {
 		new_save(g_saves + i);

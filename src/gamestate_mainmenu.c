@@ -879,6 +879,7 @@ static int quit_rects[][2] = {
 	{ 64, 256, }, { 256, 416, }, { 192, 736, },
 	{ 384, 2208, }, { 173, 2443, }, { 52, 6469, },
 };
+static int selected_skin, num_skins_cached;
 
 void draw_player_setup(void) {
 	CNM_RECT r, r2;
@@ -926,10 +927,11 @@ void draw_player_setup(void) {
 		int ralign = r.w - 20 - 16 * 8;
 		gui_text_box_draw(&ps_player_name, ps_selected == 0, RENDERER_WIDTH / 2 + ralign, RENDERER_HEIGHT / 2 + 40, trans2);
 
-		int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
-		for (int i = -1; i <= 10; i++) {
-			if (i < 0 || i > 9) Util_SetRect(&r2, 0, 352, 32, 32);
-			else memcpy(&r2, skin_bases[i], sizeof(CNM_RECT));
+		//int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
+		//Console_Print("%d %d", num_skins_cached, selected_skin);
+		for (int i = -1; i <= num_skins_cached + 1; i++) {
+			if (i < 0 || i >= num_skins_cached) Util_SetRect(&r2, 0, 352, 32, 32);
+			else memcpy(&r2, skin_bases[g_globalsave.skins_found[i]], sizeof(CNM_RECT));
 			r2.w = 32; r2.h = 32;
 			int pos = i*(32+16) - ps_pos;
 			int t = trans2;
@@ -938,10 +940,10 @@ void draw_player_setup(void) {
 			if (t > 7) t = 7;
 			Renderer_DrawBitmap(
 				RENDERER_WIDTH / 2 - 16 + pos,
-				RENDERER_HEIGHT / 2 + 48 + 16 + (i == *skin ? 0 : 4),
+				RENDERER_HEIGHT / 2 + 48 + 16 + (i == selected_skin ? 0 : 4),
 				&r2,
 				t,
-				i == *skin ? RENDERER_LIGHT : RENDERER_LIGHT + 2
+				i == selected_skin ? RENDERER_LIGHT : RENDERER_LIGHT + 2
 			);
 		}
 	}
@@ -1421,9 +1423,12 @@ void draw_main_gui(void) {
 		case 0:
 			gui_state = GUI_PLAYER_SETUP;
 			ps_selected = 0;
+			selected_skin = globalsave_find_skin(&g_globalsave, Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer);
+			if (selected_skin == -1) selected_skin = 0;
+			num_skins_cached = globalsave_get_num_skins(&g_globalsave);
 			ps_trans = 0;
 			gui_timer = 0;
-			ps_pos = Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer * (32+16);
+			ps_pos = selected_skin * (32+16);
 			ps_pos_target = ps_pos;
 			ps_player_name = gui_text_box_init(Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string, 16);
 			break;
@@ -1687,22 +1692,20 @@ void draw_player_setup_gui(void) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected--;
 	}
-	if (ps_selected == 0) {
-	}
-	int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
+	//int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
 	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING) && ps_selected == 1) {
-		if (*skin < 9) {
+		if (selected_skin + 1 < num_skins_cached) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
-			(*skin)++;
+			selected_skin++;
 			ps_pos_target += 32+16;
 		} else {
 			ps_pos_target_add = 8;
 		}
 	}
 	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING) && ps_selected == 1) {
-		if (*skin > 0) {
+		if (selected_skin > 0) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
-			(*skin)--;
+			selected_skin--;
 			ps_pos_target -= 32+16;
 		} else {
 			ps_pos_target_add = -8;
@@ -1716,6 +1719,7 @@ void draw_player_setup_gui(void) {
 		last_gui_state = gui_state;
 		gui_state = GUI_MAIN_STATE;
 		gui_timer = 0;
+		Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer = g_globalsave.skins_found[selected_skin];
 		side_blob_x = RENDERER_WIDTH;
 		side_xstart = -192;
 		ps_trans = 7*2;
