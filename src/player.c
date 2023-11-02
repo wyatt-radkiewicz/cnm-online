@@ -113,6 +113,22 @@ static void Normalize(float *x, float *y)
 	*y /= dist;
 }
 
+void Player_SetSkinInstant(WOBJ *wobj, int skinid) {
+	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
+	local_data->currskin = skinid;
+	local_data->curranim = PLAYER_ANIM_STANDING;
+	local_data->currframe = 0;
+	local_data->animspd = 0;
+	if (wobj->internal.owned)
+	{
+		if (local_data->currskin != 9)
+			anim_lengths = anim_lengths1;
+		else
+			anim_lengths = anim_lengths2;
+	}
+
+}
+
 void WobjPlayer_Create(WOBJ *wobj)
 {
 	PLAYER_LOCAL_DATA *local_data;
@@ -149,19 +165,9 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->uswords_have = 4;
 	local_data->death_limbo_counter = 0;
 
-	local_data->currskin = wobj->custom_ints[0];
-	local_data->curranim = PLAYER_ANIM_STANDING;
-	local_data->currframe = 0;
-	local_data->animspd = 0;
-	local_data->control_mul = 1.0f;
-	if (wobj->internal.owned)
-	{
-		if (local_data->currskin != 9)
-			anim_lengths = anim_lengths1;
-		else
-			anim_lengths = anim_lengths2;
-	}
+	Player_SetSkinInstant(wobj, wobj->custom_ints[0]);
 
+	local_data->control_mul = 1.0f;
 	local_data->upgrade_state = PLAYER_UPGRADE_NONE;
 	local_data->fire_resistance = 0;
 	local_data->grav = Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
@@ -588,6 +594,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 				wobj->vel_x = 0.0f;
 			}
 		}
+
+		//Console_Print("%d", local_data->is_sliding);
 
 		if (!(Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
 			  Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)) && !local_data->is_sliding)
@@ -1255,8 +1263,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		recved_normal_damage = Interaction_PlayerRecieveDamage();
 	}
 	else {
-		if (local_data->currskin != 9)
-			local_data->curranim = PLAYER_ANIM_SHOOT;
+		//if (local_data->currskin != 9)
+			//local_data->curranim = PLAYER_ANIM_SHOOT;
 	}
 	if (wobj->health < old_hp)
 	{

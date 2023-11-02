@@ -745,8 +745,9 @@ static void Command_Skin(const char *args, int from_player) {
 	if (skin < 0 || skin > 9) skin = 9;
 	Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer = skin;
 	if (Game_GetVar(GAME_VAR_PLAYER)->data.pointer != NULL) {
-		((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->custom_ints[0] = skin;
-		((PLAYER_LOCAL_DATA *)((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->local_data)->currskin = skin;
+		Player_SetSkinInstant(Game_GetVar(GAME_VAR_PLAYER)->data.pointer, skin);
+	//	((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->custom_ints[0] = skin;
+	//	((PLAYER_LOCAL_DATA *)((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->local_data)->currskin = skin;
 	}
 }
 
