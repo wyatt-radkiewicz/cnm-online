@@ -352,7 +352,7 @@ static void WobjDroppedItem_Draw(WOBJ *wobj, int camx, int camy) {
 			(int)wobj->x - camx,
 			(int)wobj->y - camy,
 			&(CNM_RECT) {
-				.x = 480, .y = 7520 + wobj->anim_frame * 32, .w = 32, .h = 32
+				.x = 480, .y = 7520 + ((Game_GetFrame() / 2) % 8) * 32, .w = 32, .h = 32
 			},
 			2,
 			RENDERER_LIGHT
