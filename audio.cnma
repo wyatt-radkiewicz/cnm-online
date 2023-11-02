@@ -84,6 +84,12 @@ MODE SOUNDS
 55 sounds/1up.wav
 56 sounds/itembroke.wav
 57 sounds/repair.wav
+58 sounds/jump.wav
+59 sounds/slide.wav
+60 sounds/land.wav
+61 sounds/fly.wav
+62 sounds/flydive.wav
+63 sounds/super_slide.wav
 MODE MUSIC_VOLUME_OVERRIDE
 MODE LEVELSELECT_ORDER
 race 0

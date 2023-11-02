@@ -358,6 +358,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) && 
 			!Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) &&
 			wobj->vel_y > 1.0f) {
+			if (Game_GetFrame() % 30 == 0) Interaction_PlaySound(wobj, 62);
 			local_data->isdiving = CNM_TRUE;
 			wobj->vel_y += 0.2f;
 			if (fabsf(wobj->vel_x) < wobj->speed * 3.0f) {
@@ -512,10 +513,13 @@ void WobjPlayer_Update(WOBJ *wobj)
 
 		if (local_data->currskin == 9 && local_data->curranim == PLAYER_ANIM_JUMP && Wobj_IsGrouneded(wobj))
 		{
+			Interaction_PlaySound(wobj, 60);
 			local_data->curranim = PLAYER_ANIM_JUMP_END;
 			local_data->currframe = 0;
 			local_data->animspd = 3;
 			local_data->animtimer = 0;
+		} else if (local_data->curranim == PLAYER_ANIM_JUMP && Wobj_IsGrouneded(wobj)) {
+			Interaction_PlaySound(wobj, 60);
 		}
 
 		if ((Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) || Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING)) &&
@@ -537,13 +541,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 					if (wobj->flags & WOBJ_HFLIP && wobj->vel_x > -final_speed) wobj->vel_x = -final_speed;
 					else if (~wobj->flags & WOBJ_HFLIP && wobj->vel_x < final_speed) wobj->vel_x = final_speed;  
 					wobj->vel_x *= 1.5f;
+					Interaction_PlaySound(wobj, 63);
 				} else {
 					wobj->vel_x = CNM_CLAMP(wobj->vel_x, -PLAYER_SLIDING_MAX_SPD, PLAYER_SLIDING_MAX_SPD);
+					Interaction_PlaySound(wobj, 59);
 				}
 				local_data->is_sliding = CNM_TRUE;
 				local_data->sliding_jump_timer = 5;
 				wobj->hitbox.y = 16.0f;
 				wobj->hitbox.h = 15.0f;
+				
 			}
 		}
 		if (Wobj_IsGrouneded(wobj) && !local_data->is_sliding) {
@@ -645,6 +652,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 					local_data->numflaps++;
 					if (wobj->vel_y > 2.0f) wobj->vel_y = 2.0f;
 					wobj->vel_y -= FLAPACCEL;
+					Interaction_PlaySound(wobj, 61);
 					if (local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) wobj->vel_y -= FLAPACCEL;
 					local_data->isdiving = CNM_FALSE;
 					//local_data->flap_spdadd = wobj->speed * (1.0f / 5.0f);
@@ -758,6 +766,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				wobj->vel_y = -jmp_speed;
 				local_data->jumped = 5;
 				local_data->animtimer = 0;
+				Interaction_PlaySound(wobj, 58);
 
 				if (local_data->is_sliding) {
 					local_data->slide_jump_cooldown = 10;

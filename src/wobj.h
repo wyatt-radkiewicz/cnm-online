@@ -161,6 +161,8 @@ typedef enum _WOBJ_TYPES
 	WOBJ_BOZO_WAYPOINT,
 	WOBJ_BOZO_FIREBALL,
 	WOBJ_SKIN_UNLOCK,
+	WOBJ_COOLPLAT,
+	WOBJ_TELEAREA2,
 	WOBJ_MAX
 } WOBJ_TYPES;
 
@@ -294,7 +296,7 @@ void WobjPhysics_ApplyWindForces(WOBJ *wobj);
 void Wobj_ResolveObjectsCollision(WOBJ *obj);
 WOBJ *Wobj_GetOwnedWobjFromUUID(int uuid);
 WOBJ *Wobj_GetAnyWOBJFromUUIDAndNode(int node, int uuid);
-int Wobj_TryTeleportWobj(WOBJ *wobj, int only_teleareas);
+int Wobj_TryTeleportWobj(WOBJ *wobj, int only_telearea2);
 WOBJ *Wobj_GetWobjColliding(WOBJ *wobj, int flags);
 WOBJ *Wobj_GetWobjCollidingWithType(WOBJ *wobj, int type);
 int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y);

@@ -33,6 +33,7 @@ static void WobjTeleport_Create(WOBJ *wobj)
 }
 static void WobjTeleport_Animate(WOBJ *wobj)
 {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	wobj->anim_frame = Game_GetFrame() % 2;
 }
 
@@ -219,6 +220,7 @@ static void WobjScMovingPlatform_Create(WOBJ *wobj)
 }
 static void WobjScMovingPlatform_Update(WOBJ *wobj)
 {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	wobj->x += wobj->vel_x;
 	wobj->custom_ints[1]--;
 	if (wobj->custom_ints[1] <= 0)
@@ -250,6 +252,7 @@ static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
 }
 static void WobjMovingPlatformVertical_Update(WOBJ *wobj)
 {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	wobj->y += wobj->vel_y;
 	wobj->custom_ints[1]--;
 	if (wobj->custom_ints[1] <= 0)
@@ -586,6 +589,7 @@ static void WobjRocket_Create(WOBJ *wobj)
 }
 static void WobjRocket_Update(WOBJ *wobj)
 {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	wobj->x += wobj->speed;
 	wobj->y += wobj->vel_y;
 	if (Game_GetFrame() % 15 == 0)
@@ -956,6 +960,7 @@ static void WobjDissapearingPlatform_Create(WOBJ *wobj)
 }
 static void WobjDissapearingPlatform_Update(WOBJ *wobj)
 {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	if (wobj->money-- < 0)
 	{
 		wobj->flags ^= WOBJ_IS_SOLID;
@@ -968,11 +973,34 @@ static void WobjDissapearingPlatform_Update(WOBJ *wobj)
 	if (wobj->flags & WOBJ_IS_SOLID)
 	{
 		wobj->anim_frame = 0;
-		if (wobj->money < 10 || wobj->money > wobj->custom_ints[0] - 10)
+		if (wobj->money < 5 || wobj->money > wobj->custom_ints[0] - 10)
 			wobj->anim_frame = 1;
 	}
 	else
 		wobj->anim_frame = 2;
+}
+
+static void WobjCoolPlatform_Create(WOBJ *wobj) {
+	int packed = wobj->custom_ints[0];
+	wobj->custom_ints[0] = packed & 0xff; // Time off
+	wobj->custom_ints[1] = wobj->custom_ints[0] + (packed >> 8 & 0xff); // Time on
+	wobj->item = wobj->custom_ints[1] + (packed >> 16 & 0xff); // Time off (again)
+	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
+	wobj->flags = WOBJ_IS_SOLID;
+	wobj->money = 0;
+}
+static void WobjCoolPlatform_Update(WOBJ *wobj) {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
+	wobj->money = Game_GetFrame() % (wobj->item);
+	int solid = wobj->money >= wobj->custom_ints[0] && wobj->money < wobj->custom_ints[1];
+	if (!solid) wobj->flags &= ~WOBJ_IS_SOLID;
+	else wobj->flags |= WOBJ_IS_SOLID;
+	wobj->anim_frame = 2;
+	if (solid) {
+		if (wobj->money < wobj->custom_ints[0] + 5) wobj->anim_frame = 1;
+		else if (wobj->money > wobj->custom_ints[1] - 10) wobj->anim_frame = 1;
+		else wobj->anim_frame = 0;
+	}
 }
 
 static void WobjSpringBoard_Create(WOBJ *wobj)
@@ -982,6 +1010,7 @@ static void WobjSpringBoard_Create(WOBJ *wobj)
 }
 static void WobjSpringBoard_Update(WOBJ *wobj)
 {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	if (wobj->custom_ints[0]-- <= 0)
 		wobj->anim_frame = 0;
 	else
@@ -1024,6 +1053,7 @@ static void WobjBreakablePlatform_Create(WOBJ *wobj)
 }
 static void WobjBreakablePlatform_Update(WOBJ *wobj)
 {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	WOBJ *np = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
 
 	if (np != NULL && wobj->custom_ints[0] == 0)
@@ -1113,6 +1143,7 @@ static void WobjVortex_Update(WOBJ *wobj)
 {
 	//if (--wobj->custom_ints[1] == 0)
 	//	Interaction_DestroyWobj(wobj);
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	VORTEX_CHECK_HOTBOX;
 	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f))
 		Interaction_DestroyWobj(wobj);
@@ -1212,6 +1243,7 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 }
 static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	if (wobj->item > 0)
 	{
 		wobj->x += wobj->vel_x;
@@ -1450,6 +1482,7 @@ static void Wobj_TeleTrigger1_Create(WOBJ *wobj) {
 	wobj->custom_ints[1] = -1;
 }
 static void Wobj_TeleTrigger1_Update(WOBJ *wobj) {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	if (Wobj_GetWobjCollidingWithType(wobj, WOBJ_PLAYER) != NULL && wobj->custom_ints[1] == -1) {
 		wobj->custom_ints[1] = (int)(wobj->custom_floats[0] * 30.0f);
 	}
@@ -1463,13 +1496,29 @@ static void Wobj_TeleTrigger1_Update(WOBJ *wobj) {
 	}
 }
 static void Wobj_TeleArea1_Create(WOBJ *wobj) {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 128.0f, 128.0f);
 	if (wobj->internal.owned)
 		LogicLinks_AddWobjToLink(wobj, (int)wobj->custom_floats[0]);
 }
 static void Wobj_TeleArea1_Update(WOBJ *wobj) {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	return;
 }
+
+static void Wobj_TeleArea2_Create(WOBJ *wobj) {
+	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 128.0f, 128.0f);
+	if (wobj->custom_ints[0] & 0x10000) wobj->custom_ints[1] = 1;
+	if (wobj->internal.owned)
+		LogicLinks_AddWobjToLink(wobj, (int)wobj->custom_floats[0]);
+}
+static void Wobj_TeleArea2_Update(WOBJ *wobj) {
+	return;
+}
+static void Wobj_TryTeleportArea2(WOBJ *wobj) {
+	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
+}
+
 static void Wobj_SfxPoint_Draw(WOBJ *wobj, int camx, int camy) {
 	if (!Audio_IsSoundPlaying(wobj->custom_ints[0]))
 		Audio_PlaySoundscape(wobj->custom_ints[0], (int)wobj->x, (int)wobj->y);
@@ -1597,7 +1646,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		CNM_FALSE
 	},
 	{ /* 6: Small Tunes Object */
-		WobjSmallTunesTrigger_Create, NULL, NULL, NULL,
+		WobjSmallTunesTrigger_Create, Wobj_TryTeleportArea2, NULL, NULL,
 		{
 			{416, 1216, 32, 32}
 		},
@@ -1607,7 +1656,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		CNM_FALSE
 	},
 	{ /* 7: Big Tunes Object */
-		WobjBigTunesTrigger_Create, NULL, NULL, NULL,
+		WobjBigTunesTrigger_Create, Wobj_TryTeleportArea2, NULL, NULL,
 		{
 			{448, 1216, 64, 64}
 		},
@@ -1627,7 +1676,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		CNM_FALSE
 	},
 	{ /* 9: Ending Text Trigger */
-		WobjEndingTextTrigger_Create, NULL, NULL, NULL,
+		WobjEndingTextTrigger_Create, Wobj_TryTeleportArea2, NULL, NULL,
 		{
 			{352, 1216, 32, 32}
 		},
@@ -1647,7 +1696,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		CNM_FALSE
 	},
 	{ /* 11: Generic Breakable Brick Wall */
-		WobjBrickWallBreakable_Create, NULL, WobjGeneric_Draw, WobjGeneric_Hurt,
+		WobjBrickWallBreakable_Create, Wobj_TryTeleportArea2, WobjGeneric_Draw, WobjGeneric_Hurt,
 		{
 			{256, 160, 32, 32}
 		},
@@ -1657,7 +1706,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		CNM_TRUE // can respawn
 	},
 	{ /* 12: Background Switch Trigger */
-		WobjBackgroundSwitch_Create, NULL, NULL, NULL,
+		WobjBackgroundSwitch_Create, Wobj_TryTeleportArea2, NULL, NULL,
 		{
 			{352, 1312, 32, 32}
 		},
@@ -1787,7 +1836,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 19: Ice Rune Object
 		WobjIceRune_Create,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -1800,7 +1849,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 20: Air Rune Object
 		WobjIceRune_Create,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -1813,7 +1862,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 21: Fire Rune Object
 		WobjIceRune_Create,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -1826,7 +1875,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 22: Lightning Rune Object
 		WobjIceRune_Create,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjLightningRune_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -1960,7 +2009,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 32: Shoes Upgrade Trigger Object
 		WobjUpgradeShoes_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -1973,7 +2022,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 33: Wings Upgrade Trigger Object
 		WobjUpgradeShoes_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -1986,7 +2035,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 34: Crystal Wings Upgrade Trigger Object
 		WobjUpgradeShoes_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2245,7 +2294,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 51: Talking Teddy Chase Trigger Object
 		WobjTTBossTriggerGeneric_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2625,7 +2674,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 77: Horizontal Push Zone Object
 		WobjHorizontalPushZone_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2638,7 +2687,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 78: Vertical Push Zone Object
 		WobjVerticalPushZone_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2651,7 +2700,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 79: Vertical Wind Zone Object
 		WobjVerticalPushZone_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2664,7 +2713,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 80: Small Horizontal Push Zone Object
 		WobjSmallHorizontalPushZone_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2760,7 +2809,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 87: Horizontal Background Switch Object
 		WobjHorizontalBackgroundSwitch_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2773,7 +2822,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 88: Vertical Background Switch Object
 		WobjVerticalBackgroundSwitch_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2786,7 +2835,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 89: Very Big Tunes Trigger Object
 		WobjVeryBigTunesTrigger_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2799,7 +2848,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 90: Small Jumpthough Platform (Invisible) Object
 		WobjJumpthrough_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2812,7 +2861,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 91: Big Jumpthough Platform (Invisible) Object
 		WobjBigJumpthrough_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2841,7 +2890,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 93: Breakable Wall With Skin Selection Object
 		WobjSkinBreakableWall_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
@@ -2859,7 +2908,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 94: Locked Red Block Object
 		WobjLockedBlockGeneric_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2872,7 +2921,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 95: Locked Green Block Object
 		WobjLockedBlockGeneric_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -2885,7 +2934,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 96: Locked Blue Block Object
 		WobjLockedBlockGeneric_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3009,7 +3058,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 104: Health Set Trigger Object
 		WobjHealthSetTrigger_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3036,7 +3085,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 106: Vortex Machine Upgrade Trigger Object
 		WobjUpgradeShoes_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3062,7 +3111,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 108: Dialoge Box Trigger Object
 		WobjEndingTextTrigger_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3075,7 +3124,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 109: Graphics Change Trigger Object
 		WobjSmallTunesTrigger_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3156,7 +3205,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 114: MAX POWER Rune Object
 		WobjIceRune_Create,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjLightningRune_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3188,7 +3237,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 			//WOBJ_TELEAREA1,
 	{ // 116: Background Speed X Change Trigger Object
 		Wobj_Trigger32x32_Create,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3201,7 +3250,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 117: Background Speed Y Change Trigger Object
 		Wobj_Trigger32x32_Create,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3214,7 +3263,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 118: Background Transparency Change Trigger Object
 		Wobj_Trigger32x32_Create,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3253,7 +3302,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 121: Sound Effect Point Object
 		NULL,
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		Wobj_SfxPoint_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3311,7 +3360,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	LUAOBJ_DEF // 139: Custom Lua (Type 15) Object
 	{ // 140: No Upgrades Trigger Object
 		Wobj_Trigger32x32_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3324,7 +3373,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 141: Finishing Trigger Object
 		Wobj_Trigger32x32_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3351,7 +3400,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 143: Gravity Trigger Object
 		Wobj_Trigger32x32_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3364,7 +3413,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 144: WOBJ_HEAVY_SHEILD_BOX
 		WobjHeavySheildBox_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjHeavySheildBox_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3417,7 +3466,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 148: Skin Unlock
 		WobjSkinUnlock_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjSkinUnlock_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3431,6 +3480,36 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 			{0, 768, 32, 32},
 			{128, 768, 32, 32},
 			{5, 4616, 32, 32}
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 149: Cool Dissaparing Platform Object
+		WobjCoolPlatform_Create, // Create
+		WobjCoolPlatform_Update, // Update
+		WobjGeneric_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{352, 2112, 32, 32},
+			{352, 2112+32, 32, 32},
+			{0, 0, 0, 0}
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 150: Teleport Area 2 Object
+		Wobj_TeleArea2_Create,
+		Wobj_TeleArea2_Update, // Update
+		NULL, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{480, 3392+96, 32, 96}
 		},
 		0.0f, // Strength reward
 		0, // Money reward

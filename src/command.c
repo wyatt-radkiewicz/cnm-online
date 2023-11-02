@@ -84,6 +84,7 @@ static void Command_NetFakePing(const char *args, int from_player);
 static void Command_LocalMap(const char *args, int from_player);
 static void Command_NoSave(const char *args, int from_player);
 static void Command_SetLives(const char *args, int from_player);
+static void Command_Skin(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -142,7 +143,8 @@ static const char *const command_names[] =
 	"net_fake_ping",
 	"localmap",
 	"nosave",
-	"setlives"
+	"setlives",
+	"skin",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -203,6 +205,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_LocalMap,
 	Command_NoSave,
 	Command_SetLives,
+	Command_Skin,
 };
 
 static int can_run_cheat1(int from_player) {
@@ -735,5 +738,15 @@ static void Command_NoSave(const char *args, int from_player) {
 static void Command_SetLives(const char *args, int from_player) {
 	if (!can_run_cheat1(from_player)) return;
 	g_saves[g_current_save].lives = atoi(Command_ExtractArg(args, 0));
+}
+static void Command_Skin(const char *args, int from_player) {
+	if (!can_run_cheat1(from_player)) return;
+	int skin = atoi(Command_ExtractArg(args, 0));
+	if (skin < 0 || skin > 9) skin = 9;
+	Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer = skin;
+	if (Game_GetVar(GAME_VAR_PLAYER)->data.pointer != NULL) {
+		((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->custom_ints[0] = skin;
+		((PLAYER_LOCAL_DATA *)((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->local_data)->currskin = skin;
+	}
 }
 
