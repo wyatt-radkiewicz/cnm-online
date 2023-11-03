@@ -1388,6 +1388,9 @@ void draw_play_gui(void) {
 			last_gui_state = gui_state;
 			gui_state = GUI_MAIN_STATE;
 			gui_timer = 0;
+			if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+				current_save_slot = 0;
+			}
 			ss_trans = 7*2;
 			side_blob_x = RENDERER_WIDTH;
 			side_xstart = -192;
