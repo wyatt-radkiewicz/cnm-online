@@ -476,7 +476,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//if (wobj->vel_x < final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x < 0.0f)) {
-				if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x += accel * 4.0f * cmul;
+				if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x += accel * 3.0f * cmul;
 				else if (wobj->vel_x < 0.0) wobj->vel_x += accel * 3.0f * cmul;
 				else wobj->vel_x += accel * cmul;
 			}
@@ -498,7 +498,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//if (wobj->vel_x > -final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x > 0.0f)) {
-				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 4.0f * cmul;
+				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 3.0f * cmul;
 				else if (wobj->vel_x > 0.0) wobj->vel_x -= accel * 3.0f * cmul;
 				else wobj->vel_x -= accel * cmul;
 			}
