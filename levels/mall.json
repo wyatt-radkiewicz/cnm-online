@@ -209,9 +209,9 @@
           ],
           "target_relative": [
             0.0,
-            527.0
+            2112.0
           ],
-          "speed": 0.25,
+          "speed": 1.0,
           "start_paused": false,
           "ty": "Normal"
         }
@@ -237,9 +237,9 @@
           ],
           "target_relative": [
             0.0,
-            527.0
+            2112.0
           ],
-          "speed": 0.25,
+          "speed": 1.0,
           "start_paused": false,
           "ty": "Normal"
         }
@@ -265,9 +265,9 @@
           ],
           "target_relative": [
             0.0,
-            527.0
+            2112.0
           ],
-          "speed": 0.25,
+          "speed": 1.0,
           "start_paused": false,
           "ty": "Normal"
         }
@@ -293,9 +293,9 @@
           ],
           "target_relative": [
             0.0,
-            527.0
+            2112.0
           ],
-          "speed": 0.25,
+          "speed": 1.0,
           "start_paused": false,
           "ty": "Normal"
         }

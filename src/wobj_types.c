@@ -47,9 +47,10 @@ static void WobjTeleport_Draw(WOBJ *wobj, int camx, int camy)
 	{
 		if (strcmp(TeleportInfos_GetTeleport(wobj->custom_ints[0])->name, ""))
 		{
+			int len = strlen(TeleportInfos_GetTeleport(wobj->custom_ints[0])->name);
 			Renderer_DrawText
 			(
-				(int)wobj->x - camx,
+				(int)wobj->x - camx - (len*8) / 2,
 				(int)wobj->y - 12 - camy,
 				0,
 				RENDERER_LIGHT,
