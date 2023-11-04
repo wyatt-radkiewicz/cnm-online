@@ -75,7 +75,7 @@ static int anim_offsets[PLAYER_ANIM_MAX][6][2] =
 		{64, 32}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	},
 };
-int skin_bases[10][2] =
+int skin_bases[PLAYER_MAX_SKINS][2] =
 {
 	{128, 1824},
 	{256, 1824},
@@ -86,7 +86,25 @@ int skin_bases[10][2] =
 	{128, 1280},
 	{0, 768},
 	{128, 768},
-	{5, 4616}
+	{5, 4616},
+	{0, 7776},
+};
+static int skin_srcbase[PLAYER_MAX_SKINS] = {
+	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	4608, 7776,
+};
+static int complex_skins[PLAYER_MAX_SKINS] = {
+	CNM_FALSE,
+	CNM_FALSE,
+	CNM_FALSE,
+	CNM_FALSE,
+	CNM_FALSE,
+	CNM_FALSE,
+	CNM_FALSE,
+	CNM_FALSE,
+	CNM_FALSE,
+	CNM_TRUE,
+	CNM_TRUE,
 };
 
 // For when the player dies and respawns
@@ -115,13 +133,14 @@ static void Normalize(float *x, float *y)
 
 void Player_SetSkinInstant(WOBJ *wobj, int skinid) {
 	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
+	if (skinid < 0 || skinid > PLAYER_MAX_SKINS) skinid = 0;
 	local_data->currskin = skinid;
 	local_data->curranim = PLAYER_ANIM_STANDING;
 	local_data->currframe = 0;
 	local_data->animspd = 0;
 	if (wobj->internal.owned)
 	{
-		if (local_data->currskin != 9)
+		if (!complex_skins[local_data->currskin])
 			anim_lengths = anim_lengths1;
 		else
 			anim_lengths = anim_lengths2;
@@ -517,7 +536,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			wobj->flags |= WOBJ_HFLIP;
 		}
 
-		if (local_data->currskin == 9 && local_data->curranim == PLAYER_ANIM_JUMP && Wobj_IsGrouneded(wobj))
+		if (complex_skins[local_data->currskin] && local_data->curranim == PLAYER_ANIM_JUMP && Wobj_IsGrouneded(wobj))
 		{
 			Interaction_PlaySound(wobj, 60);
 			local_data->curranim = PLAYER_ANIM_JUMP_END;
@@ -1304,7 +1323,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	{
 		if (local_data->curranim != PLAYER_ANIM_JUMP)
 		{
-			if (local_data->currskin == 9)
+			if (complex_skins[local_data->currskin])
 			{
 				if (wobj->vel_y < -1.0f)
 					local_data->currframe = 0;
@@ -1327,7 +1346,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		// Smush this into a 32bit integer
 		af |= pr.x&0xffff;
 		af |= (pr.y&0x7fff) << 16;
-		if (local_data->currskin == 9) af |= 0x80000000;
+		if (complex_skins[local_data->currskin]) af |= 0x80000000;
 		wobj->anim_frame = *((int *)(&af));
 	}
 
@@ -1464,7 +1483,7 @@ static void StepPlayerAnimation(WOBJ *wobj)
 
 	if (ld->currframe >= anim_lengths[ld->curranim])  ld->currframe = anim_lengths[ld->curranim]-1;
 	ld->animtimer++;
-	if (ld->currskin != 9 ||
+	if (!complex_skins[ld->currskin] ||
 		(ld->curranim == PLAYER_ANIM_WALKING ||
 		 ld->curranim == PLAYER_ANIM_HURT))
 	{
@@ -1512,7 +1531,7 @@ static void StepPlayerAnimation(WOBJ *wobj)
 }
 static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame)
 {
-	if (skin != 9)
+	if (!complex_skins[skin])
 	{
 		r->x = skin_bases[skin][0] + anim_offsets[anim][frame][0];
 		r->y = skin_bases[skin][1] + anim_offsets[anim][frame][1];
@@ -1532,12 +1551,12 @@ static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame)
 		int dx = (base+frame)%12;
 		int dy = (base+frame)/12;
 		r->x = dx*40;
-		r->y = 4608+dy*40;
+		r->y = skin_srcbase[skin]+dy*40;
 		r->w = 40;
 		r->h = 40;
 		if (anim == PLAYER_ANIM_SLIDE) {
 			r->x = 40 + frame * 40;
-			r->y = 4728;
+			r->y = skin_srcbase[skin]+120;//4728;
 		}
 	}
 }

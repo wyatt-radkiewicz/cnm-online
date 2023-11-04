@@ -742,7 +742,7 @@ static void Command_SetLives(const char *args, int from_player) {
 static void Command_Skin(const char *args, int from_player) {
 	if (!can_run_cheat1(from_player)) return;
 	int skin = atoi(Command_ExtractArg(args, 0));
-	if (skin < 0 || skin > 9) skin = 9;
+	//if (skin < 0 || skin > 9) skin = 9;
 	Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer = skin;
 	if (Game_GetVar(GAME_VAR_PLAYER)->data.pointer != NULL) {
 		Player_SetSkinInstant(Game_GetVar(GAME_VAR_PLAYER)->data.pointer, skin);
