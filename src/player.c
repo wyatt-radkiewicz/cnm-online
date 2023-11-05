@@ -407,6 +407,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->level_end_time_score *= 100 * 12;
 		local_data->level_end_rank = (int)((float)(local_data->level_end_score + local_data->level_end_time_score) / (float)par * 4.0);
 		if (local_data->level_end_rank > 4) local_data->level_end_rank = 4;
+		if (local_data->level_end_rank < 0) local_data->level_end_rank = 0;
 	}
 	// Give the player lives
 	if ((wobj->flags & WOBJ_HAS_PLAYER_FINISHED) &&
