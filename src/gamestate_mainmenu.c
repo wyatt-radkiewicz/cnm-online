@@ -401,12 +401,12 @@ void GameState_MainMenu_Init(void)
 	Gui_InitStringElement(playersetup, 0, ChangePlayerName, "PLAYER NAME: ", 15);
 	strcpy(playersetup->elements[0].props.string, Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string);
 	playersetup->elements[0].props.allow_spaces = CNM_FALSE;
-	Gui_InitNumberElement(playersetup, 1, PlayerSkinCallback, "PLAYER SKIN: ", 0, 9, 0);
+	//Gui_InitNumberElement(playersetup, 1, PlayerSkinCallback, "PLAYER SKIN: ", 0, 9, 0);
 	Gui_InitBitmapElement(playersetup, 2, 64, 0, 0, 32, 32);
-	int skinno = Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
-	Gui_SetNumberElementInt(playersetup, 1, skinno);
-	memcpy(&playersetup->elements[2].props.bitmap, &wobj_types[WOBJ_PLAYER].frames[skinno], sizeof(CNM_RECT));
-	memcpy(&playersetup->elements[2].props.bitmap, skin_bases[skinno], sizeof(CNM_RECT) / 2);
+	//int skinno = Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
+	//Gui_SetNumberElementInt(playersetup, 1, skinno);
+	//memcpy(&playersetup->elements[2].props.bitmap, &wobj_types[WOBJ_PLAYER].frames[skinno], sizeof(CNM_RECT));
+	//memcpy(&playersetup->elements[2].props.bitmap, skin_bases[skinno], sizeof(CNM_RECT) / 2);
 	playersetup->elements[2].props.bitmap.w = 32;
 	playersetup->elements[2].props.bitmap.h = 32;
 
