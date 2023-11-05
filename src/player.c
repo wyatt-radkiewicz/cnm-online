@@ -217,6 +217,25 @@ static int level_end_unlockable_y = 0, unlockable_show = CNM_FALSE;
 static int level_end_rank_y = 0;
 static int skin_unlock_y = 0, skin_unlock_timer = 0;
 
+#define MAX_USED_DIALOGS 16
+static unsigned char _used_dialogs_node[MAX_USED_DIALOGS];
+static int _used_dialogs_uuid[MAX_USED_DIALOGS];
+static int _ud_idx;
+
+static void clear_used_dialogs(void) {
+	for (int i = 0; i < MAX_USED_DIALOGS; i++) {
+		_used_dialogs_node[i] = 0;
+		_used_dialogs_uuid[i] = -1;
+	}
+	_ud_idx = 0;
+}
+static int has_used_dialog(unsigned char node, int uuid) {
+	for (int i = 0; i < MAX_USED_DIALOGS; i++) {
+		if (_used_dialogs_node[i] == node && _used_dialogs_uuid[i] == uuid) return CNM_TRUE;
+	}
+	return CNM_FALSE;
+}
+
 static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame);
 static void StepPlayerAnimation(WOBJ *player);
 static void DrawPlayerChar(WOBJ *wobj, int camx, int camy);
@@ -262,6 +281,7 @@ void Player_SwapOffhand(WOBJ *wobj) {
 	Audio_PlaySound(51, CNM_FALSE, wobj->x, wobj->y);
 	local_data->offhand_item = curritem;
 	local_data->offhand_durability = currdur;
+	Item_NullifyGhostPickup();
 }
 
 void WobjPlayer_Create(WOBJ *wobj)
@@ -281,6 +301,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->death_cam_timer = -1;
 	memset(local_data->created_vortexes_node, 0xff, sizeof(int)*PLAYER_MAX_VORTEXES);
 	memset(local_data->created_vortexes_uuid, 0xff, sizeof(int)*PLAYER_MAX_VORTEXES);
+	clear_used_dialogs();
 
 	wobj->flags = WOBJ_IS_PLAYER;
 	wobj->health = 100.0f;
@@ -1033,11 +1054,23 @@ void WobjPlayer_Update(WOBJ *wobj)
 			Audio_PlayMusic(other->custom_ints[0], CNM_TRUE);
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_ENDING_TEXT_SPAWNER);
-	if (other != NULL)
-		EndingText_Start(other->custom_ints[0], other->custom_ints[1]);
+	if (other != NULL && !has_used_dialog(other->node_id, other->uuid)) {
+		EndingText_Start(other->custom_ints[0] & 0x00ffffff, other->custom_ints[1]);
+		if (other->custom_ints[0] & 0xff000000) {
+			_used_dialogs_node[_ud_idx] = other->node_id;
+			_used_dialogs_uuid[_ud_idx] = other->uuid;
+			_ud_idx = (_ud_idx + 1) % MAX_USED_DIALOGS;
+		}
+	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_DIALOGE_BOX_TRIGGER);
-	if (other != NULL)
-		Dialoge_Start(other->custom_ints[0], other->custom_ints[1]);
+	if (other != NULL && !has_used_dialog(other->node_id, other->uuid)) {
+		Dialoge_Start(other->custom_ints[0] & 0x00ffffff, other->custom_ints[1]);
+		if (other->custom_ints[0] & 0xff000000) {
+			_used_dialogs_node[_ud_idx] = other->node_id;
+			_used_dialogs_uuid[_ud_idx] = other->uuid;
+			_ud_idx = (_ud_idx + 1) % MAX_USED_DIALOGS;
+		}
+	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_GRAPHICS_CHANGE_TRIGGER);
 	if (other != NULL)
 	{
@@ -1339,6 +1372,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->vortex_death = CNM_FALSE;
 		local_data->num_deaths++;
 		wobj->health = 100.0f;
+		wobj->speed = 5.0f;
+		wobj->jump = 10.0f;
+		clear_used_dialogs();
 		for (int k = 0; k < 5; k++)
 		{
 			for (int ll = 0; ll < 5; ll++)
@@ -1530,6 +1566,7 @@ int get_player_packed_draw_item(int anim_frame) {
 	case 1: return 4;
 	case 2: return 2;
 	case 3: return 0;
+	default: return 0;
 	}
 }
 void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)

@@ -52,12 +52,12 @@ void WobjSlime_Update(WOBJ *wobj)
 
 	if (wobj->type == WOBJ_SILVER_SLIME)
 	{
-		if (!Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * 8.0f, 16.0f))
+		if (!Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[0] * 8.0f, 16.0f))
 			wobj->custom_floats[0] *= -1.0f;
 	}
 
 	wobj->x += wobj->custom_floats[0];
-	if (Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * 2.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[0] * 2.0f, 0.0f))
 		wobj->custom_floats[0] *= -1.0f;
 	WobjPhysics_ApplyWindForces(wobj);
 
@@ -66,7 +66,7 @@ void WobjSlime_Update(WOBJ *wobj)
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_ResolveBlocksCollision(wobj);
 
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 2.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 2.0f))
 		wobj->vel_y = 0.0f;
 	else
 		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
@@ -185,7 +185,7 @@ void WobjHeavy_Update(WOBJ *wobj)
 		if (wobj->custom_ints[1] == 0) {
 			if (wobj->flags & WOBJ_HFLIP) wobj->vel_x = -HEAVY_SPD;
 			else wobj->vel_x = HEAVY_SPD;
-			if (!Wobj_IsCollidingWithBlocks(wobj, (wobj->flags & WOBJ_HFLIP ? -48.0f : 48.0f), 16.0f)) {
+			if (!Wobj_IsCollidingWithBlocksOrObjects(wobj, (wobj->flags & WOBJ_HFLIP ? -48.0f : 48.0f), 16.0f)) {
 				wobj->custom_ints[1] = 2 + (wobj->flags & WOBJ_HFLIP) != 0;
 				wobj->x += (float)(((wobj->flags & WOBJ_HFLIP) != 0) * 2 - 1) * 2.0f * HEAVY_SPD;
 			}
@@ -251,7 +251,7 @@ void WobjHeavyBlast_Create(WOBJ *wobj)
 void WobjHeavyBlast_Update(WOBJ *wobj)
 {
 	wobj->x += wobj->speed;
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID) || wobj->custom_ints[0]++ >= 30*5)
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f) || Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID) || wobj->custom_ints[0]++ >= 30*5)
 		Interaction_DestroyWobj(wobj);
 }
 
@@ -309,7 +309,7 @@ void WobjFireball_Update(WOBJ *wobj)
 {
 	wobj->x += cosf(wobj->custom_floats[0]) * wobj->speed;
 	wobj->y += sinf(wobj->custom_floats[0]) * wobj->speed;
-	if (wobj->custom_ints[0]-- <= 0 || Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f))
+	if (wobj->custom_ints[0]-- <= 0 || Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f))
 		Interaction_DestroyWobj(wobj);
 }
 void WobjFireball_Draw(WOBJ *wobj, int camx, int camy)
@@ -714,7 +714,7 @@ void WobjSlimeWalker_Update(WOBJ *wobj)
 			wobj->custom_ints[0] = Util_RandInt(10, 28);
 		}
 	}
-	if (wobj->custom_ints[1] == 1 && Wobj_IsCollidingWithBlocks(wobj, 0.0f, 3.0f) && wobj->vel_y >= 0.0f)
+	if (wobj->custom_ints[1] == 1 && Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 3.0f) && wobj->vel_y >= 0.0f)
 	{
 		wobj->custom_ints[1] = 0;
 		//wobj->custom_floats[0] = (wobj->custom_floats[0] >= 0.0f) ? wobj->speed : -wobj->speed;
@@ -725,7 +725,7 @@ void WobjSlimeWalker_Update(WOBJ *wobj)
 	if (Game_GetFrame() % 45 == rand() % 45)
 	{
 		WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
-		if (Interaction_GetDistanceToWobj(wobj, closest_player) <= (float)256.0f && wobj->custom_ints[1] == 0 && Wobj_IsCollidingWithBlocks(wobj, 0.0f, 3.0f))
+		if (Interaction_GetDistanceToWobj(wobj, closest_player) <= (float)256.0f && wobj->custom_ints[1] == 0 && Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 3.0f))
 		{
 			wobj->custom_ints[1] = 1;
 			float time_jump = 20.0f;
@@ -756,9 +756,9 @@ void WobjSlimeWalker_Update(WOBJ *wobj)
 	float grav = Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
 	if (wobj->type == SLIME_WALKER)
 		grav *= 2.0f;
-	if (Wobj_IsCollidingWithBlocks(wobj, ((wobj->custom_floats[0] >= 0.0f) ? 1.0f : -1.0f), 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, ((wobj->custom_floats[0] >= 0.0f) ? 1.0f : -1.0f), 0.0f))
 		wobj->custom_floats[0] *= -1.0f;
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 2.0f) && wobj->custom_ints[1] == 0)
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 2.0f) && wobj->custom_ints[1] == 0)
 		wobj->vel_y = 0.0f;
 	else
 		wobj->vel_y += grav;
@@ -801,7 +801,7 @@ void WobjMegaFish_Update(WOBJ *wobj)
 	}
 
 	WobjPhysics_EndUpdate(wobj);
-	if (Wobj_IsCollidingWithBlocks(wobj, wobj->vel_x * 2.0f, wobj->vel_y * 2.0f) || wobj->y < (float)wobj->custom_ints[0])
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->vel_x * 2.0f, wobj->vel_y * 2.0f) || wobj->y < (float)wobj->custom_ints[0])
 		wobj->custom_floats[1] -= 180.0f;
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
@@ -1324,8 +1324,8 @@ void WobjSpiderWalker_Update(WOBJ *wobj)
 	if (wobj->custom_ints[0] == 44)
 		Interaction_PlaySound(wobj, 29);
 
-	if (wobj->custom_ints[1]-- <= 0 || Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * 3.0f, 0.0f) ||
-		!Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * wobj->hitbox.w, -5.0f))
+	if (wobj->custom_ints[1]-- <= 0 || Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[0] * 3.0f, 0.0f) ||
+		!Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[0] * wobj->hitbox.w, -5.0f))
 	{
 		wobj->custom_ints[1] = Util_RandInt(30, 30*3);
 		wobj->custom_floats[0] *= -1.0f;
@@ -1347,7 +1347,7 @@ void WobjSpiderWalkerWeb_Create(WOBJ *wobj)
 void WobjSpiderWalkerWeb_Update(WOBJ *wobj)
 {
 	wobj->y += 0.75f;
-	if (wobj->custom_ints[1]++ > 30 * 10 || Wobj_IsCollidingWithBlocks(wobj, 0.0f, -12.0f))
+	if (wobj->custom_ints[1]++ > 30 * 10 || Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, -12.0f))
 		Interaction_DestroyWobj(wobj);
 }
 
@@ -1717,8 +1717,8 @@ void WobjBozoLaserMinion_Update(WOBJ *wobj)
 			wobj->vel_y = 0.0f;
 		if (player->y < wobj->y - 64.0f && Wobj_IsGrouneded(wobj))
 			wobj->vel_y = -14.0f;
-		if (((Wobj_IsCollidingWithBlocks(wobj, 10.0f, 0.0f) && wobj->vel_x > 0.0f) ||
-			(Wobj_IsCollidingWithBlocks(wobj, -10.0f, 0.0f) && wobj->vel_x < 0.0f)) &&
+		if (((Wobj_IsCollidingWithBlocksOrObjects(wobj, 10.0f, 0.0f) && wobj->vel_x > 0.0f) ||
+			(Wobj_IsCollidingWithBlocksOrObjects(wobj, -10.0f, 0.0f) && wobj->vel_x < 0.0f)) &&
 			player->y <= wobj->y)
 			wobj->vel_y = -5.0f - Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
 
@@ -1834,7 +1834,7 @@ void WobjBozoMk2_Update(WOBJ *wobj)
 			wobj->custom_floats[1] = wobj->vel_x;
 		}
 	} else if (wobj->custom_ints[0] == 2) { // Jumping state
-		if (Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[1], 0.0f))
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[1], 0.0f))
 			wobj->custom_floats[1] *= -1.0f;
 		wobj->vel_x = wobj->custom_floats[1];
 		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
@@ -1892,7 +1892,7 @@ void WobjEnemyRocket_Update(WOBJ *wobj) {
 	wobj->y += wobj->vel_y;
 	if (wobj->custom_ints[1]++ >= 30*4)
 		Interaction_DestroyWobj(wobj);
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) ||
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f) ||
 		Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID) ||
 		Wobj_GetWobjColliding(wobj, WOBJ_IS_PLAYER))
 	{
@@ -1955,8 +1955,8 @@ void WobjSpikeGuy_Update(WOBJ *wobj)
 			wobj->vel_y = 0.0f;
 		if (player->y < wobj->y - 64.0f && Wobj_IsGrouneded(wobj))
 			wobj->vel_y = -6.0f;
-		if (((Wobj_IsCollidingWithBlocks(wobj, 10.0f, 0.0f) && wobj->vel_x > 0.0f) ||
-			 (Wobj_IsCollidingWithBlocks(wobj, -10.0f, 0.0f) && wobj->vel_x < 0.0f)) &&
+		if (((Wobj_IsCollidingWithBlocksOrObjects(wobj, 10.0f, 0.0f) && wobj->vel_x > 0.0f) ||
+			 (Wobj_IsCollidingWithBlocksOrObjects(wobj, -10.0f, 0.0f) && wobj->vel_x < 0.0f)) &&
 			player->y <= wobj->y)
 			wobj->vel_y = -3.0f - Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
 
@@ -2114,7 +2114,7 @@ void WobjKamakaziSlime_Update(WOBJ *wobj)
 			wobj->custom_floats[0] *= -1.0f;
 		}
 
-		if (Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[0] * 3.0f, 0.0f))
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[0] * 3.0f, 0.0f))
 		{
 			wobj->custom_floats[0] *= -1.0f;
 		}
@@ -2336,9 +2336,9 @@ void WobjRockGuySmall2_Create(WOBJ *wobj)
 }
 void WobjRockGuySmall2_Update(WOBJ *wobj)
 {
-	if (Wobj_IsCollidingWithBlocks(wobj, 5.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 5.0f, 0.0f))
 		wobj->custom_ints[0] = 1;
-	if (Wobj_IsCollidingWithBlocks(wobj, -5.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, -5.0f, 0.0f))
 		wobj->custom_ints[0] = 0;
 
 	if (wobj->custom_ints[1]++ > 45)
@@ -2379,9 +2379,9 @@ void WobjRockGuySlider_Update(WOBJ *wobj)
 	Wobj_DoEnemyCry(wobj, 45);
 	WobjPhysics_BeginUpdate(wobj);
 
-	if (Wobj_IsCollidingWithBlocks(wobj, 5.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 5.0f, 0.0f))
 		wobj->custom_floats[0] = -1.0f;
-	if (Wobj_IsCollidingWithBlocks(wobj, -5.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, -5.0f, 0.0f))
 		wobj->custom_floats[0] = 1.0f;
 
 	if (fabsf(wobj->vel_x) < 15.0f)
@@ -2468,7 +2468,7 @@ void WobjRockGuySmasher_Update(WOBJ *wobj)
    			on_wrong_side = CNM_TRUE;
 
 		if ((Interaction_GetDistanceToWobj(player, wobj) < 128.0f && wobj->custom_ints[1] > 120) ||
-			Wobj_IsCollidingWithBlocks(wobj, wobj->custom_floats[1] * 4.0f, -1.0f) ||
+			Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[1] * 4.0f, -1.0f) ||
 			(wobj->custom_ints[1] > 30*10) ||
 			(on_wrong_side && wobj->custom_ints[1] > 30*2))
 		{

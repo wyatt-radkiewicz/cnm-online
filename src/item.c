@@ -567,11 +567,13 @@ ITEM_TYPE item_types[] =
 
 ITEM item_current;
 static int _pickup_cooldown;
+static int _ghost_picked_up;
 
 void Item_Init(void)
 {
 	memset(&item_current, 0, sizeof(item_current));
 	_pickup_cooldown = 0;
+	_ghost_picked_up = CNM_FALSE;
 }
 void Item_Reset(void) {
 	memset(&item_current, 0, sizeof(item_current));
@@ -588,6 +590,9 @@ const ITEM_TYPE *Item_GetItemType(int type_id)
 		return NULL;
 }
 
+void Item_NullifyGhostPickup(void) {
+	_ghost_picked_up = CNM_FALSE;
+}
 void Item_TryPickupAndDrop(WOBJ *player)
 {
 	WOBJ *other_item = Wobj_GetWobjColliding(player, WOBJ_IS_ITEM);
@@ -597,18 +602,20 @@ void Item_TryPickupAndDrop(WOBJ *player)
 	if (other_item != NULL &&
 		pressed_drop &&
 		player->item != ITEM_TYPE_NOITEM &&
-		!item_types[Item_GetCurrentItem()->type].draw_infront &&
-		Item_GetCurrentItem()->hide_timer == 0) {
+		!item_types[Item_GetCurrentItem()->type].draw_infront) {
 		Player_SwapOffhand(player);
 		if (player->item != ITEM_TYPE_NOITEM) Item_Drop(player);
+		else _ghost_picked_up = CNM_TRUE;
 		Item_Pickup(player, other_item);
 	}
 	else if (other_item != NULL && pressed_drop && player->item == ITEM_TYPE_NOITEM)
 	{
+		_ghost_picked_up = CNM_FALSE;
 		Item_Pickup(player, other_item);
 	}
 	else if (pressed_drop && player->item != ITEM_TYPE_NOITEM)
 	{
+		_ghost_picked_up = CNM_FALSE;
 		Item_Drop(player);
 	}
 }
@@ -645,6 +652,7 @@ void Item_Drop(WOBJ *player)
 {
 	if (player->item != ITEM_TYPE_NOITEM)
 	{
+		_ghost_picked_up = CNM_FALSE;
 		if (item_types[player->item].on_drop != NULL)
 			item_types[player->item].on_drop(&item_current, player);
 		WOBJ *dropped = Interaction_CreateWobj(item_types[player->item].wobj_dropped_type,
@@ -672,6 +680,21 @@ void Item_Update(WOBJ *player)
 			item_types[player->item].update(&item_current, player);
 		if (item_current.durability <= 0.0f && item_types[player->item].max_durability > 0.1f) {
 			Interaction_PlaySound(player, 56);
+			int ix = item_types[item_current.type].frames[0].x,
+				iy = item_types[item_current.type].frames[0].y;
+			WOBJ *part;
+			part = Interaction_CreateWobj(WOBJ_ITEM_BREAK_PART, player->x, player->y, (iy) | ((ix) << 16), 0.0f);
+			part->vel_x = -3.0f;
+			part->vel_y = -3.0f;
+			part = Interaction_CreateWobj(WOBJ_ITEM_BREAK_PART, player->x + 16.0f, player->y, (iy) | ((ix + 16) << 16), 0.0f);
+			part->vel_x = 3.0f;
+			part->vel_y = -3.0f;
+			part = Interaction_CreateWobj(WOBJ_ITEM_BREAK_PART, player->x, player->y + 16.0f, (iy + 16) | ((ix) << 16), 0.0f);
+			part->vel_x = -2.5f;
+			part->vel_y = -1.0f;
+			part = Interaction_CreateWobj(WOBJ_ITEM_BREAK_PART, player->x + 16.0f, player->y + 16.0f, (iy + 16) | ((ix + 16) << 16), 0.0f);
+			part->vel_x = 2.5f;
+			part->vel_y = -1.0f;
 			Item_DestroyCurrentItem(player);
 		}
 		item_current.life_timer++;
@@ -1058,6 +1081,7 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 	//player->item = ITEM_TYPE_NOITEM;
 	//player->item = ITEM_TYPE_NOITEM;
 	Item_DestroyCurrentItem(player);
+	if (_ghost_picked_up) Player_SwapOffhand(player);
 }
 
 static void ItemUnboundWand_Update(ITEM *wand, WOBJ *player)
@@ -1391,7 +1415,9 @@ static void ItemKeyGeneric_Update(ITEM *key, WOBJ *player)
 	{
 		Interaction_DestroyWobj(colliding_block);
 		Interaction_PlaySound(player, 35);
-		if (colliding_block->custom_ints[0])
+		if (colliding_block->custom_ints[0]) {
 			Item_DestroyCurrentItem(player);
+			if (_ghost_picked_up) Player_SwapOffhand(player);
+		}
 	}
 }

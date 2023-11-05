@@ -98,5 +98,6 @@ void Item_Draw(WOBJ *player, int camx, int camy);
 void Item_TryUse(WOBJ *player);
 void Item_Use(WOBJ *player);
 void Item_DestroyCurrentItem(WOBJ *player);
+void Item_NullifyGhostPickup(void);
 
 #endif

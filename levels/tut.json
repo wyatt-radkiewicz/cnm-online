@@ -369,6 +369,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
+          "despawn": true,
           "text": "Welcome to the CNM corperation.\nThis is a high security\nclearance area. Stay\nalert recuit.\n"
         }
       },
@@ -388,6 +389,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
+          "despawn": false,
           "text": "Welcome to our artificail testin\ngrounds, here you will learn\nhow to use upgrades and\nother things.\n"
         }
       },
@@ -407,6 +409,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
+          "despawn": false,
           "text": "You need to use momentum to\nuse the vortex. If you stay in i\ntoo\nlong you will die.\n"
         }
       },
@@ -426,6 +429,7 @@
       "type_data": {
         "TextSpawner": {
           "dialoge_box": true,
+          "despawn": false,
           "text": "You passed our first rounds of\ntests. Good job recruit. Report\nto duty immediatly!\n"
         }
       },
@@ -761,6 +765,42 @@
           "next_level": "hq",
           "extra_unlocked_level": null,
           "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4152.0,
+        840.0
+      ],
+      "type_data": {
+        "UpgradeTrigger": {
+          "trigger_type": "None"
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        4152.0,
+        888.0
+      ],
+      "type_data": {
+        "UpgradeTrigger": {
+          "trigger_type": "None"
         }
       },
       "spawning_criteria": {

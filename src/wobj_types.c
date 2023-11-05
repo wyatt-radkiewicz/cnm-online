@@ -115,7 +115,7 @@ static void Wobj_ShotgunPel_Update(WOBJ *wobj) {
 	else wobj->vel_x += 0.1f;
 	wobj->vel_y += wobj->speed;
 	WobjGenericAttack_Update(wobj);
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || wobj->custom_ints[0]++ >= (30*5) || Wobj_GetWobjColliding(wobj, WOBJ_IS_BREAKABLE))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f) || wobj->custom_ints[0]++ >= (30*5) || Wobj_GetWobjColliding(wobj, WOBJ_IS_BREAKABLE))
 	{
 		if (wobj->anim_frame == 1 && wobj->local_data != NULL && wobj->custom_ints[0] < 10) {
 			WOBJ *plr = (WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
@@ -144,7 +144,7 @@ static void WobjPlayerPellet_Update(WOBJ *wobj)
 	wobj->x += wobj->custom_floats[0] * wobj->speed;
 	wobj->custom_ints[0]++;
 	WobjGenericAttack_Update(wobj);
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || wobj->custom_ints[0] >= (30*5) || Wobj_GetWobjColliding(wobj, WOBJ_IS_BREAKABLE))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f) || wobj->custom_ints[0] >= (30*5) || Wobj_GetWobjColliding(wobj, WOBJ_IS_BREAKABLE))
 	{
 		Interaction_DestroyWobj(wobj);
 	}
@@ -168,7 +168,7 @@ static void WobjVelPlayerPellet_Update(WOBJ *wobj)
 	wobj->y += wobj->vel_y;
 	wobj->custom_ints[0]++;
 	WobjGenericAttack_Update(wobj);
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || wobj->custom_ints[0] >= (30 * 5) || Wobj_GetWobjColliding(wobj, WOBJ_IS_BREAKABLE))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f) || wobj->custom_ints[0] >= (30 * 5) || Wobj_GetWobjColliding(wobj, WOBJ_IS_BREAKABLE))
 	{
 		Interaction_DestroyWobj(wobj);
 	}
@@ -405,7 +405,7 @@ static void WobjFire_Update(WOBJ *wobj)
 			wobj->custom_ints[1] = 0;
 		}
 
-		if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || wobj->custom_ints[1] > 30*5)
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f) || wobj->custom_ints[1] > 30*5)
 			Interaction_DestroyWobj(wobj);
 	}
 	else if (wobj->custom_ints[0] == 1)
@@ -456,7 +456,7 @@ static void WobjIceAttack_Update(WOBJ *wobj)
 			wobj->vel_y += 0.8f;
 		else
 			wobj->vel_y = 0.0f;
-		if (Wobj_IsCollidingWithBlocks(wobj, wobj->vel_x, -fabsf(wobj->speed)))
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->vel_x, -fabsf(wobj->speed)))
 		{
 			wobj->speed *= -1.0f;
 			wobj->custom_ints[1] += 30*2;
@@ -597,7 +597,7 @@ static void WobjRocket_Update(WOBJ *wobj)
 		wobj->vel_y = (float)Util_RandInt(-5, 5) / 3.5f;
 	if (wobj->custom_ints[1]++ >= 30*3)
 		Interaction_DestroyWobj(wobj);
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) ||
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f) ||
 		Wobj_GetWobjColliding(wobj, WOBJ_IS_HOSTILE))
 	{
 		WOBJ *explosion = Interaction_CreateWobj(WOBJ_ROCKET_EXPLOSION, wobj->x - 96.0f, wobj->y - 96.0f, 0, 0.0f);
@@ -1367,7 +1367,7 @@ static void WobjBloodParticle_Update(WOBJ *wobj)
 	wobj->vel_y += 0.3f;
 	wobj->x += wobj->vel_x;
 	wobj->y += wobj->vel_y;
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f))
 	{
 		wobj->vel_x = 0.0f;
 		wobj->vel_y = 0.0f;
@@ -1395,12 +1395,12 @@ static void WobjGibParticle_Update(WOBJ *wobj)
 	wobj->y += wobj->vel_y;
 	if (wobj->custom_ints[0]++ > 70)
 		Interaction_DestroyWobj(wobj);
-	if (Wobj_IsCollidingWithBlocks(wobj, wobj->vel_x, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->vel_x, 0.0f))
 	{
 		wobj->vel_x *= -1.0f;
 		Interaction_PlaySound(wobj, 48);
 	}
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, wobj->vel_y))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, wobj->vel_y))
 	{
 		wobj->vel_y *= -1.0f;
 		Interaction_PlaySound(wobj, 48);
@@ -1548,6 +1548,35 @@ static void WobjSkinUnlock_Draw(WOBJ *wobj, int camx, int camy) {
 		},
 		2,
 		RENDERER_LIGHT
+	);
+}
+
+static void Wobj_ItemBreakPart_Create(WOBJ *wobj) {
+	wobj->custom_ints[1] = 200;
+	Util_SetBox(&wobj->hitbox, 4.0f, 4.0f, 8.0f, 8.0f);
+}
+static void Wobj_ItemBreakPart_Update(WOBJ *wobj) {
+	WobjPhysics_BeginUpdate(wobj);
+	WobjPhysics_ApplyWindForces(wobj);
+	wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, wobj->vel_y + 5.0f)) wobj->vel_y = fabsf(wobj->vel_y) * -0.8f;
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->vel_x, 0.0f)) wobj->vel_x = wobj->vel_x * -0.8f;
+	WobjPhysics_EndUpdate(wobj);
+	if (wobj->custom_ints[1]-- < 0) Interaction_DestroyWobj(wobj);
+}
+static void Wobj_ItemBreakPart_Draw(WOBJ *wobj, int camx, int camy) {
+	CNM_RECT r;
+	Util_SetRect(&r, wobj->custom_ints[0] >> 16, wobj->custom_ints[0] & 0xffff, 16, 16);
+	//Util_SetRect(&r, 32, 32, 32, 32);
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y - camy,
+		&r,
+		0,
+		Blocks_GetCalculatedBlockLight(wobj->x / BLOCK_SIZE, wobj->y / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
 	);
 }
 
@@ -3516,6 +3545,20 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		0, // Money reward
 		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 151: Item Break Part Object
+		Wobj_ItemBreakPart_Create, // Create
+		Wobj_ItemBreakPart_Update, // Update
+		Wobj_ItemBreakPart_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{ 0, 0, 0, 0, }
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
 		CNM_FALSE, // Can respawn?
 		0, // Score reward
 	},
