@@ -330,13 +330,14 @@ void WobjBozoPin_Create(WOBJ *wobj)
 	wobj->custom_ints[0] = 0;
 	wobj->speed = 4.0f;
 	if (wobj->custom_floats[0] == 0.0f) wobj->speed = 0.0f;
+	wobj->item = wobj->speed == 0.0f;
 	wobj->custom_floats[1] = 0.0f;
 }
 void WobjBozoPin_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
 	WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
-	if (Interaction_GetDistanceToWobj(wobj, closest_player) < (float)320.0f)
+	if (Interaction_GetDistanceToWobj(wobj, closest_player) < (float)320.0f && !wobj->item)
 	{
 		wobj->custom_ints[0]++;
 		float tang = atan2f(closest_player->y - wobj->y, closest_player->x - wobj->x);
@@ -359,7 +360,6 @@ void WobjBozoPin_Update(WOBJ *wobj)
 		}
 		wobj->x += cosf(wobj->custom_floats[1]) * wobj->speed;
 		wobj->y += sinf(wobj->custom_floats[1]) * wobj->speed;
-
 	}
 
 	if (Game_GetFrame() % 25 == 0)
