@@ -680,21 +680,7 @@ void Item_Update(WOBJ *player)
 			item_types[player->item].update(&item_current, player);
 		if (item_current.durability <= 0.0f && item_types[player->item].max_durability > 0.1f) {
 			Interaction_PlaySound(player, 56);
-			int ix = item_types[item_current.type].frames[0].x,
-				iy = item_types[item_current.type].frames[0].y;
-			WOBJ *part;
-			part = Interaction_CreateWobj(WOBJ_ITEM_BREAK_PART, player->x, player->y, (iy) | ((ix) << 16), 0.0f);
-			part->vel_x = -3.0f;
-			part->vel_y = -3.0f;
-			part = Interaction_CreateWobj(WOBJ_ITEM_BREAK_PART, player->x + 16.0f, player->y, (iy) | ((ix + 16) << 16), 0.0f);
-			part->vel_x = 3.0f;
-			part->vel_y = -3.0f;
-			part = Interaction_CreateWobj(WOBJ_ITEM_BREAK_PART, player->x, player->y + 16.0f, (iy + 16) | ((ix) << 16), 0.0f);
-			part->vel_x = -2.5f;
-			part->vel_y = -1.0f;
-			part = Interaction_CreateWobj(WOBJ_ITEM_BREAK_PART, player->x + 16.0f, player->y + 16.0f, (iy + 16) | ((ix + 16) << 16), 0.0f);
-			part->vel_x = 2.5f;
-			part->vel_y = -1.0f;
+			BreakPart_CreateParts(player->x, player->y, -5.0f, item_types[item_current.type].frames[0].x, item_types[item_current.type].frames[0].y, 2, 2);
 			Item_DestroyCurrentItem(player);
 		}
 		item_current.life_timer++;

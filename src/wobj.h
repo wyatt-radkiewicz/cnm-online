@@ -316,4 +316,6 @@ void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound);
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);
 void WobjGenericAttack_Update(WOBJ *wobj);
 
+void BreakPart_CreateParts(float x, float y, float yspd_start, int srcx, int srcy, int w, int h);
+
 #endif

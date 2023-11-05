@@ -1425,11 +1425,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->flags |= WOBJ_PLAYER_IS_RESPAWNING;
 		{
 			//WOBJ *tempitem;
-			int itemtype = Item_GetCurrentItem()->type;
+			//int itemtype = Item_GetCurrentItem()->type;
 			Item_GetCurrentItem()->durability -= 7.5f;
-			float durability = Item_GetCurrentItem()->durability;
-			Item_DestroyCurrentItem(wobj);
-			if (durability > 0.0f) Item_PickupByType(wobj, itemtype, durability);
+			if (Item_GetCurrentItem()->durability <= 0.0f &&
+				item_types[Item_GetCurrentItem()->type].max_durability > 0.1f) {
+				BreakPart_CreateParts(wobj->x, wobj->y, -5.0f, item_types[Item_GetCurrentItem()->type].frames[0].x, item_types[Item_GetCurrentItem()->type].frames[0].y, 2, 2);
+				Item_DestroyCurrentItem(wobj);
+			}
+			//float durability = Item_GetCurrentItem()->durability;
+			//Item_DestroyCurrentItem(wobj);
+			//if (durability > 0.0f) Item_PickupByType(wobj, itemtype, durability);
 			//tempitem = Wobj_CreateOwned(WOBJ_DROPPED_ITEM, wobj->x, wobj->y, itemtype, 0.0f);
 			//Item_Pickup(wobj, tempitem);
 		}
@@ -1487,6 +1492,20 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->curranim = PLAYER_ANIM_HURT;
 	}
 	if (local_data->upgradehp <= 0.0f) {
+		switch (local_data->upgrade_state) {
+		case PLAYER_UPGRADE_WINGS:
+			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 256, 2992, 3, 3);
+			break;
+		case PLAYER_UPGRADE_CRYSTAL_WINGS:
+			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 256, 3088, 3, 3);
+			break;
+		case PLAYER_UPGRADE_VORTEX:
+			BreakPart_CreateParts(wobj->x + 8.0f, wobj->y, -4.0f, 64, 224, 1, 2);
+			break;
+		case PLAYER_UPGRADE_SHOES:
+			BreakPart_CreateParts(wobj->x, wobj->y + 8.0f, -4.0f, 256, 144, 2, 1);
+			break;
+		}
 		local_data->upgrade_state = PLAYER_UPGRADE_NONE;
 	}
 

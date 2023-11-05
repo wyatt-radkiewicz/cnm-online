@@ -1579,6 +1579,26 @@ static void Wobj_ItemBreakPart_Draw(WOBJ *wobj, int camx, int camy) {
 		wobj->flags & WOBJ_VFLIP
 	);
 }
+void BreakPart_CreateParts(float x, float y, float yspd_start, int srcx, int srcy, int w, int h) {
+	WOBJ *part;
+	for (int i = 0; i < w; i++) {
+		for (int j = 0; j < h; j++) {
+			part = Interaction_CreateWobj(
+				WOBJ_ITEM_BREAK_PART,
+				x+((float)i*16.0f),
+				y+((float)j*16.0f),
+				(srcy + j*16) | ((srcx + i*16) << 16),
+				0.0f
+			);
+			float yper = ((float)j / (float)(h-1));
+			if (w <= 1) part->vel_x = 0.0f;
+			else if (h <= 1) part->vel_x = (((float)i - (float)(w-1)/2.0f)/((float)(w-1)/2.0f)) * 3.0f;
+			else part->vel_x = (((float)i - (float)(w-1)/2.0f)/((float)(w-1)/2.0f)) * 3.0f * (yper * 0.75f + 0.25f);
+			if (h <= 1) part->vel_y = yspd_start;
+			else part->vel_y = yspd_start + ((-1.0f - yspd_start) * yper);
+		}
+	}
+}
 
 #define LUAOBJ_DEF {\
 	NULL,\
