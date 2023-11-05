@@ -251,6 +251,18 @@ void Player_SetSkinInstant(WOBJ *wobj, int skinid) {
 	//}
 
 }
+void Player_SwapOffhand(WOBJ *wobj) {
+	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
+	int curritem = Item_GetCurrentItem()->type;
+	float currdur = Item_GetCurrentItem()->durability;
+	int offhand = local_data->offhand_item;
+	Item_DestroyCurrentItem(wobj);
+	//wobj->item = offhand;
+	Item_PickupByType(wobj, offhand, local_data->offhand_durability);
+	Audio_PlaySound(51, CNM_FALSE, wobj->x, wobj->y);
+	local_data->offhand_item = curritem;
+	local_data->offhand_durability = currdur;
+}
 
 void WobjPlayer_Create(WOBJ *wobj)
 {
@@ -1395,15 +1407,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	Item_TryUse(wobj);
 
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING) && !local_data->lock_controls) {
-		int curritem = Item_GetCurrentItem()->type;
-		float currdur = Item_GetCurrentItem()->durability;
-		int offhand = local_data->offhand_item;
-		Item_DestroyCurrentItem(wobj);
-		//wobj->item = offhand;
-		Item_PickupByType(wobj, offhand, local_data->offhand_durability);
-		Audio_PlaySound(51, CNM_FALSE, wobj->x, wobj->y);
-		local_data->offhand_item = curritem;
-		local_data->offhand_durability = currdur;
+		Player_SwapOffhand(wobj);
 	}
 
 	int recved_lava_damage = CNM_FALSE;
@@ -1483,10 +1487,21 @@ void WobjPlayer_Update(WOBJ *wobj)
 			PlayerAnimGetRect(&pr, local_data->currskin, 0, 0);
 		}
 		// Smush this into a 32bit integer
-		af |= pr.x&0x1ff;
-		af |= (pr.y << 9)&0x3ffe00;
+		af |= (pr.x / 2)&0x0ff;
+		af |= ((pr.y / 2) << 8)&0x1fff00;
 		if (Item_GetCurrentItem()->hide_timer > 0 || item_types[Item_GetCurrentItem()->type].draw_infront) {
-			af |= 0x400000;
+			//af |= 0x400000;
+			if (item_types[Item_GetCurrentItem()->type].draw_infront) {
+				af |= ((3 << 21) & 0x600000);
+			} else {
+				if (Item_GetCurrentItem()->hide_timer >= 8) {
+					af |= ((3 << 21) & 0x600000);
+				} else if (Item_GetCurrentItem()->hide_timer > 0) {
+					af |= (((Item_GetCurrentItem()->hide_timer >> 1) << 21) & 0x600000);
+				} else {
+					af |= ((0 << 21) & 0x600000);
+				}
+			}
 		}
 		af |= (local_data->currskin << 23) & 0x07800000;
 		af |= (local_data->curranim << 27) & 0x78000000;
@@ -1509,12 +1524,20 @@ int get_player_packed_anim(int anim_frame) {
 	return ((anim_frame & 0x78000000) >> 27);
 }
 int get_player_packed_draw_item(int anim_frame) {
-	return anim_frame & 0x400000;
+	int af = ((anim_frame & 0x600000) >> 21);
+	switch (af) {
+	case 0: return 7;
+	case 1: return 4;
+	case 2: return 2;
+	case 3: return 0;
+	}
 }
 void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 {
 	CNM_RECT r;
 	//CNM_RECT r;
+	int skin = get_player_packed_skin(wobj->anim_frame);
+	int anim = get_player_packed_anim(wobj->anim_frame);
 	if ((wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_VORTEX)
 	{
 		Util_SetRect(&r, 64, 224, 32, 32);
@@ -1522,7 +1545,7 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 		Renderer_DrawBitmap2
 		(
 			(int)wobj->x - camx,
-			(int)wobj->y - camy,
+			(int)wobj->y - camy + (anim == PLAYER_ANIM_SLIDE ? 16 : 0),
 			&r,
 			0,
 			RENDERER_LIGHT,
@@ -1530,13 +1553,15 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 			CNM_FALSE
 		);
 	}
+	if ((wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_SHOES) {
+		//Util_SetRect(&r, 256, 128, 32, 32);
+		//Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 0, RENDERER_LIGHT);
+	}
 	//wobj->anim_frame = custom ints[0];
 	//WobjGeneric_Draw(wobj, camx, camy);
 	//Util_SetRect(&r, (wobj->item % 8) * 32, 352 + (wobj->item / 8) * 32, 32, 32);
 	//if (wobj->item)
 	//	Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 0, RENDERER_LIGHT);
-	int skin = get_player_packed_skin(wobj->anim_frame);
-	int anim = get_player_packed_anim(wobj->anim_frame);
 	if ((wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_WINGS ||
 		(wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_CRYSTAL_WINGS)
 	{
@@ -1581,18 +1606,16 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 	}
 
 	DrawPlayerChar(wobj, camx, camy);
-	if (get_player_packed_draw_item(wobj->anim_frame)) {
-		Renderer_DrawBitmap2
-		(
-			(int)wobj->x - camx,
-			(int)wobj->y - camy - (skin == 10 ? 5 : 3) + (anim == PLAYER_ANIM_SLIDE ? 8 : 0),
-			&item_types[wobj->item].frames[0],
-			0,
-			RENDERER_LIGHT,
-			wobj->flags & WOBJ_HFLIP,
-			CNM_FALSE
-		);
-	}
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y - camy - (skin == 10 ? 5 : 3) + (anim == PLAYER_ANIM_SLIDE ? 8 : 0),
+		&item_types[wobj->item].frames[0],
+		get_player_packed_draw_item(wobj->anim_frame),
+		RENDERER_LIGHT,
+		wobj->flags & WOBJ_HFLIP,
+		CNM_FALSE
+	);
 
 	const char *name = NULL;
 	if (Interaction_GetMode() == INTERACTION_MODE_CLIENT ||
@@ -1604,16 +1627,12 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 
 	switch (wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE)
 	{
-	case PLAYER_UPGRADE_SHOES:
-		Util_SetRect(&r, 256, 128, 32, 32);
-		Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 0, RENDERER_LIGHT);
-		break;
 	case PLAYER_UPGRADE_MAXPOWER:
 		if ((Game_GetFrame() / 3) % 2 == 0)
 			Util_SetRect(&r, 192, 1120, 48, 48);
 		else
 			Util_SetRect(&r, 192, 1120+48, 48, 48);
-		Renderer_DrawBitmap((int)wobj->x - camx - 8, (int)wobj->y - camy - 8, &r, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap((int)wobj->x - camx - 8, (int)wobj->y - camy - 8, &r, 2, RENDERER_LIGHT);
 		break;
 	// case PLAYER_UPGRADE_CRYSTAL_WINGS:
 	// 	if ((Game_GetFrame() / 2) % 2 == 0)
@@ -1729,8 +1748,8 @@ CNM_RECT get_player_src_rect(int anim_frame, int *skin9offsetx, int *skin9offset
 	unsigned int af = *((unsigned int *)(&anim_frame));
 	pr.w = 32;
 	pr.h = 32;
-	pr.x = (af&0x1ff);
-	pr.y = (af&0x3ffe00) >> 9;
+	pr.x = ((af&0xff)) * 2;
+	pr.y = ((af&0x1fff00) >> 8) * 2;
 	
 	if (skin9offsetx) *skin9offsetx = 0;
 	if (skin9offsety) *skin9offsety = 0;

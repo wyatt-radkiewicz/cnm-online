@@ -594,7 +594,16 @@ void Item_TryPickupAndDrop(WOBJ *player)
 	PLAYER_LOCAL_DATA *plr_local = player->local_data;
 	if (_pickup_cooldown > 0) --_pickup_cooldown;
 	int pressed_drop = Input_GetButtonPressed(INPUT_DROP, INPUT_STATE_PLAYING) && !plr_local->lock_controls;
-	if (other_item != NULL && pressed_drop && player->item == ITEM_TYPE_NOITEM)
+	if (other_item != NULL &&
+		pressed_drop &&
+		player->item != ITEM_TYPE_NOITEM &&
+		!item_types[Item_GetCurrentItem()->type].draw_infront &&
+		Item_GetCurrentItem()->hide_timer == 0) {
+		Player_SwapOffhand(player);
+		if (player->item != ITEM_TYPE_NOITEM) Item_Drop(player);
+		Item_Pickup(player, other_item);
+	}
+	else if (other_item != NULL && pressed_drop && player->item == ITEM_TYPE_NOITEM)
 	{
 		Item_Pickup(player, other_item);
 	}
@@ -864,7 +873,7 @@ static void ItemGenericMelee_Update(ITEM *melee, WOBJ *player)
 	}
 
 	if (melee->custom_timer > 0) return;
-	melee->hide_timer = ITEM_HIDE_TIMER;
+	//melee->hide_timer = ITEM_HIDE_TIMER;
 	if (melee->custom_timer == 0) {
 		melee->custom_floats[0] = -1.0f;
 	}
