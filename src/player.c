@@ -636,6 +636,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//if (wobj->vel_x < final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x < 0.0f)) {
+				if (anim_lengths[local_data->currskin][PLAYER_TURN_AIR] && (~wobj->flags & WOBJ_IS_GROUNDED) && !playing_jump_start && (wobj->flags & WOBJ_HFLIP)) {
+					local_data->curranim = PLAYER_TURN_AIR;
+					local_data->animspd = 5;
+					local_data->animtimer = 0;
+				}
 				if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) {
 					if (anim_lengths[local_data->currskin][PLAYER_TURN_AIR] && !playing_jump_start) {
 						local_data->curranim = PLAYER_TURN_AIR;
@@ -672,6 +677,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//if (wobj->vel_x > -final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x > 0.0f)) {
+				if (anim_lengths[local_data->currskin][PLAYER_TURN_AIR] && (~wobj->flags & WOBJ_IS_GROUNDED) && !playing_jump_start && (~wobj->flags & WOBJ_HFLIP)) {
+					local_data->curranim = PLAYER_TURN_AIR;
+					local_data->animspd = 5;
+					local_data->animtimer = 0;
+				}
 				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) {
 					if (anim_lengths[local_data->currskin][PLAYER_TURN_AIR] && !playing_jump_start) {
 						local_data->curranim = PLAYER_TURN_AIR;
