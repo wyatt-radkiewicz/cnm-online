@@ -12,7 +12,9 @@
 #define PLAYER_ANIM_JUMP_END 4
 #define PLAYER_ANIM_HURT 5
 #define PLAYER_ANIM_SLIDE 6
-#define PLAYER_ANIM_MAX 7
+#define PLAYER_TURN_WALK 7
+#define PLAYER_TURN_AIR 8
+#define PLAYER_ANIM_MAX 9
 
 #define PLAYER_SLIDING_MAX_SPD (final_speed * 1.9f)
 
@@ -105,6 +107,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int level_end_rank, level_end_score, level_end_time_score;
 	int level_end_unlockable, level_end_found_secret, level_end_norank;
 	int last_touched_skin_unlock;
+	int num_deaths;
 	//int game_over_active//, game_over_timer;
 	//float item_durability;
 	//float stored_yvel;

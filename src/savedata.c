@@ -134,7 +134,7 @@ void globalsave_clear(struct globalsave *gs) {
 	for (int i = 0; i < sizeof(gs->skins_found) / sizeof(gs->skins_found[0]); i++) {
 		gs->skins_found[i] = -1;
 	}
-	gs->skins_found[0] = 9;
+	gs->skins_found[0] = 10;
 	gs->saves_created = 0;
 }
 int globalsave_visit_level(struct globalsave *gs, const char *level) {

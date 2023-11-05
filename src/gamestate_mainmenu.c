@@ -880,6 +880,19 @@ static int quit_rects[][2] = {
 	{ 384, 2208, }, { 173, 2443, }, { 52, 6469, },
 };
 static int selected_skin, num_skins_cached;
+static const char *skin_names[] = {
+	"\"OG\"",
+	"HUH?",
+	"NATWAP",
+	"HEAD",
+	"PENCIL MAN",
+	"FLAPPY",
+	"ZOBO",
+	"BLUE FELLA",
+	"MOE",
+	"RED GUY (BETA)",
+	"RED GUY",
+};
 
 void draw_player_setup(void) {
 	CNM_RECT r, r2;
@@ -921,7 +934,8 @@ void draw_player_setup(void) {
 	if (last_gui_state == GUI_PLAYER_SETUP || gui_state == GUI_PLAYER_SETUP) {
 		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*6, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "PLAYER SETUP");
 		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+12, trans2, RENDERER_LIGHT, "NAME: ");
-		Renderer_DrawText(RENDERER_WIDTH / 2 - 16, RENDERER_HEIGHT / 2 + 16 + 12+12+12, trans2, RENDERER_LIGHT, "SKIN");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+12+12, trans2, RENDERER_LIGHT, "SKIN: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 12-16 - (8*strlen(skin_names[g_globalsave.skins_found[selected_skin]])), RENDERER_HEIGHT / 2 + 16 + 12+12+12, trans2, RENDERER_LIGHT, skin_names[g_globalsave.skins_found[selected_skin]]);
 		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
 		int ralign = r.w - 20 - 16 * 8;

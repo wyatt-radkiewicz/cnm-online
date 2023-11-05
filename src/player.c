@@ -29,29 +29,131 @@ PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
 
 #define FLAPACCEL 8.0f 
 
-static int *anim_lengths;
+static const int anim_lengths[PLAYER_MAX_SKINS][PLAYER_ANIM_MAX] = {
+	{ // skin 0
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 1
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 2
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 3
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 4
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 5
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 6
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 7
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 8
+		1, // standing
+		4, // walking
+		1, // jumping
+		1, // shooting
+		1, // melee
+		1, // hurt
+		1, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 9
+		6, // standing
+		9, // walking
+		10, // jumping
+		2, // jumping1
+		2, // jumping2
+		1, // hurt
+		2, // slide
+		0, // turn walk
+		0, // turn air
+	},
+	{ // skin 10
+		6, // standing
+		8, // walking
+		6, // jumping
+		0, // jumping1
+		2, // jumping2
+		1, // hurt
+		2, // slide
+		1, // turn walk
+		1, // turn air
+	},
+};
 
-static int anim_lengths1[PLAYER_ANIM_MAX] = 
-{
-	1, // standing
-	4, // walking
-	1, // jumping
-	1, // shooting
-	1, // melee
-	1, // hurt
-	1, // slide
-};
-static int anim_lengths2[PLAYER_ANIM_MAX] =
-{
-	6, // standing
-	9, // walking
-	10, // jumping
-	2, // jumping1
-	2, // jumping2
-	1, // hurt
-	2, // slide
-};
-static int anim_offsets[PLAYER_ANIM_MAX][6][2] = 
+static const int anim_offsets[PLAYER_ANIM_MAX][6][2] = 
 {
 	{ // standing
 		{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
@@ -75,7 +177,7 @@ static int anim_offsets[PLAYER_ANIM_MAX][6][2] =
 		{64, 32}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	},
 };
-int skin_bases[PLAYER_MAX_SKINS][2] =
+const int skin_bases[PLAYER_MAX_SKINS][2] =
 {
 	{128, 1824},
 	{256, 1824},
@@ -89,11 +191,11 @@ int skin_bases[PLAYER_MAX_SKINS][2] =
 	{5, 4616},
 	{0, 7776},
 };
-static int skin_srcbase[PLAYER_MAX_SKINS] = {
+static const int skin_srcbase[PLAYER_MAX_SKINS] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	4608, 7776,
 };
-static int complex_skins[PLAYER_MAX_SKINS] = {
+static const int complex_skins[PLAYER_MAX_SKINS] = {
 	CNM_FALSE,
 	CNM_FALSE,
 	CNM_FALSE,
@@ -106,6 +208,8 @@ static int complex_skins[PLAYER_MAX_SKINS] = {
 	CNM_TRUE,
 	CNM_TRUE,
 };
+
+#define TURN_ANIM_TIME 3
 
 // For when the player dies and respawns
 static float _hud_player_y = 0.0f, _hud_player_yvel = 0.0f;
@@ -138,13 +242,13 @@ void Player_SetSkinInstant(WOBJ *wobj, int skinid) {
 	local_data->curranim = PLAYER_ANIM_STANDING;
 	local_data->currframe = 0;
 	local_data->animspd = 0;
-	if (wobj->internal.owned)
-	{
-		if (!complex_skins[local_data->currskin])
-			anim_lengths = anim_lengths1;
-		else
-			anim_lengths = anim_lengths2;
-	}
+	//if (wobj->internal.owned)
+	//{
+		//if (!complex_skins[local_data->currskin])
+			//anim_lengths = anim_lengths1;
+		//else
+			//anim_lengths = anim_lengths2;
+	//}
 
 }
 
@@ -216,6 +320,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	skin_unlock_y = -128;
 	skin_unlock_timer = 0;
 	local_data->last_touched_skin_unlock = -1;
+	local_data->num_deaths = 0;
 	//local_data->item_durability = 100.0f;
 	g_can_pause = CNM_TRUE;
 
@@ -412,8 +517,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (local_data->animforce_cooldown_timer-- <= 0)
 		local_data->animforce_cooldown = CNM_FALSE;
 
-	int touching_ice = CNM_FALSE;
+	int touching_ice = CNM_FALSE, is_turning = CNM_FALSE;
 	float ice_friction = 1.0f;
+
+	const int playing_jump_start = local_data->curranim == PLAYER_ANIM_JUMP && local_data->currframe < anim_lengths[local_data->currskin][PLAYER_ANIM_JUMP] - 2;
+	const int playing_jump_anim = local_data->curranim == PLAYER_ANIM_JUMP || local_data->curranim == PLAYER_TURN_AIR || local_data->curranim == PLAYER_ANIM_JUMP_END;
 
 	// Water things
 	if (!local_data->vortexed_mode)
@@ -495,9 +603,23 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//if (wobj->vel_x < final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x < 0.0f)) {
-				if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x += accel * 3.0f * cmul;
-				else if (wobj->vel_x < 0.0) wobj->vel_x += accel * 3.0f * cmul;
-				else wobj->vel_x += accel * cmul;
+				if (wobj->vel_x < 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) {
+					if (anim_lengths[local_data->currskin][PLAYER_TURN_AIR] && !playing_jump_start) {
+						local_data->curranim = PLAYER_TURN_AIR;
+						local_data->animspd = 5;
+						local_data->animtimer = 0;
+					}
+					wobj->vel_x += accel * 3.0f * cmul;
+				} else if (wobj->vel_x < 0.0) {
+					if (anim_lengths[local_data->currskin][PLAYER_TURN_WALK] && !playing_jump_anim) {
+						local_data->curranim = PLAYER_TURN_WALK;
+						local_data->animspd = 5;
+						local_data->animtimer = 0;
+					}
+					wobj->vel_x += accel * 3.0f * cmul;
+				} else {
+					wobj->vel_x += accel * cmul;
+				}
 			}
 			//}
 			//if (Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING) ||
@@ -517,9 +639,23 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//if (wobj->vel_x > -final_speed) {
 			if (!local_data->is_sliding || (wobj->vel_x > 0.0f)) {
-				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) wobj->vel_x -= accel * 3.0f * cmul;
-				else if (wobj->vel_x > 0.0) wobj->vel_x -= accel * 3.0f * cmul;
-				else wobj->vel_x -= accel * cmul;
+				if (wobj->vel_x > 0.0 && ~wobj->flags & WOBJ_IS_GROUNDED) {
+					if (anim_lengths[local_data->currskin][PLAYER_TURN_AIR] && !playing_jump_start) {
+						local_data->curranim = PLAYER_TURN_AIR;
+						local_data->animspd = 5;
+						local_data->animtimer = 0;
+					}
+					wobj->vel_x -= accel * 3.0f * cmul;
+				} else if (wobj->vel_x > 0.0) {
+					if (anim_lengths[local_data->currskin][PLAYER_TURN_WALK] && !playing_jump_anim) {
+						local_data->curranim = PLAYER_TURN_WALK;
+						local_data->animspd = 5;
+						local_data->animtimer = 0;
+					}
+					wobj->vel_x -= accel * 3.0f * cmul;
+				} else {
+					wobj->vel_x -= accel * cmul;
+				}
 			}
 			//}
 			//if (Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
@@ -535,8 +671,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 			//	wobj->vel_x -= accel * 2.0f;
 			wobj->flags |= WOBJ_HFLIP;
 		}
+		
+		is_turning = (local_data->curranim == PLAYER_TURN_AIR || local_data->curranim == PLAYER_TURN_WALK) && local_data->animtimer < TURN_ANIM_TIME;
 
-		if (complex_skins[local_data->currskin] && local_data->curranim == PLAYER_ANIM_JUMP && Wobj_IsGrouneded(wobj))
+		if (complex_skins[local_data->currskin] && (local_data->curranim == PLAYER_ANIM_JUMP || local_data->curranim == PLAYER_TURN_AIR) && Wobj_IsGrouneded(wobj))
 		{
 			Interaction_PlaySound(wobj, 60);
 			local_data->curranim = PLAYER_ANIM_JUMP_END;
@@ -550,7 +688,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if ((Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING) || Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING)) &&
 			!local_data->animforce_cooldown && Wobj_IsGrouneded(wobj) && !local_data->lock_controls)
 		{
-			if (local_data->curranim != PLAYER_ANIM_JUMP_END)
+			if (local_data->curranim != PLAYER_ANIM_JUMP_END && !is_turning)
 			{
 				local_data->curranim = PLAYER_ANIM_WALKING;
 				local_data->animspd = 8 - (int)fabsf(wobj->vel_x);
@@ -625,8 +763,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 				wobj->vel_x += dec * cmul;
 			else
 				wobj->vel_x = 0.0f;
-			if (!local_data->animforce_cooldown && Wobj_IsGrouneded(wobj)&&
-				local_data->curranim != PLAYER_ANIM_JUMP_END)
+			if (!local_data->animforce_cooldown && Wobj_IsGrouneded(wobj) &&
+				local_data->curranim != PLAYER_ANIM_JUMP_END && !is_turning)
 			{
 				local_data->curranim = PLAYER_ANIM_STANDING;
 				local_data->animspd = 3;
@@ -1187,6 +1325,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->in_water = CNM_FALSE;
 		local_data->vortexed_mode = CNM_FALSE;
 		local_data->vortex_death = CNM_FALSE;
+		local_data->num_deaths++;
 		wobj->health = 100.0f;
 		for (int k = 0; k < 5; k++)
 		{
@@ -1319,7 +1458,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (wobj->vel_x > 4.0f || wobj->vel_x < -4.0f) local_data->animspd = 1;
 		if (wobj->vel_x > 6.0f || wobj->vel_x < -6.0f) local_data->animspd = 0;
 	}
-	if (!Wobj_IsGrouneded(wobj) && !local_data->animforce_cooldown)
+	if (!Wobj_IsGrouneded(wobj) && !local_data->animforce_cooldown && !is_turning)
 	{
 		if (local_data->curranim != PLAYER_ANIM_JUMP)
 		{
@@ -1332,7 +1471,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		}
 		local_data->curranim = PLAYER_ANIM_JUMP;
-		local_data->animspd = 3;
+		local_data->animspd = local_data->currskin == 9 ? 3 : 4;
 	}
 	StepPlayerAnimation(wobj);
 
@@ -1481,23 +1620,23 @@ static void StepPlayerAnimation(WOBJ *wobj)
 
 	if (ld->animspd == 0) ld->animspd = 1;
 
-	if (ld->currframe >= anim_lengths[ld->curranim])  ld->currframe = anim_lengths[ld->curranim]-1;
+	if (ld->currframe >= anim_lengths[ld->currskin][ld->curranim])  ld->currframe = anim_lengths[ld->currskin][ld->curranim]-1;
 	ld->animtimer++;
 	if (!complex_skins[ld->currskin] ||
 		(ld->curranim == PLAYER_ANIM_WALKING ||
 		 ld->curranim == PLAYER_ANIM_HURT))
 	{
 		if (ld->animtimer % ld->animspd == 0)
-			ld->currframe = (ld->currframe + 1) % anim_lengths[ld->curranim];
+			ld->currframe = (ld->currframe + 1) % anim_lengths[ld->currskin][ld->curranim];
 	}
 	else if (ld->curranim == PLAYER_ANIM_STANDING)
 	{
 		if (ld->animtimer % ld->animspd == 0)
 		{
 			ld->currframe += goodanim_godir;
-			if (ld->currframe >= anim_lengths[ld->curranim]) {
+			if (ld->currframe >= anim_lengths[ld->currskin][ld->curranim]) {
 				goodanim_godir = -1;
-				ld->currframe = anim_lengths[ld->curranim] - 2;
+				ld->currframe = anim_lengths[ld->currskin][ld->curranim] - 2;
 			}
 			if (ld->currframe < 0) {
 				goodanim_godir = 1;
@@ -1509,8 +1648,8 @@ static void StepPlayerAnimation(WOBJ *wobj)
 	{
 		if (ld->animtimer % ld->animspd == 0) {
 			ld->currframe++;
-			if (ld->currframe >= anim_lengths[ld->curranim])
-				ld->currframe = anim_lengths[ld->curranim]-2;
+			if (ld->currframe >= anim_lengths[ld->currskin][ld->curranim])
+				ld->currframe = anim_lengths[ld->currskin][ld->curranim]-2;
 		}
 	}
 	else if (ld->curranim == PLAYER_ANIM_JUMP_END)
@@ -1525,7 +1664,7 @@ static void StepPlayerAnimation(WOBJ *wobj)
 	else
 	{
 		if (ld->animtimer % ld->animspd == 0)
-			ld->currframe = (ld->currframe + 1) % anim_lengths[ld->curranim];
+			ld->currframe = (ld->currframe + 1) % anim_lengths[ld->currskin][ld->curranim];
 	}
 	wobj->anim_frame = ld->currframe;
 }
@@ -1541,13 +1680,19 @@ static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame)
 	else
 	{
 		int base = 0;
-		if (anim == PLAYER_ANIM_WALKING) base = anim_lengths2[0];
-		if (anim == PLAYER_ANIM_JUMP) base = anim_lengths2[0]+ anim_lengths2[1]+2;
+		if (anim == PLAYER_ANIM_WALKING) base = anim_lengths[skin][0];
+		if (anim == PLAYER_ANIM_JUMP) base = anim_lengths[skin][0]+ anim_lengths[skin][1];
 		if (anim == PLAYER_ANIM_JUMP_END)
-			base = anim_lengths2[0]+anim_lengths2[1] +
-			anim_lengths2[2] + anim_lengths2[3];
+			base = anim_lengths[skin][0]+anim_lengths[skin][1] +
+			anim_lengths[skin][2] + anim_lengths[skin][3];
 		if (anim == PLAYER_ANIM_HURT)
-			base = 29;
+			base = anim_lengths[skin][0]+anim_lengths[skin][1] +
+			anim_lengths[skin][2] + anim_lengths[skin][3]+anim_lengths[skin][4];
+		if (anim == PLAYER_TURN_WALK || anim == PLAYER_TURN_AIR) {
+			base = anim_lengths[skin][0]+anim_lengths[skin][1] +
+			anim_lengths[skin][2] + anim_lengths[skin][3]+anim_lengths[skin][4]+anim_lengths[skin][5]+anim_lengths[skin][6];
+			if (anim == PLAYER_TURN_AIR) base += anim_lengths[skin][7];
+		}
 		int dx = (base+frame)%12;
 		int dy = (base+frame)/12;
 		r->x = dx*40;
