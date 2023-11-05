@@ -1514,10 +1514,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			if (complex_skins[local_data->currskin])
 			{
-				if (wobj->vel_y < -1.0f)
+				if (wobj->vel_y < -1.0f && local_data->curranim != PLAYER_TURN_AIR)
 					local_data->currframe = 0;
 				else
-					local_data->currframe = 7;
+					local_data->currframe = anim_lengths[local_data->currskin][PLAYER_ANIM_JUMP] - 2;
 			}
 		}
 		local_data->curranim = PLAYER_ANIM_JUMP;
