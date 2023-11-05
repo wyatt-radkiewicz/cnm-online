@@ -970,7 +970,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -990,7 +990,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1010,7 +1010,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1030,7 +1030,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1050,7 +1050,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1070,7 +1070,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1090,7 +1090,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1110,7 +1110,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1130,7 +1130,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3746,7 +3746,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3766,7 +3766,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3786,7 +3786,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3806,7 +3806,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3826,7 +3826,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3846,7 +3846,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3866,7 +3866,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3886,7 +3886,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3906,7 +3906,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3926,7 +3926,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -7067,7 +7067,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "DRAGON DEEZ NUTS"
+          "next_level": "DRAGON DEEZ NUTS",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -7085,7 +7087,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "DRAGON DEEZ NUTS"
+          "next_level": "DRAGON DEEZ NUTS",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -7103,7 +7107,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "DRAGON DEEZ NUTS"
+          "next_level": "DRAGON DEEZ NUTS",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {

@@ -1483,8 +1483,13 @@ void WobjPlayer_Update(WOBJ *wobj)
 			PlayerAnimGetRect(&pr, local_data->currskin, 0, 0);
 		}
 		// Smush this into a 32bit integer
-		af |= pr.x&0xffff;
-		af |= (pr.y&0x7fff) << 16;
+		af |= pr.x&0x1ff;
+		af |= (pr.y << 9)&0x3ffe00;
+		if (Item_GetCurrentItem()->hide_timer > 0 || item_types[Item_GetCurrentItem()->type].draw_infront) {
+			af |= 0x400000;
+		}
+		af |= (local_data->currskin << 23) & 0x07800000;
+		af |= (local_data->curranim << 27) & 0x78000000;
 		if (complex_skins[local_data->currskin]) af |= 0x80000000;
 		wobj->anim_frame = *((int *)(&af));
 	}
@@ -1496,6 +1501,15 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->strength = 9.99f;
 	// if (wobj->money > 99999)
 	// 	wobj->money = 99999;
+}
+int get_player_packed_skin(int anim_frame) {
+	return ((anim_frame & 0x07800000) >> 23);
+}
+int get_player_packed_anim(int anim_frame) {
+	return ((anim_frame & 0x78000000) >> 27);
+}
+int get_player_packed_draw_item(int anim_frame) {
+	return anim_frame & 0x400000;
 }
 void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 {
@@ -1521,6 +1535,8 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 	//Util_SetRect(&r, (wobj->item % 8) * 32, 352 + (wobj->item / 8) * 32, 32, 32);
 	//if (wobj->item)
 	//	Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 0, RENDERER_LIGHT);
+	int skin = get_player_packed_skin(wobj->anim_frame);
+	int anim = get_player_packed_anim(wobj->anim_frame);
 	if ((wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_WINGS ||
 		(wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_CRYSTAL_WINGS)
 	{
@@ -1557,7 +1573,7 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 		int flipdist = wobj->flags & WOBJ_HFLIP ? 7 : 10;
 		Renderer_DrawBitmap2(
 			(int)wobj->x - flipdist - camx,
-			(int)wobj->y - 14 - camy,
+			(int)wobj->y - 14 - camy - (skin == 10 ? 9 : 0) + (anim == PLAYER_ANIM_SLIDE ? 16 : 0),
 			(iscryst ? framesc : frames) + frame,
 			iscryst ? 1 : 0, RENDERER_LIGHT,
 			wobj->flags & WOBJ_HFLIP,
@@ -1565,16 +1581,18 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 	}
 
 	DrawPlayerChar(wobj, camx, camy);
-	Renderer_DrawBitmap2
-	(
-		(int)wobj->x - camx,
-		(int)wobj->y - camy,
-		&item_types[wobj->item].frames[0],
-		0,
-		RENDERER_LIGHT,
-		wobj->flags & WOBJ_HFLIP,
-		CNM_FALSE
-	);
+	if (get_player_packed_draw_item(wobj->anim_frame)) {
+		Renderer_DrawBitmap2
+		(
+			(int)wobj->x - camx,
+			(int)wobj->y - camy - (skin == 10 ? 5 : 3) + (anim == PLAYER_ANIM_SLIDE ? 8 : 0),
+			&item_types[wobj->item].frames[0],
+			0,
+			RENDERER_LIGHT,
+			wobj->flags & WOBJ_HFLIP,
+			CNM_FALSE
+		);
+	}
 
 	const char *name = NULL;
 	if (Interaction_GetMode() == INTERACTION_MODE_CLIENT ||
@@ -1711,8 +1729,8 @@ CNM_RECT get_player_src_rect(int anim_frame, int *skin9offsetx, int *skin9offset
 	unsigned int af = *((unsigned int *)(&anim_frame));
 	pr.w = 32;
 	pr.h = 32;
-	pr.x = (af&0xffff);
-	pr.y = ((af >> 16)&0x7fff);
+	pr.x = (af&0x1ff);
+	pr.y = (af&0x3ffe00) >> 9;
 	
 	if (skin9offsetx) *skin9offsetx = 0;
 	if (skin9offsety) *skin9offsety = 0;

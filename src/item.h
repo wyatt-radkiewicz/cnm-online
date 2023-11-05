@@ -63,6 +63,7 @@ typedef struct _ITEM_TYPE
 	int use_on_held;
 	int wobj_dropped_type;
 	float max_durability;
+	int draw_infront;
 } ITEM_TYPE;
 
 typedef struct _ITEM
@@ -75,7 +76,10 @@ typedef struct _ITEM
 	float durability;
 	WOBJ *melee_obj, *objs[8];
 	int in_use, last_in_use;
+	int hide_timer;
 } ITEM;
+
+#define ITEM_HIDE_TIMER 20
 
 extern ITEM_TYPE item_types[];
 
