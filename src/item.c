@@ -344,7 +344,7 @@ ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		25.0f, // Item durability
+		15.0f, // Item durability
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 24: Fire Potion
@@ -1214,7 +1214,7 @@ static void ItemLaserRifle_OnUse(ITEM *laser, WOBJ *player)
 static void ItemRocketLauncher_OnUse(ITEM *rpg, WOBJ *player)
 {
 	WOBJ *rocket = Interaction_CreateWobj(WOBJ_ROCKET, player->x, player->y, player->flags & WOBJ_HFLIP, 0.0f);
-	rocket->strength = player->strength;// + 1000.0f;
+	rocket->strength = player->strength + 0.5f;// + 1000.0f;
 	rocket->flags |= WOBJ_IS_PLAYER_WEAPON;
 	rpg->use_timer = 13;
 	Player_PlayShootAnim(player);

@@ -672,9 +672,9 @@ static void WobjFlameThrowerFlame_Update(WOBJ *wobj)
 
 	wobj->vel_y -= 0.01f;
 
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 8.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 8.0f))
 		wobj->vel_y -= 0.05f;
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, -8.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, -8.0f))
 		wobj->vel_y += 0.05f;
 	wobj->x += cosf(wobj->custom_floats[0]) * wobj->speed;
 	wobj->y += sinf(wobj->custom_floats[0]) * wobj->speed + wobj->vel_y;
@@ -898,12 +898,12 @@ static void WobjFissionEnergyBolt_Update(WOBJ *wobj)
 	const int penalty = 15;
 	if (wobj->vel_x != 0.0f)
 	{
-		if (Wobj_IsCollidingWithBlocks(wobj, 8.0f, 0.0f))
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 8.0f, 0.0f))
 		{
 			wobj->vel_x = -fabsf(wobj->vel_x);
 			wobj->custom_ints[0] += penalty;
 		}
-		if (Wobj_IsCollidingWithBlocks(wobj, -8.0f, 0.0f))
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, -8.0f, 0.0f))
 		{
 			wobj->vel_x = fabsf(wobj->vel_x);
 			wobj->custom_ints[0] += penalty;
@@ -911,12 +911,12 @@ static void WobjFissionEnergyBolt_Update(WOBJ *wobj)
 	}
 	if (wobj->vel_y != 0.0f)
 	{
-		if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 8.0f))
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 8.0f))
 		{
 			wobj->vel_y = -fabsf(wobj->vel_y);
 			wobj->custom_ints[0] += penalty;
 		}
-		if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, -8.0f))
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, -8.0f))
 		{
 			wobj->vel_y = fabsf(wobj->vel_y);
 			wobj->custom_ints[0] += penalty;
@@ -1135,7 +1135,7 @@ static void WobjVortex_Create(WOBJ *wobj)
 	//Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 96.0f, 96.0f);
 	wobj->custom_ints[1] = CNM_FALSE; // This is a like "cannot use flag"
 	VORTEX_CHECK_HOTBOX;
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f))
 		wobj->custom_ints[1] = CNM_TRUE;
 	VORTEX_NORMAL_HITBOX;
 	//wobj->custom_ints[1] = 0;
@@ -1146,7 +1146,7 @@ static void WobjVortex_Update(WOBJ *wobj)
 	//	Interaction_DestroyWobj(wobj);
 	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	VORTEX_CHECK_HOTBOX;
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f))
 		Interaction_DestroyWobj(wobj);
 	VORTEX_NORMAL_HITBOX;
 
