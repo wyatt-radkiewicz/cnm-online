@@ -108,6 +108,10 @@ typedef struct _PLAYER_LOCAL_DATA
 	int level_end_unlockable, level_end_found_secret, level_end_norank;
 	int last_touched_skin_unlock;
 	int num_deaths;
+
+	int jump_input_buffer, has_cut_jump, is_grounded_buffer;
+	int slide_input_buffer;
+	float stored_slide_speed;
 	//int game_over_active//, game_over_timer;
 	//float item_durability;
 	//float stored_yvel;
