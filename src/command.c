@@ -85,6 +85,7 @@ static void Command_LocalMap(const char *args, int from_player);
 static void Command_NoSave(const char *args, int from_player);
 static void Command_SetLives(const char *args, int from_player);
 static void Command_Skin(const char *args, int from_player);
+static void Command_ClPos(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -145,6 +146,7 @@ static const char *const command_names[] =
 	"nosave",
 	"setlives",
 	"skin",
+	"cl_pos",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -206,6 +208,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_NoSave,
 	Command_SetLives,
 	Command_Skin,
+	Command_ClPos,
 };
 
 static int can_run_cheat1(int from_player) {
@@ -749,5 +752,8 @@ static void Command_Skin(const char *args, int from_player) {
 	//	((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->custom_ints[0] = skin;
 	//	((PLAYER_LOCAL_DATA *)((WOBJ *)Game_GetVar(GAME_VAR_PLAYER)->data.pointer)->local_data)->currskin = skin;
 	}
+}
+static void Command_ClPos(const char *args, int from_player) {
+	Game_GetVar(GAME_VAR_CL_POS)->data.integer = atoi(Command_ExtractArg(args, 0));
 }
 

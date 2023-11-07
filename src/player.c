@@ -1005,6 +1005,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 					local_data->control_mul = CNM_MAX(0.25f - per, 0.0f);
 					wobj->vel_x *= 1.25f * per;
 					wobj->vel_y *= 1.25f * (1.25f - per);
+					if (per > 0.75f) local_data->sliding_cap_landing_speed = CNM_TRUE;
 					//if (wobj->vel_x > -2.5f && wobj->vel_x < 2.5f) {
 					//	wobj->vel_y *= 1.25f;
 					//	wobj->vel_x *= 0.1f;
@@ -1884,7 +1885,7 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 	Renderer_DrawBitmap2
 	(
 		(int)wobj->x - camx + skin9offsetx,
-		(int)wobj->y - camy + skin9offsety,
+		(int)wobj->y - camy + skin9offsety + 1,
 		&pr,
 		0,
 		Wobj_DamageLighting(wobj, Blocks_GetCalculatedBlockLight((int)wobj_center_x / BLOCK_SIZE, (int)wobj_center_y / BLOCK_SIZE)),
@@ -1918,7 +1919,7 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 		);
 	}
 
-	if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer)
+	if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer || Game_GetVar(GAME_VAR_CL_POS)->data.integer)
 	{
 		Renderer_DrawText
 		(

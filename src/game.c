@@ -234,6 +234,7 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_LEVEL_SELECT_MODE].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_NOSAVE].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_FORCE_NOSAVE].data.integer = CNM_FALSE;
+	game_vars[GAME_VAR_CL_POS].data.integer = CNM_FALSE;
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);

@@ -68,6 +68,7 @@ typedef enum _GAME_VARS
 	GAME_VAR_LEVEL_SELECT_MODE, // Use in conjunction with nosave
 	GAME_VAR_NOSAVE,
 	GAME_VAR_FORCE_NOSAVE,
+	GAME_VAR_CL_POS,
 	GAME_VAR_MAX
 } GAME_VARS;
 
