@@ -28,6 +28,7 @@
 PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
 
 #define FLAPACCEL 8.0f 
+#define JUMP_TIMER 6
 
 static const int anim_lengths[PLAYER_MAX_SKINS][PLAYER_ANIM_MAX] = {
 	{ // skin 0
@@ -973,7 +974,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 					local_data->jump_init_yspd = plat->vel_y;
 				}
 				wobj->vel_y = -jmp_speed;
-				local_data->jumped = 5;
+				local_data->jumped = JUMP_TIMER;
 				local_data->animtimer = 0;
 				Interaction_PlaySound(wobj, 58);
 
@@ -1040,9 +1041,23 @@ void WobjPlayer_Update(WOBJ *wobj)
 				//local_data->ability3_timer = 30;
 			}
 		}
-		if (local_data->jumped > 0 && !Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && wobj->vel_y < (final_jmp / -2.0f && !local_data->lock_controls))
+		if (local_data->jumped > 0 && Input_GetButtonReleased(INPUT_UP, INPUT_STATE_PLAYING) && wobj->vel_y < (final_jmp / -2.0f && !local_data->lock_controls))
 		{
-			wobj->vel_y = (final_jmp - local_data->jump_init_yspd) / -2.0f;
+			//wobj->vel_y = (final_jmp - local_data->jump_init_yspd) / -2.0f;
+			float time = ((float)(JUMP_TIMER) - (float)(local_data->jumped));
+			if (time < 0.0f) time = 0.0f;
+			const float virt_y = -0.25f * time*time - final_jmp * time;
+			float delta_s = (-72.0f+(local_data->jump_init_yspd)) - virt_y;
+			if (local_data->jumped > 3) {
+				delta_s = (-40.0f+(local_data->jump_init_yspd)) - virt_y;
+				//Console_Print("small");
+			}// else Console_Print("medium");
+			const float newvel = -sqrtf(-delta_s);
+			if (delta_s > 0.0f) {
+				wobj->vel_y = (final_jmp - local_data->jump_init_yspd) / -2.0f;
+			} else {
+				wobj->vel_y = newvel + local_data->jump_init_yspd;
+			}
 		}
 	}
 	//wobj->y -= 1.0f;
