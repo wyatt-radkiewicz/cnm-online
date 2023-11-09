@@ -336,6 +336,7 @@ void WobjBozoPin_Create(WOBJ *wobj)
 void WobjBozoPin_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	WobjPhysics_BeginUpdate(wobj);
 	WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
 	if (Interaction_GetDistanceToWobj(wobj, closest_player) < (float)320.0f && !wobj->item)
 	{
@@ -358,9 +359,10 @@ void WobjBozoPin_Update(WOBJ *wobj)
 		if (wobj->custom_ints[0] < 30*7) {
 			wobj->custom_floats[1] = tang;
 		}
-		wobj->x += cosf(wobj->custom_floats[1]) * wobj->speed;
-		wobj->y += sinf(wobj->custom_floats[1]) * wobj->speed;
+		wobj->vel_x = cosf(wobj->custom_floats[1]) * wobj->speed;
+		wobj->vel_y = sinf(wobj->custom_floats[1]) * wobj->speed;
 	}
+	WobjPhysics_EndUpdate(wobj);
 
 	if (Game_GetFrame() % 25 == 0)
 		Interaction_PlaySound(wobj, 17);
@@ -704,6 +706,7 @@ void WobjSlimeWalker_Create(WOBJ *wobj)
 void WobjSlimeWalker_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	WobjPhysics_BeginUpdate(wobj);
 	if (wobj->custom_ints[1] == 0)
 	{
 		wobj->custom_ints[0]--;
@@ -749,10 +752,12 @@ void WobjSlimeWalker_Update(WOBJ *wobj)
 	else
 		wobj->flags &= ~WOBJ_HFLIP;
 
-	wobj->x += wobj->custom_floats[0];
-	wobj->y += wobj->vel_y;
+	wobj->vel_x = wobj->custom_floats[0];
+	//wobj->x += wobj->custom_floats[0];
+	//wobj->y += wobj->vel_y;
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
-	Wobj_ResolveBlocksCollision(wobj);
+	WobjPhysics_EndUpdate(wobj);
+	//Wobj_ResolveBlocksCollision(wobj);
 	float grav = Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
 	if (wobj->type == SLIME_WALKER)
 		grav *= 2.0f;
@@ -1673,7 +1678,7 @@ void WobjBozoLaserMinion_Create(WOBJ *wobj)
 	wobj->health = 15.0f;
 	wobj->strength = 0.8333333333f;
 	wobj->custom_ints[0] = 0;
-	Util_SetBox(&wobj->hitbox, 7.0f, 33.0f, 16.0f, 30.0f);
+	Util_SetBox(&wobj->hitbox, 7.0f, 8.0f, 16.0f, 64.0f-8.0f);
 }
 void WobjBozoLaserMinion_Update(WOBJ *wobj)
 {
@@ -2016,8 +2021,10 @@ void WobjSpikeGuySpike_Update(WOBJ *wobj)
 {
 	wobj->x += wobj->vel_x;
 	wobj->y += wobj->vel_y;
-	if (wobj->custom_ints[1]++ > 30)
+	Util_SetBox(&wobj->hitbox, 15.0f, 15.0f, 2.0f, 2.0f);
+	if (wobj->custom_ints[1]++ > 30 || Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f))
 		Interaction_DestroyWobj(wobj);
+	Util_SetBox(&wobj->hitbox, 4.0f, 4.0f, 28.0f, 28.0f);
 }
 
 void WobjBanditGuy_Create(WOBJ *wobj)
@@ -2195,8 +2202,10 @@ void WobjRockGuySpear_Update(WOBJ *wobj)
 	wobj->y += wobj->vel_y;
 	if (wobj->custom_ints[0] < 25)
 		wobj->vel_y += 0.05f;
-	if (wobj->custom_ints[0]-- < 0)
+	Util_SetBox(&wobj->hitbox, 15.0f, 15.0f, 2.0f, 2.0f);
+	if (wobj->custom_ints[0]-- < 0 || Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f))
 		Interaction_DestroyWobj(wobj);
+	Util_SetBox(&wobj->hitbox, 4.0f, 4.0f, 28.0f, 28.0f);
 }
 
 #define ROCK_GUY_MEDIUM_SLEEPING 0

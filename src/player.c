@@ -831,19 +831,20 @@ void WobjPlayer_Update(WOBJ *wobj)
 			{
 				if (!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->lock_controls)
 				{
-					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocks(wobj, 0.0f, 32.0f); i++)
+					wobj->vel_y = 10.0f;
+					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 32.0f); i++)
 						wobj->y += 24.0f;
-					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocks(wobj, 0.0f, 4.0f); i++)
+					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 1.0f); i++)
 						wobj->y += 1.0f;
 
 					local_data->slide_jump_cooldown = 5;
 
 					WOBJ *w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
-													 wobj->x + 16.0f, wobj->y, 0, 1.0f);
+													 wobj->x + 16.0f, wobj->y + 1.0f, 0, 1.0f);
 					w->speed = 9.0f;
 					w->strength = wobj->strength + 0.1f;
 					w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
-													 wobj->x + 16.0f, wobj->y, 0, -1.0f);
+													 wobj->x + 16.0f, wobj->y + 1.0f, 0, -1.0f);
 					w->flags |= WOBJ_HFLIP;
 					w->speed = 9.0f;
 					w->strength = wobj->strength + 0.1f;
