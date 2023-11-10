@@ -768,7 +768,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				}
 				local_data->slide_input_buffer = 0;
 				local_data->is_sliding = CNM_TRUE;
-				local_data->sliding_jump_timer = 5;
+				local_data->sliding_jump_timer = 15;
 				wobj->hitbox.y = 17.0f;
 				wobj->hitbox.h = 15.0f;
 				local_data->stored_slide_speed = fabsf(wobj->vel_x);
@@ -1006,7 +1006,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 					local_data->control_mul = CNM_MAX(0.25f - per, 0.0f);
 					wobj->vel_x *= 1.25f * per;
 					wobj->vel_y *= 1.25f * (1.25f - per);
-					if (per >= 0.85f) local_data->sliding_cap_landing_speed = CNM_TRUE;
+					if (local_data->sliding_jump_timer > 0) local_data->sliding_cap_landing_speed = CNM_TRUE;
 					//if (wobj->vel_x > -2.5f && wobj->vel_x < 2.5f) {
 					//	wobj->vel_y *= 1.25f;
 					//	wobj->vel_x *= 0.1f;
