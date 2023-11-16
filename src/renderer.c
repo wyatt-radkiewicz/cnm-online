@@ -360,12 +360,13 @@ void Renderer_DrawHorzRippleEffect(const CNM_RECT *rect, float period, float amp
 	}
 
 	for (int y = r.y; y < r.y + r.h; y++) {
-		int xs = r.x + (int)(sinf((y + ((float)Game_GetFrame() * spd)) * (2.0f * CNM_PI) / period) * amp);
+		int xs = r.x + (int)(sinf((y + ((float)Game_GetFrame() * spd)) * CNM_PI / period) * amp);
 
 		const unsigned char *srcptr = ((unsigned char *)renderer_effects_buf->pixels) + (xs + y * RENDERER_WIDTH);
 		unsigned char *dstptr = ((unsigned char *)renderer_scr->pixels) + (r.x + y * RENDERER_WIDTH);
 		
 		for (int x = 0; x < r.w; x++) {
+			if (xs + x < 0 || xs + x >= RENDERER_WIDTH) continue;
 			*(dstptr++) = *(srcptr++);
 		}
 	}

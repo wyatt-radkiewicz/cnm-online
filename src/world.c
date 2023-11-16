@@ -246,6 +246,8 @@ void World_Draw(int mode)
 	Blocks_DrawBlocks(BLOCKS_FG, camx, camy);
 	Renderer_SaveToEffectsBuffer();
 	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS, camx, camy);
+	Renderer_SaveToEffectsBuffer();
+	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS_EX, camx, camy);
 
 	// High priority background
 	Background_Draw(1, camx, camy);

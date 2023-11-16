@@ -363,6 +363,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->is_grounded_buffer = 0;
 	local_data->slide_input_buffer = 0;
 	local_data->stored_slide_speed = 0.0f;
+	local_data->slide_super_jump_timer = 0;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
@@ -655,7 +656,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 						local_data->animspd = 5;
 						local_data->animtimer = 0;
 					}
-					wobj->vel_x += accel * 3.0f * cmul;
+					wobj->vel_x += accel * 2.0f * cmul;
 				} else if (wobj->vel_x < 0.0) {
 					if (anim_lengths[local_data->currskin][PLAYER_TURN_WALK] && !playing_jump_anim) {
 						local_data->curranim = PLAYER_TURN_WALK;
@@ -696,7 +697,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 						local_data->animspd = 5;
 						local_data->animtimer = 0;
 					}
-					wobj->vel_x -= accel * 3.0f * cmul;
+					wobj->vel_x -= accel * 2.0f * cmul;
 				} else if (wobj->vel_x > 0.0) {
 					if (anim_lengths[local_data->currskin][PLAYER_TURN_WALK] && !playing_jump_anim) {
 						local_data->curranim = PLAYER_TURN_WALK;
@@ -752,10 +753,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (local_data->sliding_crit_timer > 0) local_data->sliding_crit_timer--;
 		if (local_data->sliding_jump_timer > 0) local_data->sliding_jump_timer--;
 		if (local_data->slide_input_buffer > 0) local_data->slide_input_buffer--;
+		if (local_data->slide_super_jump_timer > 0) local_data->slide_super_jump_timer--;
 		if (Wobj_IsGrouneded(wobj)) local_data->slide_jump_cooldown--;
 		if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) local_data->slide_input_buffer = 5;
 		if (Wobj_IsGrouneded(wobj) && (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) || local_data->slide_input_buffer > 0) && !local_data->is_sliding && local_data->slide_jump_cooldown <= 0 && !local_data->lock_controls) {
 			if ((wobj->vel_x > 2.0f || wobj->vel_x < -2.0f) || local_data->sliding_crit_timer > 0) {
+				const float fast_spd = 15.0f;
 				wobj->vel_x *= 1.25f;
 				if (local_data->sliding_crit_timer > 0 && (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) || local_data->slide_input_buffer > 0)) {
 					if (wobj->flags & WOBJ_HFLIP && wobj->vel_x > -final_speed) wobj->vel_x = -final_speed;
@@ -766,9 +769,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 					wobj->vel_x = CNM_CLAMP(wobj->vel_x, -PLAYER_SLIDING_MAX_SPD, PLAYER_SLIDING_MAX_SPD);
 					Interaction_PlaySound(wobj, 59);
 				}
+				if (fabsf(wobj->vel_x) > fast_spd) {
+					if (wobj->vel_x > fast_spd) wobj->vel_x = fast_spd;
+					else wobj->vel_x = -fast_spd;
+				}
+				local_data->slide_super_jump_timer = 0;
 				local_data->slide_input_buffer = 0;
 				local_data->is_sliding = CNM_TRUE;
-				local_data->sliding_jump_timer = 15;
+				local_data->sliding_jump_timer = 30;
 				wobj->hitbox.y = 17.0f;
 				wobj->hitbox.h = 15.0f;
 				local_data->stored_slide_speed = fabsf(wobj->vel_x);
@@ -789,6 +797,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			float absvelx = wobj->vel_x < 0.0f ? -wobj->vel_x : wobj->vel_x;
 			if (absvelx < 1.5f || !Wobj_IsGrouneded(wobj)) {
 				local_data->is_sliding = CNM_FALSE;
+				local_data->slide_super_jump_timer = 3;
 			}
 		}
 	
@@ -998,15 +1007,30 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->jumped = JUMP_TIMER;
 				local_data->animtimer = 0;
 				Interaction_PlaySound(wobj, 58);
-
-				if (local_data->is_sliding) {
-					const float per = fabsf(wobj->vel_x) / local_data->stored_slide_speed;
-					local_data->slide_jump_cooldown = 10;
+				if (local_data->slide_super_jump_timer > 0 ||
+					(local_data->is_sliding && fabsf(wobj->vel_x) < 2.0f)) {
 					local_data->is_sliding = CNM_FALSE;
-					local_data->control_mul = CNM_MAX(0.25f - per, 0.0f);
-					wobj->vel_x *= 1.25f * per;
-					wobj->vel_y *= 1.25f * (1.25f - per);
-					if (local_data->sliding_jump_timer > 0) local_data->sliding_cap_landing_speed = CNM_TRUE;
+					local_data->control_mul = 0.75f;
+					wobj->vel_x *= 0.0f;
+					if (wobj->vel_y < -11.7) wobj->vel_y *= 1.1f;
+					else wobj->vel_y = -11.7;
+				} else if (local_data->is_sliding) {
+					local_data->is_sliding = CNM_FALSE;
+					if (local_data->sliding_jump_timer > 20) {
+						local_data->slide_jump_cooldown = 10;
+						local_data->control_mul = 0.0f;
+						wobj->vel_x *= 1.1f;
+						wobj->vel_y = -6.4f;
+					} else if (local_data->sliding_jump_timer > 10) {
+						local_data->slide_jump_cooldown = 5;
+						local_data->control_mul = 0.25f;
+						wobj->vel_x *= 1.0f;
+						wobj->vel_y = -8.5f;
+					} else {
+						local_data->slide_jump_cooldown = 0;
+						local_data->control_mul = 0.5f;
+					}
+					if (local_data->sliding_jump_timer > 15) local_data->sliding_cap_landing_speed = CNM_TRUE;
 					//if (wobj->vel_x > -2.5f && wobj->vel_x < 2.5f) {
 					//	wobj->vel_y *= 1.25f;
 					//	wobj->vel_x *= 0.1f;

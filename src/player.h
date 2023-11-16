@@ -112,6 +112,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int jump_input_buffer, has_cut_jump, is_grounded_buffer;
 	int slide_input_buffer;
 	float stored_slide_speed;
+	int slide_super_jump_timer;
 	//int game_over_active//, game_over_timer;
 	//float item_durability;
 	//float stored_yvel;

@@ -475,8 +475,9 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 }
 void Blocks_DrawBlocks(int layer, int camx, int camy)
 {
-	int x, y, block, sx, sy, light, is_effects;
-	if (layer == BLOCKS_DUMMY_EFFECTS) {
+	int x, y, block, sx, sy, light, is_effects, effects_layer;
+	if (layer >= BLOCKS_DUMMY_EFFECTS) {
+		effects_layer = layer;
 		is_effects = CNM_TRUE;
 		layer = BLOCKS_FG;
 	} else {
@@ -493,7 +494,11 @@ void Blocks_DrawBlocks(int layer, int camx, int camy)
 			if (!is_effects) {
 				Blocks_DrawBlock(sx, sy, block, light);
 			} else if (blocks_props[block].dmg_type == BLOCK_DMG_TYPE_LAVA) {
-				Renderer_DrawVertRippleEffect(&(CNM_RECT){ .x = sx, .y = sy, .w = 32, .h = 32}, 10.f, 2.5f, 0.1f);
+				if (effects_layer == BLOCKS_DUMMY_EFFECTS_EX) {
+					Renderer_DrawHorzRippleEffect(&(CNM_RECT){ .x = sx, .y = sy, .w = 32, .h = 32}, 35.f, 3.5f, 0.8f);
+				} else {
+					Renderer_DrawVertRippleEffect(&(CNM_RECT){ .x = sx, .y = sy, .w = 32, .h = 32}, 10.f, 2.5f, 0.4f);
+				}
 			}
 		}
 	}
