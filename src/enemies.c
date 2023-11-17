@@ -153,8 +153,13 @@ void WobjHeavy_Create(WOBJ *wobj)
 #define HEAVY_SPD 2.0f
 void WobjHeavy_Update(WOBJ *wobj)
 {
+	CNM_BOX tempbox;
+	//memcpy(&tempbox, &wobj->hitbox, sizeof(tempbox));
+	//Util_SetBox(&wobj->hitbox, 16.0f, 0.0f, 16.0f, 64.0f);
 	Wobj_DoEnemyCry(wobj, 45);
+	Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
 	WobjPhysics_BeginUpdate(wobj);
+	//memcpy(&wobj->hitbox, &tempbox, sizeof(tempbox));
 	WOBJ *sh = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
 	if (sh) {
 		sh->health = 1000000.0f;
@@ -167,7 +172,6 @@ void WobjHeavy_Update(WOBJ *wobj)
 	}
 	wobj->strength = 4.0f;
 	wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
-	Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
 	int is_close = Interaction_GetDistanceToWobj(wobj, plr) <= 96.0f;
 	if (wobj->custom_ints[0] == 0) {
 		if (Game_GetFrame() % 30 == 0) {
@@ -185,9 +189,12 @@ void WobjHeavy_Update(WOBJ *wobj)
 		if (wobj->custom_ints[1] == 0) {
 			if (wobj->flags & WOBJ_HFLIP) wobj->vel_x = -HEAVY_SPD;
 			else wobj->vel_x = HEAVY_SPD;
-			if (!Wobj_IsCollidingWithBlocksOrObjects(wobj, (wobj->flags & WOBJ_HFLIP ? -48.0f : 48.0f), 16.0f)) {
-				wobj->custom_ints[1] = 2 + (wobj->flags & WOBJ_HFLIP) != 0;
-				wobj->x += (float)(((wobj->flags & WOBJ_HFLIP) != 0) * 2 - 1) * 2.0f * HEAVY_SPD;
+			if (!Wobj_IsCollidingWithBlocksOrObjects(wobj, 48.0f, 16.0f)) {
+				wobj->custom_ints[1] = 3;
+			}
+			if (!Wobj_IsCollidingWithBlocksOrObjects(wobj, -48.0f, 16.0f)) {
+				wobj->custom_ints[1] = 2;
+				//wobj->x += (float)(((wobj->flags & WOBJ_HFLIP) != 0) * 2 - 1) * 2.0f * HEAVY_SPD;
 			}
 		} else if (wobj->custom_ints[1] == 1) {
 			wobj->vel_x = 0.0f;
@@ -233,7 +240,10 @@ void WobjHeavy_Update(WOBJ *wobj)
 	}
 	
 	//WobjPhysics_ApplyWindForces(wobj);
+	memcpy(&tempbox, &wobj->hitbox, sizeof(tempbox));
+	Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
 	WobjPhysics_EndUpdate(wobj);
+	memcpy(&wobj->hitbox, &tempbox, sizeof(tempbox));
 }
 
 void WobjHeavyBlast_Create(WOBJ *wobj)
@@ -325,7 +335,7 @@ void WobjBozoPin_Create(WOBJ *wobj)
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 48.0f;
 	wobj->flags = WOBJ_IS_HOSTILE;
-	wobj->health = 20.0f;
+	wobj->health = 12.0f;
 	wobj->strength = 3.0f;
 	wobj->custom_ints[0] = 0;
 	wobj->speed = 4.0f;
@@ -2166,7 +2176,7 @@ void WobjKamakaziSlimeExplosion_Create(WOBJ *wobj)
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 1.6667f;
 	wobj->custom_ints[0] = 20;
-	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 192.0f, 192.0f);
+	Util_SetBox(&wobj->hitbox, 48.0f, 48.0f, 96.0f, 96.0f);
 	Interaction_PlaySound(wobj, 6);
 }
 void WobjKamakaziSlimeExplosion_Update(WOBJ *wobj)

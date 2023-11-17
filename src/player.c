@@ -285,6 +285,17 @@ void Player_SwapOffhand(WOBJ *wobj) {
 	Item_NullifyGhostPickup();
 }
 
+static int player_is_on_spring(WOBJ *wobj) {
+	wobj->y += 8.0f;
+	WOBJ *other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_SPRING_BOARD);
+	wobj->y -= 8.0f;
+	if (other) {
+		return CNM_TRUE;//wobj->y + wobj->hitbox.y + wobj->hitbox.h < other->y + 16.0f;
+	} else {
+		return CNM_FALSE;
+	}
+}
+
 void WobjPlayer_Create(WOBJ *wobj)
 {
 	PLAYER_LOCAL_DATA *local_data;
@@ -785,6 +796,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Wobj_IsGrouneded(wobj) && !local_data->is_sliding) {
 			wobj->hitbox.y = 3.0f;
 			wobj->hitbox.h = 29.0f;
+			//Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
 		}
 		if (local_data->is_sliding) {
 			if (wobj->vel_x > dec) {
@@ -841,9 +853,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 				if (!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->lock_controls)
 				{
 					wobj->vel_y = 10.0f;
-					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 32.0f); i++)
+					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 32.0f) && !player_is_on_spring(wobj); i++)
 						wobj->y += 24.0f;
-					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 1.0f); i++)
+					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 1.0f) && !player_is_on_spring(wobj); i++)
 						wobj->y += 1.0f;
 
 					local_data->slide_jump_cooldown = 5;

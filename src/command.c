@@ -147,6 +147,7 @@ static const char *const command_names[] =
 	"setlives",
 	"skin",
 	"cl_pos",
+	"map",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -209,6 +210,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_SetLives,
 	Command_Skin,
 	Command_ClPos,
+	Command_LocalMap,
 };
 
 static int can_run_cheat1(int from_player) {

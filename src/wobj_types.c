@@ -2780,8 +2780,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{416, 2492, 32, 32},
-			{448, 2492, 32, 32}
+			{416, 2496, 32, 32},
+			{448, 2496, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
