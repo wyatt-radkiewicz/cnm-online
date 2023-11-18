@@ -148,6 +148,11 @@ static const char *const command_names[] =
 	"skin",
 	"cl_pos",
 	"map",
+	"item",
+	"hp",
+	"upg",
+	"hitbox",
+	"nc",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -211,6 +216,11 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_Skin,
 	Command_ClPos,
 	Command_LocalMap,
+	Command_SetItem,
+	Command_SetHealth,
+	Command_SetUpgrade,
+	Command_DebugHitboxes,
+	Command_Noclip,
 };
 
 static int can_run_cheat1(int from_player) {

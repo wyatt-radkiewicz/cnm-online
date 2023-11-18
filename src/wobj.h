@@ -192,6 +192,7 @@ typedef enum _WOBJ_TYPES
 #define WOBJ_HAS_PLAYER_FINISHED (1 << 21)
 
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
+#define Wobj_IsGrounded(w) Wobj_IsGrouneded(w)
 #define Wobj_DamageLighting(w, l) (((w)->flags & WOBJ_DAMAGE_INDICATE) ? 0 : (l))
 
 #define WOBJDATA_STRUCT_DEF(name) struct name \
@@ -291,6 +292,7 @@ void Wobj_GetCollisionsWithType(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISI
 void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS]);
 void Wobj_DrawWobjs(int camx, int camy);
 void Wobj_ResolveBlocksCollision(WOBJ *obj);
+void wobj_move_and_hit_blocks(WOBJ *obj);
 void WobjPhysics_BeginUpdate(WOBJ *wobj);
 void WobjPhysics_EndUpdate(WOBJ *wobj);
 void WobjPhysics_ApplyWindForces(WOBJ *wobj);

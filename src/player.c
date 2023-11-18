@@ -845,6 +845,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->animspd = 3;
 			}
 		}
+		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
 		if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES)
 		{
@@ -992,6 +993,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Wobj_IsGrouneded(wobj)) {
 			local_data->is_grounded_buffer = 6;
 		}
+		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
 		if (local_data->is_grounded_buffer > 0 || (local_data->upgrade_state == PLAYER_UPGRADE_NONE && local_data->in_water))//Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || other != NULL)
 		{
@@ -999,7 +1001,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			if (Wobj_IsGrouneded(wobj))
 			{
 				local_data->jumped = 0;
-				wobj->vel_y = 0.0f;
+				//wobj->vel_y = 0.0f;
 			}
 			if ((local_data->jump_input_buffer > 0 || Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING)) && !local_data->lock_controls)
 			{
@@ -1757,7 +1759,7 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 		(int)wobj->y - camy - (skin == 10 ? 5 : 3) + (anim == PLAYER_ANIM_SLIDE ? 8 : 0),
 		&item_types[wobj->item].frames[0],
 		get_player_packed_draw_item(wobj->anim_frame),
-		RENDERER_LIGHT,
+		Blocks_GetCalculatedBlockLight((int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE),
 		wobj->flags & WOBJ_HFLIP,
 		CNM_FALSE
 	);
@@ -1922,7 +1924,7 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 	Renderer_DrawBitmap2
 	(
 		(int)wobj->x - camx + skin9offsetx,
-		(int)wobj->y - camy + skin9offsety + 1,
+		(int)ceilf(wobj->y) - camy + skin9offsety,
 		&pr,
 		0,
 		Wobj_DamageLighting(wobj, Blocks_GetCalculatedBlockLight((int)wobj_center_x / BLOCK_SIZE, (int)wobj_center_y / BLOCK_SIZE)),

@@ -361,11 +361,16 @@ void Renderer_DrawHorzRippleEffect(const CNM_RECT *rect, float period, float amp
 
 	for (int y = r.y; y < r.y + r.h; y++) {
 		int xs = r.x + (int)(sinf((y + ((float)Game_GetFrame() * spd)) * CNM_PI / period) * amp);
+		int startx = 0;
+		if (xs < 0) {
+			startx -= xs;
+			xs = 0;
+		}
 
 		const unsigned char *srcptr = ((unsigned char *)renderer_effects_buf->pixels) + (xs + y * RENDERER_WIDTH);
 		unsigned char *dstptr = ((unsigned char *)renderer_scr->pixels) + (r.x + y * RENDERER_WIDTH);
 		
-		for (int x = 0; x < r.w; x++) {
+		for (int x = startx; x < r.w; x++) {
 			if (xs + x < 0 || xs + x >= RENDERER_WIDTH) continue;
 			*(dstptr++) = *(srcptr++);
 		}
@@ -658,10 +663,18 @@ void Renderer_DrawRect(const CNM_RECT *_rect, int color, int trans, int light) {
 		return;
 
 	memcpy(&rect, _rect, sizeof(CNM_RECT));
-	if (rect.x < 0) rect.x = 0;
+	if (rect.x < 0) {
+		rect.w += rect.x;
+		rect.x = 0;
+		if (rect.w <= 0) return;
+	}
 	if (rect.x >= RENDERER_WIDTH) return;
 	if (rect.x + rect.w >= RENDERER_WIDTH) rect.w = RENDERER_WIDTH - rect.x;
-	if (rect.y < 0) rect.y = 0;
+	if (rect.y < 0) {
+		rect.h += rect.y;
+		rect.y = 0;
+		if (rect.h <= 0) return;
+	}
 	if (rect.y >= RENDERER_HEIGHT) return;
 	if (rect.y + rect.h >= RENDERER_HEIGHT) rect.h = RENDERER_HEIGHT - rect.y;
 

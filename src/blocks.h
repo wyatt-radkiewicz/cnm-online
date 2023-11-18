@@ -60,8 +60,12 @@ void Blocks_SetBlockDirectLight(int x, int y, int light);
 int Blocks_GetBlockDirectLight(int x, int y);
 int Blocks_GetCalculatedBlockLight(int x, int y);
 int Blocks_IsCollidingWithSolid(const CNM_BOX *b);
+int Blocks_IsCollidingWithSolidFlags(const CNM_BOX *b, int doheight, int donorm);
 BLOCK_PROPS *Blocks_IsCollidingWithDamage(const CNM_BOX *b);
-void Blocks_ResolveCollision(CNM_BOX *b, int *resolved_in_x, int *resolved_in_y);
+void Blocks_ResolveCollisionInstant(CNM_BOX *b, int *resolved_in_x, int *resolved_in_y);
+struct bresolve_result {
+	float x, y, vx, vy;
+} bresolve_collision(float x, float y, float vx, float vy, CNM_BOX b);
 void Blocks_StickBoxToGround(CNM_BOX *b);
 
 void Blocks_GetBlockDrawRect(BLOCK block, CNM_RECT *src);

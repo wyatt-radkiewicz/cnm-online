@@ -601,8 +601,8 @@
     },
     {
       "pos": [
-        2368.0,
-        1440.0
+        2367.7395,
+        1439.7395
       ],
       "type_data": {
         "VerticalWindZone": {
@@ -1251,6 +1251,26 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": true,
+          "dist": 155.0,
+          "speed": 2.0
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        1080.0,
+        1096.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": false,
           "dist": 155.0,
           "speed": 2.0
         }

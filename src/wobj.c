@@ -607,7 +607,7 @@ void Wobj_ResolveBlocksCollision(WOBJ *obj)
 	h.y = obj->y + obj->hitbox.y;
 	h.w = obj->hitbox.w;
 	h.h = obj->hitbox.h;
-	Blocks_ResolveCollision(&h, &x, &y);
+	Blocks_ResolveCollisionInstant(&h, &x, &y);
 	obj->x = h.x - obj->hitbox.x;
 	obj->y = h.y - obj->hitbox.y;
 	if (x)
@@ -629,15 +629,17 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 			jump_through = NULL;
 	}
 	wobj->y -= 1.0f;
-	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 1.0f) || other != NULL || jump_through != NULL)
+	float ycomp = 0.0f;//wobj->type == WOBJ_PLAYER && other != NULL ? -other->vel_y : 0.0f;
+	const int touching_plat = other != NULL && other->y + other->hitbox.y + ycomp + 1.0f > wobj->y + wobj->hitbox.y + wobj->hitbox.h;
+	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 1.0f) || touching_plat || jump_through != NULL)
 		return CNM_TRUE;
 	else
 		return CNM_FALSE;
 }
 void WobjPhysics_BeginUpdate(WOBJ *wobj)
 {
-	wobj->flags &= ~WOBJ_IS_GROUNDED;
-	wobj->flags |= WobjPhysics_IsGrounded(wobj) ? WOBJ_IS_GROUNDED : 0;
+	//wobj->flags &= ~WOBJ_IS_GROUNDED;
+	//wobj->flags |= WobjPhysics_IsGrounded(wobj) ? WOBJ_IS_GROUNDED : 0;
 }
 void WobjPhysics_EndUpdate(WOBJ *wobj)
 {
@@ -648,9 +650,7 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 	Wobj_ResolveBlocksCollision(wobj);
 
 	// Stick to ground with slopes
-	if (Wobj_IsGrouneded(wobj) &&
-		!WobjPhysics_IsGrounded(wobj) &&
-		wobj->vel_y >= 0.0f)
+	if (Wobj_IsGrounded(wobj) && wobj->vel_y >= 0.0f)
 	{
 		CNM_BOX h;
 		h.x = wobj->x + wobj->hitbox.x;
@@ -670,11 +670,14 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 		if (plat->flags & WOBJ_IS_MOVESTAND)
 		{
 			wobj->x += plat->vel_x;
-			if (plat->vel_y > 0.0f)
-				wobj->y += plat->vel_y * 1.5f;
+			//if (plat->vel_y > 0.0f)
+				//wobj->y += plat->vel_y * 1.5f;
 		}
 	}
 	wobj->y -= 1.0f;
+
+	wobj->flags &= ~WOBJ_IS_GROUNDED;
+	wobj->flags |= WobjPhysics_IsGrounded(wobj) ? WOBJ_IS_GROUNDED : 0;
 }
 void WobjPhysics_ApplyWindForces(WOBJ *wobj)
 {
@@ -775,9 +778,9 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 			obj->x = h.x - obj->hitbox.x;
 			obj->y = h.y - obj->hitbox.y;
 			if (x)
-				obj->vel_x = 0.0f;
+				obj->vel_x = collider->vel_x;
 			if (y)
-				obj->vel_y = 0.0f;
+				obj->vel_y = collider->vel_y;
 		}
 		if (collider->flags & WOBJ_IS_JUMPTHROUGH)
 		{
