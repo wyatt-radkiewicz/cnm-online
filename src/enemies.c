@@ -36,6 +36,7 @@ void WobjSlime_Create(WOBJ *wobj)
 void WobjSlime_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	WobjPhysics_BeginUpdate(wobj);
 
 	wobj->custom_ints[0]--;
 	if (wobj->custom_ints[0] <= 0)
@@ -56,20 +57,15 @@ void WobjSlime_Update(WOBJ *wobj)
 			wobj->custom_floats[0] *= -1.0f;
 	}
 
-	wobj->x += wobj->custom_floats[0];
+	wobj->vel_x = wobj->custom_floats[0];
 	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[0] * 2.0f, 0.0f))
 		wobj->custom_floats[0] *= -1.0f;
 	WobjPhysics_ApplyWindForces(wobj);
 
-	wobj->y += wobj->vel_y;
+	wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
 	wobj->anim_frame = Game_GetFrame() / 10 % 2;
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
-	Wobj_ResolveBlocksCollision(wobj);
-
-	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 2.0f))
-		wobj->vel_y = 0.0f;
-	else
-		wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+	WobjPhysics_EndUpdate(wobj);
 }
 void WobjSlime_Draw(WOBJ *wobj, int camx, int camy)
 {

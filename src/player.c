@@ -1549,7 +1549,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (!local_data->ability3_hasjumped) {
 		local_data->ability3_timer--;
 	}
-	if (local_data->ability3_timer <= 0 && local_data->finish_timer <= 0) {
+	if (local_data->ability3_timer <= 0 && local_data->finish_timer <= 0 && !Game_GetVar(GAME_VAR_GOD)->data.integer) {
 		if (local_data->fire_resistance-- <= 0)
 			recved_lava_damage = Interaction_WobjReceiveBlockDamage(wobj);
 		if (wobj->health >= old_hp)
@@ -1793,7 +1793,7 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 
 void Player_RecieveDamage(WOBJ *player, WOBJ *inflictor, float damage_taken)
 {
-	player->health -= damage_taken;
+	if (!Game_GetVar(GAME_VAR_GOD)->data.integer) player->health -= damage_taken;
 }
 
 static void StepPlayerAnimation(WOBJ *wobj)

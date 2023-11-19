@@ -242,7 +242,7 @@ static int Blocks_IsCollidingWithBlock(const CNM_BOX *b, int layer, int x, int y
 		block.h = (float)bp->coll_data.hitbox.h;
 		return Util_AABBCollision(b, &block);
 	}
-	else if (doheight)
+	else if (bp->coll_type == BLOCKS_COLL_HEIGHT && doheight)
 	{
 		int start = (int)floorf(b->x) - (x * BLOCK_SIZE);
 		if (start < 0)
@@ -296,19 +296,17 @@ BLOCK_PROPS *Blocks_IsCollidingWithDamage(const CNM_BOX *b)
 	{
 		for (x = (int)b->x / BLOCK_SIZE - 1; x < (int)(b->x + b->w) / BLOCK_SIZE + 1; x++)
 		{
-			if (Blocks_IsBlockDamageable(x, y))
+			BLOCK_PROPS *props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x, y));
+			if (props->dmg_type == BLOCK_DMG_TYPE_NONE) props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, x, y));
+			if (props->dmg_type != BLOCK_DMG_TYPE_NONE && props->coll_type == BLOCKS_COLL_BOX)
 			{
-				block.x = (float)(x * BLOCK_SIZE);
-				block.y = (float)(y * BLOCK_SIZE);
-				block.w = (float)BLOCK_SIZE;
-				block.h = (float)BLOCK_SIZE;
+				block.x = (float)(x * BLOCK_SIZE) + props->coll_data.hitbox.x;
+				block.y = (float)(y * BLOCK_SIZE) + props->coll_data.hitbox.y;
+				block.w = props->coll_data.hitbox.w;
+				block.h = props->coll_data.hitbox.h;
 				if (Util_AABBCollision(b, &block))
 				{
-					BLOCK_PROPS *props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x, y));
-					if (props->dmg_type != BLOCK_DMG_TYPE_NONE && props->dmg != 0)
-						return Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x, y));
-					else
-						return Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, x, y));
+					return props;
 				}
 			}
 		}
@@ -418,19 +416,26 @@ void Blocks_ResolveCollisionInstant(CNM_BOX *b, int *resolved_in_x, int *resolve
 }
 
 struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, CNM_BOX b) {
-	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + vy, .w = b.w, .h = b.h }, 0, 1)) {
-		const float move = (float)(vy > 0.0f) - (float)(vy < 0.0f);
-		for (int iters = 0; iters < ceilf(fabsf(vy)) && !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + move, .w = b.w, .h = b.h }, 0, 1); iters++) {
-			y += move;
+	// Step up things
+	int process_x = CNM_TRUE;
+	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + 1.0f, .w = b.w, .h = b.h }, 1, 1) ||
+		(Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 0) &&
+		 !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 0, 1)) ||
+		Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + vy, .w = b.w, .h = b.h }, 1, 0)) {
+		int i = 0;
+		for (; i < 17 && Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1); i++) {
+			y -= 1.0f;
 		}
-		vy = 0.0f;
-	} else {
-		y += vy;
+		if (i == 17) {
+			y += 16.0f;
+		} else {
+			process_x = CNM_FALSE;
+		}
 	}
 
-	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 0, 1)) {
+	if (process_x && Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1)) {
 		const float move = (float)(vx > 0.0f) - (float)(vx < 0.0f);
-		for (int iters = 0; iters < ceilf(fabsf(vx)) && !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + move, .y = y + b.y, .w = b.w, .h = b.h }, 0, 1); iters++) {
+		for (int iters = 0; iters < ceilf(fabsf(vx)) && !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + move, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1); iters++) {
 			x += move;
 		}
 		vx = 0.0f;
@@ -438,9 +443,14 @@ struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, 
 		x += vx;
 	}
 
-	// Step up things
-	for (int i = 0; i < 32 && Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y, .w = b.w, .h = b.h }, 1, 0); i++) {
-		y -= 1.0f;
+	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + vy, .w = b.w, .h = b.h }, 1, 1)) {
+		const float move = (float)(vy > 0.0f) - (float)(vy < 0.0f);
+		for (int iters = 0; iters < ceilf(fabsf(vy)) && !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + move, .w = b.w, .h = b.h }, 1, 1); iters++) {
+			y += move;
+		}
+		vy = 0.0f;
+	} else {
+		y += vy;
 	}
 
 	return (struct bresolve_result){ .x = x, .y = y, .vx = vx, .vy = vy };
@@ -499,6 +509,41 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 	if (block < 0 || block > 4095)
 		return;
 	Blocks_GetBlockDrawRect(block, &src);
+#ifdef DEBUG
+	if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer) {
+		BLOCK_PROPS *prop = Blocks_GetBlockProp(block);
+		//Renderer_DrawRect(&(CNM_RECT){ .x = x + 31, .y = y, .w = 1, .h = 32 }, Renderer_MakeColor(255, 0, 0), 4, RENDERER_LIGHT);
+		//Renderer_DrawRect(&(CNM_RECT){ .x = x, .y = y + 31, .w = 31, .h = 1 }, Renderer_MakeColor(255, 0, 0), 4, RENDERER_LIGHT);
+		if ((~prop->flags & BLOCK_FLAG_SOLID) && (prop->dmg_type == BLOCK_DMG_TYPE_NONE)) return;
+		if (prop->coll_type == BLOCKS_COLL_BOX) {
+			Renderer_DrawRect(
+				&(CNM_RECT) {
+					.x = x + prop->coll_data.hitbox.x,
+					.y = y + prop->coll_data.hitbox.y,
+					.w = prop->coll_data.hitbox.w,
+					.h = prop->coll_data.hitbox.h,
+				},
+				prop->dmg_type == BLOCK_DMG_TYPE_NONE ? Renderer_MakeColor(255, 0, 255) : Renderer_MakeColor(255, 0, 0),
+				1,
+				RENDERER_LIGHT
+			);
+		} else {
+			for (int i = 0; i < 32; i++) {
+				Renderer_DrawRect(
+					&(CNM_RECT) {
+						.x = x + i,
+						.y = y + 32 - prop->coll_data.heightmap[i],
+						.w = 1,
+						.h = prop->coll_data.heightmap[i],
+					},
+					Renderer_MakeColor(0, 0, 255),
+					1,
+					RENDERER_LIGHT
+				);
+			}
+		}
+	} else {
+#endif
 	Renderer_DrawBitmap
 	(
 		x,
@@ -507,6 +552,9 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 		Blocks_GetBlockProp(block)->transparency,
 		light
 	);
+#ifdef DEBUG
+	}
+#endif
 }
 void Blocks_DrawBlocks(int layer, int camx, int camy)
 {

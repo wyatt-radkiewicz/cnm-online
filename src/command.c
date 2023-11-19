@@ -86,6 +86,7 @@ static void Command_NoSave(const char *args, int from_player);
 static void Command_SetLives(const char *args, int from_player);
 static void Command_Skin(const char *args, int from_player);
 static void Command_ClPos(const char *args, int from_player);
+static void Command_God(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -153,6 +154,7 @@ static const char *const command_names[] =
 	"upg",
 	"hitbox",
 	"nc",
+	"god",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -221,6 +223,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_SetUpgrade,
 	Command_DebugHitboxes,
 	Command_Noclip,
+	Command_God,
 };
 
 static int can_run_cheat1(int from_player) {
@@ -767,5 +770,9 @@ static void Command_Skin(const char *args, int from_player) {
 }
 static void Command_ClPos(const char *args, int from_player) {
 	Game_GetVar(GAME_VAR_CL_POS)->data.integer = atoi(Command_ExtractArg(args, 0));
+}
+static void Command_God(const char *args, int from_player) {
+	if (!can_run_cheat1(from_player)) return;
+	Game_GetVar(GAME_VAR_GOD)->data.integer = !Game_GetVar(GAME_VAR_GOD)->data.integer;
 }
 

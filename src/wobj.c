@@ -636,21 +636,25 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 	else
 		return CNM_FALSE;
 }
+void wobj_move_and_hit_blocks(WOBJ *wobj) {
+	struct bresolve_result result = bresolve_collision(wobj->x, wobj->y, wobj->vel_x, wobj->vel_y, wobj->hitbox);
+	wobj->x = result.x;
+	wobj->y = result.y;
+	wobj->vel_x = result.vx;
+	wobj->vel_y = result.vy;
+}
 void WobjPhysics_BeginUpdate(WOBJ *wobj)
 {
-	//wobj->flags &= ~WOBJ_IS_GROUNDED;
-	//wobj->flags |= WobjPhysics_IsGrounded(wobj) ? WOBJ_IS_GROUNDED : 0;
+	(void)wobj;
 }
+
 void WobjPhysics_EndUpdate(WOBJ *wobj)
 {
-	wobj->x += wobj->vel_x;
-	wobj->y += wobj->vel_y;
-
+	wobj_move_and_hit_blocks(wobj);
 	Wobj_ResolveObjectsCollision(wobj);
-	Wobj_ResolveBlocksCollision(wobj);
 
 	// Stick to ground with slopes
-	if (Wobj_IsGrounded(wobj) && wobj->vel_y >= 0.0f)
+	if ((Wobj_IsGrounded(wobj) || WobjPhysics_IsGrounded(wobj)) && wobj->vel_y >= 0.0f)
 	{
 		CNM_BOX h;
 		h.x = wobj->x + wobj->hitbox.x;
@@ -667,12 +671,7 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 	WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
 	if (plat != NULL)
 	{
-		if (plat->flags & WOBJ_IS_MOVESTAND)
-		{
-			wobj->x += plat->vel_x;
-			//if (plat->vel_y > 0.0f)
-				//wobj->y += plat->vel_y * 1.5f;
-		}
+		if (plat->flags & WOBJ_IS_MOVESTAND) wobj->x += plat->vel_x;
 	}
 	wobj->y -= 1.0f;
 
@@ -1062,7 +1061,7 @@ void WobjGeneric_Draw(WOBJ *obj, int camx, int camy)
 	Renderer_DrawBitmap2
 	(
 		(int)obj->x - camx,
-		(int)obj->y - camy,
+		(int)ceilf(obj->y) - camy,
 		&wobj_types[obj->type].frames[obj->anim_frame],
 		0,
 		Wobj_DamageLighting(obj, Blocks_GetCalculatedBlockLight((int)obj_center_x / BLOCK_SIZE, (int)obj_center_y / BLOCK_SIZE)),
