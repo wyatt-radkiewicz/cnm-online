@@ -1,3 +1,4 @@
+#include <math.h>
 #include "game.h"
 #include "camera.h"
 #include "renderer.h"
@@ -5,6 +6,8 @@
 
 static int *camx, *camy;
 static int cam_in_ybounds, camy_scroll_back, cam_forced, cam_top;
+static int cam_ext_target, cam_ext_offset;
+static int cam_ext_targety, cam_ext_offsety;
 
 #define DEFAULT_TOP 40
 
@@ -18,6 +21,10 @@ void Camera_Setup(int x, int y)
 	camy = &Game_GetVar(GAME_VAR_CAMERA_Y)->data.integer;
 	*camx = x - RENDERER_WIDTH / 2;
 	*camy = y - RENDERER_HEIGHT / 2;
+	cam_ext_target = 0;
+	cam_ext_offset = 0;
+	cam_ext_targety = 0;
+	cam_ext_offsety = 0;
 }
 void Camera_Update(int target_x, int target_y)
 {
@@ -51,13 +58,23 @@ void Camera_Update(int target_x, int target_y)
 	if (target_y < center_y - cam_top)
 		center_y = target_y + cam_top;
 
-	//if (cam_in_ybounds > 30)
-	//{
-	//	// Smoothly scroll the center_y value back to the player's y pos
-	//	center_y -= camy_scroll_back++;
-	//	if (center_y < target_y)
-	//		center_y = target_y;
-	//}
+	// Extended camera
+	if (fabsf(player->vel_x) > player->speed * 1.5f && (player->flags & WOBJ_HFLIP) == player->vel_x < 0.0f) {
+		cam_ext_target = player->vel_x < 0.0f ? -64 : 64;
+	} else {
+		cam_ext_target = 0;
+	}
+	if (fabsf(player->vel_y) > 14.5f) {
+		cam_ext_targety = player->vel_y < 0.0f ? -64 : 64;
+	} else {
+		cam_ext_targety = 0;
+	}
+	if (cam_ext_offset < cam_ext_target) cam_ext_offset += 4;
+	if (cam_ext_offset > cam_ext_target) cam_ext_offset -= 4;
+	if (cam_ext_offsety < cam_ext_targety) cam_ext_offsety += 4;
+	if (cam_ext_offsety > cam_ext_targety) cam_ext_offsety -= 4;
+	center_x += cam_ext_offset;
+	center_y += cam_ext_offsety;
 
 	center_x -= RENDERER_WIDTH / 2;
 	center_y -= RENDERER_HEIGHT / 2;
