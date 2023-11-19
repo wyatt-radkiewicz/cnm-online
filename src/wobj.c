@@ -210,7 +210,7 @@ static void Wobj_FreeOwnedWobjAndRemove(WOBJ *wobj)
 		float x = wobj->x, y = wobj->y;
 		if (wobj->hitbox.w > 0.0f) x += wobj->hitbox.x + wobj->hitbox.w / 2.0f;
 		if (wobj->hitbox.h > 0.0f) y += wobj->hitbox.y + wobj->hitbox.h / 2.0f;
-		Wobj_CreateOwned(WOBJ_DROPPED_ITEM, x - 8.0f, y - 8.0f, wobj->dropped_death_item, 0.0f);
+		Wobj_CreateOwned(WOBJ_DROPPED_ITEM, x - 16.0f, y - 16.0f, wobj->dropped_death_item, 0.0f);
 	}
 
 	if (wobj->on_destroy != NULL)
