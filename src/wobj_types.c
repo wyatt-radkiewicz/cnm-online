@@ -207,7 +207,11 @@ static void WobjScMovingPlatform_Create(WOBJ *wobj)
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
 	wobj->item = (wobj->custom_ints[0] >> 16) & 0xffff;
-	wobj->custom_ints[0] &= 0xffff;
+	if (wobj->custom_ints[0] & 0x8000) {
+		wobj->flags |= WOBJ_IS_JUMPTHROUGH;
+		wobj->flags &= ~WOBJ_IS_SOLID;
+	}
+	wobj->custom_ints[0] &= 0x7fff;
 	if (wobj->item == 0) {
 		wobj->item = (9 << 12) | 5;
 	}
@@ -269,6 +273,19 @@ static void WobjMovingPlatform_Draw(WOBJ *wobj, int camx, int camy) {
 		0,
 		0
 	);
+
+	if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
+	{
+		CNM_RECT r;
+		Util_SetRect(&r, (int)(wobj->x + wobj->hitbox.x) - camx, (int)(wobj->y + wobj->hitbox.y) - camy,
+					 (int)wobj->hitbox.w, (int)wobj->hitbox.h);
+		Renderer_DrawRect(
+			&r,
+			(wobj->flags & WOBJ_IS_JUMPTHROUGH) ? Renderer_MakeColor(255, 255, 0) : Renderer_MakeColor(255, 0, 255),
+			2,
+			RENDERER_LIGHT
+		);
+	}
 }
 
 static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
@@ -279,7 +296,11 @@ static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
 	wobj->item = (wobj->custom_ints[0] >> 16) & 0xffff;
-	wobj->custom_ints[0] &= 0xffff;
+	if (wobj->custom_ints[0] & 0x8000) {
+		wobj->flags |= WOBJ_IS_JUMPTHROUGH;
+		wobj->flags &= ~WOBJ_IS_SOLID;
+	}
+	wobj->custom_ints[0] &= 0x7fff;
 	if (wobj->item == 0) {
 		wobj->item = (9 << 12) | 5;
 	}
@@ -1670,6 +1691,13 @@ static void Wobj_PlayerStompDust_Update(WOBJ *wobj) {
 		wobj->anim_frame = 7;
 		Interaction_DestroyWobj(wobj);
 	}
+}
+static void WobjInvisBlock_Create(WOBJ *wobj) {
+	wobj->flags = WOBJ_IS_SOLID;
+	wobj->hitbox = (CNM_BOX){
+		.x = 0.0f, .y = 0.0f,
+		.w = 32.0f, .h = 32.0f,
+	};
 }
 
 #define LUAOBJ_DEF {\
@@ -3668,6 +3696,20 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 			{ 160+32*5, 7744, 32, 32, },
 			{ 160+32*6, 7744, 32, 32, },
 			{ 160+32*7, 7744, 32, 32, },
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 153: Invisible Block Object
+		WobjInvisBlock_Create, // Create
+		NULL, // Update
+		NULL, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{ 128, 7744, 32, 32, },
 		},
 		0.0f, // Strength reward
 		0, // Money reward

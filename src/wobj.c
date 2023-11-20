@@ -630,8 +630,9 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 	other = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
 	if ((jump_through = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH)) != NULL)
 	{
+		//Console_Print("%f, %f, %f", wobj->vel_y, jump_through->vel_y, wobj->vel_y - jump_through->vel_y);
 		if ((wobj->y + wobj->hitbox.y + wobj->hitbox.h) > (jump_through->y + jump_through->hitbox.y + 1) ||
-			wobj->vel_y < 0.0f)
+			wobj->vel_y - jump_through->vel_y > 0.1f)
 			jump_through = NULL;
 	}
 	wobj->y -= 1.0f;
@@ -672,11 +673,17 @@ static void stick_to_moving_platforms(WOBJ *wobj) {
 	const float oy = wobj->y;
 	wobj->y += 10.0f;
 	other = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
-	if (other && wobj->vel_y > other->vel_y - 1.0f) {
+	if (other) {
 		wobj->y = other->y + other->hitbox.y - wobj->hitbox.h - wobj->hitbox.y;
 		wobj->vel_y = other->vel_y;
 	} else {
-		wobj->y = oy;
+		other = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
+		if (other && wobj->vel_y > other->vel_y - 1.0f) {
+			wobj->y = other->y + other->hitbox.y - wobj->hitbox.h - wobj->hitbox.y;
+			wobj->vel_y = other->vel_y;
+		} else {
+			wobj->y = oy;
+		}
 	}
 }
 void WobjPhysics_BeginUpdate(WOBJ *wobj)
@@ -711,6 +718,12 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 	if (plat != NULL)
 	{
 		if (plat->flags & WOBJ_IS_MOVESTAND) wobj->x += plat->vel_x;
+	}
+	if (plat == NULL) {
+		plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
+		if (plat && (plat->flags & WOBJ_IS_MOVESTAND) && wobj->vel_y - plat->vel_y > -0.1f && (wobj->y + wobj->hitbox.y) < (plat->y + plat->hitbox.y + 8.0f)) {
+			wobj->x += plat->vel_x;
+		}
 	}
 	wobj->y -= 1.0f;
 
@@ -823,10 +836,11 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 		}
 		if (collider->flags & WOBJ_IS_JUMPTHROUGH)
 		{
-			if (obj->vel_y > 0.0f && (obj->y + obj->hitbox.y) < (collider->y + collider->hitbox.y))
+			if (obj->vel_y - collider->vel_y > 0.1f && (obj->y + obj->hitbox.y) < (collider->y + collider->hitbox.y))
 			{
 				obj->y = (collider->y + collider->hitbox.y) - (obj->hitbox.h + obj->hitbox.y);
-				obj->vel_y = 0.0f;
+				obj->vel_y = collider->vel_y;
+				//obj->vel_x = collider->vel_x;
 			}
 		}
 	}

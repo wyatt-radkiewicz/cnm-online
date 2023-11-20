@@ -1032,6 +1032,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				const float oy = wobj->y;
 				wobj->y += 10.0f;
 				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+				if (!plat) plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
 				wobj->y = oy;
 				if (plat) {
 					local_data->stored_plat_velx = plat->vel_x;
@@ -1061,6 +1062,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				const float oy = wobj->y;
 				wobj->y += 10.0f;
 				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+				if (!plat) plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
 				wobj->y = oy;
 				local_data->jump_init_yspd = 0.0f;
 				if (plat != NULL)
