@@ -131,7 +131,14 @@ void Serial_LoadBlocks(const char *cnmb_file)
 	e = lparse_get_entry(lp, "BP_ANIM_SPEED");
 	for (i = 0; i < numprops; i++) lparse_get_data(lp, e, i, 1, &Blocks_GetBlockProp(i)->anim_speed);
 	e = lparse_get_entry(lp, "BP_NUM_FRAMES");
-	for (i = 0; i < numprops; i++) lparse_get_data(lp, e, i, 1, &Blocks_GetBlockProp(i)->num_frames);
+	for (i = 0; i < numprops; i++) {
+		BLOCK_PROPS *prop = Blocks_GetBlockProp(i);
+		int val;
+		lparse_get_data(lp, e, i, 1, &val);
+
+		prop->num_frames = val & 0xff;
+		prop->angle = val >> 8;
+	}
 	e = lparse_get_entry(lp, "BP_FRAMESX");
 	for (i = 0; i < numprops; i++) lparse_get_data(lp, e, i*BLOCKS_MAX_FRAMES, BLOCKS_MAX_FRAMES, &Blocks_GetBlockProp(i)->frames_x);
 	e = lparse_get_entry(lp, "BP_FRAMESY");
@@ -265,7 +272,12 @@ void Serial_SaveBlocks(const char *cnmb_file)
 	e = lparse_make_entry(lp, "BP_ANIM_SPEED", lparse_i32, numprops);
 	for (i = 0; i < numprops; i++) lparse_set_data(lp, e, i, 1, &Blocks_GetBlockProp(i)->anim_speed);
 	e = lparse_make_entry(lp, "BP_NUM_FRAMES", lparse_i32, numprops);
-	for (i = 0; i < numprops; i++) lparse_set_data(lp, e, i, 1, &Blocks_GetBlockProp(i)->num_frames);
+	for (i = 0; i < numprops; i++) {
+		BLOCK_PROPS *prop = Blocks_GetBlockProp(i);
+		int val = prop->num_frames;
+		val |= prop->angle << 8;
+		lparse_set_data(lp, e, i, 1, &val);
+	}
 	e = lparse_make_entry(lp, "BP_FRAMESX", lparse_i32, numprops*BLOCKS_MAX_FRAMES);
 	for (i = 0; i < numprops; i++) lparse_set_data(lp, e, i*BLOCKS_MAX_FRAMES, BLOCKS_MAX_FRAMES, &Blocks_GetBlockProp(i)->frames_x);
 	e = lparse_make_entry(lp, "BP_FRAMESY", lparse_i32, numprops*BLOCKS_MAX_FRAMES);

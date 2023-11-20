@@ -30,6 +30,7 @@ typedef struct _BLOCK_PROPS
 	int dmg;
 	int anim_speed;
 	int num_frames;
+	int angle;
 	int frames_x[BLOCKS_MAX_FRAMES], frames_y[BLOCKS_MAX_FRAMES];
 	
 	union

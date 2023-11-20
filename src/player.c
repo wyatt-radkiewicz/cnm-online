@@ -376,6 +376,8 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->stored_slide_speed = 0.0f;
 	local_data->slide_super_jump_timer = 0;
 
+	local_data->stored_plat_velx = 0.0f;
+
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
 void WobjPlayer_Update(WOBJ *wobj)
@@ -993,8 +995,22 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Wobj_IsGrouneded(wobj)) {
 			local_data->is_grounded_buffer = 6;
 		}
+
+		{
+			local_data->stored_plat_velx = 0.0f;
+			if (Wobj_IsGrounded(wobj)) {
+				const float oy = wobj->y;
+				wobj->y += 10.0f;
+				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+				wobj->y = oy;
+				if (plat) {
+					local_data->stored_plat_velx = plat->vel_x;
+				}
+			}
+		}
 		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
+		int apply_plat_velx = !Wobj_IsGrounded(wobj);
 		if (local_data->is_grounded_buffer > 0 || (local_data->upgrade_state == PLAYER_UPGRADE_NONE && local_data->in_water))//Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || other != NULL)
 		{
 			//local_data->has_hammer_jumped = CNM_FALSE;
@@ -1017,7 +1033,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->jump_init_yspd = 0.0f;
 				if (plat != NULL)
 				{
-					wobj->vel_x += plat->vel_x;
+					//wobj->vel_x += plat->vel_x;
+					// Look further down for vel_x change
+					apply_plat_velx = CNM_TRUE;
 					jmp_speed -= plat->vel_y;
 					local_data->jump_init_yspd = plat->vel_y;
 				}
@@ -1068,6 +1086,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 				}
 			}
 		}
+
+		if (local_data->stored_plat_velx != 0.0f && apply_plat_velx) {
+			wobj->vel_x += local_data->stored_plat_velx;
+			local_data->stored_plat_velx = 0.0f;
+		}
+
 		// Max power double jumping
 		if (!Wobj_IsGrouneded(wobj))
 		{
