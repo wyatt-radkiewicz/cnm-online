@@ -823,7 +823,7 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 		}
 		if (collider->flags & WOBJ_IS_JUMPTHROUGH)
 		{
-			if (obj->vel_y > 0.0f && (obj->y + obj->hitbox.y + obj->hitbox.h / 2.0f) < (collider->y + collider->hitbox.y))
+			if (obj->vel_y > 0.0f && (obj->y + obj->hitbox.y) < (collider->y + collider->hitbox.y))
 			{
 				obj->y = (collider->y + collider->hitbox.y) - (obj->hitbox.h + obj->hitbox.y);
 				obj->vel_y = 0.0f;
@@ -913,7 +913,7 @@ int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y)
 {
 	CNM_BOX b;
 	Util_SetBox(&b, wobj->x + offset_x + wobj->hitbox.x, wobj->y + offset_y + wobj->hitbox.y, wobj->hitbox.w, wobj->hitbox.h);
-	return Blocks_IsCollidingWithSolid(&b);
+	return Blocks_IsCollidingWithSolid(&b, wobj->vel_y >= -0.05f);
 }
 int Wobj_IsCollidingWithBlocksOrObjects(WOBJ *wobj, float offset_x, float offset_y) {
 	if (Wobj_IsCollidingWithBlocks(wobj, offset_x, offset_y)) return CNM_TRUE;

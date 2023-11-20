@@ -226,21 +226,25 @@ int Blocks_GetCalculatedBlockLight(int x, int y)
 		return Blocks_GetBlockAmbientLight(x, y);
 	}
 }
-static int Blocks_IsCollidingWithBlock(const CNM_BOX *b, int layer, int x, int y, int doheight, int donorm)
+static int Blocks_IsCollidingWithBlock(const CNM_BOX *b, int layer, int x, int y, int doheight, int donorm, int dojt, float oldjt_y)
 {
 	BLOCK_PROPS *bp = Blocks_GetBlockProp(Blocks_GetBlock(layer, x, y));
 
 	if (!(bp->flags & BLOCK_FLAG_SOLID))
 		return CNM_FALSE;
 
-	if (bp->coll_type == BLOCKS_COLL_BOX && donorm)
+	if ((bp->coll_type == BLOCKS_COLL_BOX && donorm) || (bp->coll_type == BLOCKS_COLL_JT && dojt))
 	{
 		CNM_BOX block;
 		block.x = (float)(x * BLOCK_SIZE + bp->coll_data.hitbox.x);
 		block.y = (float)(y * BLOCK_SIZE + bp->coll_data.hitbox.y);
 		block.w = (float)bp->coll_data.hitbox.w;
 		block.h = (float)bp->coll_data.hitbox.h;
-		return Util_AABBCollision(b, &block);
+		if (bp->coll_type == BLOCKS_COLL_JT) {
+			return oldjt_y < block.y && Util_AABBCollision(b, &block);
+		} else {
+			return Util_AABBCollision(b, &block);
+		}
 	}
 	else if (bp->coll_type == BLOCKS_COLL_HEIGHT && doheight)
 	{
@@ -270,23 +274,23 @@ static int Blocks_IsCollidingWithBlock(const CNM_BOX *b, int layer, int x, int y
 
 	return CNM_FALSE;
 }
-int Blocks_IsCollidingWithSolidFlags(const CNM_BOX *b, int doheight, int donorm)
+int Blocks_IsCollidingWithSolidFlags(const CNM_BOX *b, int doheight, int donorm, int dojt, float prev_y_forjt)
 {
 	int x, y;
 	for (y = (int)b->y / BLOCK_SIZE - 1; y < (int)(b->y + b->h) / BLOCK_SIZE + 1; y++)
 	{
 		for (x = (int)b->x / BLOCK_SIZE - 1; x < (int)(b->x + b->w) / BLOCK_SIZE + 1; x++)
 		{
-			if (Blocks_IsCollidingWithBlock(b, BLOCKS_FG, x, y, doheight, donorm) || Blocks_IsCollidingWithBlock(b, BLOCKS_BG, x, y, doheight, donorm))
+			if (Blocks_IsCollidingWithBlock(b, BLOCKS_FG, x, y, doheight, donorm, dojt, prev_y_forjt) || Blocks_IsCollidingWithBlock(b, BLOCKS_BG, x, y, doheight, donorm, dojt, prev_y_forjt))
 				return CNM_TRUE;
 		}
 	}
 
 	return CNM_FALSE;
 }
-int Blocks_IsCollidingWithSolid(const CNM_BOX *b)
+int Blocks_IsCollidingWithSolid(const CNM_BOX *b, int dojt)
 {
-	return Blocks_IsCollidingWithSolidFlags(b, 1, 1);
+	return Blocks_IsCollidingWithSolidFlags(b, 1, 1, dojt, b->y + b->h / 2.0f);
 }
 BLOCK_PROPS *Blocks_IsCollidingWithDamage(const CNM_BOX *b)
 {
@@ -391,7 +395,7 @@ void Blocks_ResolveCollisionInstant(CNM_BOX *b, int *resolved_in_x, int *resolve
 	int num_blocks = 0;
 	*resolved_in_x = CNM_FALSE;
 	*resolved_in_y = CNM_FALSE;
-	if (!Blocks_IsCollidingWithSolid(b))
+	if (!Blocks_IsCollidingWithSolid(b, 0))
 		return;
 	// Order the blocks from farthest to closest
 	cx = b->x + b->w / 2.0f;
@@ -423,13 +427,15 @@ void Blocks_ResolveCollisionInstant(CNM_BOX *b, int *resolved_in_x, int *resolve
 
 struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, CNM_BOX b) {
 	// Step up things
+	const int test_jt = vy > 0.0f;
+	const float oy = y + b.y + b.h - 4.0f;
 	int process_x = CNM_TRUE;
-	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + 1.0f, .w = b.w, .h = b.h }, 1, 1) ||
-		(Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 0) &&
-		 !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 0, 1)) ||
-		Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + vy, .w = b.w, .h = b.h }, 1, 0)) {
+	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + 1.0f, .w = b.w, .h = b.h }, 1, 1, 0, 0.0f) ||
+		(Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 0, 0, 0.0f) &&
+		 !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 0, 1, 0, 0.0f)) ||
+		Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + vy, .w = b.w, .h = b.h }, 1, 0, 0, 0.0f)) {
 		int i = 0;
-		for (; i < 17 && Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1); i++) {
+		for (; i < 17 && Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1, 0, 0.0f); i++) {
 			y -= 1.0f;
 		}
 		if (i == 17) {
@@ -439,9 +445,9 @@ struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, 
 		}
 	}
 
-	if (process_x && Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1)) {
+	if (process_x && Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1, 0, 0.0f)) {
 		const float move = (float)(vx > 0.0f) - (float)(vx < 0.0f);
-		for (int iters = 0; iters < ceilf(fabsf(vx)) && !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + move, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1); iters++) {
+		for (int iters = 0; iters < ceilf(fabsf(vx)) && !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + move, .y = y + b.y, .w = b.w, .h = b.h }, 1, 1, 0, 0.0f); iters++) {
 			x += move;
 		}
 		vx = 0.0f;
@@ -449,14 +455,18 @@ struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, 
 		x += vx;
 	}
 
-	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + vy, .w = b.w, .h = b.h }, 1, 1)) {
+	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + vy, .w = b.w, .h = b.h }, 1, 1, test_jt, oy)) {
 		const float move = (float)(vy > 0.0f) - (float)(vy < 0.0f);
-		for (int iters = 0; iters < ceilf(fabsf(vy)) && !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + move, .w = b.w, .h = b.h }, 1, 1); iters++) {
+		for (int iters = 0; iters < ceilf(fabsf(vy)) && !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + move, .w = b.w, .h = b.h }, 1, 1, test_jt, oy); iters++) {
 			y += move;
 		}
 		vy = 0.0f;
 	} else {
 		y += vy;
+	}
+
+	while (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y, .w = b.w, .h = b.h }, 0, 0, test_jt, y + b.y + b.h / 2.0f)) {
+		y -= 1.0f;
 	}
 
 	return (struct bresolve_result){ .x = x, .y = y, .vx = vx, .vy = vy };
@@ -468,12 +478,12 @@ void Blocks_StickBoxToGround(CNM_BOX *b)
 
 	c.y = floorf(c.y);
 	c.y += 16.0f;
-	if (Blocks_IsCollidingWithSolid(&c))
+	if (Blocks_IsCollidingWithSolid(&c, 0))
 	{
 		c.y = b->y;
 		for (int y = 0; y < 16; y++, c.y += 1.0f)
 		{
-			if (Blocks_IsCollidingWithSolid(&c))
+			if (Blocks_IsCollidingWithSolid(&c, 0))
 			{
 				b->y = c.y - 1.0f;
 				return;
@@ -532,7 +542,7 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 		//Renderer_DrawRect(&(CNM_RECT){ .x = x + 31, .y = y, .w = 1, .h = 32 }, Renderer_MakeColor(255, 0, 0), 4, RENDERER_LIGHT);
 		//Renderer_DrawRect(&(CNM_RECT){ .x = x, .y = y + 31, .w = 31, .h = 1 }, Renderer_MakeColor(255, 0, 0), 4, RENDERER_LIGHT);
 		if ((~prop->flags & BLOCK_FLAG_SOLID) && (prop->dmg_type == BLOCK_DMG_TYPE_NONE)) return;
-		if (prop->coll_type == BLOCKS_COLL_BOX) {
+		if (prop->coll_type == BLOCKS_COLL_BOX || prop->coll_type == BLOCKS_COLL_JT) {
 			Renderer_DrawRect(
 				&(CNM_RECT) {
 					.x = x + prop->coll_data.hitbox.x,
@@ -540,7 +550,7 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 					.w = prop->coll_data.hitbox.w,
 					.h = prop->coll_data.hitbox.h,
 				},
-				prop->dmg_type == BLOCK_DMG_TYPE_NONE ? Renderer_MakeColor(255, 0, 255) : Renderer_MakeColor(255, 0, 0),
+				prop->dmg_type == BLOCK_DMG_TYPE_NONE ? (prop->coll_type == BLOCKS_COLL_JT ? Renderer_MakeColor(255, 255, 0) : Renderer_MakeColor(255, 0, 255)) : Renderer_MakeColor(255, 0, 0),
 				1,
 				RENDERER_LIGHT
 			);

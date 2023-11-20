@@ -11,6 +11,7 @@
 
 #define BLOCKS_COLL_BOX		0
 #define BLOCKS_COLL_HEIGHT	1
+#define BLOCKS_COLL_JT		2
 
 #define BLOCKS_MAX_FRAMES		32
 #define BLOCK_FLAG_SOLID		(1 << 0)
@@ -60,8 +61,8 @@ int Blocks_GetBlockAmbientLight(int x, int y);
 void Blocks_SetBlockDirectLight(int x, int y, int light);
 int Blocks_GetBlockDirectLight(int x, int y);
 int Blocks_GetCalculatedBlockLight(int x, int y);
-int Blocks_IsCollidingWithSolid(const CNM_BOX *b);
-int Blocks_IsCollidingWithSolidFlags(const CNM_BOX *b, int doheight, int donorm);
+int Blocks_IsCollidingWithSolid(const CNM_BOX *b, int dojt);
+int Blocks_IsCollidingWithSolidFlags(const CNM_BOX *b, int doheight, int donorm, int dojt, float prev_y_forjt);
 BLOCK_PROPS *Blocks_IsCollidingWithDamage(const CNM_BOX *b);
 void Blocks_ResolveCollisionInstant(CNM_BOX *b, int *resolved_in_x, int *resolved_in_y);
 struct bresolve_result {

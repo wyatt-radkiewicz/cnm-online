@@ -144,8 +144,6 @@ void GameState_BlocksEdit_Draw(void)
 
 	CNM_BOX b;
 	Util_SetBox(&b, cx + 160.0f, cy + 120.0f, 1.0f, 1.0f);
-	if (Blocks_IsCollidingWithSolid(&b))
-		Renderer_DrawText(8, 8, 0, RENDERER_LIGHT, "***SOLID***");
 	if (fg != 0)
 		Renderer_DrawText(8, 16, 0, RENDERER_LIGHT, "***FOREGROUND***");
 	if (bg != 0)

@@ -1776,7 +1776,7 @@ void WobjBozoLaserMinion_Update(WOBJ *wobj)
 			{
 				CNM_BOX b;
 				Util_SetBox(&b, lx, ly, 16.0f, 16.0f);
-				BLOCK is_solid = Blocks_IsCollidingWithSolid(&b);
+				BLOCK is_solid = Blocks_IsCollidingWithSolid(&b, 0);
 				if (is_solid)
 					break;
 				lx += cosf(ang) * 12.0f;

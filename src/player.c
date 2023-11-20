@@ -1525,6 +1525,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->vortexed_mode = CNM_FALSE;
 		local_data->vortex_death = CNM_FALSE;
 		local_data->num_deaths++;
+		wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
 		wobj->health = 100.0f;
 		wobj->speed = 5.0f;
 		wobj->jump = 10.0f;
