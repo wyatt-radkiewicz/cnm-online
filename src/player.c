@@ -377,6 +377,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->slide_super_jump_timer = 0;
 
 	local_data->stored_plat_velx = 0.0f;
+	local_data->been_jumping_timer = 0;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
@@ -637,7 +638,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			local_data->grav_add = 0.0f;
 			if (wobj->vel_y >= -1.0f) {
 				if (!touching_ice) local_data->control_mul = 1.0f;
-				if (local_data->sliding_cap_landing_speed) {
+				if (local_data->sliding_cap_landing_speed && local_data->been_jumping_timer < 45) {
 					if (wobj->vel_x > final_speed) wobj->vel_x = final_speed;
 					if (wobj->vel_x < -final_speed) wobj->vel_x = -final_speed;
 				}
@@ -647,6 +648,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (local_data->in_water != local_data->last_in_water)
 			Interaction_CreateWobj(WOBJ_WATER_SPLASH_EFFECT, wobj->x, wobj->y - 16.0f, 0, 0.0f);
 		float cmul = local_data->control_mul;
+		if (local_data->been_jumping_timer < 9999) local_data->been_jumping_timer++;
 		if (cmul < 0.0f) cmul = 0.0f;
 		if (local_data->control_mul < 1.0f) local_data->control_mul += 0.01f;
 		if (local_data->control_mul > 1.0f) local_data->control_mul -= 0.01f;
@@ -1008,9 +1010,18 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !Wobj_IsGrouneded(wobj)) {
 			local_data->jump_input_buffer = 3;
 		}
+		if (local_data->been_jumping_timer > 5 && wobj->vel_y > 0.0f && Wobj_IsCollidingWithBlocks(wobj, 0.0f, wobj->vel_y)) {
+			// get vel x once landed
+			//Console_Print("asdf %d", Game_GetFrame());
+			const float ang = Wobj_GetGroundAngle(wobj);
+			wobj->vel_x += (wobj->vel_y * -sinf(ang));
+			local_data->been_jumping_timer = 0;
+		}
 		if (Wobj_IsGrouneded(wobj)) {
 			local_data->is_grounded_buffer = 6;
+			local_data->been_jumping_timer = 0;
 		}
+		//Console_Print("%d", local_data->been_jumping_timer);
 
 		{
 			local_data->stored_plat_velx = 0.0f;
@@ -1037,6 +1048,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 			if ((local_data->jump_input_buffer > 0 || Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING)) && !local_data->lock_controls)
 			{
+				local_data->been_jumping_timer = 0;
 				local_data->has_cut_jump = CNM_FALSE;
 				local_data->jump_input_buffer = 0;
 				local_data->is_grounded_buffer = 0;
@@ -1301,6 +1313,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (other != NULL && wobj->y < other->y && wobj->vel_y > 0.0f && !local_data->vortexed_mode)
 	{
 		wobj->vel_y = -other->custom_floats[0];
+		wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
 		other->custom_ints[0] = 15;
 		Interaction_PlaySound(wobj, 33);
 	}

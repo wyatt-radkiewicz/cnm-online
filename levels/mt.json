@@ -56,9 +56,9 @@
       ],
       "type_data": {
         "CoolPlatform": {
-          "time_off_before": 70,
+          "time_off_before": 0,
           "time_on": 30,
-          "time_off_after": 0
+          "time_off_after": 70
         }
       },
       "spawning_criteria": {
@@ -76,9 +76,9 @@
       ],
       "type_data": {
         "CoolPlatform": {
-          "time_off_before": 40,
+          "time_off_before": 30,
           "time_on": 30,
-          "time_off_after": 30
+          "time_off_after": 40
         }
       },
       "spawning_criteria": {
@@ -96,9 +96,9 @@
       ],
       "type_data": {
         "CoolPlatform": {
-          "time_off_before": 10,
+          "time_off_before": 60,
           "time_on": 30,
-          "time_off_after": 60
+          "time_off_after": 10
         }
       },
       "spawning_criteria": {
@@ -118,7 +118,9 @@
         "MovingPlatform": {
           "vertical": false,
           "dist": 256.0,
-          "speed": 2.0
+          "speed": 2.0,
+          "bitmapx": 0,
+          "bitmapy": 0
         }
       },
       "spawning_criteria": {
@@ -824,7 +826,9 @@
         "MovingPlatform": {
           "vertical": false,
           "dist": 256.0,
-          "speed": 2.0
+          "speed": 2.0,
+          "bitmapx": 0,
+          "bitmapy": 0
         }
       },
       "spawning_criteria": {
@@ -920,7 +924,9 @@
         "MovingPlatform": {
           "vertical": false,
           "dist": 388.0,
-          "speed": 4.0
+          "speed": 4.0,
+          "bitmapx": 0,
+          "bitmapy": 0
         }
       },
       "spawning_criteria": {
@@ -1186,13 +1192,15 @@
     {
       "pos": [
         1664.0,
-        960.25824
+        960.0
       ],
       "type_data": {
         "MovingPlatform": {
           "vertical": true,
           "dist": 152.0,
-          "speed": 4.0
+          "speed": 4.0,
+          "bitmapx": 12,
+          "bitmapy": 239
         }
       },
       "spawning_criteria": {
@@ -1212,7 +1220,9 @@
         "MovingPlatform": {
           "vertical": true,
           "dist": 152.0,
-          "speed": 8.0
+          "speed": 8.0,
+          "bitmapx": 0,
+          "bitmapy": 0
         }
       },
       "spawning_criteria": {
@@ -1232,7 +1242,9 @@
         "MovingPlatform": {
           "vertical": true,
           "dist": 152.0,
-          "speed": -8.0
+          "speed": -8.0,
+          "bitmapx": 0,
+          "bitmapy": 0
         }
       },
       "spawning_criteria": {
@@ -1252,7 +1264,9 @@
         "MovingPlatform": {
           "vertical": true,
           "dist": 154.0,
-          "speed": 2.0
+          "speed": 2.0,
+          "bitmapx": 0,
+          "bitmapy": 0
         }
       },
       "spawning_criteria": {
@@ -1272,7 +1286,31 @@
         "MovingPlatform": {
           "vertical": false,
           "dist": 128.0,
-          "speed": -8.0
+          "speed": -8.0,
+          "bitmapx": 0,
+          "bitmapy": 0
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        1816.0,
+        1120.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": false,
+          "dist": 154.0,
+          "speed": 2.0,
+          "bitmapx": 0,
+          "bitmapy": 0
         }
       },
       "spawning_criteria": {

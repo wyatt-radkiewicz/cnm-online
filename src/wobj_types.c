@@ -206,6 +206,11 @@ static void WobjScMovingPlatform_Create(WOBJ *wobj)
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
+	wobj->item = (wobj->custom_ints[0] >> 16) & 0xffff;
+	wobj->custom_ints[0] &= 0xffff;
+	if (wobj->item == 0) {
+		wobj->item = (9 << 12) | 5;
+	}
 	if (wobj->custom_ints[0] < 0) {
 		Console_Print("Negative ScMoving Platform Distance! at %d %d", (int)wobj->x, (int)wobj->y);
 		Interaction_DestroyWobj(wobj);
@@ -248,6 +253,23 @@ static void WobjScMovingPlatform_Update(WOBJ *wobj)
 	}
 	wobj->x += wobj->vel_x;
 }
+static void WobjMovingPlatform_Draw(WOBJ *wobj, int camx, int camy) {
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)ceilf(wobj->y) - camy,
+		&(CNM_RECT){
+			.x = (wobj->item >> 12) * 32,
+			.y = (wobj->item & 0xfff) * 32,
+			.w = 32,
+			.h = 32,
+		},
+		0,
+		Blocks_GetCalculatedBlockLight(((int)wobj->x + 16) / BLOCK_SIZE, ((int)wobj->y + 16) / BLOCK_SIZE),
+		0,
+		0
+	);
+}
 
 static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
 {
@@ -256,6 +278,11 @@ static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
+	wobj->item = (wobj->custom_ints[0] >> 16) & 0xffff;
+	wobj->custom_ints[0] &= 0xffff;
+	if (wobj->item == 0) {
+		wobj->item = (9 << 12) | 5;
+	}
 	if (wobj->custom_ints[0] < 0) {
 		//wobj->y += wobj->custom_ints[0];
 		//wobj->custom_ints[0] *= -1;
@@ -1781,7 +1808,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		CNM_FALSE
 	},
 	{ /* 10: Super City Moving Platform */
-		WobjScMovingPlatform_Create, WobjScMovingPlatform_Update, WobjGeneric_Draw, NULL,
+		WobjScMovingPlatform_Create, WobjScMovingPlatform_Update, WobjMovingPlatform_Draw, NULL,
 		{
 			{288, 160, 32, 32}
 		},
@@ -2836,7 +2863,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ // 82: Moving Platform Vertical Object
 		WobjMovingPlatformVertical_Create, // Create
 		WobjMovingPlatformVertical_Update, // Update
-		WobjGeneric_Draw, // Draw
+		WobjMovingPlatform_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{288, 160, 32, 32}

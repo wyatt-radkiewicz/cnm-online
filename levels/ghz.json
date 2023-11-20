@@ -664,62 +664,6 @@
     },
     {
       "pos": [
-        5168.0,
-        960.0
-      ],
-      "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            13,
-            214
-          ],
-          "target_relative": [
-            128.0,
-            0.0
-          ],
-          "speed": 2.0,
-          "start_paused": false,
-          "ty": "Normal"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        5328.0,
-        880.0
-      ],
-      "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            13,
-            214
-          ],
-          "target_relative": [
-            -128.0,
-            0.0
-          ],
-          "speed": 2.0,
-          "start_paused": false,
-          "ty": "Normal"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
         5584.0,
         848.0
       ],
@@ -822,90 +766,6 @@
         "spawn_delay_secs": 5.0,
         "mode": "MultiAndSingleplayer",
         "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6128.0,
-        960.0
-      ],
-      "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            13,
-            214
-          ],
-          "target_relative": [
-            0.0,
-            96.0
-          ],
-          "speed": 2.0,
-          "start_paused": false,
-          "ty": "Normal"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6112.0,
-        896.0
-      ],
-      "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            13,
-            214
-          ],
-          "target_relative": [
-            0.0,
-            -96.0
-          ],
-          "speed": 2.0,
-          "start_paused": false,
-          "ty": "Normal"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6272.0,
-        720.0
-      ],
-      "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            13,
-            214
-          ],
-          "target_relative": [
-            -96.0,
-            0.0
-          ],
-          "speed": 2.0,
-          "start_paused": false,
-          "ty": "Normal"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
       },
       "dropped_item": null,
       "spawner_group": null
@@ -1221,7 +1081,7 @@
     },
     {
       "pos": [
-        4999.847,
+        5000.0,
         968.0
       ],
       "type_data": {
@@ -1408,7 +1268,7 @@
     {
       "pos": [
         1392.0,
-        1344.0
+        1328.0
       ],
       "type_data": {
         "MovingFire": {
@@ -1876,6 +1736,116 @@
       "type_data": {
         "RockGuy": {
           "rock_guy_type": "Medium"
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        5168.0,
+        960.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": false,
+          "dist": 128.0,
+          "speed": 2.0,
+          "bitmapx": 13,
+          "bitmapy": 214
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        5200.0,
+        880.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": false,
+          "dist": 128.0,
+          "speed": -2.0,
+          "bitmapx": 13,
+          "bitmapy": 214
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6112.0,
+        800.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": true,
+          "dist": 96.0,
+          "speed": -2.0,
+          "bitmapx": 13,
+          "bitmapy": 214
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6128.0,
+        960.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": true,
+          "dist": 96.0,
+          "speed": 2.0,
+          "bitmapx": 13,
+          "bitmapy": 214
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6176.0,
+        720.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": false,
+          "dist": 96.0,
+          "speed": -2.0,
+          "bitmapx": 13,
+          "bitmapy": 214
         }
       },
       "spawning_criteria": {

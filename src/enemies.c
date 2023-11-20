@@ -1442,24 +1442,39 @@ void WobjMovingFireVertical_Create(WOBJ *wobj)
 	wobj->speed = fabsf(wobj->custom_floats[0]);
 	wobj->custom_floats[0] = wobj->y;
 	wobj->custom_floats[1] = wobj->y + (float)wobj->custom_ints[0];
+	wobj->health = wobj->speed / 10.0f;
+	wobj->jump = fabsf((wobj->speed * wobj->speed) / (2.0f * wobj->health));
 	if (wobj->custom_floats[1] < wobj->custom_floats[0]) {
 		float tmp = wobj->custom_floats[1];
 		wobj->custom_floats[1] = wobj->custom_floats[0];
 		wobj->custom_floats[0] = tmp;
 		wobj->speed *= -1.f;
+		wobj->health *= -1.0f;
 	}
+	wobj->vel_y = 0.0f;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
 void WobjMovingFireVertical_Update(WOBJ *wobj)
 {
-	wobj->y += wobj->speed;
-	if (wobj->y < wobj->custom_floats[0] || wobj->y > wobj->custom_floats[1])
-	{
-		wobj->speed *= -1.0f;
-		wobj->y += wobj->speed;
+	wobj->y += wobj->vel_y;
+
+	if (wobj->y < wobj->custom_floats[0] + wobj->jump) {
+		if (wobj->speed > 0.0f) wobj->vel_y += wobj->health;
+		else wobj->vel_y -= wobj->health;
+
 		if (wobj->money) {
-			// Despawn after a while
-			Interaction_DestroyWobj(wobj);
+			if ((wobj->speed > 0.0f && wobj->vel_y < 0.0f) ||
+				(wobj->speed < 0.0f && wobj->vel_y > 0.0f))
+				Interaction_DestroyWobj(wobj);
+		}
+	} else if (wobj->y > wobj->custom_floats[1] - wobj->jump) {
+		if (wobj->speed > 0.0f) wobj->vel_y -= wobj->health;
+		else wobj->vel_y += wobj->health;
+
+		if (wobj->money) {
+			if ((wobj->speed > 0.0f && wobj->vel_y < 0.0f) ||
+				(wobj->speed < 0.0f && wobj->vel_y > 0.0f))
+				Interaction_DestroyWobj(wobj);
 		}
 	}
 }
@@ -1471,29 +1486,38 @@ void WobjMovingFireHorizontal_Create(WOBJ *wobj)
 	wobj->speed = fabsf(wobj->custom_floats[0]);
 	wobj->custom_floats[0] = wobj->x;
 	wobj->custom_floats[1] = wobj->x + (float)wobj->custom_ints[0];
+	wobj->health = wobj->speed / 10.0f;
+	wobj->jump = fabsf((wobj->speed * wobj->speed) / (2.0f * wobj->health));
 	if (wobj->custom_floats[1] < wobj->custom_floats[0]) {
 		float tmp = wobj->custom_floats[1];
 		wobj->custom_floats[1] = wobj->custom_floats[0];
 		wobj->custom_floats[0] = tmp;
 		wobj->speed *= -1.f;
+		wobj->health *= -1.0f;
 	}
-	//if (wobj->speed < 0) {
-		//wobj->x = wobj->custom_floats[1];
-	//}
-	//if (wobj->custom_floats[1] < wobj->custom_floats[0])
-	//	wobj->speed *= -1.0f;
+	wobj->vel_x = 0.0f;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
 void WobjMovingFireHorizontal_Update(WOBJ *wobj)
 {
-	wobj->x += wobj->speed;
-	if (wobj->x < wobj->custom_floats[0] || wobj->x > wobj->custom_floats[1])
-	{
-		wobj->speed *= -1.0f;
-		wobj->x += wobj->speed * 2.0f;
+	wobj->x += wobj->vel_x;
+	if (wobj->x < wobj->custom_floats[0] + wobj->jump) {
+		if (wobj->speed > 0.0f) wobj->vel_x += wobj->health;
+		else wobj->vel_x -= wobj->health;
+
 		if (wobj->money) {
-			// Despawn after a while
-			Interaction_DestroyWobj(wobj);
+			if ((wobj->speed > 0.0f && wobj->vel_x < 0.0f) ||
+				(wobj->speed < 0.0f && wobj->vel_x > 0.0f))
+				Interaction_DestroyWobj(wobj);
+		}
+	} else if (wobj->x > wobj->custom_floats[1] - wobj->jump) {
+		if (wobj->speed > 0.0f) wobj->vel_x -= wobj->health;
+		else wobj->vel_x += wobj->health;
+
+		if (wobj->money) {
+			if ((wobj->speed > 0.0f && wobj->vel_x < 0.0f) ||
+				(wobj->speed < 0.0f && wobj->vel_x > 0.0f))
+				Interaction_DestroyWobj(wobj);
 		}
 	}
 }
