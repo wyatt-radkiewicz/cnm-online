@@ -207,6 +207,10 @@ void titlebg_draw(void(*mid_callback)(void)) {
 
 	Blocks_DrawBlocks(BLOCKS_BG, (int)_camx, (int)(_camy - 0.5f));
 	Blocks_DrawBlocks(BLOCKS_FG, (int)_camx, (int)(_camy - 0.5f));
+	Renderer_SaveToEffectsBuffer();
+	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS, (int)_camx, (int)(_camy - 0.5f));
+	Renderer_SaveToEffectsBuffer();
+	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS_EX, (int)_camx, (int)(_camy - 0.5f));
 
 	Util_SetRect(&player, 40 + ((Game_GetFrame() % 2) * 40), 4688, 40, 40);
 	int hflip = vel[0] < 0.0f;
