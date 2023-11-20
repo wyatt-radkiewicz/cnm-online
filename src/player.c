@@ -852,8 +852,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
 		if (local_data->upgrade_state == PLAYER_UPGRADE_NONE) {
-			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) {
+			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
 				wobj->custom_ints[1] |= PLAYER_FLAG_STOMPING;
+				local_data->slide_jump_cooldown = 5;
 			}
 		}
 		if (Wobj_IsGrounded(wobj)) {

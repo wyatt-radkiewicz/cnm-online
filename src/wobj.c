@@ -643,7 +643,7 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 		return CNM_FALSE;
 }
 void wobj_move_and_hit_blocks(WOBJ *wobj) {
-	const float ground_ang = Wobj_GetGroundAngle(wobj);
+	const float ground_ang = Wobj_IsGrounded(wobj) ? Wobj_GetGroundAngle(wobj) : 0.0f;
 	const int ang_type = roundf((ground_ang > CNM_PI ? CNM_PI - (ground_ang - CNM_PI) : ground_ang) / CNM_PI * 6.0f);
 	const int doslow = (ground_ang < CNM_PI) == (wobj->vel_x > 0.0f);
 	switch (ang_type) {
@@ -1092,7 +1092,13 @@ void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound)
 		Interaction_PlaySound(wobj, cry_sound);
 }
 float Wobj_GetGroundAngle(const WOBJ *wobj) {
-	return Blocks_GetAngle(wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 2.0f);
+	//if (!Wobj_IsGrounded(wobj)) return 0.0f;
+	const float ang1 = Blocks_GetAngle(wobj->x + wobj->hitbox.x + wobj->hitbox.w, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 2.0f);
+	const float ang2 = Blocks_GetAngle(wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 2.0f);
+	const float ang3 = Blocks_GetAngle(wobj->x + wobj->hitbox.x, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 2.0f);
+	if (ang1) return ang1;
+	else if (ang2) return ang2;
+	else return ang3;
 }
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy)
