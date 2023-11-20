@@ -792,6 +792,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->slide_input_buffer = 0;
 				local_data->is_sliding = CNM_TRUE;
 				local_data->sliding_jump_timer = 30;
+				wobj->custom_ints[1] |= PLAYER_FLAG_SLIDE_AFTERIMAGE;
 				wobj->hitbox.y = 17.0f;
 				wobj->hitbox.h = 15.0f;
 				local_data->stored_slide_speed = fabsf(wobj->vel_x);
@@ -800,6 +801,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Wobj_IsGrouneded(wobj) && !local_data->is_sliding) {
 			wobj->hitbox.y = 3.0f;
 			wobj->hitbox.h = 29.0f;
+			wobj->custom_ints[1] &= ~PLAYER_FLAG_SLIDE_AFTERIMAGE;
 			//Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
 		}
 		if (local_data->is_sliding) {
@@ -1526,6 +1528,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->vortex_death = CNM_FALSE;
 		local_data->num_deaths++;
 		wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
+		wobj->custom_ints[1] &= ~PLAYER_FLAG_SLIDE_AFTERIMAGE;
 		wobj->health = 100.0f;
 		wobj->speed = 5.0f;
 		wobj->jump = 10.0f;
@@ -1985,17 +1988,21 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 	
 	int skin9offsetx, skin9offsety;
 	pr = get_player_src_rect(wobj->anim_frame, &skin9offsetx, &skin9offsety);
-	if (wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) {
-		Renderer_DrawBitmap2
-		(
-			(int)(wobj->x - wobj->vel_x) - camx + skin9offsetx,
-			(int)(wobj->y - wobj->vel_y) - camy + skin9offsety,
-			&pr,
-			3,
-			Wobj_DamageLighting(wobj, Blocks_GetCalculatedBlockLight((int)wobj_center_x / BLOCK_SIZE, (int)wobj_center_y / BLOCK_SIZE)),
-			wobj->flags & WOBJ_HFLIP,
-			wobj->flags & WOBJ_VFLIP
-		);
+	if (wobj->custom_ints[1] & (PLAYER_FLAG_STOMPING | PLAYER_FLAG_SLIDE_AFTERIMAGE)) {
+		if (!(wobj->custom_ints[1] & PLAYER_FLAG_SLIDE_AFTERIMAGE) || fabsf(wobj->vel_x) > wobj->speed * (2.0f / 3.0f) || (~wobj->flags & WOBJ_IS_GROUNDED)) {
+			float wvx = wobj->vel_x * ((wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) ? 1.0f : 0.5f);
+			float wvy = wobj->vel_y * ((wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) ? 1.0f : 0.5f);
+			Renderer_DrawBitmap2
+			(
+				(int)(wobj->x - wvx) - camx + skin9offsetx,
+				(int)(wobj->y - wvy) - camy + skin9offsety,
+				&pr,
+				3,
+				Wobj_DamageLighting(wobj, Blocks_GetCalculatedBlockLight((int)wobj_center_x / BLOCK_SIZE, (int)wobj_center_y / BLOCK_SIZE)),
+				wobj->flags & WOBJ_HFLIP,
+				wobj->flags & WOBJ_VFLIP
+			);
+		}
 	}
 	Renderer_DrawBitmap2
 	(
