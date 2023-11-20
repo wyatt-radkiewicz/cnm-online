@@ -65,6 +65,7 @@ void World_Start(int mode)
 	//Fadeout_Setup();
 	BossBar_Init();
 	Player_ResetHUD();
+	Game_ResetFrame();
 
 	// Misc game global vars
 	Game_GetVar(GAME_VAR_GRAVITY)->data.decimal = 0.5f;

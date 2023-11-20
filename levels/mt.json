@@ -56,9 +56,9 @@
       ],
       "type_data": {
         "CoolPlatform": {
-          "time_off_before": 0,
+          "time_off_before": 70,
           "time_on": 30,
-          "time_off_after": 70
+          "time_off_after": 0
         }
       },
       "spawning_criteria": {
@@ -71,14 +71,14 @@
     },
     {
       "pos": [
-        1552.2087,
+        1552.0,
         768.0
       ],
       "type_data": {
         "CoolPlatform": {
-          "time_off_before": 30,
+          "time_off_before": 40,
           "time_on": 30,
-          "time_off_after": 40
+          "time_off_after": 30
         }
       },
       "spawning_criteria": {
@@ -96,9 +96,9 @@
       ],
       "type_data": {
         "CoolPlatform": {
-          "time_off_before": 60,
+          "time_off_before": 10,
           "time_on": 30,
-          "time_off_after": 10
+          "time_off_after": 60
         }
       },
       "spawning_criteria": {

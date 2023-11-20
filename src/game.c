@@ -122,6 +122,9 @@ int Game_GetFrame(void)
 {
 	return game_frame;
 }
+void Game_ResetFrame(void) {
+	game_frame = 0;
+}
 
 static void Game_ApplyStateChanges(void)
 {

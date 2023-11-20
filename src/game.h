@@ -167,6 +167,7 @@ void Game_Quit(void);
 void Game_Stop(void);
 int Game_DedicatedMode(void);
 int Game_GetFrame(void);
+void Game_ResetFrame(void);
 
 void Game_SwitchState(int state_id);
 void Game_PushState(int state_id);
