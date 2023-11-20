@@ -849,6 +849,22 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
+		if (local_data->upgrade_state == PLAYER_UPGRADE_NONE) {
+			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) {
+				wobj->custom_ints[1] |= PLAYER_FLAG_STOMPING;
+			}
+		}
+		if (Wobj_IsGrounded(wobj)) {
+			if (wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) {
+				Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x - 16.0f, wobj->y, 0, 0.0f);
+				Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x + 16.0f, wobj->y, 1, 0.0f);
+			}
+			wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
+		}
+		if ((wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) && wobj->vel_y < 12.0f) {
+			wobj->vel_y += 4.0f;
+		}
+
 		if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES)
 		{
 			if (!Wobj_IsGrouneded(wobj))
@@ -1023,6 +1039,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			{
 				local_data->has_cut_jump = CNM_FALSE;
 				local_data->jump_input_buffer = 0;
+				local_data->is_grounded_buffer = 0;
 				float jmp_speed = final_jmp;
 				if (local_data->in_water)
 					jmp_speed /= 1.5f;
@@ -1039,7 +1056,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 					jmp_speed -= plat->vel_y;
 					local_data->jump_init_yspd = plat->vel_y;
 				}
-				wobj->vel_y = -jmp_speed;
+				const float ang = Wobj_GetGroundAngle(wobj);
+				//wobj->vel_y = -jmp_speed * cosf(ang);
+				//wobj->vel_x += -jmp_speed * sinf(ang);
+				wobj->vel_y = (-jmp_speed * cosf(ang)) + (-wobj->vel_x * sinf(ang));
+				wobj->vel_x = (-jmp_speed * sinf(ang)) + (wobj->vel_x * cosf(ang));
 				local_data->jumped = JUMP_TIMER;
 				local_data->animtimer = 0;
 				Interaction_PlaySound(wobj, 58);
@@ -1949,6 +1970,18 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 	
 	int skin9offsetx, skin9offsety;
 	pr = get_player_src_rect(wobj->anim_frame, &skin9offsetx, &skin9offsety);
+	if (wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) {
+		Renderer_DrawBitmap2
+		(
+			(int)(wobj->x - wobj->vel_x) - camx + skin9offsetx,
+			(int)(wobj->y - wobj->vel_y) - camy + skin9offsety,
+			&pr,
+			3,
+			Wobj_DamageLighting(wobj, Blocks_GetCalculatedBlockLight((int)wobj_center_x / BLOCK_SIZE, (int)wobj_center_y / BLOCK_SIZE)),
+			wobj->flags & WOBJ_HFLIP,
+			wobj->flags & WOBJ_VFLIP
+		);
+	}
 	Renderer_DrawBitmap2
 	(
 		(int)wobj->x - camx + skin9offsetx,

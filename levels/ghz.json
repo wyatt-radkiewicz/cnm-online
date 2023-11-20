@@ -1537,7 +1537,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1555,7 +1557,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1573,7 +1577,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1591,7 +1597,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1609,7 +1617,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1627,7 +1637,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1645,7 +1657,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1663,7 +1677,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1681,7 +1697,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1699,7 +1717,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1717,7 +1737,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1735,7 +1757,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1753,7 +1777,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1771,7 +1797,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1789,7 +1817,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1807,7 +1837,9 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "AC"
+          "next_level": "AC",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
@@ -1862,6 +1894,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -1882,6 +1915,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -1902,6 +1936,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -1922,6 +1957,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -1942,6 +1978,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -1962,6 +1999,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 45,
       "frames": [
         [
           12,
@@ -2010,6 +2048,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 315,
       "frames": [
         [
           13,
@@ -2058,6 +2097,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -2078,6 +2118,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 23,
       "frames": [
         [
           8,
@@ -2126,6 +2167,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 23,
       "frames": [
         [
           9,
@@ -2174,6 +2216,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -2194,6 +2237,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -2214,6 +2258,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 337,
       "frames": [
         [
           14,
@@ -2262,6 +2307,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 337,
       "frames": [
         [
           15,
@@ -2310,6 +2356,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -2330,6 +2377,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -2350,6 +2398,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -2370,6 +2419,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -2390,6 +2440,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -2410,6 +2461,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -2430,6 +2482,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -2450,6 +2503,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -2470,6 +2524,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -2490,6 +2545,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -2510,6 +2566,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -2530,6 +2587,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -2550,6 +2608,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -2570,6 +2629,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -2590,6 +2650,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -2610,6 +2671,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -2630,6 +2692,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -2650,6 +2713,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -2670,6 +2734,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -2690,6 +2755,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -2710,6 +2776,7 @@
       "transparency": 2,
       "damage_type": "None",
       "anim_speed": 4,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -2742,6 +2809,7 @@
       "transparency": 2,
       "damage_type": "None",
       "anim_speed": 4,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -2774,6 +2842,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -2796,6 +2865,7 @@
         "Spikes": 200
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,

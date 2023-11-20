@@ -643,9 +643,27 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 		return CNM_FALSE;
 }
 void wobj_move_and_hit_blocks(WOBJ *wobj) {
+	const float ground_ang = Wobj_GetGroundAngle(wobj);
+	const int ang_type = roundf((ground_ang > CNM_PI ? CNM_PI - (ground_ang - CNM_PI) : ground_ang) / CNM_PI * 6.0f);
+	const int doslow = (ground_ang < CNM_PI) == (wobj->vel_x > 0.0f);
+	switch (ang_type) {
+	case 1: wobj->vel_x *= doslow ? (2.0f / 3.0f) : (6.0f / 5.0f); break;
+	case 2: wobj->vel_x *= doslow ? (1.0f / 2.0f) : (1.0f); break;
+	case 3: wobj->vel_x *= doslow ? (1.0f / 3.0f) : (3.0f / 4.0f); break;
+	default: break;
+	}
+	if (wobj->type == WOBJ_PLAYER) {
+		//Console_Print("%d %d", ang_type, ground_ang);
+	}
 	struct bresolve_result result = bresolve_collision(wobj->x, wobj->y, wobj->vel_x, wobj->vel_y, wobj->hitbox);
 	wobj->x = result.x;
 	wobj->y = result.y;
+	switch (ang_type) {
+	case 1: result.vx *= doslow ? (3.0f / 2.0f) : (5.0f / 6.0f); break;
+	case 2: result.vx *= doslow ? (2.0f) : (1.0f); break;
+	case 3: result.vx *= doslow ? (3.0f) : (4.0f / 3.0f); break;
+	default: break;
+	}
 	wobj->vel_x = result.vx;
 	wobj->vel_y = result.vy;
 }
@@ -1072,6 +1090,9 @@ void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound)
 {
 	if (wobj->flags & WOBJ_DAMAGE_INDICATE)
 		Interaction_PlaySound(wobj, cry_sound);
+}
+float Wobj_GetGroundAngle(const WOBJ *wobj) {
+	return Blocks_GetAngle(wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 5.0f);
 }
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy)

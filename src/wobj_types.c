@@ -1634,6 +1634,17 @@ void BreakPart_CreateParts(float x, float y, float yspd_start, int srcx, int src
 	}
 }
 
+static void Wobj_PlayerStompDust_Create(WOBJ *wobj) {
+	wobj->anim_frame = 0;
+	wobj->flags = wobj->custom_ints[0] ? WOBJ_HFLIP : 0;
+}
+static void Wobj_PlayerStompDust_Update(WOBJ *wobj) {
+	if (++wobj->anim_frame >= 8) {
+		wobj->anim_frame = 7;
+		Interaction_DestroyWobj(wobj);
+	}
+}
+
 #define LUAOBJ_DEF {\
 	NULL,\
 	NULL,\
@@ -3613,6 +3624,27 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		0, // Money reward
 		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 152: Player Stomp Dust Object
+		Wobj_PlayerStompDust_Create, // Create
+		Wobj_PlayerStompDust_Update, // Update
+		WobjGeneric_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{ 160, 7744, 32, 32, },
+			{ 160+32*1, 7744, 32, 32, },
+			{ 160+32*2, 7744, 32, 32, },
+			{ 160+32*3, 7744, 32, 32, },
+			{ 160+32*4, 7744, 32, 32, },
+			{ 160+32*5, 7744, 32, 32, },
+			{ 160+32*6, 7744, 32, 32, },
+			{ 160+32*7, 7744, 32, 32, },
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
 		CNM_FALSE, // Can respawn?
 		0, // Score reward
 	},

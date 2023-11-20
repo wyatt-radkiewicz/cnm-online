@@ -2164,7 +2164,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -2184,7 +2184,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -4149,6 +4149,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -4169,6 +4170,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -4189,6 +4191,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -4209,6 +4212,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -4229,6 +4233,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -4249,6 +4254,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -4269,6 +4275,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -4289,6 +4296,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -4309,6 +4317,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -4329,6 +4338,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -4349,6 +4359,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -4371,6 +4382,7 @@
         "Spikes": 30
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -4393,6 +4405,7 @@
         "Quicksand": 10
       },
       "anim_speed": 10,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -4417,6 +4430,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 45,
       "frames": [
         [
           6,
@@ -4465,6 +4479,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 315,
       "frames": [
         [
           2,
@@ -4513,6 +4528,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -4533,6 +4549,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -4553,6 +4570,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -4573,6 +4591,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -4593,6 +4612,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -4613,6 +4633,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -4633,6 +4654,7 @@
       "transparency": 6,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -4653,6 +4675,7 @@
       "transparency": 6,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -4673,6 +4696,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -4693,6 +4717,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -4713,6 +4738,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -4733,6 +4759,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -4753,6 +4780,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -4773,6 +4801,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -4793,6 +4822,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -4813,6 +4843,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -4833,6 +4864,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -4853,6 +4885,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -4873,6 +4906,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -4893,6 +4927,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -4913,6 +4948,7 @@
       "transparency": 6,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -4933,6 +4969,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -4981,6 +5018,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -5029,6 +5067,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,

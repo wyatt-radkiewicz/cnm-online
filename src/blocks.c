@@ -304,6 +304,12 @@ BLOCK_PROPS *Blocks_IsCollidingWithDamage(const CNM_BOX *b)
 				block.y = (float)(y * BLOCK_SIZE) + props->coll_data.hitbox.y;
 				block.w = props->coll_data.hitbox.w;
 				block.h = props->coll_data.hitbox.h;
+				if (props->flags & BLOCK_FLAG_SOLID) {
+					block.x = (float)(x * BLOCK_SIZE);
+					block.y = (float)(y * BLOCK_SIZE);
+					block.w = 32.0f;
+					block.h = 32.0f;
+				}
 				if (Util_AABBCollision(b, &block))
 				{
 					return props;
@@ -473,6 +479,17 @@ void Blocks_StickBoxToGround(CNM_BOX *b)
 				return;
 			}
 		}
+	}
+}
+float Blocks_GetAngle(const float x, const float y) {
+	const int bx = (int)(x / (float)BLOCK_SIZE);
+	const int by = (int)(y / (float)BLOCK_SIZE);
+	const BLOCK_PROPS *prop = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, bx, by));
+	if (~prop->flags & BLOCK_FLAG_SOLID) prop = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, bx, by));
+	if (~prop->flags & BLOCK_FLAG_SOLID) {
+		return 0.0f;
+	} else {
+		return (float)prop->angle / 180.0f * CNM_PI;
 	}
 }
 

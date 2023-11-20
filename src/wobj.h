@@ -164,6 +164,7 @@ typedef enum _WOBJ_TYPES
 	WOBJ_COOLPLAT,
 	WOBJ_TELEAREA2,
 	WOBJ_ITEM_BREAK_PART,
+	WOBJ_PLAYER_STOMP_DUST,
 	WOBJ_MAX
 } WOBJ_TYPES;
 
@@ -314,6 +315,7 @@ void Wobj_CalculateLightForGridChunk(int gx, int gy);
 void Wobj_CalculateLightForScreen(int camx, int camy);
 void Wobj_UpdateGridPos(WOBJ *wobj);
 void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound);
+float Wobj_GetGroundAngle(const WOBJ *wobj);
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);
 void WobjGenericAttack_Update(WOBJ *wobj);
