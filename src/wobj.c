@@ -258,23 +258,29 @@ void Wobj_DestroyOwnedWobjs(void)
 	major_reset = CNM_FALSE;
 	WobjSearch_Reset();
 }
+static void update_owned_wobj(WOBJ *wobj) {
+	if (wobj_types[wobj->type].update != NULL)
+	{
+		wobj_types[wobj->type].update(wobj);
+		ObjGrid_MoveObject(owned_grid, &wobj->internal.obj, wobj->x, wobj->y);
+		if (Game_GetFrame() % 3 == 0)
+			wobj->flags &= ~WOBJ_DAMAGE_INDICATE;
+	}
+}
 void Wobj_UpdateOwnedWobjs(void)
 {
-	WOBJ *rover, *next;
+	WOBJ *rover, *next, *player = NULL;
 	/* Update only owned objects */
 	rover = owned;
 	while (rover != NULL)
 	{
 		next = rover->internal.next;
-		if (wobj_types[rover->type].update != NULL)
-		{
-			wobj_types[rover->type].update(rover);
-			ObjGrid_MoveObject(owned_grid, &rover->internal.obj, rover->x, rover->y);
-			if (Game_GetFrame() % 3 == 0)
-				rover->flags &= ~WOBJ_DAMAGE_INDICATE;
-		}
+		if (rover->type == WOBJ_PLAYER) player = rover;
+		else update_owned_wobj(rover);
 		rover = next;
 	}
+
+	if (player) update_owned_wobj(player);
 }
 
 void Wobj_RecordWobjHistory(int newframe) {
@@ -643,6 +649,18 @@ void wobj_move_and_hit_blocks(WOBJ *wobj) {
 	wobj->vel_x = result.vx;
 	wobj->vel_y = result.vy;
 }
+static void stick_to_moving_platforms(WOBJ *wobj) {
+	WOBJ *other;
+	const float oy = wobj->y;
+	wobj->y += 10.0f;
+	other = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+	if (other && wobj->vel_y > other->vel_y - 1.0f) {
+		wobj->y = other->y + other->hitbox.y - wobj->hitbox.h - wobj->hitbox.y;
+		wobj->vel_y = other->vel_y;
+	} else {
+		wobj->y = oy;
+	}
+}
 void WobjPhysics_BeginUpdate(WOBJ *wobj)
 {
 	(void)wobj;
@@ -664,6 +682,9 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 		Blocks_StickBoxToGround(&h);
 		wobj->x = h.x - wobj->hitbox.x;
 		wobj->y = h.y - wobj->hitbox.y;
+	}
+	if (Wobj_IsGrounded(wobj)) {
+		stick_to_moving_platforms(wobj);
 	}
 
 	// Stick to ground with moving platforms
@@ -778,8 +799,9 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 			obj->y = h.y - obj->hitbox.y;
 			if (x)
 				obj->vel_x = collider->vel_x;
-			if (y)
+			if (y) {
 				obj->vel_y = collider->vel_y;
+			}
 		}
 		if (collider->flags & WOBJ_IS_JUMPTHROUGH)
 		{

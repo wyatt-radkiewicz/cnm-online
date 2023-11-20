@@ -1010,10 +1010,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 				float jmp_speed = final_jmp;
 				if (local_data->in_water)
 					jmp_speed /= 1.5f;
+				const float oy = wobj->y;
+				wobj->y += 10.0f;
 				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+				wobj->y = oy;
 				local_data->jump_init_yspd = 0.0f;
-				if (plat != NULL && plat->flags & WOBJ_IS_MOVESTAND)
+				if (plat != NULL)
 				{
+					wobj->vel_x += plat->vel_x;
 					jmp_speed -= plat->vel_y;
 					local_data->jump_init_yspd = plat->vel_y;
 				}
@@ -1022,7 +1026,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->animtimer = 0;
 				Interaction_PlaySound(wobj, 58);
 				if (local_data->slide_super_jump_timer > 0 ||
-					(local_data->is_sliding && fabsf(wobj->vel_x) < 2.0f)) {
+					(local_data->is_sliding && fabsf(wobj->vel_x) < 3.0f)) {
 					local_data->is_sliding = CNM_FALSE;
 					local_data->control_mul = 0.75f;
 					wobj->vel_x *= 0.0f;

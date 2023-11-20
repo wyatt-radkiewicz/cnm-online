@@ -59,7 +59,7 @@ void Camera_Update(int target_x, int target_y)
 		center_y = target_y + cam_top;
 
 	// Extended camera
-	if (fabsf(player->vel_x) > player->speed * 1.5f && (player->flags & WOBJ_HFLIP) == player->vel_x < 0.0f) {
+	if (fabsf(player->vel_x) > player->speed * 1.5f && !!(player->flags & WOBJ_HFLIP) == player->vel_x < 0.0f) {
 		cam_ext_target = player->vel_x < 0.0f ? -64 : 64;
 	} else {
 		cam_ext_target = 0;

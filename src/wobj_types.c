@@ -207,28 +207,46 @@ static void WobjScMovingPlatform_Create(WOBJ *wobj)
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
 	if (wobj->custom_ints[0] < 0) {
-		wobj->x += wobj->custom_ints[0];
-		wobj->custom_ints[0] *= -1;
-		wobj->custom_floats[0] *= -1.0f;
+		Console_Print("Negative ScMoving Platform Distance! at %d %d", (int)wobj->x, (int)wobj->y);
+		Interaction_DestroyWobj(wobj);
 	}
-	wobj->custom_ints[1] = wobj->custom_ints[0];
 	wobj->vel_x = wobj->custom_floats[0];
 	wobj->vel_y = 0.0f;
+	wobj->custom_floats[1] = wobj->vel_x / 10.0f;
 
+	const float adddist = 2.0f * (10.0f - (wobj->vel_x)/(2.0f * wobj->custom_floats[1]));
 	if (wobj->vel_x < 0.0) {
-		wobj->x += wobj->custom_ints[1] * -wobj->vel_x;
+		wobj->x += wobj->custom_ints[0] * -wobj->vel_x;
 	}
+	wobj->custom_ints[0] += (int)adddist;
+	wobj->custom_ints[1] = wobj->custom_ints[0];
+
+	wobj->vel_x = 0.0f;
+
+
 }
 static void WobjScMovingPlatform_Update(WOBJ *wobj)
 {
 	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
-	wobj->x += wobj->vel_x;
+	if (wobj->custom_ints[1] > wobj->custom_ints[0] - 10) {
+		wobj->vel_x += wobj->custom_floats[1];
+		//if (wobj->custom_floats[0] < 0.0f) wobj->vel_x -= wobj->custom_floats[1];
+		//else wobj->vel_x += wobj->custom_floats[1];
+	}
+	if (wobj->custom_ints[1] < 10+1) {
+		wobj->vel_x -= wobj->custom_floats[1];
+		//if (wobj->custom_floats[0] < 0.0f) wobj->vel_x += wobj->custom_floats[1];
+		//else wobj->vel_x -= wobj->custom_floats[1];
+	}
 	wobj->custom_ints[1]--;
 	if (wobj->custom_ints[1] <= 0)
 	{
 		wobj->custom_ints[1] = wobj->custom_ints[0];
-		wobj->vel_x *= -1.0f;
+		wobj->custom_floats[0] *= -1.0f;
+		wobj->custom_floats[1] *= -1.0f;
+		wobj->vel_x = 0.0f;
 	}
+	wobj->x += wobj->vel_x;
 }
 
 static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
@@ -239,28 +257,44 @@ static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
 	if (wobj->custom_ints[0] < 0) {
-		wobj->y += wobj->custom_ints[0];
-		wobj->custom_ints[0] *= -1;
-		wobj->custom_floats[0] *= -1.0f;
+		//wobj->y += wobj->custom_ints[0];
+		//wobj->custom_ints[0] *= -1;
+		//wobj->custom_floats[0] *= -1.0f;
+		Console_Print("Negative Vertical Platform Distance! at %d %d", (int)wobj->x, (int)wobj->y);
+		Interaction_DestroyWobj(wobj);
 	}
-	wobj->custom_ints[1] = wobj->custom_ints[0];
 	wobj->vel_y = wobj->custom_floats[0];
 	wobj->vel_x = 0.0f;
+	wobj->custom_floats[1] = wobj->vel_y / 10.0f;
 
+	const float adddist = 2.0f * (10.0f - (wobj->vel_y)/(2.0f * wobj->custom_floats[1]));
 	if (wobj->vel_y < 0.0) {
-		wobj->y += wobj->custom_ints[1] * -wobj->vel_y;
+		wobj->y += wobj->custom_ints[0] * -wobj->vel_y;
 	}
+	wobj->custom_ints[0] += (int)adddist;
+	wobj->custom_ints[1] = wobj->custom_ints[0];
+
+
+	wobj->vel_y = 0.0f;
 }
 static void WobjMovingPlatformVertical_Update(WOBJ *wobj)
 {
 	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
-	wobj->y += wobj->vel_y;
+	if (wobj->custom_ints[1] > wobj->custom_ints[0] - 10) {
+		wobj->vel_y += wobj->custom_floats[1];
+	}
+	if (wobj->custom_ints[1] < 10+1) {
+		wobj->vel_y -= wobj->custom_floats[1];
+	}
 	wobj->custom_ints[1]--;
 	if (wobj->custom_ints[1] <= 0)
 	{
 		wobj->custom_ints[1] = wobj->custom_ints[0];
-		wobj->vel_y *= -1.0f;
+		wobj->custom_floats[0] *= -1.0f;
+		wobj->custom_floats[1] *= -1.0f;
+		wobj->vel_y = 0.0f;
 	}
+	wobj->y += wobj->vel_y;
 }
 
 static void WobjBrickWallBreakable_Create(WOBJ *wobj)
