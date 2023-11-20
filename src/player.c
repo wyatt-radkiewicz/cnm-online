@@ -894,7 +894,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 					w->speed = 9.0f;
 					w->strength = wobj->strength + 0.1f;
 
-					wobj->vel_y = 10.0f;
+					wobj->vel_y = 15.0f;
 					wobj->custom_ints[1] |= PLAYER_FLAG_USED_DOUBLE_JUMP;
 					Interaction_PlaySound(wobj, 25);
 				}
@@ -1018,6 +1018,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			//Console_Print("asdf %d", Game_GetFrame());
 			const float ang = Wobj_GetGroundAngle(wobj);
 			wobj->vel_x += (wobj->vel_y * -sinf(ang));
+			wobj->vel_y = (wobj->vel_y * cosf(ang));
 			local_data->been_jumping_timer = 0;
 		}
 		if (Wobj_IsGrouneded(wobj)) {
