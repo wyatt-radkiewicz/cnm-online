@@ -1092,7 +1092,7 @@ void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound)
 		Interaction_PlaySound(wobj, cry_sound);
 }
 float Wobj_GetGroundAngle(const WOBJ *wobj) {
-	return Blocks_GetAngle(wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 5.0f);
+	return Blocks_GetAngle(wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 2.0f);
 }
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy)
