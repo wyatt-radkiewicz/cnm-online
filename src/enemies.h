@@ -109,6 +109,7 @@ void WobjMovingFireVertical_Create(WOBJ *wobj);
 void WobjMovingFireVertical_Update(WOBJ *wobj);
 void WobjMovingFireHorizontal_Create(WOBJ *wobj);
 void WobjMovingFireHorizontal_Update(WOBJ *wobj);
+void WobjMovingFire_Draw(WOBJ *wobj, int camx, int camy);
 
 // Super Dragon
 void WobjSuperDragonBoss_Create(WOBJ *wobj);

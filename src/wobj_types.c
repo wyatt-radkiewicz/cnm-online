@@ -2586,7 +2586,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ // 61: Moving Fire Vertical Object
 		WobjMovingFireVertical_Create, // Create
 		WobjMovingFireVertical_Update, // Update
-		WobjRotatingFireColunmPiece_Draw, // Draw
+		WobjMovingFire_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{480, 2048, 32, 32},
@@ -2601,7 +2601,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ // 62: Moving Fire Horizontal Object
 		WobjMovingFireHorizontal_Create, // Create
 		WobjMovingFireHorizontal_Update, // Update
-		WobjRotatingFireColunmPiece_Draw, // Draw
+		WobjMovingFire_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{448, 2048, 32, 32},

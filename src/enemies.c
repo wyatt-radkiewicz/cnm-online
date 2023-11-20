@@ -1438,6 +1438,13 @@ void WobjMovingFireVertical_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 25.0f;
+
+	wobj->item = wobj->custom_ints[0] >> 16;
+	wobj->custom_ints[0] = (wobj->custom_ints[0] << 16) >> 16;
+	if (wobj->item == 0 || wobj->item == -1) {
+		wobj->item = (10 << 12) | 70;
+	}
+
 	wobj->money = wobj->custom_floats[0] < 0;
 	wobj->speed = fabsf(wobj->custom_floats[0]);
 	wobj->custom_floats[0] = wobj->y;
@@ -1482,6 +1489,13 @@ void WobjMovingFireHorizontal_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 25.0f;
+
+	wobj->item = wobj->custom_ints[0] >> 16;
+	wobj->custom_ints[0] = (wobj->custom_ints[0] << 16) >> 16;
+	if (wobj->item == 0 || wobj->item == -1) {
+		wobj->item = (10 << 12) | 70;
+	}
+
 	wobj->money = wobj->custom_floats[0] < 0;
 	wobj->speed = fabsf(wobj->custom_floats[0]);
 	wobj->custom_floats[0] = wobj->x;
@@ -1519,6 +1533,36 @@ void WobjMovingFireHorizontal_Update(WOBJ *wobj)
 				(wobj->speed < 0.0f && wobj->vel_x > 0.0f))
 				Interaction_DestroyWobj(wobj);
 		}
+	}
+}
+void WobjMovingFire_Draw(WOBJ *wobj, int camx, int camy) {
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y - camy,
+		&(CNM_RECT){
+			.x = (((wobj->item >> 12) & 0xf) * 32) + ((Game_GetFrame() & 1) * 32),
+			.y = (wobj->item & 0xfff) * 32,
+			.w = 32,
+			.h = 32,
+		},
+		0,
+		Blocks_GetCalculatedBlockLight(((int)wobj->x + 16) / BLOCK_SIZE, ((int)wobj->y + 16) / BLOCK_SIZE),
+		0,
+		0
+	);
+
+	if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
+	{
+		CNM_RECT r;
+		Util_SetRect(&r, (int)(wobj->x + wobj->hitbox.x) - camx, (int)(wobj->y + wobj->hitbox.y) - camy,
+					 (int)wobj->hitbox.w, (int)wobj->hitbox.h);
+		Renderer_DrawRect(
+			&r,
+			Renderer_MakeColor(255, 0, 255),
+			2,
+			RENDERER_LIGHT
+		);
 	}
 }
 
