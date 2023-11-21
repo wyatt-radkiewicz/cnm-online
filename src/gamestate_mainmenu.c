@@ -21,10 +21,12 @@
 #include "savedata.h"
 #include "titlebg.h"
 #include "ending_text.h"
+#include "player.h"
 
 #define SB_START 4
 
-extern int skin_bases[10][2];
+extern int skin_bases[PLAYER_MAX_SKINS][2];
+extern const int complex_skins[PLAYER_MAX_SKINS];
 //static CNM_RECT clouds;
 static int editor_cheat = CNM_FALSE;
 //static int pressed_start;
@@ -1013,17 +1015,26 @@ void draw_player_setup(void) {
 		//int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
 		//Console_Print("%d %d", num_skins_cached, selected_skin);
 		for (int i = -1; i <= num_skins_cached + 1; i++) {
-			if (i < 0 || i >= num_skins_cached) Util_SetRect(&r2, 0, 352, 32, 32);
-			else memcpy(&r2, skin_bases[g_globalsave.skins_found[i]], sizeof(CNM_RECT));
-			r2.w = 32; r2.h = 32;
+			const int skinid = g_globalsave.skins_found[i];
+			if (i < 0 || i >= num_skins_cached) {
+				Util_SetRect(&r2, 0, 352, 32, 32);
+			} else {
+				memcpy(&r2, skin_bases[skinid], sizeof(CNM_RECT));
+				if (complex_skins[skinid]) {
+					r2.w = 40; r2.h = 40;
+				} else {
+					r2.w = 32; r2.h = 32;
+				}
+			}
 			int pos = i*(32+16) - ps_pos;
 			int t = trans2;
 			if (pos < -(32+16)) t = trans2 + (-pos - (32+16)) / 3;
 			if (pos > 32+16) t = trans2 + (pos - (32+16)) / 3;
 			if (t > 7) t = 7;
+			const int complex_offset = complex_skins[skinid] ? 4 : 0;
 			Renderer_DrawBitmap(
-				RENDERER_WIDTH / 2 - 16 + pos,
-				RENDERER_HEIGHT / 2 + 48 + 16 + (i == selected_skin ? 0 : 4),
+				RENDERER_WIDTH / 2 - 16 + pos - complex_offset,
+				RENDERER_HEIGHT / 2 + 48 + 16 + (i == selected_skin ? 0 : 4) - complex_offset,
 				&r2,
 				t,
 				i == selected_skin ? RENDERER_LIGHT : RENDERER_LIGHT + 2

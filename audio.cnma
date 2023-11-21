@@ -90,6 +90,7 @@ MODE SOUNDS
 61 sounds/fly.wav
 62 sounds/flydive.wav
 63 sounds/super_slide.wav
+64 sounds/normstomp.wav
 MODE MUSIC_VOLUME_OVERRIDE
 MODE LEVELSELECT_ORDER
 race 0

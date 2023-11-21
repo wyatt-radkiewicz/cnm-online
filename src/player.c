@@ -76,15 +76,15 @@ static const int anim_lengths[PLAYER_MAX_SKINS][PLAYER_ANIM_MAX] = {
 		0, // turn air
 	},
 	{ // skin 4
-		1, // standing
-		4, // walking
-		1, // jumping
-		1, // shooting
-		1, // melee
+		6, // standing
+		8, // walking
+		6, // jumping
+		0, // jumping1
+		2, // jumping2
 		1, // hurt
-		1, // slide
-		0, // turn walk
-		0, // turn air
+		2, // slide
+		1, // turn walk
+		1, // turn air
 	},
 	{ // skin 5
 		1, // standing
@@ -120,15 +120,15 @@ static const int anim_lengths[PLAYER_MAX_SKINS][PLAYER_ANIM_MAX] = {
 		0, // turn air
 	},
 	{ // skin 8
-		1, // standing
-		4, // walking
-		1, // jumping
-		1, // shooting
-		1, // melee
+		6, // standing
+		8, // walking
+		6, // jumping
+		0, // jumping1
+		2, // jumping2
 		1, // hurt
-		1, // slide
-		0, // turn walk
-		0, // turn air
+		2, // slide
+		1, // turn walk
+		1, // turn air
 	},
 	{ // skin 9
 		6, // standing
@@ -184,28 +184,31 @@ const int skin_bases[PLAYER_MAX_SKINS][2] =
 	{256, 1824},
 	{256, 1920-32},
 	{256, 3392},
-	{128, 1984},
+	{0, 7936},
 	{0, 1280},
 	{128, 1280},
 	{0, 768},
-	{128, 768},
-	{5, 4616},
+	{0, 8096},
+	{0, 4608},
 	{0, 7776},
 };
 static const int skin_srcbase[PLAYER_MAX_SKINS] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0,
+	7936,
+	0, 0, 0,
+	8096,
 	4608, 7776,
 };
-static const int complex_skins[PLAYER_MAX_SKINS] = {
+const int complex_skins[PLAYER_MAX_SKINS] = {
 	CNM_FALSE,
 	CNM_FALSE,
 	CNM_FALSE,
 	CNM_FALSE,
+	CNM_TRUE,
 	CNM_FALSE,
 	CNM_FALSE,
 	CNM_FALSE,
-	CNM_FALSE,
-	CNM_FALSE,
+	CNM_TRUE,
 	CNM_TRUE,
 	CNM_TRUE,
 };
@@ -860,6 +863,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
 				wobj->custom_ints[1] |= PLAYER_FLAG_STOMPING;
 				local_data->slide_jump_cooldown = 5;
+				Interaction_PlaySound(wobj, 64);
 			}
 		}
 		if (Wobj_IsGrounded(wobj)) {
