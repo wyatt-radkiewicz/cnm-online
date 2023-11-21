@@ -605,7 +605,7 @@ void Blocks_DrawBlocks(int layer, int camx, int camy)
 				Blocks_DrawBlock(sx, sy, block, light);
 			} else if (blocks_props[block].dmg_type == BLOCK_DMG_TYPE_LAVA) {
 				if (effects_layer == BLOCKS_DUMMY_EFFECTS_EX) {
-					Renderer_DrawHorzRippleEffect(&(CNM_RECT){ .x = sx, .y = sy, .w = 32, .h = 32}, 35.f, 3.5f, 0.8f);
+					Renderer_DrawHorzRippleEffect(&(CNM_RECT){ .x = sx, .y = sy, .w = 32, .h = 32}, 35.f, 3.5f, -0.8f);
 				} else {
 					Renderer_DrawVertRippleEffect(&(CNM_RECT){ .x = sx, .y = sy, .w = 32, .h = 32}, 10.f, 2.5f, 0.4f);
 				}
