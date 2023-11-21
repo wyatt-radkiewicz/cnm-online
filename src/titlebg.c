@@ -36,16 +36,16 @@ void titlebg_init(void) {
 	ai_ydir = Util_RandInt(0, 1) * 2 - 1;
 	ai_timer = Util_RandInt(5, 60);
 	ai_same_speed = 0;
-	Util_SetRect(&title_card, 0, 7104, 304, 96);
+	Util_SetRect(&title_card, 0, 0, 304, 96);
 	pos[0] = 120.0f;
 	pos[1] = 96.0f;
 	vel[0] = 10.0f;
 	vel[1] = -2.0f;
-	Util_SetRect(&player, 0, 288, 32, 32);
-	Util_SetRect(wings + 0, 256, 3088, 48, 48);
-	Util_SetRect(wings + 1, 256+48, 3088, 48, 48);
-	Util_SetRect(wings + 2, 0,  7056, 48, 48);
-	Util_SetRect(wings + 3, 48, 7056, 48, 48);
+	Util_SetRect(&player, 384, 96, 32, 32);
+	Util_SetRect(wings + 0, 288+48, 0, 48, 48);
+	Util_SetRect(wings + 1, 288+48, 48, 48, 48);
+	Util_SetRect(wings + 2, 288,  96, 48, 48);
+	Util_SetRect(wings + 3, 288+48, 96, 48, 48);
 
 	_cam_list_len = 0;
 	_next_cam_target = 1;
@@ -214,7 +214,7 @@ void titlebg_draw(void(*mid_callback)(void)) {
 	Renderer_SaveToEffectsBuffer();
 	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS_EX, (int)_camx, (int)(_camy - 0.5f));
 
-	Util_SetRect(&player, 40 + ((Game_GetFrame() % 2) * 40), 4688, 40, 40);
+	Util_SetRect(&player, 224 + ((Game_GetFrame() % 2) * 32), 144, 32, 32);
 	int hflip = vel[0] < 0.0f;
 	if (vel[1] > 3.0f) {
 		Renderer_DrawBitmap2((int)pos[0] - 8, (int)pos[1] - 8, wings + 2 + (Game_GetFrame() / 3 % 2), 2, RENDERER_LIGHT, hflip, 0);

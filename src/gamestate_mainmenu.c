@@ -25,7 +25,21 @@
 
 #define SB_START 4
 
-extern int skin_bases[PLAYER_MAX_SKINS][2];
+//extern int skin_bases[PLAYER_MAX_SKINS][2];
+static const int skin_bases[PLAYER_MAX_SKINS][2] =
+{
+	{0, 96},
+	{32, 96},
+	{64, 96},
+	{96, 96},
+	{96, 160},
+	{32, 128},
+	{64, 128},
+	{0, 128},
+	{144, 160},
+	{0, 160},
+	{48, 160},
+};
 extern const int complex_skins[PLAYER_MAX_SKINS];
 //static CNM_RECT clouds;
 static int editor_cheat = CNM_FALSE;
@@ -845,28 +859,28 @@ void draw_main_gui_bars(void) {
 	const int yheight = 160;
 	int idx = options_num - 5;
 	//Console_Print("%d", options_num);
-	Util_SetRect(&r, 384, 7104, 128, 32);
+	Util_SetRect(&r, 384, 0, 128, 32);
 	for (int i = -1; i < yheight/r.h+2; i++) {
-		Util_SetRect(&r, 384, 7104, 128, 32);
+		Util_SetRect(&r, 384, 0, 128, 32);
 		Renderer_DrawBitmap(-r.w + side_xstart + i*32 + left_disp, RENDERER_HEIGHT-yheight + i*32 + left_disp, &r, 2, RENDERER_LIGHT);
 		if (idx >= 0 && idx < sizeof(option_names)/sizeof(*option_names)) {
 			int center = strlen(option_names[idx]) * 8 / 2;
-			if (idx != options_num) Renderer_SetFont(384, 1264, 8, 8);
-			else Renderer_SetFont(384, 448, 8, 8);
+			if (idx != options_num) Renderer_SetFont(288, 544, 8, 8);
+			else Renderer_SetFont(288, 416, 8, 8);
 			Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - yheight + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx]);
 			if (idx == options_num) {
 				int w = r.w;
-				Util_SetRect(&r, 376-24, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+				Util_SetRect(&r, 312-24, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 				Renderer_DrawBitmap(-w + side_xstart + i*32 + left_disp + (w / 2 - center) - 12, RENDERER_HEIGHT - yheight + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT);
-				Util_SetRect(&r, 376-24, 1264 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
+				Util_SetRect(&r, 312-24, 608 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
 				Renderer_DrawBitmap2(-w + side_xstart + i*32 + left_disp + (w / 2 + center) , RENDERER_HEIGHT - yheight + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 			}
 		}
 		idx++;
 	}
 
-	Util_SetRect(&r, 400, 7136, 112, 48);
-	Renderer_SetFont(384, 448, 8, 8);
+	Util_SetRect(&r, 400, 32, 112, 48);
+	Renderer_SetFont(288, 416, 8, 8);
 	Renderer_DrawBitmap2(side_blob_x, RENDERER_HEIGHT-48, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 	int text_off = 12;
 	if (help_text_lines[options_num] == 3) text_off += 6;
@@ -902,7 +916,7 @@ static void DrawHealthBar(int x, int y, int w, int trans2) {
 	for (; w > 0; w -= 32) {
 		int ww = w;
 		if (ww > 32) ww = 32;
-		Util_SetRect(&r, 256 + (fine % 32), 3936 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
+		Util_SetRect(&r, 288 + (fine % 32), 144 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
 		Renderer_DrawBitmap(x+xoff, y, &r, trans2, RENDERER_LIGHT);
 		xoff += 32;
 	}
@@ -912,13 +926,32 @@ static float curr_audio = 0.0f;
 static char joingame_buf[32];
 static int return_rect, quit_rect;
 static int return_rects[][2] = {
-	{ 6, 4616 }, { 0, 6368, }, { 288, 6368, }, { 192, 6368, }, { 224, 6368, },
-	{ 256, 3392, }, { 96, 448, }, { 160, 736, },
+	{ 480, 480 + ( 32 * 0 ) },
+	{ 480, 480 + ( 32 * 1 ) },
+	{ 480, 480 + ( 32 * 2 ) },
+	{ 480, 480 + ( 32 * 3 ) },
+	{ 480, 480 + ( 32 * 4 ) },
+	{ 480, 480 + ( 32 * 5 ) },
+	{ 480, 480 + ( 32 * 6 ) },
+	{ 480, 480 + ( 32 * 7 ) },
+	//{ 6, 4616 }, { 0, 6368, }, { 288, 6368, }, { 192, 6368, }, { 224, 6368, },
+	//{ 256, 3392, }, { 96, 448, }, { 160, 736, },
 };
 static int quit_rects[][2] = {
-	{ 416, 2208 }, { 288, 1536, }, { 416, 1456, }, { 327, 1088, }, { 384, 416, },
-	{ 64, 256, }, { 256, 416, }, { 192, 736, },
-	{ 384, 2208, }, { 173, 2443, }, { 52, 6469, },
+	{ 416, 480 + ( 32 * 0 ) },
+	{ 416, 480 + ( 32 * 1 ) },
+	{ 416, 480 + ( 32 * 2 ) },
+	{ 416, 480 + ( 32 * 3 ) },
+	{ 416, 480 + ( 32 * 4 ) },
+	{ 416, 480 + ( 32 * 5 ) },
+	{ 416, 480 + ( 32 * 6 ) },
+	{ 416, 480 + ( 32 * 7 ) },
+	{ 416, 480 + ( 32 * 8 ) },
+	{ 448, 480 + ( 32 * 0 ) },
+	{ 448, 480 + ( 32 * 1 ) },
+	//{ 416, 2208 }, { 288, 1536, }, { 416, 1456, }, { 327, 1088, }, { 384, 416, },
+	//{ 64, 256, }, { 256, 416, }, { 192, 736, },
+	//{ 384, 2208, }, { 173, 2443, }, { 52, 6469, },
 };
 static int selected_skin, num_skins_cached;
 static const char *skin_names[] = {
@@ -983,8 +1016,8 @@ void draw_player_setup(void) {
 		ystart = -48;
 		height = 4;
 	}
-	Util_SetRect(&r, 400, 7136, 112, 48);
-	Util_SetRect(&r2, 400, 7168, 112, 16);
+	Util_SetRect(&r, 400, 32, 112, 48);
+	Util_SetRect(&r2, 400, 64, 112, 16);
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 	for (int i = 0; i < height; i++) {
@@ -1009,7 +1042,7 @@ void draw_player_setup(void) {
 		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+12, trans2, RENDERER_LIGHT, "NAME: ");
 		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+12+12, trans2, RENDERER_LIGHT, "SKIN: ");
 		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 12-16 - (8*strlen(skin_names[g_globalsave.skins_found[selected_skin]])), RENDERER_HEIGHT / 2 + 16 + 12+12+12, trans2, RENDERER_LIGHT, skin_names[g_globalsave.skins_found[selected_skin]]);
-		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Util_SetRect(&r2, 312, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
 		int ralign = r.w - 20 - 16 * 8;
 		gui_text_box_draw(&ps_player_name, ps_selected == 0, RENDERER_WIDTH / 2 + ralign, RENDERER_HEIGHT / 2 + 40, trans2);
@@ -1019,7 +1052,7 @@ void draw_player_setup(void) {
 		for (int i = -1; i <= num_skins_cached + 1; i++) {
 			const int skinid = g_globalsave.skins_found[i];
 			if (i < 0 || i >= num_skins_cached) {
-				Util_SetRect(&r2, 0, 352, 32, 32);
+				Util_SetRect(&r2, 416, 160, 32, 32);
 			} else {
 				memcpy(&r2, skin_bases[skinid], sizeof(CNM_RECT));
 				if (complex_skins[skinid]) {
@@ -1055,13 +1088,13 @@ void draw_player_setup(void) {
 			(Game_GetVar(GAME_VAR_HIRESMODE)->data.integer ? "YES" : " NO"));
 
 		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*3), trans2, RENDERER_LIGHT, "VOLUME: ");
-		Util_SetRect(&r2, 72, 4324, 85, 9);
+		Util_SetRect(&r2, 296, 180, 85, 9);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 + r.w - 20 - r2.w, RENDERER_HEIGHT / 2 + 16 + 12+(12*3) - 1, &r2, trans2, RENDERER_LIGHT);
 		curr_audio += (Audio_GetGlobalVolume() - curr_audio) * 0.5f;
 		DrawHealthBar(RENDERER_WIDTH / 2 + r.w - 20 - r2.w + 2, RENDERER_HEIGHT / 2 + 16 + 12+(12*3) + 1, 81.0f * curr_audio, trans2);
 		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*4), trans2, RENDERER_LIGHT, "MS. IP: ");
 		gui_text_box_draw(&options_mserv, ps_selected == 3, RENDERER_WIDTH / 2 + r.w - 20 - (14 * 8), RENDERER_HEIGHT / 2 + 16 + 12+(12*4), trans2);
-		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Util_SetRect(&r2, 312, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
 	}
 
@@ -1070,8 +1103,8 @@ void draw_player_setup(void) {
 		for (int i = -4; i < num_bgs + 4; i++) {
 			const char *str = "????";
 			if (i > -1 && i < num_bgs) str = bgs[i];
-			if (i < 0 || i >= num_bgs || bgids[i] != g_globalsave.titlebg) Renderer_SetFont(384, 1264, 8, 8);
-			else Renderer_SetFont(384, 448, 8, 8);
+			if (i < 0 || i >= num_bgs || bgids[i] != g_globalsave.titlebg) Renderer_SetFont(288, 544, 8, 8);
+			else Renderer_SetFont(288, 416, 8, 8);
 			const int center = RENDERER_HEIGHT / 2 + 16 + (12 * 4 + 2);
 			int y = center - ps_pos + (i * 12);
 			int trans3 = trans2;
@@ -1081,7 +1114,7 @@ void draw_player_setup(void) {
 			Renderer_DrawText(RENDERER_WIDTH / 2 - (strlen(str)*4), y, trans3, RENDERER_LIGHT, str);
 			if (ps_selected == i) {
 				const int isblue = (i > -1 && i < num_bgs && bgids[i] == g_globalsave.titlebg) * 24;
-				Util_SetRect(&r2, 376-isblue, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+				Util_SetRect(&r2, 312-isblue, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 				Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - (strlen(str)*4) - 12, y, &r2, trans2, RENDERER_LIGHT, 0, 0);
 				Renderer_DrawBitmap2(RENDERER_WIDTH / 2 + (strlen(str)*4) + 4, y, &r2, trans2, RENDERER_LIGHT, 1, 0);
 			}
@@ -1092,7 +1125,7 @@ void draw_player_setup(void) {
 		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*11-4, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "JOIN GAME BY IP ADDRESS");
 		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*2), trans2, RENDERER_LIGHT, "IP: ");
 		gui_text_box_draw(&options_mserv, ps_selected == 0, RENDERER_WIDTH / 2 + r.w - 20 - (14 * 8), RENDERER_HEIGHT / 2 + 16 + 12+(12*2), trans2);
-		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Util_SetRect(&r2, 312, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 12+(12*2) + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
 	}
 
@@ -1100,7 +1133,7 @@ void draw_player_setup(void) {
 		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*11-4, RENDERER_HEIGHT / 2 - 48 + 12, trans2, RENDERER_LIGHT, "HOST A MULTIPLAYER GAME");
 		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 48 + 12+12, trans2, RENDERER_LIGHT, "NAME: ");
 		gui_text_box_draw(&options_mserv, ps_selected == 0, RENDERER_WIDTH / 2 + r.w - 20 - (17 * 8), RENDERER_HEIGHT / 2 - 48 + 12+(12*1), trans2);
-		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Util_SetRect(&r2, 312, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 		if (ps_selected >= 4) r2.x -= 24;
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 - 48 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
 		
@@ -1121,7 +1154,7 @@ void draw_player_setup(void) {
 
 		//int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
 		for (int i = -1; i <= num_lvls+1; i++) {
-			if (i < 0 || i >= num_lvls) Util_SetRect(&r2, 416, 7200, 96, 64);
+			if (i < 0 || i >= num_lvls) Util_SetRect(&r2, 416, 96, 96, 64);
 			else memcpy(&r2, FileSystem_GetLevelPreview(Filesystem_GetLevelIdFromFileName(g_globalsave.levels_found[i])), sizeof(CNM_RECT));
 			//r2.w = 96; r2.h = 64;
 			int pos = i*(96+16) - ps_pos;
@@ -1158,12 +1191,12 @@ void draw_player_setup(void) {
 		if (ps_selected == 1) posx = RENDERER_WIDTH / 2 + r.w - 20 - (8*6) - 10;
 		quit_posx += (posx - quit_posx) * 0.75f;
 
-		Util_SetRect(&r2, 376-24, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+		Util_SetRect(&r2, 312-24, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 		Renderer_DrawBitmap(quit_posx, y, &r2, trans2, RENDERER_LIGHT);
-		Util_SetRect(&r2, 376-24, 1264 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
+		Util_SetRect(&r2, 312-24, 608 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
 		Renderer_DrawBitmap2(quit_posx + (8*7) + 4, y, &r2, trans2, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 
-		Util_SetRect(&r2, 400, 7264, 32+8, 32+8);
+		Util_SetRect(&r2, 240, 96, 32+8, 32+8);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 20 + (8*3) - 20, y + 16, &r2, trans2, RENDERER_LIGHT);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 + r.w - 20 - (8*3) - 20, y + 16, &r2, trans2, RENDERER_LIGHT);
 		r2.w = 32; r2.h = 32;
@@ -1192,8 +1225,8 @@ static int saves_add_y, levels_add_y;
 static void draw_save_card(int slotx, int basey, int trans, int *out_light, int *out_basex) {
 	CNM_RECT r, r2;
 
-	Util_SetRect(&r, 456, 7136, 56, 48);
-	Util_SetRect(&r2, 456, 7168, 56, 16);
+	Util_SetRect(&r, 456, 32, 56, 48);
+	Util_SetRect(&r2, 456, 64, 56, 16);
 
 	const int basex = RENDERER_WIDTH / 2 + slotx*SAVE_SLOT_EXTENT - ps_pos;
 	int light = RENDERER_LIGHT;
@@ -1225,11 +1258,11 @@ static void draw_delete_bars(int basex, int basey, int trans2) {
 
 	int x = basex - width / 2;
 	int yoff = (int)(sinf((float)Game_GetFrame() / 20)*3.0f);
-	Util_SetRect(&r2, 480, 7264, 4, 16);
+	Util_SetRect(&r2, 480, 160, 4, 16);
 	Renderer_DrawBitmap2(x, basey - 8 - yoff, &r2, trans3, light, CNM_FALSE, CNM_FALSE);
 	Renderer_DrawBitmap2(x, basey + 48*3 - 8 + yoff, &r2, trans3, light, CNM_FALSE, CNM_TRUE);
 	CNM_RECT r3;
-	Util_SetRect(&r3, 496, 7264+((Game_GetFrame() / 2) % 7)*16, 16, 16);
+	Util_SetRect(&r3, 496, 160+((Game_GetFrame() / 2) % 7)*16, 16, 16);
 	x += r2.w;
 	int width_left = width - r2.w;
 	for (; width_left >= 16; width_left -= 16) {
@@ -1284,7 +1317,7 @@ void draw_play_gui_nologic(void) {
 	//Util_SetRect(&r, 256, 7328, 112, 192);
 	//Renderer_DrawBitmap(playbit1_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
 
-	Util_SetRect(&r, 400-16, 7136, 128, 48);
+	Util_SetRect(&r, 400-16, 32, 128, 48);
 	char text[16];
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, completion_basey, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, completion_basey, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
@@ -1318,11 +1351,11 @@ void draw_play_gui_nologic(void) {
 			int id = Filesystem_GetLevelIdFromFileName(g_globalsave.levels_found[(Game_GetFrame() / 15) % gs_numlvls]);
 			if (lvlselect_mode) id = -1;
 			int flip = (id == -1) ? Game_GetFrame() % 2 == 0 : 0;
-			if (id == -1) Util_SetRect(&r2, 416, 7200, 96, 64);
+			if (id == -1) Util_SetRect(&r2, 416, 96, 96, 64);
 			else memcpy(&r2, FileSystem_GetLevelPreview(id), sizeof(r2));
 			Renderer_DrawBitmap2(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + (12*3), &r2, trans2, light, flip, CNM_FALSE);
 			if (lvlselect_mode) {
-				Util_SetRect(&r2, 448, 7296, 32, 32);
+				Util_SetRect(&r2, 448, 192, 32, 32);
 				Renderer_DrawBitmap2(
 					basex - SAVE_SLOT_WIDTH / 2 + 8 + 48 - 16,
 					basey + (12*3) + 32 - 16 + (int)(sinf((float)Game_GetFrame() / 10.0f)*4.0f),
@@ -1354,7 +1387,7 @@ void draw_play_gui_nologic(void) {
 		}
 
 		if (slot == SAVE_SLOTS) {
-			Util_SetRect(&r2, 448, 7264, 32, 32);
+			Util_SetRect(&r2, 448, 160, 32, 32);
 			Renderer_DrawBitmap2(
 				basex - 16,
 				basey + 88 - 16 + (int)(sinf((float)Game_GetFrame() / 10.0f)*4.0f),
@@ -1368,7 +1401,7 @@ void draw_play_gui_nologic(void) {
 
 		int id = Filesystem_GetLevelIdFromFileName(g_saves[slot].level);
 		int flip = (id == -1) ? Game_GetFrame() % 2 == 0 : 0;
-		if (id == -1) Util_SetRect(&r2, 416, 7200, 96, 64);
+		if (id == -1) Util_SetRect(&r2, 416, 96, 96, 64);
 		else memcpy(&r2, FileSystem_GetLevelPreview(id), sizeof(r2));
 		const char *lvlname = id == -1 ? "NEW SAVE" : FileSystem_GetLevelName(id);
 		Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + (12*2), trans2, light, lvlname);
@@ -1706,7 +1739,7 @@ void draw_press_start(void) {
 
 	gui_timer++;
 	if ((gui_timer / 15) % 2 == 0) {
-		Util_SetRect(&r, 432-32, 7184, 112, 16);
+		Util_SetRect(&r, 432-32, 80, 112, 16);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - (r.w/2), RENDERER_HEIGHT / 2 + 96, &r, 0, RENDERER_LIGHT);
 	}
 
@@ -1963,6 +1996,7 @@ void draw_options_gui(void) {
 }
 
 void draw_new_gui(void) {
+	Renderer_SetFont(288, 416, 8, 8);
 	ps_trans--;
 	ss_trans--;
 	switch (gui_state) {

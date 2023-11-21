@@ -533,7 +533,7 @@ void Blocks_GetBlockDrawRect(BLOCK block, CNM_RECT *src)
 void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 {
 	CNM_RECT src;
-	if (block < 0 || block > 4095)
+	if (block < 1 || block > 4095)
 		return;
 	Blocks_GetBlockDrawRect(block, &src);
 #ifdef DEBUG

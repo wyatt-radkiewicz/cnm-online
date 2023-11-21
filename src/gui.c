@@ -176,7 +176,7 @@ void Gui_Draw(void)
 	{
 		/* Draw arrow going up */
 		y = gui_frame->props.top - 14;
-		Util_SetRect(&src, 360, 1288, 16, 8);
+		Util_SetRect(&src, 296, 632, 16, 8);
 		Renderer_DrawBitmap(arrow_pos, y, &src, 0, RENDERER_LIGHT);
 	}
 	for (i = 0, y = gui_frame->props.top - gui_frame->cam_index * 8; i < gui_frame->num_elements; i++, y += 8)
@@ -185,25 +185,25 @@ void Gui_Draw(void)
 			break;
 
 		if (!gui_frame->elements[i].active)
-			Renderer_SetFont(384, 1264, 8, 8);
+			Renderer_SetFont(288, 544, 8, 8);
 		if (i >= gui_frame->cam_index)
 			Gui_GenericDraw(i, gui_frame->elements + i, y, &left);
 		if (gui_frame->elements[i].draw != NULL)
 			gui_frame->elements[i].draw(i, gui_frame->elements + i, y);
 		if (!gui_frame->elements[i].active)
-			Renderer_SetFont(384, 448, 8, 8);
+			Renderer_SetFont(288, 416, 8, 8);
 
 		if (i == gui_frame->active_index && gui_frame->elements[i].type && i >= gui_frame->cam_index)
 		{
 			/* Draw selecting pointer */
 			if (gui_frame->editing)
 			{
-				Util_SetRect(&src, 352, (Game_GetFrame() / 3) % 6 * 8 + 1264, 8, 8);
+				Util_SetRect(&src, 288, (Game_GetFrame() / 3) % 6 * 8 + 608, 8, 8);
 				Renderer_DrawBitmap(left - 10, y, &src, 0, RENDERER_LIGHT);
 			}
 			else
 			{
-				Util_SetRect(&src, 376, (Game_GetFrame() / 3) % 6 * 8 + 1264, 8, 8);
+				Util_SetRect(&src, 312, (Game_GetFrame() / 3) % 6 * 8 + 608, 8, 8);
 				Renderer_DrawBitmap(left - 14, y, &src, 0, RENDERER_LIGHT);
 			}
 		}
@@ -212,7 +212,7 @@ void Gui_Draw(void)
 	{
 		/* Draw arrow going down */
 		y = (gui_frame->props.top + gui_frame->props.line_count * 8) + 6;
-		Util_SetRect(&src, 360, 1280, 16, 8);
+		Util_SetRect(&src, 296, 624, 16, 8);
 		Renderer_DrawBitmap(arrow_pos, y, &src, 0, RENDERER_LIGHT);
 	}
 }

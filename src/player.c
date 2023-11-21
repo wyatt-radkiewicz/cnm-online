@@ -178,7 +178,7 @@ static const int anim_offsets[PLAYER_ANIM_MAX][6][2] =
 		{64, 32}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	},
 };
-const int skin_bases[PLAYER_MAX_SKINS][2] =
+static const int skin_bases[PLAYER_MAX_SKINS][2] =
 {
 	{128, 1824},
 	{256, 1824},

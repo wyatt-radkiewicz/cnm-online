@@ -1036,7 +1036,9 @@
           "vertical": true,
           "dist": 74,
           "speed": 1.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -1057,7 +1059,9 @@
           "vertical": true,
           "dist": 74,
           "speed": 1.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -1078,7 +1082,9 @@
           "vertical": true,
           "dist": 74,
           "speed": 1.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -1099,7 +1105,9 @@
           "vertical": true,
           "dist": 74,
           "speed": 1.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -1120,7 +1128,9 @@
           "vertical": true,
           "dist": 74,
           "speed": 1.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -1141,7 +1151,9 @@
           "vertical": true,
           "dist": 74,
           "speed": 1.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -15832,6 +15844,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -15852,6 +15865,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -15872,6 +15886,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -15892,6 +15907,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -15912,6 +15928,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -15964,6 +15981,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -16016,6 +16034,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -16036,6 +16055,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -16056,6 +16076,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -16076,6 +16097,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -16096,6 +16118,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -16144,6 +16167,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -16164,6 +16188,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -16212,6 +16237,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -16232,6 +16258,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -16252,6 +16279,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -16272,6 +16300,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -16292,6 +16321,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -16312,6 +16342,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -16332,6 +16363,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -16352,6 +16384,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -16372,6 +16405,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -16392,6 +16426,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -16412,6 +16447,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -16432,6 +16468,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 91,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -16468,6 +16505,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -16488,6 +16526,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -16508,6 +16547,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -16528,6 +16568,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -16548,6 +16589,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -16568,6 +16610,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -16588,6 +16631,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -16608,6 +16652,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -16628,6 +16673,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -16648,6 +16694,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -16668,6 +16715,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -16688,6 +16736,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -16708,6 +16757,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -16756,6 +16806,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -16776,6 +16827,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -16796,6 +16848,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -16816,6 +16869,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -16836,6 +16890,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -16856,6 +16911,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -16876,6 +16932,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -16896,6 +16953,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -16948,6 +17006,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -17000,6 +17059,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -17020,6 +17080,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -17040,6 +17101,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -17060,6 +17122,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -17084,6 +17147,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -17108,6 +17172,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -17132,6 +17197,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -17156,6 +17222,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 2,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -17196,6 +17263,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 90,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -17228,6 +17296,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -17248,6 +17317,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -17268,6 +17338,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -17288,6 +17359,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -17308,6 +17380,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -17328,6 +17401,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -17348,6 +17422,7 @@
       "transparency": 4,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -17368,6 +17443,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -17388,6 +17464,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -17436,6 +17513,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -17456,6 +17534,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -17476,6 +17555,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -17496,6 +17576,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -17516,6 +17597,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -17564,6 +17646,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -17612,6 +17695,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -17632,6 +17716,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -17680,6 +17765,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -17728,6 +17814,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -17776,6 +17863,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -17796,6 +17884,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -17844,6 +17933,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -17864,6 +17954,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -17884,6 +17975,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -17904,6 +17996,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -17924,6 +18017,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -17944,6 +18038,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -17964,6 +18059,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -17984,6 +18080,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -18004,6 +18101,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -18024,6 +18122,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -18044,6 +18143,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -18066,6 +18166,7 @@
         "Spikes": 80
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -18086,6 +18187,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -18106,6 +18208,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -18154,6 +18257,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -18176,6 +18280,7 @@
         "Quicksand": 1
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -18224,6 +18329,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -18244,6 +18350,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -18264,6 +18371,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 7,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -18288,6 +18396,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -18318,6 +18427,7 @@
         "Lava": -32
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -18340,6 +18450,7 @@
         "Spikes": -12
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -18360,6 +18471,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -18380,6 +18492,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 150,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -18408,6 +18521,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 177,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -18432,6 +18546,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -18452,6 +18567,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -18472,6 +18588,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -18492,6 +18609,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           1,
@@ -18512,6 +18630,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -18532,6 +18651,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 46,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -18556,6 +18676,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 71,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -18580,6 +18701,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 3,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -18648,6 +18770,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -18668,6 +18791,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -18688,6 +18812,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -18708,6 +18833,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -18728,6 +18854,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -18748,6 +18875,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           13,
@@ -18768,6 +18896,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -18788,6 +18917,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -18808,6 +18938,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -18828,6 +18959,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -18850,6 +18982,7 @@
         "Spikes": 6
       },
       "anim_speed": 3,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -18900,6 +19033,7 @@
         "Spikes": -1
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -18924,6 +19058,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -18944,6 +19079,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 3,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -18968,6 +19104,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 6,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -18992,6 +19129,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 2,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -19018,6 +19156,7 @@
         "Spikes": 1
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -19044,6 +19183,7 @@
         "Spikes": -452
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -19064,6 +19204,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 12,
+      "angle": 0,
       "frames": [
         [
           2,
@@ -19088,6 +19229,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -19108,6 +19250,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -19144,6 +19287,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 5,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -19188,6 +19332,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 8,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -19212,6 +19357,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 3,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -19264,10 +19410,11 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           0,
-          0
+          5
         ]
       ],
       "collision_data": {
@@ -19286,6 +19433,7 @@
         "Lava": 0
       },
       "anim_speed": 6,
+      "angle": 0,
       "frames": [
         [
           0,
@@ -19334,6 +19482,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -19354,6 +19503,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -19374,6 +19524,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -19394,6 +19545,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -19414,6 +19566,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -19434,6 +19587,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -19454,6 +19608,7 @@
       "transparency": 4,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -19474,6 +19629,7 @@
       "transparency": 4,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -19494,6 +19650,7 @@
       "transparency": 4,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -19514,6 +19671,7 @@
       "transparency": 4,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           5,
@@ -19534,6 +19692,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           3,
@@ -19554,6 +19713,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -19574,6 +19734,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 3,
+      "angle": 0,
       "frames": [
         [
           4,
@@ -19602,6 +19763,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -19650,6 +19812,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -19700,6 +19863,7 @@
         "Lava": 0
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -19720,6 +19884,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           12,
@@ -19740,6 +19905,7 @@
       "transparency": 4,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -19760,6 +19926,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           15,
@@ -19782,6 +19949,7 @@
         "Spikes": -1
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -19804,6 +19972,7 @@
         "Quicksand": 0
       },
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -19824,6 +19993,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -19844,6 +20014,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           6,
@@ -19864,6 +20035,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           8,
@@ -19884,6 +20056,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           7,
@@ -19904,6 +20077,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           9,
@@ -19924,6 +20098,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           14,
@@ -19944,6 +20119,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           11,
@@ -19964,6 +20140,7 @@
       "transparency": 0,
       "damage_type": "None",
       "anim_speed": 1,
+      "angle": 0,
       "frames": [
         [
           10,
@@ -20197,7 +20374,7 @@
     },
     {
       "origin": [
-        4279.0,
+        2124.0,
         96.0
       ],
       "scroll_speed": [
