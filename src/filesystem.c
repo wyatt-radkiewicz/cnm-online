@@ -227,7 +227,11 @@ int Filesystem_GetLevelType(int level) {
 #if defined(__unix__) || defined(__APPLE__) || defined(__MINGW32__)
 
 #include <dirent.h>
+#include <unistd.h>
 
+int Filesystem_FileExist(const char *filepath) {
+	return access(filepath, F_OK) == 0;
+}
 void FileSystem_SearchForLevels(int clear_level_list)
 {
     num_levels = 0;
@@ -281,6 +285,14 @@ void FileSystem_SearchForLevels(int clear_level_list)
 #elif defined(_WIN32)
 
 #include <windows.h>
+#include <io.h>
+//#define F_OK 0
+//#define access _access
+
+int Filesystem_FileExist(const char *filepath) {
+	return _access(filepath, 0) == 0;
+}
+
 void FileSystem_SearchForLevels(int clear_level_list)
 {
 	num_levels = 0;

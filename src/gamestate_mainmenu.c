@@ -311,6 +311,8 @@ static void scan_and_play_music(void) {
 static void swap_title_bg(const char *lvl) {
 	char pathbuf[32];
 
+	// Load in the graphics for the level
+	Serial_LoadLevelGfx(lvl);
 	sprintf(pathbuf, "%s.cnmb", lvl);
 	Serial_LoadBlocks(pathbuf);
 	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS);

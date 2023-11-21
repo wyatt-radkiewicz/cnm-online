@@ -535,3 +535,14 @@ static int Serial_GetWriteLParser(const char *cnm_file, LParse **lp) {
 	*lp = lparse_open_from_file(fp, lparse_write);
 	return 1;
 }
+void Serial_LoadLevelGfx(const char *level_path) {
+	char buf[48];
+	sprintf(buf, "%s.bmp", level_path);
+	if (Filesystem_FileExist(buf)) {
+		Renderer_LoadBitmap(buf);
+	} else {
+		Console_Print("warning: loading gfx.bmp for levels is depricated. It is only used for palette info now");
+		Renderer_LoadBitmap("gfx.bmp");
+	}
+}
+

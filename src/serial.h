@@ -22,5 +22,6 @@ void Serial_SaveSpawners(const char *cnms_file);
 void Serial_LoadAudioCfg(const char *cnma_file);
 void Serial_SaveConfig(void);
 void Serial_LoadConfig(void);
+void Serial_LoadLevelGfx(const char *level_path);
 
 #endif

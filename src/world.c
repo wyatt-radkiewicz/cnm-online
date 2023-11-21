@@ -75,6 +75,9 @@ void World_Start(int mode)
 	// Force unused save slot if in nosave mode
 	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) g_current_save = SAVE_SLOTS;
 
+	// Load in the graphics for the level
+	Serial_LoadLevelGfx(Game_GetVar(GAME_VAR_LEVEL)->data.string);
+
 	// Make sure the player is the first thing created as some other entities might depend on it for creation
 	PlayerSpawns_SetMode(PLAYER_SPAWN_TYPE_NORMAL_MODES);
 	player = Wobj_CreateOwned(WOBJ_PLAYER, 0.0f, 0.0f, Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer, 0.0f);
