@@ -79,6 +79,7 @@ void World_Start(int mode)
 	PlayerSpawns_SetMode(PLAYER_SPAWN_TYPE_NORMAL_MODES);
 	player = Wobj_CreateOwned(WOBJ_PLAYER, 0.0f, 0.0f, Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer, 0.0f);
 	Interaction_SetClientPlayerWObj(player);
+	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) Player_TryTitlePopup();
 
 	// Updating and getting world variables
 	Game_GetVar(GAME_VAR_PLAYER)->data.pointer = player;

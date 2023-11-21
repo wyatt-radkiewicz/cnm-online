@@ -119,6 +119,12 @@ int Filesystem_GetLevelIdFromFileName(const char *level) {
 	}
 	return id;
 }
+int Filesystem_LevelIDToLevelOrderNum(int id) {
+	for (int i = 0; i < num_levels; i++) {
+		if (level_order[i] == id) return i;
+	}
+	return -1;
+}
 
 void FileSystem_Init(void)
 {

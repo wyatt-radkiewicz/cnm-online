@@ -71,6 +71,7 @@ int Filesystem_GetLevelIdFromFileName(const char *level);
 int Filesystem_GetNumTitleLevels(void);
 int Filesystem_IsLevelSecret(int level);
 int Filesystem_GetLevelType(int level);
+int Filesystem_LevelIDToLevelOrderNum(int id);
 
 void FileSystem_Init(void);
 void FileSystem_RegisterGfx(const char *bmp_file);

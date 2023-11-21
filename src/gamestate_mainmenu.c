@@ -20,6 +20,7 @@
 #include "background.h"
 #include "savedata.h"
 #include "titlebg.h"
+#include "ending_text.h"
 
 #define SB_START 4
 
@@ -39,6 +40,7 @@ enum gui_state {
 	GUI_BROWSE_STATE,
 	GUI_PLAY_STATE,
 	GUI_QUIT_STATE,
+	GUI_TITLEBG_STATE,
 };
 
 
@@ -292,6 +294,32 @@ static void JoinGameBrowserCallback(GUI_ELEMENT *elem, int index)
 
 static void MainMenu_OnPacket(NET_PACKET *packet);
 
+static void scan_and_play_music(void) {
+	SPAWNER *iter = Spawners_Iterate(NULL);
+	while (iter) {
+		if (iter->wobj_type == WOBJ_SMALL_TUNES_TRIGGER ||
+			iter->wobj_type == WOBJ_VERYBIG_TUNES_TRIGGER ||
+			iter->wobj_type == WOBJ_BIG_TUNES_TRIGGER) {
+			Audio_PlayMusic(iter->custom_int, CNM_TRUE);	
+			break;
+		}
+		iter = Spawners_Iterate(iter);
+	}
+}
+static void swap_title_bg(const char *lvl) {
+	char pathbuf[32];
+
+	sprintf(pathbuf, "%s.cnmb", lvl);
+	Serial_LoadBlocks(pathbuf);
+	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS);
+	sprintf(pathbuf, "%s.cnms", lvl);
+	Serial_LoadSpawners(pathbuf);
+	scan_and_play_music();
+
+	titlebg_cleanup();
+	titlebg_init();
+}
+
 void GameState_MainMenu_Init(void)
 {
 	GUI_FRAME_PROPS props;
@@ -454,7 +482,7 @@ void GameState_MainMenu_Init(void)
 
 	Net_AddPollingFunc(MainMenu_OnPacket);
 
-	Audio_PlayMusic(2, CNM_FALSE);
+	//Audio_PlayMusic(2, CNM_FALSE);
 	
 	int num_title_levels = Filesystem_GetNumTitleLevels();
 	if (!num_title_levels) {
@@ -463,20 +491,22 @@ void GameState_MainMenu_Init(void)
 		Game_Stop();
 		return;
 	}
-	int title_level = Util_RandInt(0, num_title_levels);
+	//int title_level = Util_RandInt(0, num_title_levels);
 	char pathbuf[32];
-
-	sprintf(pathbuf, "levels/_title%d.cnmb", title_level);
-	Serial_LoadBlocks(pathbuf);
-	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS);
-	sprintf(pathbuf, "levels/_title%d.cnms", title_level);
-	Serial_LoadSpawners(pathbuf);
+	sprintf(pathbuf, "levels/_title%d", g_globalsave.titlebg);
+	swap_title_bg(pathbuf);
+	cleanup_bg = CNM_TRUE;
+	//Serial_LoadBlocks(pathbuf);
+	//Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS);
+	//sprintf(pathbuf, "levels/_title%d.cnms", title_level);
+	//Serial_LoadSpawners(pathbuf);
+	//scan_and_play_music();
 
 	gui_state = GUI_PRESS_START;
 	last_gui_state = GUI_PRESS_START;
 
-	titlebg_init();
-	cleanup_bg = CNM_TRUE;
+	//titlebg_init();
+	//cleanup_bg = CNM_TRUE;
 	playbit0_x = playbit1_x = -1000;
 	globalsave_save(&g_globalsave);
 	//pressed_start = CNM_FALSE;
@@ -689,10 +719,11 @@ static const char *option_names[] = {
 	"JOIN GAME",
 	"HOST GAME",
 	"BROWSE GAME",
+	"TITLE BG",
 	"SEE YA MAN",
 };
 static int help_text_lines[] = {
-	4, 4, 4, 3, 3, 4, 2,
+	4, 4, 4, 3, 3, 4, 3, 2,
 };
 static const char *help_text[][4] = {
 	{
@@ -730,6 +761,12 @@ static const char *help_text[][4] = {
 		"MASTER",
 		"SERVER FOR",
 		"GAMES",
+	},
+	{
+		"CUSTOMIZE",
+		"THE TITLE",
+		"BACKGROUND",
+		"",
 	},
 	{
 		"EXIT THE",
@@ -894,6 +931,38 @@ static const char *skin_names[] = {
 	"RED GUY",
 };
 
+#define MAX_BGS 64
+static char bgs[MAX_BGS][ENDING_TEXT_MAX_WIDTH + 1];
+static int bgids[MAX_BGS];
+static int num_bgs;
+
+static void cache_titlebgs(void) {
+	num_bgs = 1;
+	bgids[0] = 0;
+	ps_selected = 0;
+	strcpy(bgs[0], "");
+	Serial_LoadSpawnersLevelName("levels/_title0.cnms", bgs[0]);
+	for (int i = 0; i < 64; i++) {
+		if (strlen(g_globalsave.levels_found[i]) == 0) continue;
+
+		bgids[num_bgs] = Filesystem_LevelIDToLevelOrderNum(Filesystem_GetLevelIdFromFileName(g_globalsave.levels_found[i]));
+		if (bgids[num_bgs] == -1) continue;
+		bgids[num_bgs]++;
+
+		char level_path[32];
+		sprintf(level_path, "levels/_title%d.cnms", bgids[num_bgs]);
+		bgs[num_bgs][0] = '\0';
+		Serial_LoadSpawnersLevelName(level_path, bgs[num_bgs]);
+		if (strlen(bgs[num_bgs]) == 0) continue;
+
+		if (bgids[num_bgs] == g_globalsave.titlebg) ps_selected = num_bgs;
+
+		num_bgs++;
+	}
+
+	//Console_Print("%d", num_bgs);
+}
+
 void draw_player_setup(void) {
 	CNM_RECT r, r2;
 	static int quit_posx = RENDERER_WIDTH / 2 - 112 + 20 - 10;
@@ -981,6 +1050,29 @@ void draw_player_setup(void) {
 		gui_text_box_draw(&options_mserv, ps_selected == 3, RENDERER_WIDTH / 2 + r.w - 20 - (14 * 8), RENDERER_HEIGHT / 2 + 16 + 12+(12*4), trans2);
 		Util_SetRect(&r2, 376, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
+	}
+
+	if (last_gui_state == GUI_TITLEBG_STATE || gui_state == GUI_TITLEBG_STATE) {
+		Renderer_DrawText(RENDERER_WIDTH / 2 - (8*17)/2, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "PICK A BACKGROUND");
+		for (int i = -4; i < num_bgs + 4; i++) {
+			const char *str = "????";
+			if (i > -1 && i < num_bgs) str = bgs[i];
+			if (i < 0 || i >= num_bgs || bgids[i] != g_globalsave.titlebg) Renderer_SetFont(384, 1264, 8, 8);
+			else Renderer_SetFont(384, 448, 8, 8);
+			const int center = RENDERER_HEIGHT / 2 + 16 + (12 * 4 + 2);
+			int y = center - ps_pos + (i * 12);
+			int trans3 = trans2;
+			if (y - center < 2) trans3 += -((y - center) + 2) / 4;
+			if (y - center > 8) trans3 += ((y - center) - 8) / 4;
+			if (trans3 > 7) trans3 = 7;
+			Renderer_DrawText(RENDERER_WIDTH / 2 - (strlen(str)*4), y, trans3, RENDERER_LIGHT, str);
+			if (ps_selected == i) {
+				const int isblue = (i > -1 && i < num_bgs && bgids[i] == g_globalsave.titlebg) * 24;
+				Util_SetRect(&r2, 376-isblue, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+				Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - (strlen(str)*4) - 12, y, &r2, trans2, RENDERER_LIGHT, 0, 0);
+				Renderer_DrawBitmap2(RENDERER_WIDTH / 2 + (strlen(str)*4) + 4, y, &r2, trans2, RENDERER_LIGHT, 1, 0);
+			}
+		}
 	}
 
 	if (last_gui_state == GUI_JOIN_STATE || gui_state == GUI_JOIN_STATE) {
@@ -1202,7 +1294,7 @@ void draw_play_gui_nologic(void) {
 	if (current_save_slot < 2) {
 		const int basey = save_slot_basey - (current_save_slot == -1 ? 6 + loading_save_timer : 0);
 		int basex, light;
-		draw_save_card(-1, basey, trans, &light, &basex);
+		if (gs_numlvls) draw_save_card(-1, basey, trans, &light, &basex);
 		if ((delete_mode || gui_timer > 0) && current_save_slot == -1) {
 			draw_delete_bars(basex, basey, trans2);
 		}
@@ -1413,6 +1505,52 @@ void draw_play_gui(void) {
 	}
 }
 
+void draw_titlebg_gui(void) {
+	draw_main_gui_bars();
+	draw_player_setup();
+
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		g_globalsave.titlebg = bgids[ps_selected];
+		Fadeout_FadeToWhite(1, 5, 5);
+		char levelname[32];
+		sprintf(levelname, "levels/_title%d", g_globalsave.titlebg);
+		swap_title_bg(levelname);
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_DOWN, INPUT_STATE_PLAYING)) {
+		if (ps_selected + 1 < num_bgs) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			ps_selected++;
+			ps_pos_target += 8+4;
+		} else {
+			ps_pos_target_add = 8;
+		}
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_PLAYING)) {
+		if (ps_selected > 0) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			ps_selected--;
+			ps_pos_target -= 8+4;
+		} else {
+			ps_pos_target_add = -8;
+		}
+	}
+
+	ps_trans += 2;
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+		ps_trans = 7*2;
+		globalsave_save(&g_globalsave);
+		//Serial_SaveConfig();
+	}
+}
+
 void draw_main_gui(void) {
 	CNM_RECT r;
 
@@ -1506,6 +1644,14 @@ void draw_main_gui(void) {
 			titlebg_set_card_movement(4, 0, CNM_FALSE);
 			break;
 		case 6:
+			cache_titlebgs();
+			gui_state = GUI_TITLEBG_STATE;
+			ps_trans = 0;
+			gui_timer = 0;
+			ps_pos = ps_selected * (8+8);
+			ps_pos_target = ps_pos;
+			break;
+		case 7:
 			return_rect = Util_RandInt(0, sizeof(return_rects) / sizeof(*return_rects));
 			quit_rect = Util_RandInt(0, sizeof(quit_rects) / sizeof(*quit_rects));
 			gui_state = GUI_QUIT_STATE;
@@ -1816,6 +1962,7 @@ void draw_new_gui(void) {
 	case GUI_HOST_STATE: draw_host_game_gui(); break;
 	case GUI_BROWSE_STATE: draw_browser_game_gui(); break;
 	case GUI_QUIT_STATE: draw_quit_gui(); break;
+	case GUI_TITLEBG_STATE: draw_titlebg_gui(); break;
 	}
 }
 void draw_play_gui_bg(void) {

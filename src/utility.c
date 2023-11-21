@@ -249,7 +249,8 @@ void Util_RandSetSeed(unsigned int seed)
 }
 int Util_RandInt(int min, int max)
 {
-	return rand() % (max - min) + min;
+	if (min == max) return min;
+	else return rand() % (max - min) + min;
 }
 float Util_RandFloat(void)
 {

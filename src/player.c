@@ -217,6 +217,7 @@ static float _hud_player_y = 0.0f, _hud_player_yvel = 0.0f;
 static int level_end_unlockable_y = 0, unlockable_show = CNM_FALSE;
 static int level_end_rank_y = 0;
 static int skin_unlock_y = 0, skin_unlock_timer = 0;
+static int titlepopup_y = 0, titlepopup_timer = 0;
 
 #define MAX_USED_DIALOGS 16
 static unsigned char _used_dialogs_node[MAX_USED_DIALOGS];
@@ -364,6 +365,8 @@ void WobjPlayer_Create(WOBJ *wobj)
 
 	skin_unlock_y = -128;
 	skin_unlock_timer = 0;
+	titlepopup_y = -128;
+	titlepopup_timer = 0;
 	local_data->last_touched_skin_unlock = -1;
 	local_data->num_deaths = 0;
 	//local_data->item_durability = 100.0f;
@@ -2235,6 +2238,22 @@ static void StepAndDrawParticles(void) {
 	}
 }
 
+void Player_TryTitlePopup(void) {
+	for (int i = 0; i < 64; i++) {
+		if (strcmp(g_globalsave.levels_found[i], Game_GetVar(GAME_VAR_LEVEL)->data.string) == 0) return;
+	}
+	int ordernum = Filesystem_LevelIDToLevelOrderNum(Filesystem_GetLevelIdFromFileName(Game_GetVar(GAME_VAR_LEVEL)->data.string));
+	if (ordernum == -1) return;
+	char checkbuf[32], lvlpath[32];
+	sprintf(lvlpath, "levels/_title%d.cnms", ordernum);
+	strcpy(checkbuf, "");
+	Serial_LoadSpawnersLevelName(lvlpath, checkbuf);
+	if (strlen(checkbuf) == 0) return;
+	//Console_Print("found it");
+	titlepopup_y = -128;
+	titlepopup_timer = 30*5;
+}
+
 void Player_ResetHUD(void) {
 	hp_curr = 0.0f;
 	last_hpbreak = 0;
@@ -2504,6 +2523,21 @@ void Player_DrawHUD(WOBJ *player) {
 		}
 		int target = local_data->finish_timer > PLAYER_FINISH_TIMER / 3 * 2 ? -64 : 0;
 		level_end_unlockable_y += (target - level_end_unlockable_y) * 0.25f;
+	}
+
+	if (titlepopup_timer > 0) {
+		Util_SetRect(&r, 400-16, 7136, 128, 48);
+		Renderer_DrawBitmap2(RENDERER_WIDTH / 2, titlepopup_y, &r, 2, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
+		Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, titlepopup_y, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
+		Renderer_DrawText(RENDERER_WIDTH / 2 - (8*18) / 2, titlepopup_y + 4+(12*0), 0, RENDERER_LIGHT, "UNLOCKED TITLE BG!");
+		if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer || Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*32) / 2, titlepopup_y + 4+(12*1), 0, RENDERER_LIGHT, "NOT UNLOCKED DUE TO LEVEL SELECT");
+		} else {
+			Renderer_DrawText(RENDERER_WIDTH / 2 - (8*25) / 2, titlepopup_y + 4+(12*1), 0, RENDERER_LIGHT, "FIND IT IN THE MAIN MENU!");
+		}
+		int target = titlepopup_timer < 10 ? -80 : 0;
+		titlepopup_y += (target - titlepopup_y) * 0.25f;
+		titlepopup_timer--;
 	}
 
 	if (skin_unlock_timer > 0) {

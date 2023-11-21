@@ -13,6 +13,7 @@ typedef struct savedata {
 
 struct globalsave {
 	int saves_created;
+	int titlebg;
 	char levels_found[64][32];
 	int skins_found[32];
 };

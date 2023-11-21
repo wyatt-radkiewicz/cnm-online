@@ -122,10 +122,12 @@ LParseType	lparse_get_type(LParseEntry *entry) {
 	else return entry->type;
 }
 void		lparse_get_data(LParse *lp, LParseEntry *entry, size_t elem, size_t cnt, void *buf) {
+	if (!lp->fp) return;
 	fseek(lp->fp, entry->offs + elem * type_sizes[entry->type], SEEK_SET);
 	fread(buf, type_sizes[entry->type], cnt, lp->fp);
 }
 void		lparse_set_data(LParse *lp, LParseEntry *entry, size_t elem, size_t cnt, const void *buf) {
+	if (!lp->fp) return;
 	fseek(lp->fp, entry->offs + elem * type_sizes[entry->type], SEEK_SET);
 	fwrite(buf, type_sizes[entry->type], cnt, lp->fp);
 }

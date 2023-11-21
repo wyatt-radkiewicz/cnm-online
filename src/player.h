@@ -136,5 +136,6 @@ void Player_SaveData(WOBJ *player, savedata_t *data);
 void Player_LoadFromSave(WOBJ *player, const savedata_t *data);
 void Player_SetSkinInstant(WOBJ *player, int skinid);
 void Player_SwapOffhand(WOBJ *player);
+void Player_TryTitlePopup(void);
 
 #endif

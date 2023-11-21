@@ -514,7 +514,7 @@ static int Serial_GetLParser(const char *cnm_file, LParse **lp) {
 	*lp = NULL;
 	fp = fopen(cnm_file, "rb");
 	if (fp == NULL) {
-		Console_Print("Cannot load the level file: \"%s\"!", cnm_file);
+		//Console_Print("Cannot load the level file: \"%s\"!", cnm_file);
 		return 0;
 	}
 	*lp = lparse_open_from_file(fp, lparse_read);

@@ -88,8 +88,10 @@ void titlebg_init(void) {
 }
 void titlebg_cleanup(void) {
 	//Console_Print("cleanup!");
-	free(_camx_list);
-	free(_camy_list);
+	if (_camx_list) free(_camx_list);
+	_camx_list = NULL;
+	if (_camy_list) free(_camy_list);
+	_camy_list = NULL;
 }
 void titlebg_update(void) {
 	int last_ydir = ai_ydir;
