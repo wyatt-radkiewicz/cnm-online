@@ -118,6 +118,7 @@ typedef struct _PLAYER_LOCAL_DATA
 
 	float stored_plat_velx;
 	int been_jumping_timer;
+	int skip_jumpthrough_timer;
 	//int game_over_active//, game_over_timer;
 	//float item_durability;
 	//float stored_yvel;

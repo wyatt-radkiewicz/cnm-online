@@ -223,7 +223,8 @@ void GameConsole_Draw(void)
 	if (!gameconsole_initialized)
 		return;
 
-	Renderer_SetFont(0, 704, 8, 8);
+	if (Game_TopState() == GAME_STATE_MAINMENU) Renderer_SetFont(288, 480, 8, 8);
+	else Renderer_SetFont(256, 256, 8, 8);
 	y = ((GAMECONSOLE_HISTORY + 1) * -8) + gameconsole_y;
 	for (l = GAMECONSOLE_HISTORY - 1; l > -1; l--)
 	{
@@ -252,7 +253,8 @@ void GameConsole_Draw(void)
 		else
 			Renderer_DrawText(c * 8, gameconsole_y, f, RENDERER_LIGHT, " ");
 	}
-	Renderer_SetFont(384, 448, 8, 8);
+	if (Game_TopState() == GAME_STATE_MAINMENU) Renderer_SetFont(288, 416, 8, 8);
+	else Renderer_SetFont(256, 192, 8, 8);
 }
 int GameConsole_IsOpen(void)
 {

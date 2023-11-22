@@ -115,7 +115,7 @@ void Fadeout_ApplyFade(void)
 		Renderer_DrawRect(&r, fc, lvl, RENDERER_LIGHT);
 		break;
 	case TYPE_DEATH:
-		Util_SetRect(&r, 128, 1888, 128, 64);
+		Util_SetRect(&r, 128, 832, 128, 64);
 		if (fade_counter < 25)
 		{
 			offsx = Util_RandInt(-(25 - fade_counter), 25 - fade_counter);
@@ -123,11 +123,11 @@ void Fadeout_ApplyFade(void)
 		}
 		if (fade_counter < fade_in + fade_time + 1)
 		{
-			Util_SetRect(&r, 0, 2432, 128, 32);
+			Util_SetRect(&r, 384, 896, 128, 32);
 			Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - 64 + offsx, RENDERER_HEIGHT / 2 - 32 + offsy, &r, 3, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
 			Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - 64 + offsx, RENDERER_HEIGHT / 2 - 32 + offsy+32, &r, 3, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
-			Util_SetRect(&r, 128, 1888, 128, 64);
-			Renderer_DrawBitmap(RENDERER_WIDTH / 2 - 64 + offsx, RENDERER_HEIGHT / 2 - 32 + offsy, &r, 0, RENDERER_LIGHT);
+			Util_SetRect(&r, 128, 832, 96, 64);
+			Renderer_DrawBitmap(RENDERER_WIDTH / 2 - 48 + offsx, RENDERER_HEIGHT / 2 - 32 + offsy, &r, 0, RENDERER_LIGHT);
 		}
 		Util_SetRect(&r, 0, 0, RENDERER_WIDTH, RENDERER_HEIGHT);
 		if (fade_counter > fade_in)
@@ -147,7 +147,7 @@ void Fadeout_ApplyFade(void)
 		fc = Renderer_MakeColor(0, 0, 0);
 		Util_SetRect(&r, 0, 0, RENDERER_WIDTH, RENDERER_HEIGHT);
 		Renderer_DrawRect(&r, fc, lvl, RENDERER_LIGHT);
-		Util_SetRect(&r, 256, 7312, 112, 48);
+		Util_SetRect(&r, 400, 1408, 112, 48);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w / 2, gameover_y, &r, 0, RENDERER_LIGHT);
 		if (fade_counter >= fade_in + fade_time + fade_out) lvl = 0;
 		else if (fade_counter >= fade_in + fade_time) lvl = (1.0f - ((float)(fade_counter - fade_in - fade_time) / (float)fade_out)) * 7.0f;

@@ -354,7 +354,7 @@ void World_Draw(int mode)
 	if (title_card_timer-- > 0)
 	{
 		int trans = 0;
-		Renderer_SetFont(0, 1184, 16, 16);
+		Renderer_SetFont(0, 544, 16, 16);
 		if (title_card_timer < 8)
 			trans = 7 - title_card_timer;
 		for (int i = 0; i < title_card_num_lines; i++)
@@ -368,6 +368,6 @@ void World_Draw(int mode)
 				title_card_strings[i]
 			);
 		}
-		Renderer_SetFont(384, 448, 8, 8);
+		Renderer_SetFont(256, 192, 8, 8);
 	}
 }

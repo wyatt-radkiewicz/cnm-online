@@ -634,6 +634,9 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 		if ((wobj->y + wobj->hitbox.y + wobj->hitbox.h) > (jump_through->y + jump_through->hitbox.y + 1) ||
 			wobj->vel_y - jump_through->vel_y > 0.1f)
 			jump_through = NULL;
+		if (wobj->flags & WOBJ_SKIP_JUMPTHROUGH) {
+			jump_through = NULL;
+		}
 	}
 	wobj->y -= 1.0f;
 	float ycomp = 0.0f;//wobj->type == WOBJ_PLAYER && other != NULL ? -other->vel_y : 0.0f;
@@ -656,7 +659,7 @@ void wobj_move_and_hit_blocks(WOBJ *wobj) {
 	if (wobj->type == WOBJ_PLAYER) {
 		//Console_Print("%d %d", ang_type, ground_ang);
 	}
-	struct bresolve_result result = bresolve_collision(wobj->x, wobj->y, wobj->vel_x, wobj->vel_y, wobj->hitbox);
+	struct bresolve_result result = bresolve_collision(wobj->x, wobj->y, wobj->vel_x, wobj->vel_y, wobj->hitbox, wobj->flags & WOBJ_SKIP_JUMPTHROUGH);
 	wobj->x = result.x;
 	wobj->y = result.y;
 	switch (ang_type) {
@@ -678,7 +681,7 @@ static void stick_to_moving_platforms(WOBJ *wobj) {
 		wobj->vel_y = other->vel_y;
 	} else {
 		other = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
-		if (other && wobj->vel_y > other->vel_y - 1.0f) {
+		if (other && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH) && wobj->vel_y > other->vel_y - 1.0f) {
 			wobj->y = other->y + other->hitbox.y - wobj->hitbox.h - wobj->hitbox.y;
 			wobj->vel_y = other->vel_y;
 		} else {
@@ -719,7 +722,7 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 	{
 		if (plat->flags & WOBJ_IS_MOVESTAND) wobj->x += plat->vel_x;
 	}
-	if (plat == NULL) {
+	if (plat == NULL && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH)) {
 		plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
 		if (plat && (plat->flags & WOBJ_IS_MOVESTAND) && wobj->vel_y - plat->vel_y > -0.1f && (wobj->y + wobj->hitbox.y) < (plat->y + plat->hitbox.y + 8.0f)) {
 			wobj->x += plat->vel_x;
@@ -834,7 +837,7 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 				obj->vel_y = collider->vel_y;
 			}
 		}
-		if (collider->flags & WOBJ_IS_JUMPTHROUGH)
+		if ((collider->flags & WOBJ_IS_JUMPTHROUGH) && !(obj->flags & WOBJ_SKIP_JUMPTHROUGH))
 		{
 			if (obj->vel_y - collider->vel_y > 0.1f && (obj->y + obj->hitbox.y) < (collider->y + collider->hitbox.y))
 			{
@@ -873,7 +876,7 @@ int Wobj_TryTeleportWobj(WOBJ *wobj, int only_telearea2)
 	Wobj_GetCollision(wobj, collisions);
 	while (i < WOBJ_MAX_COLLISIONS && collisions[i] != NULL)
 	{
-		if ((collisions[i]->type == WOBJ_TELEPORT && !only_telearea2) || 
+		if ((collisions[i]->type == WOBJ_TELEPORT && wobj->type == WOBJ_PLAYER && !only_telearea2) || 
 			(collisions[i]->type == WOBJ_TELEAREA1 && collisions[i]->custom_ints[1] && !only_telearea2) ||
 			(collisions[i]->type == WOBJ_TELEAREA2 && collisions[i]->custom_ints[1]))
 		{
@@ -927,7 +930,7 @@ int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y)
 {
 	CNM_BOX b;
 	Util_SetBox(&b, wobj->x + offset_x + wobj->hitbox.x, wobj->y + offset_y + wobj->hitbox.y, wobj->hitbox.w, wobj->hitbox.h);
-	return Blocks_IsCollidingWithSolid(&b, wobj->vel_y >= -0.05f);
+	return Blocks_IsCollidingWithSolid(&b, wobj->vel_y >= -0.05f && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH));
 }
 int Wobj_IsCollidingWithBlocksOrObjects(WOBJ *wobj, float offset_x, float offset_y) {
 	if (Wobj_IsCollidingWithBlocks(wobj, offset_x, offset_y)) return CNM_TRUE;

@@ -192,6 +192,7 @@ typedef enum _WOBJ_TYPES
 #define WOBJ_PLAYER_IS_RESPAWNING (1 << 19)
 #define WOBJ_IS_PLAYER_BULLET (1 << 20)
 #define WOBJ_HAS_PLAYER_FINISHED (1 << 21)
+#define WOBJ_SKIP_JUMPTHROUGH (1 << 22)
 
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
 #define Wobj_IsGrounded(w) Wobj_IsGrouneded(w)

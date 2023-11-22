@@ -68,11 +68,11 @@ void BossBar_Draw(void)
 				pixels = (int)((hps[i] / maxhps[i]) * 256.0f);
 			if (pixels < 0) pixels = 0;
 			if (pixels > 256) pixels = 256;
-			Util_SetRect(&src, 256, 4072, 256 - pixels, 8);
+			Util_SetRect(&src, 256, 1672, 256 - pixels, 8);
 			Renderer_DrawBitmap(x, y, &src, 2, RENDERER_LIGHT);
-			Util_SetRect(&src, 256 + (256 - pixels), 4064, pixels, 8);
+			Util_SetRect(&src, 256 + (256 - pixels), 1664, pixels, 8);
 			Renderer_DrawBitmap(x + (256 - pixels), y, &src, 2, RENDERER_LIGHT);
-			Util_SetRect(&src, 256, 4080, 256, 10);
+			Util_SetRect(&src, 256, 1680, 256, 10);
 			Renderer_DrawBitmap(x, y-1, &src, 0, RENDERER_LIGHT);
 
 			if (j++ >= MAX_CONCURRENT_BARS) return;

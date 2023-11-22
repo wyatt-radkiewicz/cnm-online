@@ -72,7 +72,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Shotgun Item
-		{32, 352, 32, 32},
+		{32, 352-256, 32, 32},
 		ItemGeneric_MusleFlash, // Update
 		NULL, // On Pickup
 		ItemShotgun_OnDrop, // On Drop
@@ -84,7 +84,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Knife Item
-		{64, 352, 32, 32},
+		{64, 352-256, 32, 32},
 		ItemGenericMelee_Update, // Update
 		ItemGenericMelee_OnPickup, // On Pickup
 		ItemGenericMelee_OnDrop, // On Drop
@@ -96,7 +96,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Apple Item
-		{96, 352, 32, 32},
+		{96, 352-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -108,7 +108,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Cake Item
-		{128, 352, 32, 32},
+		{128, 352-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -120,7 +120,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Strength Item
-		{160, 352, 32, 32},
+		{160, 352-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -132,7 +132,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Speed Item
-		{192, 352, 32, 32},
+		{192, 352-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -144,7 +144,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Jump Item
-		{224, 352, 32, 32},
+		{224, 352-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -156,7 +156,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Sword Item
-		{0, 384, 32, 32},
+		{0, 384-256, 32, 32},
 		ItemGenericMelee_Update,
 		ItemGenericMelee_OnPickup,
 		ItemGenericMelee_OnDrop,
@@ -168,7 +168,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Healh Potion Item
-		{32, 384, 32, 32},
+		{32, 384-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -180,7 +180,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Sniper Rifle Item
-		{64, 384, 32, 32},
+		{64, 384-256, 32, 32},
 		ItemGeneric_MusleFlash, // Update
 		NULL, // On Pickup
 		ItemShotgun_OnDrop, // On Drop
@@ -192,7 +192,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 50 Money Item
-		{96, 384, 32, 32},
+		{96, 384-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -204,7 +204,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 100 Money Item
-		{128, 384, 32, 32},
+		{128, 384-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -216,7 +216,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 500 Money Item
-		{160, 384, 32, 32},
+		{160, 384-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -228,7 +228,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Cheeseburger Item
-		{192, 384, 32, 32},
+		{192, 384-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -240,7 +240,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Golden Axe Item
-		{224, 384, 32, 32},
+		{224, 384-256, 32, 32},
 		ItemGenericMelee_Update,
 		ItemGenericMelee_OnPickup,
 		ItemGenericMelee_OnDrop,
@@ -252,7 +252,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Unbound Wand Item
-		{0, 416, 32, 32},
+		{0, 416-256, 32, 32},
 		ItemUnboundWand_Update,
 		NULL,
 		NULL,
@@ -264,7 +264,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 17: Fire Wand Item
-		{32, 416, 32, 32},
+		{32, 416-256, 32, 32},
 		NULL,
 		NULL,
 		NULL,
@@ -276,7 +276,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 18: Ice Wand Item
-		{64, 416, 32, 32},
+		{64, 416-256, 32, 32},
 		NULL,
 		NULL,
 		NULL,
@@ -288,7 +288,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 19: Air Wand Item
-		{96, 416, 32, 32},
+		{96, 416-256, 32, 32},
 		NULL,
 		NULL,
 		NULL,
@@ -300,7 +300,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 20: Lightning Wand Item
-		{128, 416, 32, 32},
+		{128, 416-256, 32, 32},
 		NULL,
 		NULL,
 		NULL,
@@ -312,7 +312,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 21: Golden Shotgun Item
-		{160, 416, 32, 32},
+		{160, 416-256, 32, 32},
 		ItemGeneric_MusleFlash, // Update
 		NULL, // On Pickup
 		ItemShotgun_OnDrop, // On Drop
@@ -324,7 +324,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 22: Laser Rifle Item
-		{192, 416, 32, 32},
+		{192, 416-256, 32, 32},
 		ItemLaserRifle_Update, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -336,7 +336,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 23: Rocket Launcher Item
-		{224, 416, 32, 32},
+		{224, 416-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -348,7 +348,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 24: Fire Potion
-		{0, 448, 32, 32},
+		{0, 448-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -360,7 +360,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 25: Minigun Item
-		{32, 448, 32, 32},
+		{32, 448-256, 32, 32},
 		ItemMinigun_OnUpdate, // Update
 		ItemMinigun_OnPickup, // On Pickup
 		ItemMinigun_OnDrop, // On Drop
@@ -372,7 +372,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 26: Mega Potion
-		{64, 448, 32, 32},
+		{64, 448-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -384,7 +384,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 27: Ultra Mega Potion
-		{96, 448, 32, 32},
+		{96, 448-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -396,7 +396,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 28: AWP
-		{128, 448, 32, 32},
+		{128, 448-256, 32, 32},
 		ItemGeneric_MusleFlash, // Update
 		NULL, // On Pickup
 		ItemShotgun_OnDrop, // On Drop
@@ -408,7 +408,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 29: Flamethrower
-		{160, 448, 32, 32},
+		{160, 448-256, 32, 32},
 		ItemFlameThrower_OnUpdate, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -420,7 +420,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 30: Poisonious Strength Potion
-		{192, 448, 32, 32},
+		{192, 448-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -432,7 +432,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 31: Poisonious Speed Potion
-		{224, 448, 32, 32},
+		{224, 448-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -444,7 +444,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 32: Poisonious Jump Potion
-		{0, 480, 32, 32},
+		{0, 480-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -456,7 +456,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 33: Beastchurger Consumable
-		{32, 480, 32, 32},
+		{32, 480-256, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -468,7 +468,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 34: Ultra Sword
-		{64, 480, 32, 32},
+		{64, 480-256, 32, 32},
 		ItemUltraSword_OnUpdate, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -480,7 +480,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 34: Heavy Hammer
-		{96, 480, 32, 32},
+		{96, 480-256, 32, 32},
 		ItemHeavyHammer_OnUpdate, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -492,7 +492,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 34: Fission Gun
-		{128, 480, 32, 32},
+		{128, 480-256, 32, 32},
 		ItemGeneric_MusleFlash, // Update
 		NULL, // On Pickup
 		ItemShotgun_OnDrop, // On Drop
@@ -504,7 +504,7 @@ ITEM_TYPE item_types[] =
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 35: Red Key
-		{160, 480, 32, 32},
+		{160, 480-256, 32, 32},
 		ItemKeyGeneric_Update, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -516,7 +516,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 36: Green Key
-		{192, 480, 32, 32},
+		{192, 480-256, 32, 32},
 		ItemKeyGeneric_Update, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -528,7 +528,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 37: Blue Key
-		{224, 480, 32, 32},
+		{224, 480-256, 32, 32},
 		ItemKeyGeneric_Update, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -540,7 +540,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 38: 1-Up Orange Juice Box 
-		{128, 736, 32, 32},
+		{256, 96, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop
@@ -552,7 +552,7 @@ ITEM_TYPE item_types[] =
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 39: Fix it up Wrench 
-		{160, 2048, 32, 32},
+		{288, 96, 32, 32},
 		NULL, // Update
 		NULL, // On Pickup
 		NULL, // On Drop

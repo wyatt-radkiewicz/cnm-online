@@ -425,9 +425,9 @@ void Blocks_ResolveCollisionInstant(CNM_BOX *b, int *resolved_in_x, int *resolve
 	}
 }
 
-struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, CNM_BOX b) {
+struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, CNM_BOX b, int skip_jumpthrough) {
 	// Step up things
-	const int test_jt = vy > 0.0f;
+	const int test_jt = vy > 0.0f && !skip_jumpthrough;
 	const float oy = y + b.y + b.h - 4.0f;
 	int process_x = CNM_TRUE;
 	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + 1.0f, .w = b.w, .h = b.h }, 1, 1, 0, 0.0f) ||

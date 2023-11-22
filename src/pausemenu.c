@@ -210,26 +210,26 @@ void pause_menu_draw(void) {
 	int idx = options_num - 5;
 	//Console_Print("%d", options_num);
 	for (int i = -1; i < start/r.h+2; i++) {
-		Util_SetRect(&r, 384, 7104, 128, 32);
+		Util_SetRect(&r, 384, 1536, 128, 32);
 		Renderer_DrawBitmap(-r.w + side_xstart + i*32 + left_disp, RENDERER_HEIGHT-start + i*32 + left_disp, &r, 2, RENDERER_LIGHT);
 		if (idx >= 0 && idx < sizeof(option_names)/sizeof(*option_names)) {
 			int center = strlen(option_names[idx][text_mode]) * 8 / 2;
-			if (idx != options_num) Renderer_SetFont(384, 1264, 8, 8);
-			else Renderer_SetFont(384, 448, 8, 8);
+			if (idx != options_num) Renderer_SetFont(384, 576, 8, 8);
+			else Renderer_SetFont(256, 192, 8, 8);
 			if (!(g_saves[g_current_save].lives <= 1 && idx == 0) || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx][text_mode]);
 			if (idx == options_num) {
 				int w = r.w;
-				Util_SetRect(&r, 376-24, 1264 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
+				Util_SetRect(&r, 376-24, 576 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 				Renderer_DrawBitmap(-w + side_xstart + i*32 + left_disp + (w / 2 - center) - 12, RENDERER_HEIGHT - start + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT);
-				Util_SetRect(&r, 376-24, 1264 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
+				Util_SetRect(&r, 376-24, 576 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
 				Renderer_DrawBitmap2(-w + side_xstart + i*32 + left_disp + (w / 2 + center) , RENDERER_HEIGHT - start + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 			}
 		}
 		idx++;
 	}
 
-	Util_SetRect(&r, 400, 7136, 112, 48);
-	Renderer_SetFont(384, 448, 8, 8);
+	Util_SetRect(&r, 400, 1792, 112, 48);
+	Renderer_SetFont(256, 192, 8, 8);
 	Renderer_DrawBitmap2(side_blob_x, RENDERER_HEIGHT-48, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 	int text_off = 12;
 	if (help_text_lines[options_num][text_mode] == 3) text_off += 6;

@@ -2017,9 +2017,9 @@ void draw_play_gui_bg(void) {
 	int trans = 7 - ss_trans / 2;
 	if (trans < 3) trans = 3;
 	if (trans < 8) {
-		Util_SetRect(&r, 368, 7376, 144, 144);
+		Util_SetRect(&r, 368, 272, 144, 144);
 		Renderer_DrawBitmap(playbit0_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
-		Util_SetRect(&r, 256, 7360, 112, 160);
+		Util_SetRect(&r, 256, 256, 112, 160);
 		Renderer_DrawBitmap(playbit1_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
 	}
 }

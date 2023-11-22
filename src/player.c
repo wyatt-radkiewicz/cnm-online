@@ -180,24 +180,25 @@ static const int anim_offsets[PLAYER_ANIM_MAX][6][2] =
 };
 static const int skin_bases[PLAYER_MAX_SKINS][2] =
 {
-	{128, 1824},
-	{256, 1824},
-	{256, 1920-32},
-	{256, 3392},
-	{0, 7936},
-	{0, 1280},
-	{128, 1280},
+	{0, 704},
 	{0, 768},
-	{0, 8096},
-	{0, 4608},
-	{0, 7776},
+	{0, 832},
+	{0, 1232},
+	{0, 1584},
+	{0, 640},
+	{128, 640},
+	{384, 640},
+	{0, 1712},
+	{0, 1328},
+	{0, 1456},
 };
 static const int skin_srcbase[PLAYER_MAX_SKINS] = {
 	0, 0, 0, 0,
-	7936,
+	1584,
 	0, 0, 0,
-	8096,
-	4608, 7776,
+	1712,
+	1328,
+	1456,
 };
 const int complex_skins[PLAYER_MAX_SKINS] = {
 	CNM_FALSE,
@@ -384,6 +385,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 
 	local_data->stored_plat_velx = 0.0f;
 	local_data->been_jumping_timer = 0;
+	local_data->skip_jumpthrough_timer = 0;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 }
@@ -500,10 +502,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 	float final_grav;
 	float final_jmp;
 	//float final_strength;
+	int apply_plat_velx = CNM_FALSE;//!Wobj_IsGrounded(wobj);
 
 	final_speed = wobj->speed;
 	final_jmp = wobj->jump;
 	final_grav = local_data->grav + local_data->grav_add;
+	local_data->stored_plat_velx = 0.0f;
 
 	if (local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER)
 	{
@@ -775,6 +779,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (local_data->sliding_jump_timer > 0) local_data->sliding_jump_timer--;
 		if (local_data->slide_input_buffer > 0) local_data->slide_input_buffer--;
 		if (local_data->slide_super_jump_timer > 0) local_data->slide_super_jump_timer--;
+		if (local_data->skip_jumpthrough_timer > 0) local_data->skip_jumpthrough_timer--;
 		if (Wobj_IsGrouneded(wobj)) local_data->slide_jump_cooldown--;
 		if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) local_data->slide_input_buffer = 5;
 		if (Wobj_IsGrouneded(wobj) && (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) || local_data->slide_input_buffer > 0) && !local_data->is_sliding && local_data->slide_jump_cooldown <= 0 && !local_data->lock_controls) {
@@ -804,6 +809,21 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->stored_slide_speed = fabsf(wobj->vel_x);
 			}
 		}
+		if (Wobj_IsGrounded(wobj) && local_data->skip_jumpthrough_timer <= 0 && local_data->slide_jump_cooldown <= 0 && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->is_sliding && fabsf(wobj->vel_x) < 0.05f) {
+			local_data->skip_jumpthrough_timer = 8;
+			wobj->vel_y = 2.0f;
+			const float oy = wobj->y;
+			wobj->y += 10.0f;
+			WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
+			wobj->y = oy;
+			if (plat) {
+				local_data->stored_plat_velx = plat->vel_x;
+				if (plat->vel_y > 0.0f) wobj->vel_y += plat->vel_y;
+				else if (plat->vel_y < -4.0f) wobj->vel_y -= 2.0f;
+			}
+		}
+		if (local_data->skip_jumpthrough_timer <= 0) wobj->flags &= ~WOBJ_SKIP_JUMPTHROUGH;
+		else wobj->flags |= WOBJ_SKIP_JUMPTHROUGH;
 		if (Wobj_IsGrouneded(wobj) && !local_data->is_sliding) {
 			wobj->hitbox.y = 3.0f;
 			wobj->hitbox.h = 29.0f;
@@ -862,7 +882,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (local_data->upgrade_state == PLAYER_UPGRADE_NONE) {
 			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
 				wobj->custom_ints[1] |= PLAYER_FLAG_STOMPING;
-				local_data->slide_jump_cooldown = 5;
+				if (local_data->slide_jump_cooldown < 5) local_data->slide_jump_cooldown = 5;
+				else local_data->slide_jump_cooldown = 7;
 				Interaction_PlaySound(wobj, 64);
 			}
 		}
@@ -1035,12 +1056,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 		//Console_Print("%d", local_data->been_jumping_timer);
 
 		{
-			local_data->stored_plat_velx = 0.0f;
 			if (Wobj_IsGrounded(wobj)) {
 				const float oy = wobj->y;
 				wobj->y += 10.0f;
 				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
-				if (!plat) plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
+				if (!plat && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH)) plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
 				wobj->y = oy;
 				if (plat) {
 					local_data->stored_plat_velx = plat->vel_x;
@@ -1049,7 +1069,6 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
-		int apply_plat_velx = !Wobj_IsGrounded(wobj);
 		if (local_data->is_grounded_buffer > 0 || (local_data->upgrade_state == PLAYER_UPGRADE_NONE && local_data->in_water))//Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || other != NULL)
 		{
 			//local_data->has_hammer_jumped = CNM_FALSE;
@@ -1070,7 +1089,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				const float oy = wobj->y;
 				wobj->y += 10.0f;
 				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
-				if (!plat) plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
+				if (!plat && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH)) plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
 				wobj->y = oy;
 				local_data->jump_init_yspd = 0.0f;
 				if (plat != NULL)
@@ -1131,11 +1150,6 @@ void WobjPlayer_Update(WOBJ *wobj)
 					//}
 				}
 			}
-		}
-
-		if (local_data->stored_plat_velx != 0.0f && apply_plat_velx) {
-			wobj->vel_x += local_data->stored_plat_velx;
-			local_data->stored_plat_velx = 0.0f;
 		}
 
 		// Max power double jumping
@@ -1602,6 +1616,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 
 	if (!local_data->vortexed_mode)
 		WobjPhysics_EndUpdate(wobj);
+
+	apply_plat_velx |= !Wobj_IsGrounded(wobj);
+	if (local_data->stored_plat_velx != 0.0f && apply_plat_velx) {
+		wobj->vel_x = local_data->stored_plat_velx;
+		//if (wobj->vel_x < fabsf(local_data->stored_plat_velx) && wobj->vel_x > -fabsf()) wobj->vel_x = local_data->stored_plat_velx;
+		local_data->stored_plat_velx = 0.0f;
+	}
+
 	//wobj->y += stored_movestand_yvel;
 
 	// HPCOST from MAXPOWER upgrade
@@ -1652,16 +1674,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (local_data->upgradehp <= 0.0f) {
 		switch (local_data->upgrade_state) {
 		case PLAYER_UPGRADE_WINGS:
-			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 256, 2992, 3, 3);
+			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 416, 1040, 3, 3);
 			break;
 		case PLAYER_UPGRADE_CRYSTAL_WINGS:
-			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 256, 3088, 3, 3);
+			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 320, 1040, 3, 3);
 			break;
 		case PLAYER_UPGRADE_VORTEX:
-			BreakPart_CreateParts(wobj->x + 8.0f, wobj->y, -4.0f, 64, 224, 1, 2);
+			BreakPart_CreateParts(wobj->x, wobj->y, -4.0f, 160, 32, 2, 2);
 			break;
 		case PLAYER_UPGRADE_SHOES:
-			BreakPart_CreateParts(wobj->x, wobj->y + 8.0f, -4.0f, 256, 144, 2, 1);
+			BreakPart_CreateParts(wobj->x, wobj->y, -4.0f, 400, 0, 2, 1);
 			break;
 		}
 		local_data->upgrade_state = PLAYER_UPGRADE_NONE;
@@ -1764,7 +1786,7 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 	int anim = get_player_packed_anim(wobj->anim_frame);
 	if ((wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_VORTEX)
 	{
-		Util_SetRect(&r, 64, 224, 32, 32);
+		Util_SetRect(&r, 128, 32, 32, 32);
 		//Renderer_DrawBitmap((int)wobj->x - camx, (int)wobj->y - camy, &r, 0, RENDERER_LIGHT);
 		Renderer_DrawBitmap2
 		(
@@ -1791,19 +1813,19 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 	{
 		int iscryst = (wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE) == PLAYER_UPGRADE_CRYSTAL_WINGS;
 		const CNM_RECT frames[] = {
-			{ 256,    2992, 48, 48 },	
-			{ 256+48, 2992, 48, 48 },	
-			{ 256,    2992+48, 48, 48 },	
-			{ 256+48, 2992+48, 48, 48 },
-			{ 0, 7008, 48, 48 },
-			{ 48, 7008, 48, 48 },
+			{ 416,    1040, 48, 48 },	
+			{ 416+48, 1040, 48, 48 },	
+			{ 416,    1040+48, 48, 48 },	
+			{ 416+48, 1040+48, 48, 48 },
+			{ 224, 1040, 48, 48 },
+			{ 224+48, 1040, 48, 48 },
 		}, framesc[] = {
-			{ 256,    2992+96, 48, 48 },	
-			{ 256+48, 2992+96, 48, 48 },	
-			{ 256,    2992+96+48, 48, 48 },	
-			{ 256+48, 2992+96+48, 48, 48 },	
-			{ 0,  7008+48, 48, 48 },
-			{ 48, 7008+48, 48, 48 },
+			{ 320,    1040, 48, 48 },	
+			{ 320+48, 1040, 48, 48 },	
+			{ 320,    1040+48, 48, 48 },	
+			{ 320+48, 1040+48, 48, 48 },	
+			{ 224,  1040+48, 48, 48 },
+			{ 224+48, 1040+48, 48, 48 },
 		};
 		int frame = 0;
 		if (wobj->vel_y > 0.0f || Wobj_IsGrouneded(wobj)) {
@@ -1853,9 +1875,9 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 	{
 	case PLAYER_UPGRADE_MAXPOWER:
 		if ((Game_GetFrame() / 3) % 2 == 0)
-			Util_SetRect(&r, 192, 1120, 48, 48);
+			Util_SetRect(&r, 192, 480, 48, 48);
 		else
-			Util_SetRect(&r, 192, 1120+48, 48, 48);
+			Util_SetRect(&r, 192, 480+48, 48, 48);
 		Renderer_DrawBitmap((int)wobj->x - camx - 8, (int)wobj->y - camy - 8, &r, 2, RENDERER_LIGHT);
 		break;
 	// case PLAYER_UPGRADE_CRYSTAL_WINGS:
@@ -1941,29 +1963,48 @@ static void PlayerAnimGetRect(CNM_RECT *r, int skin, int anim, int frame)
 	else
 	{
 		int base = 0;
-		if (anim == PLAYER_ANIM_WALKING) base = anim_lengths[skin][0];
-		if (anim == PLAYER_ANIM_JUMP) base = anim_lengths[skin][0]+ anim_lengths[skin][1];
-		if (anim == PLAYER_ANIM_JUMP_END)
-			base = anim_lengths[skin][0]+anim_lengths[skin][1] +
-			anim_lengths[skin][2] + anim_lengths[skin][3];
-		if (anim == PLAYER_ANIM_HURT)
-			base = anim_lengths[skin][0]+anim_lengths[skin][1] +
-			anim_lengths[skin][2] + anim_lengths[skin][3]+anim_lengths[skin][4];
-		if (anim == PLAYER_TURN_WALK || anim == PLAYER_TURN_AIR) {
-			base = anim_lengths[skin][0]+anim_lengths[skin][1] +
-			anim_lengths[skin][2] + anim_lengths[skin][3]+anim_lengths[skin][4]+anim_lengths[skin][5]+anim_lengths[skin][6];
-			if (anim == PLAYER_TURN_AIR) base += anim_lengths[skin][7];
+		switch (anim) {
+		case PLAYER_TURN_AIR:
+			base += anim_lengths[skin][7];
+		case PLAYER_TURN_WALK:
+			base += anim_lengths[skin][6];
+		case PLAYER_ANIM_SLIDE:
+			base += anim_lengths[skin][5];
+		case PLAYER_ANIM_HURT:
+			base += anim_lengths[skin][4];
+		case PLAYER_ANIM_JUMP_END:
+			base += anim_lengths[skin][3] + anim_lengths[skin][2];
+		case PLAYER_ANIM_JUMP:
+			base += anim_lengths[skin][1];
+		case PLAYER_ANIM_WALKING:
+			base += anim_lengths[skin][0];
+		default:
+			break;
 		}
+		//if (anim == PLAYER_ANIM_WALKING) base = anim_lengths[skin][0];
+		//if (anim == PLAYER_ANIM_JUMP) base = anim_lengths[skin][0]+ anim_lengths[skin][1];
+		//if (anim == PLAYER_ANIM_JUMP_END)
+		//	base = anim_lengths[skin][0]+anim_lengths[skin][1] +
+		//	anim_lengths[skin][2] + anim_lengths[skin][3];
+		//if (anim == PLAYER_ANIM_HURT)
+		//	base = anim_lengths[skin][0]+anim_lengths[skin][1] +
+		//	anim_lengths[skin][2] + anim_lengths[skin][3]+anim_lengths[skin][4];
+		//if (anim == PLAYER_TURN_WALK || anim == PLAYER_TURN_AIR || anim == PLAYER_ANIM_SLIDE) {
+		//	base = anim_lengths[skin][0]+anim_lengths[skin][1] +
+		//	anim_lengths[skin][2] + anim_lengths[skin][3]+anim_lengths[skin][4]+anim_lengths[skin][5]+anim_lengths[skin][6];
+		//	if (anim == PLAYER_TURN_AIR) base += anim_lengths[skin][7];
+		//	if (anim == PLAYER_ANIM_SLIDE)
+		//}
 		int dx = (base+frame)%12;
 		int dy = (base+frame)/12;
 		r->x = dx*40;
 		r->y = skin_srcbase[skin]+dy*40;
 		r->w = 40;
 		r->h = 40;
-		if (anim == PLAYER_ANIM_SLIDE) {
-			r->x = 40 + frame * 40;
-			r->y = skin_srcbase[skin]+120;//4728;
-		}
+		//if (anim == PLAYER_ANIM_SLIDE) {
+			//r->x = 40 + frame * 40;
+			//r->y = skin_srcbase[skin]+120;//4728;
+		//}
 	}
 }
 CNM_RECT get_player_src_rect(int anim_frame, int *skin9offsetx, int *skin9offsety) {
@@ -2037,7 +2078,7 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 	//wobj->flags &= WOBJ_DAMAGE_INDICATE;
 
 	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
-		Util_SetRect(&r, 384, 32, 32, 32);
+		Util_SetRect(&r, 192, 0, 32, 32);
 		Renderer_DrawBitmap((int)wobj->x - camx + skin9offsetx, (int)wobj->y - camy + skin9offsety - 32, &r, 0, RENDERER_LIGHT);
 	}
 	
@@ -2119,7 +2160,7 @@ static void DrawUpgradeHPBar(int x, int y, int w) {
 	for (; w > 0; w -= 32) {
 		int ww = w;
 		if (ww > 32) ww = 32;
-		Util_SetRect(&r, 256 + (fine % 32), 4288 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
+		Util_SetRect(&r, 64 + (fine % 32), 1200 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
 		Renderer_DrawBitmap(x+xoff-ww, y, &r, 0, RENDERER_LIGHT);
 		xoff -= 32;
 	}
@@ -2135,7 +2176,7 @@ static void DrawDurabilityBar(int x, int y, int w) {
 	for (; w > 0; w -= 32) {
 		int ww = w;
 		if (ww > 32) ww = 32;
-		Util_SetRect(&r, 256 + (fine % 32), 3936 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
+		Util_SetRect(&r, 64 + (fine % 32), 1168 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
 		Renderer_DrawBitmap(x+xoff-ww, y, &r, 0, RENDERER_LIGHT);
 		xoff -= 32;
 	}
@@ -2151,7 +2192,7 @@ static void DrawHealthBar(int x, int y, int w) {
 	for (; w > 0; w -= 32) {
 		int ww = w;
 		if (ww > 32) ww = 32;
-		Util_SetRect(&r, 288 + (fine % 32), 4256 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
+		Util_SetRect(&r, 416 + (fine % 32), 1264 + offsets[coarse % 4] + (ccoarse % 5), ww, 5);
 		Renderer_DrawBitmap(x+xoff, y, &r, 0, RENDERER_LIGHT);
 		xoff += 32;
 	}
@@ -2164,15 +2205,15 @@ static void DrawHealthOutline(int x, int y, int w)
 	for (; w > 0; w -= 32)
 	{
 		int ww = w;
-		Util_SetRect(&r, 320, 4247, 32, 9);
+		Util_SetRect(&r, 448, 1255, 32, 9);
 		if (ww > 32) ww = 32;
 		else {
-			Util_SetRect(&r, 352+(32-ww), 4247, ww, 9);
+			Util_SetRect(&r, 480+(32-ww), 1255, ww, 9);
 		}
 		Renderer_DrawBitmap(x + xoff, y, &r, 0, RENDERER_LIGHT);
 		xoff += ww;
 	}
-	Util_SetRect(&r, 352, 4261 + (Game_GetFrame() % 3)*9, 9, 9);
+	Util_SetRect(&r, 480, 1269 + (Game_GetFrame() % 3)*9, 9, 9);
 	Renderer_DrawBitmap(x + xoff - 1, y, &r, 0, RENDERER_LIGHT);
 }
 static void DrawHealthBG(int x, int y, int w)
@@ -2184,7 +2225,7 @@ static void DrawHealthBG(int x, int y, int w)
 	{
 		int ww = w;
 		if (ww > 32) ww = 32;
-		Util_SetRect(&r, 352, 4256, ww, 5);
+		Util_SetRect(&r, 480, 1264, ww, 5);
 		Renderer_DrawBitmap(x + xoff, y, &r, 2, RENDERER_LIGHT);
 		xoff += ww;
 	}
@@ -2273,14 +2314,16 @@ void Player_DrawHUD(WOBJ *player) {
 	CNM_RECT r;
 	PLAYER_LOCAL_DATA *local_data = (PLAYER_LOCAL_DATA *)player->local_data;
 
+	Renderer_SetFont(256, 192, 8, 8);
+
 	char temp_hud[64];
-	Util_SetRect(&r, 192, 4224, 96, 6);
+	Util_SetRect(&r, 320, 1232, 96, 6);
 	Renderer_DrawBitmap(0, RENDERER_HEIGHT - 64, &r, 2, RENDERER_LIGHT);
-	Util_SetRect(&r, 288, 4241, 81, 5);
+	Util_SetRect(&r, 416, 1249, 81, 5);
 	Renderer_DrawBitmap(2, RENDERER_HEIGHT - 64 + 8, &r, 2, RENDERER_LIGHT);
 
 	if (curr_hpbreak) {
-		Util_SetRect(&r, 352, 4256, 32, 5);
+		Util_SetRect(&r, 480, 1264, 32, 5);
 		Renderer_DrawBitmap(83, RENDERER_HEIGHT - 64 + 8, &r, 2, RENDERER_LIGHT);
 		Renderer_DrawBitmap(83+32, RENDERER_HEIGHT - 64 + 8, &r, 2, RENDERER_LIGHT);
 	}
@@ -2324,14 +2367,14 @@ void Player_DrawHUD(WOBJ *player) {
 
 	if (!curr_hpbreak) {
 		if (hp_break_anim < 2.0f) {
-			Util_SetRect(&r, 288, 4230, 93, 9);
+			Util_SetRect(&r, 416, 1238, 93, 9);
 			Renderer_DrawBitmap(0, RENDERER_HEIGHT - 64 + 6, &r, 0, RENDERER_LIGHT);
 			hp_break_anim = 0.0f;
 		}
 		else {
-			Util_SetRect(&r, 288, 4230, 74, 9);
+			Util_SetRect(&r, 416, 1238, 74, 9);
 			Renderer_DrawBitmap(0, RENDERER_HEIGHT - 64 + 6, &r, 0, RENDERER_LIGHT);
-			Util_SetRect(&r, 288, 4247, 19, 9);
+			Util_SetRect(&r, 416, 1255, 19, 9);
 			Renderer_DrawBitmap(74, RENDERER_HEIGHT - 64 + 6, &r, 0, RENDERER_LIGHT);
 			DrawHealthBG(83, RENDERER_HEIGHT - 64 + 6+2, (int)hp_break_anim+3);
 			DrawHealthOutline(87, RENDERER_HEIGHT - 64 + 6, (int)hp_break_anim);
@@ -2341,14 +2384,14 @@ void Player_DrawHUD(WOBJ *player) {
 	}
 	else {
 		hp_break_anim = 0;
-		Util_SetRect(&r, 288, 4230, 74, 9);
+		Util_SetRect(&r, 416, 1238, 74, 9);
 		Renderer_DrawBitmap(0, RENDERER_HEIGHT - 64 + 6, &r, 0, RENDERER_LIGHT);
-		Util_SetRect(&r, 288, 4247, 32, 9);
+		Util_SetRect(&r, 416, 1255, 32, 9);
 		Renderer_DrawBitmap(74, RENDERER_HEIGHT - 64 + 6, &r, 0, RENDERER_LIGHT);
-		Util_SetRect(&r, 320, 4247, 32, 9);
+		Util_SetRect(&r, 448, 1255, 32, 9);
 		Renderer_DrawBitmap(106, RENDERER_HEIGHT - 64 + 6, &r, 0, RENDERER_LIGHT);
 		if (!curr_hpbreak2) {
-			Util_SetRect(&r, 375, 4247, 9, 9);
+			Util_SetRect(&r, 503, 1255, 9, 9);
 			Renderer_DrawBitmap(106 + 32, RENDERER_HEIGHT - 64 + 6, &r, 0, RENDERER_LIGHT);
 		}
 		else {
@@ -2361,7 +2404,7 @@ void Player_DrawHUD(WOBJ *player) {
 		}
 	}
 
-	Util_SetRect(&r, 160, 4304, 96, 32);
+	Util_SetRect(&r, 224, 1264, 96, 32);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 96, 0, &r, 2, RENDERER_LIGHT);
 	// Upgrade Health
 	if (local_data->upgradehp > 0.0f && local_data->upgrade_state != PLAYER_UPGRADE_NONE) {
@@ -2379,13 +2422,13 @@ void Player_DrawHUD(WOBJ *player) {
 
 	//Console_Print("%f",Item_GetCurrentItem()->durability);
 	DrawDurabilityBar(RENDERER_WIDTH - 96 + 91, 6, visible_width);
-	Util_SetRect(&r, 64+96, 4320-32, 96, 16);
+	Util_SetRect(&r, 160, 960, 96, 16);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 96, 16, &r, 2, RENDERER_LIGHT);
-	Util_SetRect(&r, 64, 4320, 96, 16);
+	Util_SetRect(&r, 64, 960, 96, 16);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 96, 0, &r, 2, RENDERER_LIGHT);
 
 
-	Util_SetRect(&r, 192, 4224+6+9, 96, 64-6-9);
+	Util_SetRect(&r, 320, 1247, 96, 64-6-9);
 	Renderer_DrawBitmap(0, RENDERER_HEIGHT - 64 + 6 + 9, &r, 2, RENDERER_LIGHT);
 	
 	sprintf(temp_hud, "%d", (int)ceilf(player->health));
@@ -2426,7 +2469,9 @@ void Player_DrawHUD(WOBJ *player) {
 
 	//Util_SetRect(&r, 0, 4288, 64, 32);
 	//Renderer_DrawBitmap2(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 32, &r, 2, RENDERER_LIGHT, 1, 1);
-	Util_SetRect(&r, 0, 4288, 64, 32);
+	Util_SetRect(&r, 320, 960, 64, 16);
+	Renderer_DrawBitmap(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 16, &r, 2, RENDERER_LIGHT);
+	Util_SetRect(&r, 256, 960, 64, 16);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 32, &r, 2, RENDERER_LIGHT);
 
 	int bx = RENDERER_WIDTH - 64, by = RENDERER_HEIGHT - 32;
@@ -2453,13 +2498,13 @@ void Player_DrawHUD(WOBJ *player) {
 	skinoffx += 34-5;
 	skinoffy += 11-4 + (int)_hud_player_y;
 	Renderer_DrawBitmap2(bx+skinoffx, by+skinoffy, &r, 0, RENDERER_LIGHT, 1, 0);
-	Util_SetRect(&r, 0, 4288+32, 64, 16);
+	Util_SetRect(&r, 0, 960, 64, 16);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 64, RENDERER_HEIGHT - 16, &r, 0, RENDERER_LIGHT);
 	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
 		sprintf(temp_hud, "%d", g_saves[g_current_save].lives);
 		Renderer_DrawText(RENDERER_WIDTH - 64+6, RENDERER_HEIGHT - 32+18, 0, RENDERER_LIGHT, temp_hud);
 	} else {
-		Util_SetRect(&r, 384, 456, 8, 8);
+		Util_SetRect(&r, 256, 200, 8, 8);
 		Renderer_DrawBitmap(RENDERER_WIDTH - 64+6+2, RENDERER_HEIGHT - 32+18, &r, 0, RENDERER_LIGHT);
 	}
 	//sprintf(temp_hud, "%d%%%%", (int)ceilf(player->speed * 20.0f));
@@ -2470,7 +2515,7 @@ void Player_DrawHUD(WOBJ *player) {
 	//Renderer_DrawText(bx+62 - (strlen(temp_hud) - 1) * 8, by+22, 0, RENDERER_LIGHT, temp_hud);
 
 	// Draw score hud
-	Util_SetRect(&r, 64, 4288, 96, 32);
+	Util_SetRect(&r, 128, 1264, 96, 32);
 	Renderer_DrawBitmap(0, 0, &r, 2, RENDERER_LIGHT);
 	sprintf(temp_hud, "%08d", local_data->score);
 	Renderer_DrawText(29, 5, 0, RENDERER_LIGHT, temp_hud);
@@ -2490,14 +2535,23 @@ void Player_DrawHUD(WOBJ *player) {
 		if (trans < 2) trans = 2;
 		if (trans > 7) trans = 7;
 		bx = RENDERER_WIDTH / 2 - 64, by = level_end_rank_y;
-		Util_SetRect(&r, 128, 2432, 32, 32);
+		const CNM_RECT rank_rects[] = {
+			{ 128, 256, 32, 32 },
+			{ 128, 256+32, 32, 32 },
+			{ 128+32, 256, 32, 32 },
+			{ 128+32, 256+32, 32, 32 },
+			{ 128+64, 256, 32, 32 },
+		};
+		//Util_SetRect(&r, 128, 2432, 32, 32);
 		if (local_data->finish_timer < PLAYER_FINISH_TIMER / 4) {
-			r.y += Util_RandInt(0, 4) * 32;
+			//r.y += Util_RandInt(0, 4) * 32;
+			r = rank_rects[Util_RandInt(0, 4)];
 		} else {
-			r.y += local_data->level_end_rank * 32;
+			//r.y += local_data->level_end_rank * 32;
+			r = rank_rects[local_data->level_end_rank];
 		}
 		Renderer_DrawBitmap(bx + 80, by + 32, &r, trans2, RENDERER_LIGHT);
-		Util_SetRect(&r, 0, 2432, 128, 80);
+		Util_SetRect(&r, 384, 896, 128, 80);
 		Renderer_DrawBitmap(bx, by, &r, trans, RENDERER_LIGHT);
 		Renderer_DrawText(bx + 4, by + 8, trans2, RENDERER_LIGHT, "SCORE: %d", local_data->level_end_score);
 		Renderer_DrawText(bx + 4, by + 16, trans2, RENDERER_LIGHT, "TIME: %d", local_data->level_end_time_score);

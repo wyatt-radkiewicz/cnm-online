@@ -438,7 +438,7 @@ static void WobjDroppedItem_Draw(WOBJ *wobj, int camx, int camy) {
 			(int)wobj->x - camx,
 			(int)wobj->y - camy,
 			&(CNM_RECT) {
-				.x = 480, .y = 7520 + ((Game_GetFrame() / 2) % 8) * 32, .w = 32, .h = 32
+				.x = 0, .y = 1296 + ((Game_GetFrame() / 2) % 8) * 32, .w = 32, .h = 32
 			},
 			2,
 			RENDERER_LIGHT
@@ -1728,8 +1728,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ /* 1: Teleport Object */
 		WobjTeleport_Create, WobjTeleport_Animate, WobjTeleport_Draw, NULL,
 		{
-			{96, 32, 32, 32},
-			{32, 160, 32, 32}
+			{0, 32, 32, 32},
+			{0, 64, 32, 32}
 		},
 		0.0f,
 		0,
@@ -1739,8 +1739,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ /* 2: Slime Object */
 		WobjSlime_Create, WobjSlime_Update, WobjSlime_Draw, WobjGeneric_Hurt,
 		{
-			{32, 256, 32, 32},
-			{32, 256 + 32, 32, 32}
+			{192, 32, 32, 32},
+			{192, 64, 32, 32}
 		},
 		0.00f,
 		10,
@@ -1788,7 +1788,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ /* 5: Player Shotgun Pellet Object */
 		WobjPlayerPellet_Create, WobjPlayerPellet_Update, WobjGeneric_Draw, NULL,
 		{
-			{0, 224, 32, 32}
+			{32, 0, 32, 32}
 		},
 		0.0f,
 		0,
@@ -1848,7 +1848,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ /* 11: Generic Breakable Brick Wall */
 		WobjBrickWallBreakable_Create, Wobj_TryTeleportArea2, WobjGeneric_Draw, WobjGeneric_Hurt,
 		{
-			{256, 160, 32, 32}
+			{64, 32, 32, 32}
 		},
 		0.0f,
 		0,
@@ -1871,7 +1871,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw,					// On Draw
 		NULL,								// On Hurt
 		{									// Animation Frames
-			{32, 320, 32, 32},
+			{448, 288, 32, 32},
 			{0, 0, 0, 0}
 		},
 		0.0f,								// Strength Reward
@@ -1909,47 +1909,47 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL,				  // On Hurt
 		{					  // Animation Frames
 			{320, 1216, 32, 32}, // Null Item
-			{32, 352, 32, 32},  // Shotgun item
-			{64, 352, 32, 32},  // Knife Item
-			{96, 352, 32, 32},  // Apple Item
-			{128, 352, 32, 32}, // Cake Item
-			{160, 352, 32, 32}, // Strength Potion
-			{192, 352, 32, 32}, // Speed Potion
-			{224, 352, 32, 32}, // Jump Potion
-			{0, 384, 32, 32},	// Sword Item
-			{32, 384, 32, 32}, 	// Health Potion
-			{64, 384, 32, 32}, 	// Sniper Rifle
-			{96, 384, 32, 32}, 	// 50 Dollars
-			{128, 384, 32, 32},	// 100 Dollars
-			{160, 384, 32, 32},	// 500 Dollars
-			{192, 384, 32, 32},	// Cheeseburger
-			{224, 384, 32, 32},	// Golden Axe
-			{0, 416, 32, 32},	// Unbound Wand
-			{32, 416, 32, 32}, 	// Fire Wand
-			{64, 416, 32, 32}, 	// Ice Wand
-			{96, 416, 32, 32}, 	// Air Wand
-			{128, 416, 32, 32},	// Lightning Wand
-			{160, 416, 32, 32},	// Golden Shotgun
-			{192, 416, 32, 32},	// Laser Rifle
-			{224, 416, 32, 32},	// Rocket Launcher
-			{0, 448, 32, 32},	// Fire Resistance Potion
-			{32, 448, 32, 32}, 	// Minigun
-			{64, 448, 32, 32}, 	// Mega Health Potion
-			{96, 448, 32, 32}, 	// Ultra Mega Health Potion
-			{128, 448, 32, 32},	// AWP Item
-			{160, 448, 32, 32},	// Flamethrower
-			{192, 448, 32, 32},	// Poisionus Strength Potion
-			{224, 448, 32, 32},	// Poisionus Speed Potion
-			{0, 480, 32, 32},	// Poisionus Jump Potion
-			{32, 480, 32, 32}, 	// Unused
-			{64, 480, 32, 32}, 	// Unused
-			{96, 480, 32, 32}, 	// Unused
-			{128, 480, 32, 32},	// Unused
-			{160, 480, 32, 32},	// Unused
-			{192, 480, 32, 32},	// Unused
-			{224, 480, 32, 32},	// Unused
-			{128, 736, 32, 32}, // 1-Up box
-			{160, 2048, 32, 32}, // Wrench
+			{32, 352-256, 32, 32},  // Shotgun item
+			{64, 352-256, 32, 32},  // Knife Item
+			{96, 352-256, 32, 32},  // Apple Item
+			{128, 352-256, 32, 32}, // Cake Item
+			{160, 352-256, 32, 32}, // Strength Potion
+			{192, 352-256, 32, 32}, // Speed Potion
+			{224, 352-256, 32, 32}, // Jump Potion
+			{0, 384-256, 32, 32},	// Sword Item
+			{32, 384-256, 32, 32}, 	// Health Potion
+			{64, 384-256, 32, 32}, 	// Sniper Rifle
+			{96, 384-256, 32, 32}, 	// 50 Dollars
+			{128, 384-256, 32, 32},	// 100 Dollars
+			{160, 384-256, 32, 32},	// 500 Dollars
+			{192, 384-256, 32, 32},	// Cheeseburger
+			{224, 384-256, 32, 32},	// Golden Axe
+			{0, 416-256, 32, 32},	// Unbound Wand
+			{32, 416-256, 32, 32}, 	// Fire Wand
+			{64, 416-256, 32, 32}, 	// Ice Wand
+			{96, 416-256, 32, 32}, 	// Air Wand
+			{128, 416-256, 32, 32},	// Lightning Wand
+			{160, 416-256, 32, 32},	// Golden Shotgun
+			{192, 416-256, 32, 32},	// Laser Rifle
+			{224, 416-256, 32, 32},	// Rocket Launcher
+			{0, 448-256, 32, 32},	// Fire Resistance Potion
+			{32, 448-256, 32, 32}, 	// Minigun
+			{64, 448-256, 32, 32}, 	// Mega Health Potion
+			{96, 448-256, 32, 32}, 	// Ultra Mega Health Potion
+			{128, 448-256, 32, 32},	// AWP Item
+			{160, 448-256, 32, 32},	// Flamethrower
+			{192, 448-256, 32, 32},	// Poisionus Strength Potion
+			{224, 448-256, 32, 32},	// Poisionus Speed Potion
+			{0, 480-256, 32, 32},	// Poisionus Jump Potion
+			{32, 480-256, 32, 32}, 	// Unused
+			{64, 480-256, 32, 32}, 	// Unused
+			{96, 480-256, 32, 32}, 	// Unused
+			{128, 480-256, 32, 32},	// Unused
+			{160, 480-256, 32, 32},	// Unused
+			{192, 480-256, 32, 32},	// Unused
+			{224, 480-256, 32, 32},	// Unused
+			{256, 96, 32, 32}, // 1-Up box
+			{288, 96, 32, 32}, // Wrench
 		},
 		0.0f,				  // Strength Reward
 		0,					  // Money Reward
@@ -1962,7 +1962,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{64, 320, 32, 32},
+			{480, 288, 32, 32},
 			{0, 0, 0, 0} // Null Frame
 		},
 		0.0f, // Strength reward
@@ -1976,7 +1976,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{224, 384, 32, 32},
+			{224, 128, 32, 32},
 			{0, 0, 0, 0} // Null Frame
 		},
 		0.0f, // Strength reward
@@ -1990,7 +1990,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{263, 361, 46, 44}
+			{326, 136, 48, 46}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2003,7 +2003,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{448, 32, 64, 32}
+			{128, 0, 64, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2016,7 +2016,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{256, 64, 64, 64}
+			{256, 128, 64, 64}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2029,8 +2029,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjLightningRune_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{320, 64, 64, 64},
-			{320+64, 64, 64, 64}
+			{384, 64, 64, 64},
+			{384, 128, 64, 64}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2043,7 +2043,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{256, 64, 64, 64}
+			{256, 128, 64, 64}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2056,7 +2056,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{263, 361, 46, 44}
+			{326, 136, 48, 46}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2069,7 +2069,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{448, 32, 64, 32}
+			{128, 0, 64, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2082,8 +2082,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{320, 64, 64, 64},
-			{320 + 64, 64, 64, 64}
+			{384, 64, 64, 64},
+			{384, 128, 64, 64}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2096,7 +2096,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{0, 224, 32, 32}
+			{384, 0, 8, 8}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2109,7 +2109,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjPlayerLaser_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{320, 128, 32, 32}
+			{32, 64, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2122,7 +2122,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{96, 320, 32, 32}
+			{320, 96, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2135,7 +2135,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{320, 896, 192, 192}
+			{320, 704, 192, 192}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2148,9 +2148,9 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjPlayerMinigunPellet_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{0, 4064, 64, 32},
-			{64, 4064, 64, 32},
-			{128, 4064, 64, 32},
+			{128+0, 1232, 64, 32},
+			{128+64, 1232, 64, 32},
+			{128+128, 1232, 64, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2163,7 +2163,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{256, 128, 32, 32}
+			{400, 0, 32, 16}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2176,7 +2176,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{320, 352, 36, 38}
+			{416, 1050, 41, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2189,7 +2189,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{384, 352, 48, 48}
+			{322, 1048, 41, 35}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2202,8 +2202,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{448, 320, 32, 32},
-			{448+32, 320, 32, 32}
+			{448, 256, 32, 32},
+			{448+32, 256, 32, 32}
 		},
 		0.00f, // Strength reward
 		20, // Money reward
@@ -2217,10 +2217,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{128, 224, 64, 64},
-			{128, 288, 64, 64},
-			{160, 2432, 64, 64},
-			{160, 2432+64, 64, 64},
+			{384, 192, 64, 64},
+			{384, 192, 64, 64},
+			{128, 704, 64, 64},
+			{128, 704+64, 64, 64},
 		},
 		0.0f, // Strength reward
 		100, // Money reward
@@ -2234,7 +2234,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{32, 224, 32, 32}
+			{416, 16, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2247,10 +2247,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{192, 224, 128, 128},
-			{192 + 128, 224, 128, 128},
-			{256, 640, 128, 128},
-			{256 + 128, 640, 128, 128}
+			{256, 320, 128, 128},
+			{256 + 128, 320, 128, 128},
+			{0, 320, 128, 128},
+			{0 + 128, 320, 128, 128}
 		},
 		0.0f, // Strength reward
 		1000, // Money reward
@@ -2278,14 +2278,14 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjBozoPin_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{320 + (48 * 0), 1088 + (64 * 0), 48, 64},
-			{320 + (48 * 1), 1088 + (64 * 0), 48, 64},
-			{320 + (48 * 2), 1088 + (64 * 0), 48, 64},
-			{320 + (48 * 3), 1088 + (64 * 0), 48, 64},
-			{320 + (48 * 0), 1088 + (64 * 1), 48, 64},
-			{320 + (48 * 1), 1088 + (64 * 1), 48, 64},
-			{320 + (48 * 2), 1088 + (64 * 1), 48, 64},
-			{320 + (48 * 3), 1088 + (64 * 1), 48, 64}
+			{320 + (48 * 0), 448 + (64 * 0), 48, 64},
+			{320 + (48 * 1), 448 + (64 * 0), 48, 64},
+			{320 + (48 * 2), 448 + (64 * 0), 48, 64},
+			{320 + (48 * 3), 448 + (64 * 0), 48, 64},
+			{320 + (48 * 0), 448 + (64 * 1), 48, 64},
+			{320 + (48 * 1), 448 + (64 * 1), 48, 64},
+			{320 + (48 * 2), 448 + (64 * 1), 48, 64},
+			{320 + (48 * 3), 448 + (64 * 1), 48, 64}
 		},
 		0.0f, // Strength reward
 		750, // Money reward
@@ -2299,8 +2299,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{448, 64, 64, 128},
-			{448, 64+128, 64, 128}
+			{448, 0, 64, 128},
+			{448, 128, 64, 128}
 		},
 		0.0f, // Strength reward
 		10000, // Money reward
@@ -2314,8 +2314,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjSlime_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{64, 256, 32, 32},
-			{64, 256 + 32, 32, 32}
+			{224, 32, 32, 32},
+			{224, 32 + 32, 32, 32}
 		},
 		0.0f, // Strength reward
 		100, // Money reward
@@ -2328,8 +2328,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{416, 400, 48, 48},
-			{416 + 48, 400, 48, 48}
+			{256, 48, 48, 48},
+			{256 + 48, 48, 48, 48}
 		},
 		0.0f, // Strength reward
 		5000, // Money reward
@@ -2343,7 +2343,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{256, 416, 32, 32}
+			{224, 0, 32, 32}
 		},
 		0.0f, // Strength reward
 		5000, // Money reward
@@ -2356,7 +2356,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{288, 416, 32, 64}
+			{352, 48, 32, 64}
 		},
 		0.0f, // Strength reward
 		10000, // Money reward
@@ -2370,10 +2370,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjSlimeWalker_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 1376, 64, 64},
-			{384+64, 1376, 64, 64},
-			{384, 1376+64, 64, 64},
-			{384+64, 1376+64, 64, 64}
+			{0,  448, 64, 64},
+			{64, 448, 64, 64},
+			{0,  448+64, 64, 64},
+			{64, 448+64, 64, 64}
 		},
 		0.0f, // Strength reward
 		5000, // Money reward
@@ -2387,7 +2387,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{256, 448, 32, 32}
+			{64, 64, 32, 32}
 		},
 		0.0f, // Strength reward
 		50, // Money reward
@@ -2400,11 +2400,11 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{0, 2368, 64, 64},
-			{64, 2368, 64, 64},
-			{128, 2368, 64, 64},
-			{192, 2368, 64, 64},
-			{256, 2368, 64, 64}
+			{0,   976, 64, 64},
+			{64,  976, 64, 64},
+			{128, 976, 64, 64},
+			{192, 976, 64, 64},
+			{256, 976, 64, 64}
 		},
 		0.01f, // Strength reward
 		12500, // Money reward
@@ -2418,10 +2418,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{320, 2368, 64, 64},
-			{384, 2368, 64, 64},
-			{448, 2368, 32, 32},
-			{480, 2368, 32, 32}
+			{320, 976, 64, 64},
+			{384, 976, 64, 64},
+			{448, 976, 32, 32},
+			{480, 976, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2434,8 +2434,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{448, 2400, 32, 32},
-			{480, 2400, 32, 32}
+			{448, 1008, 32, 32},
+			{480, 1008, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2449,7 +2449,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{320, 1248, 32, 32},
-			{256, 480, 32, 32}
+			{32, 32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2463,7 +2463,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{320, 1280, 32, 32},
-			{224, 640, 32, 32},
+			{128, 64, 32, 32},
 			{0, 0, 0, 0}
 		},
 		0.0f, // Strength reward
@@ -2491,7 +2491,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 416, 32, 32}
+			{96, 64, 32, 32}
 		},
 		0.25f, // Strength reward
 		500000, // Money reward
@@ -2504,7 +2504,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{352, 1408, 32, 96}
+			{320, 576, 32, 96}
 		},
 		0.0f, // Strength reward
 		100, // Money reward
@@ -2517,8 +2517,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{96, 256, 32, 32},
-			{96, 256 + 32, 32, 32}
+			{128, 512, 32, 32},
+			{128, 512 + 32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2531,8 +2531,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{288, 1472, 32, 32},
-			{320, 1472, 32, 32}
+			{288, 672, 32, 32},
+			{320, 672, 32, 32}
 		},
 		0.0f, // Strength reward
 		500, // Money reward
@@ -2545,7 +2545,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{384, 2048, 32, 32}
+			{352, 672, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2558,9 +2558,9 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{224, 1536, 32, 32},
-			{256, 1536, 32, 32},
-			{288, 1536, 32, 32},
+			{128, 544, 32, 32},
+			{160, 544, 32, 32},
+			{160, 576, 32, 32},
 			{0, 0, 0, 0}
 		},
 		0.0f, // Strength reward
@@ -2575,8 +2575,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{416, 2048, 32, 32},
-			{96, 256, 32, 32},
-			{96, 256 + 32, 32, 32}
+			{128, 512, 32, 32},
+			{128, 512 + 32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2590,8 +2590,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{480, 2048, 32, 32},
-			{96, 256, 32, 32},
-			{96, 256 + 32, 32, 32}
+			{128, 512, 32, 32},
+			{128, 512 + 32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2605,8 +2605,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{448, 2048, 32, 32},
-			{96, 256, 32, 32},
-			{96, 256 + 32, 32, 32}
+			{128, 512, 32, 32},
+			{128, 512 + 32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2619,7 +2619,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 1664, 128, 128}
+			{192, 704, 128, 128}
 		},
 		0.01f, // Strength reward
 		10000, // Money reward
@@ -2646,7 +2646,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{416, 2080, 32, 32}
+			{352, 640, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2659,10 +2659,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{384, 2432, 32, 32},
-			{416, 2432, 32, 32},
-			{448, 2432, 32, 32},
-			{384, 2464, 32, 32}
+			{304, 896, 32, 32},
+			{336, 896, 32, 32},
+			{272, 928, 32, 32},
+			{304, 928, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2675,12 +2675,12 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{0, 2512, 32, 32},
-			{64, 2512, 32, 32},
-			{96, 2512, 32, 32},
-			{0, 2512+32, 32, 32},
-			{32, 2512+32, 32, 32},
-			{64, 2512+32, 32, 32},
+			{0, 1040, 32, 32},
+			{64, 1040, 32, 32},
+			{96, 1040, 32, 32},
+			{0, 1040+32, 32, 32},
+			{32, 1040+32, 32, 32},
+			{64, 1040+32, 32, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2693,7 +2693,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{416, 2080, 32, 32}
+			{416, 16, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2706,7 +2706,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 2528, 32, 64}
+			{240, 896, 32, 64}
 		},
 		0.0f, // Strength reward
 		20000, // Money reward
@@ -2720,10 +2720,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{416, 2528, 32, 32},
-			{448, 2528, 32, 32},
-			{416, 2560, 32, 32},
-			{448, 2560, 32, 32}
+			{224, 864, 32, 32},
+			{256, 864, 32, 32},
+			{288, 864, 32, 32},
+			{272, 896, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2736,7 +2736,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{328, 136, 16, 16}
+			{32, 64, 16, 16}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2749,11 +2749,11 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{224, 2432, 48, 64},
-			{224+48, 2432, 48, 64},
-			{224+48*2, 2432, 48, 64},
-			{224, 2432+64, 48, 64},
-			{224+48, 2432+64, 48, 64},
+			{0, 896, 48, 64},
+			{48, 896, 48, 64},
+			{48*2, 896, 48, 64},
+			{48*3, 896, 48, 64},
+			{48*4, 896, 48, 64},
 		},
 		0.05f, // Strength reward
 		100000, // Money reward
@@ -2767,7 +2767,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{384, 2592, 32, 32}
+			{224, 256, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2780,7 +2780,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 2208, 32, 32}
+			{288, 832, 32, 32}
 		},
 		0.0f, // Strength reward
 		100, // Money reward
@@ -2794,14 +2794,14 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{384 + (32 * 0), 1984+ (32 * 0), 32, 32},
-			{384 + (32 * 1), 1984+ (32 * 0), 32, 32},
-			{384 + (32 * 2), 1984+ (32 * 0), 32, 32},
-			{384 + (32 * 3), 1984+ (32 * 0), 32, 32},
-			{384 + (32 * 0), 1984+ (32 * 1), 32, 32},
-			{384 + (32 * 1), 1984+ (32 * 1), 32, 32},
-			{384 + (32 * 2), 1984+ (32 * 1), 32, 32},
-			{384 + (32 * 3), 1984+ (32 * 1), 32, 32}
+			{(32 * 0), 256 + (32 * 0), 32, 32},
+			{(32 * 1), 256 + (32 * 0), 32, 32},
+			{(32 * 2), 256 + (32 * 0), 32, 32},
+			{(32 * 3), 256 + (32 * 0), 32, 32},
+			{(32 * 0), 256 + (32 * 1), 32, 32},
+			{(32 * 1), 256 + (32 * 1), 32, 32},
+			{(32 * 2), 256 + (32 * 1), 32, 32},
+			{(32 * 3), 256 + (32 * 1), 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2814,8 +2814,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{416, 2208, 32, 32},
-			{448, 2208, 32, 32}
+			{128, 480, 32, 32},
+			{160, 480, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2880,8 +2880,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{416, 2496, 32, 32},
-			{448, 2496, 32, 32}
+			{192, 288, 32, 32},
+			{192+32, 288, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2907,8 +2907,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{352, 2112, 32, 32},
-			{352, 2112+32, 32, 32},
+			{256, 0, 32, 32},
+			{256+32, 0, 32, 32},
 			{0, 0, 0, 0}
 		},
 		0.0f, // Strength reward
@@ -2922,8 +2922,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjKamakaziSlime_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{448, 2080, 32, 32},
-			{480, 2080, 32, 32},
+			{128, 448, 32, 32},
+			{160, 448, 32, 32},
 		},
 		0.0f, // Strength reward
 		200, // Money reward
@@ -2936,7 +2936,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{320, 896, 192, 192}
+			{320, 704, 192, 192}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -2949,8 +2949,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{448, 0, 32, 32},
-			{480, 0, 32, 32}
+			{64, 0, 32, 32},
+			{96, 0, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3028,10 +3028,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{256, 1184, 32, 32},
-			{256+32, 1184, 32, 32},
-			{256, 1184+32, 32, 32},
-			{256+32, 1184+32, 32, 32}
+			{256, 544, 32, 32},
+			{256+32, 544, 32, 32},
+			{256, 544+32, 32, 32},
+			{256+32, 544+32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3045,11 +3045,11 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
 			{288, 1312, 32, 32},
-			{256, 1248, 32, 32},
-			{288, 1248, 32, 32},
-			{256, 1280, 32, 32},
-			{288, 1280, 32, 32},
-			{256, 1312, 32, 32}
+			{256, 608, 32, 32},
+			{288, 608, 32, 32},
+			{256, 608+32, 32, 32},
+			{288, 608+32, 32, 32},
+			{256, 608+64, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3062,7 +3062,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{288, 1120, 32, 32}
+			{288, 480, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3075,7 +3075,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{288, 1152, 32, 32}
+			{288, 512, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3088,7 +3088,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{288, 1184, 32, 32}
+			{288, 544, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3101,8 +3101,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 3040, 32, 64},
-			{416, 3040, 32, 64}
+			{96, 1072, 32, 64},
+			{128, 1072, 32, 64}
 		},
 		0.0f, // Strength reward
 		500, // Money reward
@@ -3116,7 +3116,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{390, 3117, 22, 19}
+			{198, 1053, 22, 19}
 		},
 		0.0f, // Strength reward
 		10, // Money reward
@@ -3129,7 +3129,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{425, 3122, 14, 14}
+			{72, 1122, 15, 14}
 		},
 		0.0f, // Strength reward
 		10, // Money reward
@@ -3142,9 +3142,9 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 3136, 64, 32},
-			{384, 3168, 64, 32},
-			{448, 3168, 64, 32}
+			{160, 1072, 64, 32},
+			{160, 1072, 64, 32},
+			{64, 1136, 64, 32}
 		},
 		0.0f, // Strength reward
 		750, // Money reward
@@ -3158,10 +3158,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{384, 3392, 32, 96},
-			{416, 3392, 64, 96},
-			{384, 3488, 96, 64},
-			{384, 3552, 96, 32},
+			{320, 1136, 32, 96},
+			{352, 1136, 64, 96},
+			{416, 1136, 96, 64},
+			{416, 1200, 96, 32},
 		},
 		0.0f, // Strength reward
 		1500, // Money reward
@@ -3175,15 +3175,15 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{448 + (32 * 1), 3040 + (32 * 3), 32, 32},
-			{448 + (32 * 1), 3040 + (32 * 2), 32, 32},
-			{448 + (32 * 1), 3040 + (32 * 1), 32, 32},
-			{448 + (32 * 1), 3040 + (32 * 0), 32, 32},
+			{(32 * 1), 1104 + (32 * 3), 32, 32},
+			{(32 * 1), 1104 + (32 * 2), 32, 32},
+			{(32 * 1), 1104 + (32 * 1), 32, 32},
+			{(32 * 1), 1104 + (32 * 0), 32, 32},
 
-			{448 + (32 * 0), 3040 + (32 * 3), 32, 32},
-			{448 + (32 * 0), 3040 + (32 * 2), 32, 32},
-			{448 + (32 * 0), 3040 + (32 * 1), 32, 32},
-			{448 + (32 * 0), 3040 + (32 * 0), 32, 32},
+			{(32 * 0), 1104 + (32 * 3), 32, 32},
+			{(32 * 0), 1104 + (32 * 2), 32, 32},
+			{(32 * 0), 1104 + (32 * 1), 32, 32},
+			{(32 * 0), 1104 + (32 * 0), 32, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3196,10 +3196,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjWaterSplashEffect_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{288, 1088+16, 32, 16},
-			{256, 1088+16, 32, 16},
-			{256, 1088+32, 32, 32},
-			{256, 1088+64, 32, 32},
+			{288, 448+16, 32, 16},
+			{256, 448+16, 32, 16},
+			{256, 448+32, 32, 32},
+			{256, 448+64, 32, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3225,8 +3225,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{256, 3968, 96, 96},
-			{256+96, 3968, 96, 96},
+			{128, 1136, 96, 96},
+			{128+96, 1136, 96, 96},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3239,7 +3239,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{96, 224, 32, 32}
+			{160, 32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3291,14 +3291,14 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjTeleParticles_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{224, 1088, 16, 16},
-			{224+16, 1088, 16, 16},
-			{224, 1088+16, 16, 16},
-			{224+16, 1088+16, 16, 16},
-			{224+32, 1088, 16, 16},
-			{224+48, 1088, 16, 16},
-			{224 + 64, 1088, 16, 16},
-			{224 + 80, 1088, 16, 16},
+			{224, 448, 16, 16},
+			{224+16, 448, 16, 16},
+			{224, 448+16, 16, 16},
+			{224+16, 448+16, 16, 16},
+			{224+32, 448, 16, 16},
+			{224+48, 448, 16, 16},
+			{224 + 64, 448, 16, 16},
+			{224 + 80, 448, 16, 16},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3311,10 +3311,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{192, 1088, 16, 16},
-			{192+16, 1088, 16, 16},
-			{192, 1088+16, 16, 16},
-			{192+16, 1088+16, 16, 16}
+			{192, 448, 16, 16},
+			{192+16, 448, 16, 16},
+			{192, 448+16, 16, 16},
+			{192+16, 448+16, 16, 16}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3327,10 +3327,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{-128+ 256, 64+ 1888, 16, 16},
-			{-128+ 256 + 16, 64+ 1888, 16, 16},
-			{-128+ 256, 64+ 1888 + 16, 16, 16},
-			{-128+ 256 + 16, 64+ 1888 + 16, 16, 16}
+			{224, 832, 16, 16},
+			{224 + 16, 832, 16, 16},
+			{224, 832 + 16, 16, 16},
+			{224 + 16, 832 + 16, 16, 16}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3343,10 +3343,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{-128+ 288, 64+ 1888, 16, 16},
-			{-128+ 288 + 16, 64+ 1888, 16, 16},
-			{-128+ 288, 64+ 1888 + 16, 16, 16},
-			{-128+ 288 + 16, 64+ 1888 + 16, 16, 16}
+			{256, 832, 16, 16},
+			{256 + 16, 832, 16, 16},
+			{256, 832 + 16, 16, 16},
+			{256 + 16, 832 + 16, 16, 16}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3359,8 +3359,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjLightningRune_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{192, 1120, 48, 48},
-			{192, 1120+48, 48, 48}
+			{192, 480, 48, 48},
+			{192, 480+48, 48, 48}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3469,10 +3469,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjSlimeWalker_Draw, // Draw
 		WobjGeneric_Hurt, // Hurt callback
 		{ // Animation Frames
-			{352,      4480,      64, 32},
-			{352 + 64, 4480,      64, 32},
-			{352,      4480 + 32, 64, 32},
-			{352 + 64, 4480 + 32, 64, 32}
+			{384,      1840,      64, 32},
+			{384 + 64, 1840,      64, 32},
+			{384,      1840 + 32, 64, 32},
+			{384 + 64, 1840 + 32, 64, 32}
 		},
 		0.0f, // Strength reward
 		500, // Money reward
@@ -3540,8 +3540,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{288, 32, 6, 6},
-			{304, 32, 9, 4}
+			{384, 16, 6, 6},
+			{400, 16, 9, 4}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3580,7 +3580,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{96, 320, 32, 32},
+			{320, 96, 32, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3606,8 +3606,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{96, 256, 32, 32},
-			{96, 256+32, 32, 32}
+			{128, 512, 32, 32},
+			{128, 512+32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3620,17 +3620,28 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjSkinUnlock_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{128, 1824, 32, 32},
-			{256, 1824, 32, 32},
-			{256, 1920-32, 32, 32},
-			{256, 3392, 32, 32},
-			{128, 1984, 32, 32},
-			{0, 1280, 32, 32},
-			{128, 1280, 32, 32},
+			{0, 704, 32, 32},
 			{0, 768, 32, 32},
-			{128, 768, 32, 32},
-			{5, 4616, 32, 32},
-			{0, 7776, 32, 32},
+			{0, 832, 32, 32},
+			{0, 1232, 32, 32},
+			{0, 1584, 40, 40},
+			{0, 640, 32, 32},
+			{128, 640, 32, 32},
+			{384, 640, 32, 32},
+			{0, 1712, 40, 40},
+			{0, 1328, 40, 40},
+			{0, 1456, 40, 40},
+			//{128, 1824, 32, 32},
+			//{256, 1824, 32, 32},
+			//{256, 1920-32, 32, 32},
+			//{256, 3392, 32, 32},
+			//{128, 1984, 32, 32},
+			//{0, 1280, 32, 32},
+			//{128, 1280, 32, 32},
+			//{0, 768, 32, 32},
+			//{128, 768, 32, 32},
+			//{5, 4616, 32, 32},
+			//{0, 7776, 32, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -3644,8 +3655,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{352, 2112, 32, 32},
-			{352, 2112+32, 32, 32},
+			{256, 0, 32, 32},
+			{256+32, 0, 32, 32},
 			{0, 0, 0, 0}
 		},
 		0.0f, // Strength reward
@@ -3688,14 +3699,14 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{ 160, 7744, 32, 32, },
-			{ 160+32*1, 7744, 32, 32, },
-			{ 160+32*2, 7744, 32, 32, },
-			{ 160+32*3, 7744, 32, 32, },
-			{ 160+32*4, 7744, 32, 32, },
-			{ 160+32*5, 7744, 32, 32, },
-			{ 160+32*6, 7744, 32, 32, },
-			{ 160+32*7, 7744, 32, 32, },
+			{ 256,      1296, 32, 32, },
+			{ 256+32*1, 1296, 32, 32, },
+			{ 256+32*2, 1296, 32, 32, },
+			{ 256+32*3, 1296, 32, 32, },
+			{ 256+32*4, 1296, 32, 32, },
+			{ 256+32*5, 1296, 32, 32, },
+			{ 256+32*6, 1296, 32, 32, },
+			{ 256+32*7, 1296, 32, 32, },
 		},
 		0.0f, // Strength reward
 		0, // Money reward
