@@ -155,7 +155,7 @@ void Serial_LoadBlocks(const char *cnmb_file)
 	}
 	e = lparse_get_entry(lp, "BP_HITBOX");
 	for (i = 0; i < numprops; i++) {
-		if (Blocks_GetBlockProp(i)->coll_type != BLOCKS_COLL_BOX) continue;
+		if (Blocks_GetBlockProp(i)->coll_type == BLOCKS_COLL_HEIGHT) continue;
 		lparse_get_data(lp, e, i, 1, &Blocks_GetBlockProp(i)->coll_data.hitbox);
 	}
 	FileSystem_RegisterBlocks(cnmb_file);

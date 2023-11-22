@@ -370,14 +370,14 @@ static void Command_StartBlockEdit(const char *args, int from_player)
 	if (Game_TopState() == GAME_STATE_BLOCKSEDIT || Game_TopState() == GAME_STATE_SINGLEPLAYER)
 		return;
 
-	Game_SwitchState(GAME_STATE_BLOCKSEDIT);
+	if (can_run_cheat3(from_player)) Game_SwitchState(GAME_STATE_BLOCKSEDIT);
 }
 static void Command_StartMainMenu(const char *args, int from_player)
 {
 	if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_SINGLEPLAYER)
 		return;
 
-	Game_SwitchState(GAME_STATE_MAINMENU);
+	if (can_run_cheat3(from_player)) Game_SwitchState(GAME_STATE_MAINMENU);
 }
 static void Command_ClearAllBlocks(const char *args, int from_player)
 {
@@ -396,10 +396,10 @@ static void Command_ClearAllBlocks(const char *args, int from_player)
 }
 static void Command_StartBPEdit(const char *args, int from_player)
 {
-	if (Game_TopState() == GAME_STATE_BLOCKPROPSEDIT || Game_TopState() == GAME_STATE_SINGLEPLAYER)
+	if (Game_TopState() == GAME_STATE_BLOCKPROPSEDIT)
 		return;
-
-	Game_SwitchState(GAME_STATE_BLOCKPROPSEDIT);
+	
+	if (can_run_cheat3(from_player)) Game_SwitchState(GAME_STATE_BLOCKPROPSEDIT);
 }
 static void Command_SaveSpawners(const char *args, int from_player)
 {
@@ -512,7 +512,7 @@ static void Command_StartLightEdit(const char *args, int from_player)
 	if (Game_TopState() == GAME_STATE_LIGHT_EDITOR || Game_TopState() == GAME_STATE_SINGLEPLAYER)
 		return;
 
-	Game_SwitchState(GAME_STATE_LIGHT_EDITOR);
+	if (can_run_cheat3(from_player)) Game_SwitchState(GAME_STATE_LIGHT_EDITOR);
 }
 static void Command_Noclip(const char *args, int from_player)
 {

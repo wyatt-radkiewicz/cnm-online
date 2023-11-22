@@ -159,12 +159,12 @@ static void ChangeBlockCollType(GUI_ELEMENT *elem, int index)
 		{
 			memset(bp->coll_data.heightmap, 0, sizeof(bp->coll_data.heightmap));
 		}
-		else if (bp->coll_type == BLOCKS_COLL_BOX)
+		else if (bp->coll_type == BLOCKS_COLL_BOX || bp->coll_type == BLOCKS_COLL_JT)
 		{
 			Util_SetRect(&bp->coll_data.hitbox, 0, 0, BLOCK_SIZE, BLOCK_SIZE);
 		}
 
-		elem->frame->elements[index + 1].props.btn_link = (bp->coll_type ? NULL : block_coll_hitbox[elem->frame->custom_hint]);
+		elem->frame->elements[index + 1].props.btn_link = (bp->coll_type == BLOCKS_COLL_HEIGHT ? NULL : block_coll_hitbox[elem->frame->custom_hint]);
 	}
 }
 static void BlockChangeHitboxSize(GUI_ELEMENT *elem, int index)
@@ -183,7 +183,7 @@ static void SetHitboxEditingMode(GUI_ELEMENT *elem, int index)
 	{
 		BLOCK_PROPS *bp = Blocks_GetBlockProp(elem->frame->custom_hint);
 
-		if (bp->coll_type == BLOCKS_COLL_BOX)
+		if (bp->coll_type == BLOCKS_COLL_BOX || bp->coll_type == BLOCKS_COLL_JT)
 		{
 			editing_hitbox = CNM_TRUE;
 		}
@@ -272,8 +272,9 @@ static void InitializeBlockPropPreviews(void)
 		Gui_InitSetElement(block_props[i], 10, ChangeBlockCollType, "COLLISION TYPE: ");
 		Gui_AddItemToSet(block_props[i], 10, "HITBOX");
 		Gui_AddItemToSet(block_props[i], 10, "HEIGHTMAP");
+		Gui_AddItemToSet(block_props[i], 10, "JMPT");
 		block_props[i]->elements[10].props.set_index = bp->coll_type;
-		Gui_InitButtonElement(block_props[i], 11, SetHitboxEditingMode, "COLLISION DATA", (bp->coll_type ? NULL : block_coll_hitbox[i]), CNM_FALSE);
+		Gui_InitButtonElement(block_props[i], 11, SetHitboxEditingMode, "COLLISION DATA", (bp->coll_type == BLOCKS_COLL_HEIGHT ? NULL : block_coll_hitbox[i]), CNM_FALSE);
 		Gui_InitNumberElement(block_props[i], 12, ChangeBlockAnimSpeed, "ANIMATION SPEED: ", 1, 30*60*60, bp->anim_speed);
 		Gui_InitNumberElement(block_props[i], 13, ChangeBlockFrameCount, "NUMBER OF FRAMES: ", 1, BLOCKS_MAX_FRAMES, bp->num_frames);
 		UpdateBlockPropsEditableFrames(block_props[i]);
