@@ -3903,9 +3903,9 @@
       ],
       "type_data": {
         "KeyRemover": {
-          "remove_red": true,
-          "remove_green": false,
-          "remove_blue": true
+          "remove_red": false,
+          "remove_green": true,
+          "remove_blue": false
         }
       },
       "spawning_criteria": {

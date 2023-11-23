@@ -439,7 +439,7 @@ static void WobjDroppedItem_Draw(WOBJ *wobj, int camx, int camy) {
 			(int)wobj->x - camx,
 			(int)wobj->y - camy,
 			&(CNM_RECT) {
-				.x = 0, .y = 1296 + ((Game_GetFrame() / 2) % 8) * 32, .w = 32, .h = 32
+				.x = 0 + ((Game_GetFrame() / 2) % 8) * 32, .y = 1296, .w = 32, .h = 32
 			},
 			2,
 			RENDERER_LIGHT
@@ -2491,8 +2491,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjFireball_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{96, 256, 32, 32},
-			{96, 256+32, 32, 32}
+			{128, 512, 32, 32},
+			{128, 512+32, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
