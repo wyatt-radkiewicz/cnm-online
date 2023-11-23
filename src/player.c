@@ -1433,6 +1433,33 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BGSPEED_Y);
 	if (other != NULL)
 		Background_GetLayer(other->custom_ints[0])->speed[1] = other->custom_floats[0];
+	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_KEY_REMOVER);
+	if (other != NULL) {
+		if (other->custom_ints[0] & 0x1) {
+			if (local_data->offhand_item == ITEM_TYPE_KEY_RED) {
+				local_data->offhand_item = ITEM_TYPE_NOITEM;
+			}
+			if (Item_GetCurrentItem()->type == ITEM_TYPE_KEY_RED) {
+				Item_DestroyCurrentItem(wobj);
+			}
+		}
+		if (other->custom_ints[0] & 0x2) {
+			if (local_data->offhand_item == ITEM_TYPE_KEY_GREEN) {
+				local_data->offhand_item = ITEM_TYPE_NOITEM;
+			}
+			if (Item_GetCurrentItem()->type == ITEM_TYPE_KEY_GREEN) {
+				Item_DestroyCurrentItem(wobj);
+			}
+		}
+		if (other->custom_ints[0] & 0x4) {
+			if (local_data->offhand_item == ITEM_TYPE_KEY_BLUE) {
+				local_data->offhand_item = ITEM_TYPE_NOITEM;
+			}
+			if (Item_GetCurrentItem()->type == ITEM_TYPE_KEY_BLUE) {
+				Item_DestroyCurrentItem(wobj);
+			}
+		}
+	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BGTRANS);
 	if (other != NULL)
 		Background_GetLayer(other->custom_ints[0])->transparency = (int)other->custom_floats[0];

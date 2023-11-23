@@ -1923,6 +1923,9 @@ static void WobjPet_Draw(WOBJ *wobj, int camx, int camy) {
 		wobj->flags & WOBJ_VFLIP
 	);
 }
+static void Wobj_KeyRemover_Create(WOBJ *wobj) {
+	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 64.0f, 96.0f);
+}
 
 #define LUAOBJ_DEF {\
 	NULL,\
@@ -3940,7 +3943,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 153: Invisible Block Object
 		WobjInvisBlock_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		NULL, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3954,7 +3957,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	},
 	{ // 154: Player Pet Skin Unlock Object
 		Wobj_Trigger32x32_Create, // Create
-		NULL, // Update
+		Wobj_TryTeleportArea2, // Update
 		WobjPetUnlock_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
@@ -3978,6 +3981,20 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0, // Money reward
 		CNM_TRUE, // Does network interpolation?
 		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 156: Key Remover Object
+		Wobj_KeyRemover_Create, // Create
+		Wobj_TryTeleportArea2, // Update
+		NULL, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{ 0, 0, 32, 32, },
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_TRUE, // Can respawn?
 		0, // Score reward
 	},
 };
