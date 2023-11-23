@@ -1474,6 +1474,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			!(local_data->vortex_cooldown > 0 && local_data->last_used_vortex_node == other->node_id &&
 			  local_data->last_used_vortex_uuid == other->uuid))
 		{
+			wobj->custom_ints[1] &= ~(PLAYER_FLAG_STOMPING | PLAYER_FLAG_SLIDE_AFTERIMAGE);
 			local_data->vortex_usage_timer = 30*10;
 			local_data->vortexed_mode = CNM_TRUE;
 			local_data->vortex_x = other->x + 32.0f;

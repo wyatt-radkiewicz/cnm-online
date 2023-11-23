@@ -989,7 +989,7 @@
           "speed": 6.0,
           "despawn": false,
           "bitmapx": 10,
-          "bitmapy": 70
+          "bitmapy": 81
         }
       },
       "spawning_criteria": {
@@ -1002,7 +1002,7 @@
     },
     {
       "pos": [
-        5360.0,
+        5359.8345,
         3136.0
       ],
       "type_data": {
@@ -1012,7 +1012,7 @@
           "speed": 6.0,
           "despawn": false,
           "bitmapx": 10,
-          "bitmapy": 70
+          "bitmapy": 81
         }
       },
       "spawning_criteria": {
@@ -1712,7 +1712,7 @@
     },
     {
       "pos": [
-        1824.0,
+        1823.6895,
         3040.0
       ],
       "type_data": {
@@ -1720,8 +1720,8 @@
           "vertical": false,
           "dist": 159.0,
           "speed": 3.0,
-          "bitmapx": 0,
-          "bitmapy": 0,
+          "bitmapx": 15,
+          "bitmapy": 81,
           "jumpthrough": false
         }
       },
@@ -1743,8 +1743,8 @@
           "vertical": false,
           "dist": 159.0,
           "speed": 3.0,
-          "bitmapx": 0,
-          "bitmapy": 0,
+          "bitmapx": 15,
+          "bitmapy": 81,
           "jumpthrough": false
         }
       },
@@ -1766,8 +1766,8 @@
           "vertical": false,
           "dist": 159.0,
           "speed": 3.0,
-          "bitmapx": 0,
-          "bitmapy": 0,
+          "bitmapx": 15,
+          "bitmapy": 81,
           "jumpthrough": false
         }
       },
@@ -1789,8 +1789,8 @@
           "vertical": false,
           "dist": 159.0,
           "speed": 3.0,
-          "bitmapx": 0,
-          "bitmapy": 0,
+          "bitmapx": 15,
+          "bitmapy": 81,
           "jumpthrough": false
         }
       },
@@ -1812,8 +1812,8 @@
           "vertical": false,
           "dist": 159.0,
           "speed": 3.0,
-          "bitmapx": 0,
-          "bitmapy": 0,
+          "bitmapx": 15,
+          "bitmapy": 81,
           "jumpthrough": false
         }
       },
@@ -1835,8 +1835,8 @@
           "vertical": false,
           "dist": 159.0,
           "speed": 3.0,
-          "bitmapx": 0,
-          "bitmapy": 0,
+          "bitmapx": 15,
+          "bitmapy": 81,
           "jumpthrough": false
         }
       },
@@ -3588,8 +3588,8 @@
           "vertical": true,
           "dist": 156.0,
           "speed": 4.0,
-          "bitmapx": 0,
-          "bitmapy": 0,
+          "bitmapx": 15,
+          "bitmapy": 81,
           "jumpthrough": false
         }
       },
@@ -3604,7 +3604,7 @@
     {
       "pos": [
         2672.0,
-        768.0
+        680.0
       ],
       "type_data": {
         "MovingFire": {
@@ -3613,7 +3613,7 @@
           "speed": 6.0,
           "despawn": false,
           "bitmapx": 10,
-          "bitmapy": 70
+          "bitmapy": 81
         }
       },
       "spawning_criteria": {
@@ -4461,6 +4461,164 @@
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
         "max_concurrent_spawns": 1
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2000.0,
+        3040.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": false,
+          "dist": 159.0,
+          "speed": 3.0,
+          "bitmapx": 15,
+          "bitmapy": 81,
+          "jumpthrough": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        1696.3156,
+        3040.0
+      ],
+      "type_data": {
+        "MovingPlatform": {
+          "vertical": false,
+          "dist": 159.0,
+          "speed": 3.0,
+          "bitmapx": 15,
+          "bitmapy": 81,
+          "jumpthrough": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        1824.0,
+        3040.0
+      ],
+      "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        1824.0,
+        3008.0
+      ],
+      "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        1824.0,
+        3072.0
+      ],
+      "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        1824.0,
+        2976.0
+      ],
+      "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2016.0,
+        2976.0
+      ],
+      "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2016.0,
+        3008.0
+      ],
+      "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2016.0,
+        3040.0
+      ],
+      "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2016.0,
+        3072.0
+      ],
+      "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
       },
       "dropped_item": null,
       "spawner_group": null

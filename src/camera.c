@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "renderer.h"
 #include "wobj.h"
+#include "player.h"
 
 static int *camx, *camy;
 static int cam_in_ybounds, camy_scroll_back, cam_forced, cam_top;
@@ -29,6 +30,7 @@ void Camera_Setup(int x, int y)
 void Camera_Update(int target_x, int target_y)
 {
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
+	PLAYER_LOCAL_DATA *plr_local = player->local_data;
 
 	if (cam_forced)
 		return;
@@ -67,6 +69,10 @@ void Camera_Update(int target_x, int target_y)
 	if (fabsf(player->vel_y) > 14.5f) {
 		cam_ext_targety = player->vel_y < 0.0f ? -64 : 64;
 	} else {
+		cam_ext_targety = 0;
+	}
+	if (plr_local->vortexed_mode) {
+		cam_ext_target = 0;
 		cam_ext_targety = 0;
 	}
 	if (cam_ext_offset < cam_ext_target) cam_ext_offset += 4;
