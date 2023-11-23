@@ -1779,7 +1779,7 @@ static void WobjPet_Update(WOBJ *wobj) {
 		}
 		wobj->y += (target_y - wobj->y) * 0.15f;
 		wobj->x += (target_x - wobj->x) * 0.15f;
-		if (Game_GetFrame() % 8 == 0) wobj->anim_frame += 1;
+		if (Game_GetFrame() % 3 == 0) wobj->anim_frame += 1;
 		wobj->money = 0;
 	} else if (def->ai_type == PETAI_WALK || def->ai_type == PETAI_BOUNCE) {
 		if (!local->didinit) {
@@ -1802,10 +1802,10 @@ static void WobjPet_Update(WOBJ *wobj) {
 			changed_target = CNM_TRUE;
 			if (fabsf(target_x - wobj->x) < 8.0f && (def->ai_type == PETAI_WALK || !def->ai_data.bounce.bounce_idly)) {
 				wobj->money = 0;
-				if (Game_GetFrame() % 8 == 0) wobj->anim_frame++;
+				if (Game_GetFrame() % 6 == 0) wobj->anim_frame++;
 			} else {
 				wobj->money = 1;
-				if (Game_GetFrame() % 5 == 0) wobj->anim_frame++;
+				if (Game_GetFrame() % 4 == 0) wobj->anim_frame++;
 			}
 			wobj->custom_ints[1]++;
 		} else {
@@ -1814,7 +1814,7 @@ static void WobjPet_Update(WOBJ *wobj) {
 
 		if (!changed_target && def->ai_type == PETAI_WALK) {
 			wobj->money = 1;
-			if (Game_GetFrame() % 5 == 0) wobj->anim_frame++;
+			if (Game_GetFrame() % 4 == 0) wobj->anim_frame++;
 
 			if (!Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 8.0f)) {
 				wobj->money = 2;
@@ -1822,7 +1822,7 @@ static void WobjPet_Update(WOBJ *wobj) {
 			}
 		} else if (!changed_target) {
 			wobj->money = 1;
-			if (Game_GetFrame() % 5 == 0) wobj->anim_frame++;
+			if (Game_GetFrame() % 4 == 0) wobj->anim_frame++;
 		}
 
 		float gospeed = 0.2f;
