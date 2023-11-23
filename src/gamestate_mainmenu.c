@@ -30,7 +30,7 @@
 static const int skin_bases[PLAYER_MAX_SKINS][2] =
 {
 	{0, 96},
-	{32, 96},
+	{192, 256},
 	{64, 96},
 	{96, 96},
 	{96, 160},
@@ -960,7 +960,7 @@ static int selected_skin, num_skins_cached;
 static int selected_pet, num_pets_cached;
 static const char *skin_names[] = {
 	"\"OG\"",
-	"HUH?",
+	"...",
 	"NATWAP",
 	"HEAD",
 	"PENCIL MAN",
@@ -1455,8 +1455,10 @@ void draw_play_gui_nologic(void) {
 		Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + (12*2), trans2, light, lvlname);
 		Renderer_DrawBitmap2(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + (12*3), &r2, trans2, light, flip, CNM_FALSE);
 		memcpy(&r2, skin_bases[Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer], sizeof(int[2]));
-		r2.w = 32; r2.h = 32;
-		Renderer_DrawBitmap2(basex - SAVE_SLOT_WIDTH / 2 + 12, basey + 104, &r2, trans2, light, CNM_TRUE, CNM_FALSE);
+		int skinoff = complex_skins[Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer] ? -4 : 0;
+		int skinsz = complex_skins[Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer] ? 40 : 32;
+		r2.w = skinsz; r2.h = skinsz;
+		Renderer_DrawBitmap2(basex - SAVE_SLOT_WIDTH / 2 + 12 + skinoff, basey + 104 + skinoff, &r2, trans2, light, CNM_TRUE, CNM_FALSE);
 		sprintf(text, "X %d", g_saves[slot].lives);
 		Renderer_DrawText(basex - SAVE_SLOT_WIDTH / 2 + 12 + 32 + 8, basey + 104 + 12, trans2, light, text);
 	}
@@ -1975,8 +1977,10 @@ void draw_player_setup_gui(void) {
 
 	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING) && ps_selected == 2) {
 		if (selected_pet + 1 < num_pets_cached + 1) {
-			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			selected_pet++;
+			int audioid = (selected_pet > 0) ? g_petdefs[g_globalsave.pets_found[selected_pet - 1]].idle_snd : -1;
+			if (audioid == -1) audioid = 43;
+			Audio_PlaySound(audioid, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			ps2_pos_target += 32+16;
 		} else {
 			ps2_pos_target_add = 8;
@@ -1984,8 +1988,10 @@ void draw_player_setup_gui(void) {
 	}
 	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING) && ps_selected == 2) {
 		if (selected_pet > 0) {
-			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			selected_pet--;
+			int audioid = (selected_pet > 0) ? g_petdefs[g_globalsave.pets_found[selected_pet - 1]].idle_snd : -1;
+			if (audioid == -1) audioid = 43;
+			Audio_PlaySound(audioid, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			ps2_pos_target -= 32+16;
 		} else {
 			ps2_pos_target_add = -8;

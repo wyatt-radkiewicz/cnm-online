@@ -44,15 +44,15 @@ static const int anim_lengths[PLAYER_MAX_SKINS][PLAYER_ANIM_MAX] = {
 		0, // turn air
 	},
 	{ // skin 1
-		1, // standing
-		4, // walking
-		1, // jumping
-		1, // shooting
-		1, // melee
+		6, // standing
+		8, // walking
+		6, // jumping
+		0, // jumping1
+		2, // jumping2
 		1, // hurt
-		1, // slide
-		0, // turn walk
-		0, // turn air
+		2, // slide
+		1, // turn walk
+		1, // turn air
 	},
 	{ // skin 2
 		1, // standing
@@ -182,7 +182,7 @@ static const int anim_offsets[PLAYER_ANIM_MAX][6][2] =
 static const int skin_bases[PLAYER_MAX_SKINS][2] =
 {
 	{0, 704},
-	{0, 768},
+	{0, 1904},
 	{0, 832},
 	{0, 1232},
 	{0, 1584},
@@ -194,7 +194,9 @@ static const int skin_bases[PLAYER_MAX_SKINS][2] =
 	{0, 1456},
 };
 static const int skin_srcbase[PLAYER_MAX_SKINS] = {
-	0, 0, 0, 0,
+	0,
+	1904,
+	0, 0,
 	1584,
 	0, 0, 0,
 	1712,
@@ -203,7 +205,7 @@ static const int skin_srcbase[PLAYER_MAX_SKINS] = {
 };
 const int complex_skins[PLAYER_MAX_SKINS] = {
 	CNM_FALSE,
-	CNM_FALSE,
+	CNM_TRUE,
 	CNM_FALSE,
 	CNM_FALSE,
 	CNM_TRUE,
@@ -769,7 +771,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			Interaction_PlaySound(wobj, 60);
 			local_data->curranim = PLAYER_ANIM_JUMP_END;
 			local_data->currframe = 0;
-			local_data->animspd = 3;
+			local_data->animspd = 4;
 			local_data->animtimer = 0;
 		} else if (local_data->curranim == PLAYER_ANIM_JUMP && Wobj_IsGrouneded(wobj)) {
 			Interaction_PlaySound(wobj, 60);
