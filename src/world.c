@@ -107,6 +107,13 @@ void World_Start(int mode)
 
 	// Load in the new player position
 	PlayerSpawn_SetWobjLoc(&player->x);
+	{
+		PLAYER_LOCAL_DATA *local_data = player->local_data;
+		if (local_data->pet) {
+			local_data->pet->x = player->x;
+			local_data->pet->y = player->y;
+		}
+	}
 	Camera_Setup((int)player->x, (int)player->y); // Initializing camera values
 	
 	// Load player state

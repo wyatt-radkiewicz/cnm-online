@@ -108,7 +108,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	float jump_init_yspd;
 	int level_end_rank, level_end_score, level_end_time_score;
 	int level_end_unlockable, level_end_found_secret, level_end_norank;
-	int last_touched_skin_unlock;
+	int last_touched_skin_unlock, last_touched_pet_unlock;
 	int num_deaths;
 
 	int jump_input_buffer, has_cut_jump, is_grounded_buffer;
@@ -119,6 +119,8 @@ typedef struct _PLAYER_LOCAL_DATA
 	float stored_plat_velx;
 	int been_jumping_timer;
 	int skip_jumpthrough_timer;
+
+	WOBJ *pet;
 	//int game_over_active//, game_over_timer;
 	//float item_durability;
 	//float stored_yvel;

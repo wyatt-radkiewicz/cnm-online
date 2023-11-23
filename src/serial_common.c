@@ -9,6 +9,7 @@
 #include "filesystem.h"
 #include "player.h"
 #include "gamelua.h"
+#include "petdefs.h"
 
 void Serial_LoadAudioCfg(const char *cnma_file)
 {
@@ -69,6 +70,19 @@ void Serial_LoadAudioCfg(const char *cnma_file)
 					//AutorunLua_Run();
 					continue;
 				}
+				else if (strcmp(filename, "PETDEFS") == 0) {
+					mode = 0x8001;
+
+					g_num_petdefs = 0;
+					while (g_num_petdefs < MAX_PETDEFS) {
+						Util_GetLine(lualine, sizeof(lualine), fp);
+						if (strcmp(lualine, "ENDPETS") == 0)
+							break;
+						g_petdefs[g_num_petdefs++] = petdef_from_line(lualine);
+					}
+
+					continue;
+				}
 			}
 			else
 			{
@@ -127,7 +141,7 @@ void Serial_SaveConfig(void)
 		fprintf(fp, "%d\n%d\n%d\n%d\n",
 				Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
 				Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
-				Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer,
+				0,
 				(int)(Audio_GetGlobalVolume()*100.0f));
 		fputc('\"', fp);
 		fputs(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string, fp);
@@ -158,12 +172,13 @@ void Serial_LoadConfig(void)
 	FILE *fp = fopen("config.txt", "r");
 	if (fp != NULL)
 	{
+		int dummy;
 		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string);
 		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string);
 		fscanf(fp, "\n%d\n%d\n%d\n%d",
 			   &Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
 			   &Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
-			   &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer,
+			   &dummy,
 			   &Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.integer);
 		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string);
 		//Renderer_SetFullscreen(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer);

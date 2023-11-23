@@ -134,9 +134,14 @@ void globalsave_clear(struct globalsave *gs) {
 	for (int i = 0; i < sizeof(gs->skins_found) / sizeof(gs->skins_found[0]); i++) {
 		gs->skins_found[i] = -1;
 	}
+	for (int i = 0; i < sizeof(gs->pets_found) / sizeof(gs->pets_found[0]); i++) {
+		gs->pets_found[i] = -1;
+	}
 	gs->skins_found[0] = 10;
 	gs->saves_created = 0;
 	gs->titlebg = 0;
+	Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer = 10;
+	Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer = -1;
 }
 int globalsave_visit_level(struct globalsave *gs, const char *level) {
 	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return CNM_TRUE;
@@ -186,6 +191,12 @@ void globalsave_load(struct globalsave *gs) {
 	}
 
 	LParseEntry *entry;
+	entry = lparse_get_entry(lp, "PLRSKIN");
+	if (entry) lparse_get_data(lp, entry, 0, 1, &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer);
+	entry = lparse_get_entry(lp, "PETSKIN");
+	if (entry) lparse_get_data(lp, entry, 0, 1, &Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer);
+	entry = lparse_get_entry(lp, "PETSFOUND");
+	if (entry) lparse_get_data(lp, entry, 0, sizeof(gs->pets_found) / sizeof(gs->pets_found[0]), &gs->pets_found);
 	entry = lparse_get_entry(lp, "NUMSAVES");
 	if (entry) lparse_get_data(lp, entry, 0, 1, &gs->saves_created);
 	entry = lparse_get_entry(lp, "LVLSFOUND");
@@ -212,6 +223,12 @@ void globalsave_save(const struct globalsave *gs) {
 	}
 
 	LParseEntry *entry;
+	entry = lparse_make_entry(lp, "PLRSKIN", lparse_i32, 1);
+	lparse_set_data(lp, entry, 0, 1, &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer);
+	entry = lparse_make_entry(lp, "PETSKIN", lparse_i32, 1);
+	lparse_set_data(lp, entry, 0, 1, &Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer);
+	entry = lparse_make_entry(lp, "PETSFOUND", lparse_i32, sizeof(gs->pets_found) / sizeof(gs->pets_found[0]));
+	lparse_set_data(lp, entry, 0, sizeof(gs->pets_found) / sizeof(gs->pets_found[0]), &gs->pets_found);
 	entry = lparse_make_entry(lp, "NUMSAVES", lparse_i32, 1);
 	lparse_set_data(lp, entry, 0, 1, &gs->saves_created);
 	entry = lparse_make_entry(lp, "LVLSFOUND", lparse_u8, sizeof(gs->levels_found));
@@ -247,5 +264,33 @@ int globalsave_get_num_skins(const struct globalsave *gs) {
 		if (gs->skins_found[i] != -1) ++num;
 	}
 	return num;
+}
+int globalsave_visit_pet(struct globalsave *gs, int petid) {
+	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return CNM_TRUE;
+	for (int i = 0; i < sizeof(gs->pets_found) / sizeof(gs->pets_found[0]); i++) {
+		if (gs->pets_found[i] == petid) return CNM_FALSE;
+	}
+
+	for (int i = 0; i < sizeof(gs->pets_found) / sizeof(gs->pets_found[0]); i++) {
+		if (gs->pets_found[i] == -1) {
+			gs->pets_found[i] = petid;
+			return CNM_TRUE;
+		}
+	}
+	return CNM_FALSE;
+}
+int globalsave_get_num_pets(const struct globalsave *gs) {
+	int num = 0;
+	for (int i = 0; i < sizeof(gs->pets_found) / sizeof(gs->pets_found[0]); i++) {
+		if (gs->pets_found[i] != -1) ++num;
+	}
+	return num;
+}
+int globalsave_find_pet(struct globalsave *gs, int petid) {
+	if (petid == -1) return -1;
+	for (int i = 0; i < sizeof(gs->pets_found) / sizeof(gs->pets_found[0]); i++) {
+		if (gs->pets_found[i] == petid) return i;
+	}
+	return -1;
 }
 

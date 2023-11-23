@@ -22,6 +22,7 @@
 #include "titlebg.h"
 #include "ending_text.h"
 #include "player.h"
+#include "petdefs.h"
 
 #define SB_START 4
 
@@ -902,6 +903,8 @@ static int ps_selected;
 static int ps_selected_pos;
 static int ps_pos, ps_pos_target;
 static int ps_pos_target_add;
+static int ps2_pos, ps2_pos_target;
+static int ps2_pos_target_add;
 static struct gui_text_box ps_player_name, options_mserv;
 static int host_game_level_idx;
 
@@ -954,6 +957,7 @@ static int quit_rects[][2] = {
 	//{ 384, 2208, }, { 173, 2443, }, { 52, 6469, },
 };
 static int selected_skin, num_skins_cached;
+static int selected_pet, num_pets_cached;
 static const char *skin_names[] = {
 	"\"OG\"",
 	"HUH?",
@@ -1016,6 +1020,10 @@ void draw_player_setup(void) {
 		ystart = -48;
 		height = 4;
 	}
+	if (last_gui_state == GUI_PLAYER_SETUP || gui_state == GUI_PLAYER_SETUP) {
+		ystart = -32;
+		height = 3;
+	}
 	Util_SetRect(&r, 400, 32, 112, 48);
 	Util_SetRect(&r2, 400, 64, 112, 16);
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
@@ -1032,20 +1040,27 @@ void draw_player_setup(void) {
 	if ((last_gui_state == GUI_HOST_STATE || gui_state == GUI_HOST_STATE) && ps_selected == 4) {
 		target_selected = 10*12-1;
 	}
+	if ((last_gui_state == GUI_PLAYER_SETUP || gui_state == GUI_PLAYER_SETUP) && ps_selected == 2) {
+		target_selected = 1*12+48;
+	}
 	ps_selected_pos += (target_selected - ps_selected_pos) * 0.75f;
 	if (ps_pos_target_add > 0) ps_pos_target_add--;
 	if (ps_pos_target_add < 0) ps_pos_target_add++;
 	ps_pos += ((ps_pos_target + ps_pos_target_add) - ps_pos) * 0.33f;
+	if (ps2_pos_target_add > 0) ps2_pos_target_add--;
+	if (ps2_pos_target_add < 0) ps2_pos_target_add++;
+	ps2_pos += ((ps2_pos_target + ps2_pos_target_add) - ps2_pos) * 0.33f;
 
 	if (last_gui_state == GUI_PLAYER_SETUP || gui_state == GUI_PLAYER_SETUP) {
-		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*6, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "PLAYER SETUP");
-		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+12, trans2, RENDERER_LIGHT, "NAME: ");
-		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+12+12, trans2, RENDERER_LIGHT, "SKIN: ");
-		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 12-16 - (8*strlen(skin_names[g_globalsave.skins_found[selected_skin]])), RENDERER_HEIGHT / 2 + 16 + 12+12+12, trans2, RENDERER_LIGHT, skin_names[g_globalsave.skins_found[selected_skin]]);
+		Renderer_DrawText(RENDERER_WIDTH / 2 - 8*6, RENDERER_HEIGHT / 2 - 32 + 12, trans2, RENDERER_LIGHT, "PLAYER SETUP");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 32 + 12+12, trans2, RENDERER_LIGHT, "NAME: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 32 + 12+12+12, trans2, RENDERER_LIGHT, "SKIN: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 12-16 - (8*strlen(skin_names[g_globalsave.skins_found[selected_skin]])), RENDERER_HEIGHT / 2 - 32 + 12+12+12, trans2, RENDERER_LIGHT, skin_names[g_globalsave.skins_found[selected_skin]]);
+
 		Util_SetRect(&r2, 312, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
-		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 - 32 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
 		int ralign = r.w - 20 - 16 * 8;
-		gui_text_box_draw(&ps_player_name, ps_selected == 0, RENDERER_WIDTH / 2 + ralign, RENDERER_HEIGHT / 2 + 40, trans2);
+		gui_text_box_draw(&ps_player_name, ps_selected == 0, RENDERER_WIDTH / 2 + ralign, RENDERER_HEIGHT / 2 - 32 + 24, trans2);
 
 		//int *skin = &Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
 		//Console_Print("%d %d", num_skins_cached, selected_skin);
@@ -1069,10 +1084,43 @@ void draw_player_setup(void) {
 			const int complex_offset = complex_skins[skinid] ? 4 : 0;
 			Renderer_DrawBitmap(
 				RENDERER_WIDTH / 2 - 16 + pos - complex_offset,
-				RENDERER_HEIGHT / 2 + 48 + 16 + (i == selected_skin ? 0 : 4) - complex_offset,
+				RENDERER_HEIGHT / 2 + 16 + (i == selected_skin ? 0 : 4) - complex_offset,
 				&r2,
 				t,
 				i == selected_skin ? RENDERER_LIGHT : RENDERER_LIGHT + 2
+			);
+		}
+
+		{
+			Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 - 32 + 12+12+12+48, trans2, RENDERER_LIGHT, "PET: ");
+			const char *petname = selected_pet > 0 ? g_petdefs[g_globalsave.pets_found[selected_pet - 1]].name : "NO PET :(";
+			Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 12-16 - (8*strlen(petname)), RENDERER_HEIGHT / 2 - 32 + 12+12+12+48, trans2, RENDERER_LIGHT, petname);
+		}
+
+		//Console_Print("%d", num_pets_cached);
+		for (int i = -1; i <= num_pets_cached + 2; i++) {
+			const int petid = i == 0 ? -1 : g_globalsave.pets_found[i - 1];
+			if (i < 0 || i >= num_pets_cached + 1) {
+				Util_SetRect(&r2, 416, 160, 32, 32);
+			} else if (petid == -1) {
+				Util_SetRect(&r2, 448, 224, 32, 32);
+			} else {
+				r2.x = g_petdefs[petid].iconx * 32;
+				r2.y = g_petdefs[petid].icony * 32;
+				r2.w = 32;
+				r2.h = 32;
+			}
+			int pos = i*(32+16) - ps2_pos;
+			int t = trans2;
+			if (pos < -(32+16)) t = trans2 + (-pos - (32+16)) / 3;
+			if (pos > 32+16) t = trans2 + (pos - (32+16)) / 3;
+			if (t > 7) t = 7;
+			Renderer_DrawBitmap(
+				RENDERER_WIDTH / 2 - 16 + pos,
+				RENDERER_HEIGHT / 2 + 16 + 48 + (i == selected_pet ? 0 : 4),
+				&r2,
+				t,
+				i == selected_pet ? RENDERER_LIGHT : RENDERER_LIGHT + 2
 			);
 		}
 	}
@@ -1593,7 +1641,6 @@ void draw_titlebg_gui(void) {
 		side_xstart = -192;
 		ps_trans = 7*2;
 		globalsave_save(&g_globalsave);
-		//Serial_SaveConfig();
 	}
 }
 
@@ -1627,11 +1674,16 @@ void draw_main_gui(void) {
 			selected_skin = globalsave_find_skin(&g_globalsave, Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer);
 			if (selected_skin == -1) selected_skin = 0;
 			num_skins_cached = globalsave_get_num_skins(&g_globalsave);
+			selected_pet = globalsave_find_pet(&g_globalsave, Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer) + 1;
+			num_pets_cached = globalsave_get_num_pets(&g_globalsave);
 			ps_trans = 0;
 			gui_timer = 0;
 			ps_pos = selected_skin * (32+16);
 			ps_pos_target = ps_pos;
+			ps2_pos = selected_pet * (32+16);
+			ps2_pos_target = ps2_pos;
 			ps_player_name = gui_text_box_init(Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string, 16);
+			titlebg_set_card_movement(4, 0, CNM_FALSE);
 			break;
 		case 1:
 			gui_state = GUI_PLAY_STATE;
@@ -1893,7 +1945,7 @@ void draw_player_setup_gui(void) {
 	gui_text_box_update(&ps_player_name, ps_selected == 0);
 	draw_player_setup();
 
-	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 1) {
+	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 2) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected++;
 	}
@@ -1921,17 +1973,39 @@ void draw_player_setup_gui(void) {
 		}
 	}
 
+	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING) && ps_selected == 2) {
+		if (selected_pet + 1 < num_pets_cached + 1) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			selected_pet++;
+			ps2_pos_target += 32+16;
+		} else {
+			ps2_pos_target_add = 8;
+		}
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING) && ps_selected == 2) {
+		if (selected_pet > 0) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			selected_pet--;
+			ps2_pos_target -= 32+16;
+		} else {
+			ps2_pos_target_add = -8;
+		}
+	}
+
 	ps_trans += 2;
 
 	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		titlebg_set_card_movement(36, 0, CNM_FALSE);
 		last_gui_state = gui_state;
 		gui_state = GUI_MAIN_STATE;
 		gui_timer = 0;
 		Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer = g_globalsave.skins_found[selected_skin];
+		Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer = selected_pet == 0 ? -1 : g_globalsave.pets_found[selected_pet - 1];
 		side_blob_x = RENDERER_WIDTH;
 		side_xstart = -192;
 		ps_trans = 7*2;
+		globalsave_save(&g_globalsave);
 		Serial_SaveConfig();
 	}
 }

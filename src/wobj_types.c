@@ -18,6 +18,7 @@
 #include "ending_text.h"
 #include "logic_links.h"
 #include "gamelua.h"
+#include "petdefs.h"
 
 static void WobjGeneric_Hurt(WOBJ *victim, WOBJ *inflictor)
 {
@@ -1626,7 +1627,7 @@ static void WobjSkinUnlock_Draw(WOBJ *wobj, int camx, int camy) {
 		(int)wobj->x - camx,
 		(int)wobj->y - camy,
 		&(CNM_RECT) {
-			.x = 480, .y = 7520 + wobj->anim_frame * 32, .w = 32, .h = 32
+			.x = 0 + wobj->anim_frame * 32, .y = 1296, .w = 32, .h = 32
 		},
 		2,
 		RENDERER_LIGHT
@@ -1698,6 +1699,231 @@ static void WobjInvisBlock_Create(WOBJ *wobj) {
 		.x = 0.0f, .y = 0.0f,
 		.w = 32.0f, .h = 32.0f,
 	};
+}
+static void WobjPetUnlock_Draw(WOBJ *wobj, int camx, int camy) {
+	if (Game_GetFrame() % 2 == 0) wobj->anim_frame = (wobj->anim_frame + 1) % 8;
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y + (sinf((float)Game_GetFrame() / 10.0f + wobj->x + wobj->y) * 5.0f) - camy,
+		&(CNM_RECT) {
+			.x = g_petdefs[wobj->custom_ints[0]].basex * 32,
+			.y = g_petdefs[wobj->custom_ints[0]].basey * 32,
+			.w = 32,
+			.h = 32,
+		},
+		0,
+		Blocks_GetCalculatedBlockLight(wobj->x / BLOCK_SIZE, wobj->y / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
+	);
+	Renderer_DrawBitmap
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y - camy,
+		&(CNM_RECT) {
+			.x = 0 + wobj->anim_frame * 32, .y = 1296, .w = 32, .h = 32
+		},
+		2,
+		RENDERER_LIGHT
+	);
+}
+
+#define PLRPOS_HISTORY (20)
+typedef struct PetLocalData {
+	float px[PLRPOS_HISTORY];
+	float py[PLRPOS_HISTORY];
+	int i, didinit;
+} PetLocalData;
+static void WobjPet_OnDestroy(WOBJ *wobj) {
+	free(wobj->local_data);
+	//Console_Print("freed");
+}
+static void WobjPet_Create(WOBJ *wobj) {
+	Util_SetBox(&wobj->hitbox, 4.0f, 8.0f, 24.0f, 24.0f);
+	wobj->flags = 0;
+	wobj->anim_frame = 0;
+	wobj->vel_x = 0.0f;
+	wobj->vel_y = 0.0f;
+	wobj->local_data = malloc(sizeof(PetLocalData));
+	PetLocalData *local = wobj->local_data;
+	local->i = 0;
+	local->didinit = CNM_FALSE;
+	wobj->on_destroy = WobjPet_OnDestroy;
+	wobj->item = Util_RandInt(30*1, 30*30);
+}
+static void WobjPet_Update(WOBJ *wobj) {
+	WOBJ *plr = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
+	if (!plr) return;
+	PetDef *def = &g_petdefs[wobj->custom_ints[0]];
+	PetLocalData *local = wobj->local_data;
+
+	if (wobj->item-- <= 0) {
+		wobj->item = Util_RandInt(30*1, 30*30);
+		if (def->idle_snd != -1) Interaction_PlaySound(wobj, def->idle_snd);
+	}
+
+	if (def->ai_type == PETAI_FLY) {
+		if (wobj->custom_ints[1]-- <= 0) {
+			wobj->custom_floats[0] = Util_RandFloat() * 8.0f - 4.0f;
+			wobj->custom_floats[1] = Util_RandFloat() * 10.0f - 5.0f;
+			wobj->custom_ints[1] = 10;
+		}
+		float target_y = plr->y - 32 + wobj->custom_floats[1];
+		float target_x = ((~plr->flags & WOBJ_HFLIP) ? plr->x - plr->hitbox.x - 50 - wobj->hitbox.w : plr->x + plr->hitbox.w + 50) + wobj->custom_floats[1];
+		if (Blocks_IsCollidingWithSolidFlags(
+				&(CNM_BOX){
+					.x = target_x + 15,
+					.y = target_y + 15,
+					.w = 1.0f,
+					.h = 1.0f
+				},
+				1, 1, 0, 0
+			)) {
+			target_y += 28;
+		}
+		wobj->y += (target_y - wobj->y) * 0.15f;
+		wobj->x += (target_x - wobj->x) * 0.15f;
+		if (Game_GetFrame() % 8 == 0) wobj->anim_frame += 1;
+		wobj->money = 0;
+	} else if (def->ai_type == PETAI_WALK || def->ai_type == PETAI_BOUNCE) {
+		if (!local->didinit) {
+			for (int i = 0; i < PLRPOS_HISTORY; i++) {
+				local->px[i] = plr->x;
+				local->py[i] = plr->y;
+			}
+			local->didinit = CNM_TRUE;
+		}
+		local->i = (local->i + 1) % PLRPOS_HISTORY;
+		float target_x = local->px[local->i];
+		float gospeed = 0.1f;
+		float target_y = local->py[local->i];
+		local->px[local->i] = plr->x;
+		local->py[local->i] = plr->y;
+
+		int changed_target = CNM_FALSE;
+
+		if (fabsf(target_x - plr->x) < 16.0f && fabsf(target_y - plr->y) < 64.0f && Wobj_IsGrounded(plr)) {
+			target_x = (~plr->flags & WOBJ_HFLIP) ? plr->x - plr->hitbox.x - 16 - wobj->hitbox.w : plr->x + plr->hitbox.w + 16;
+			changed_target = CNM_TRUE;
+			if (fabsf(target_x - wobj->x) < 8.0f && (def->ai_type == PETAI_WALK || !def->ai_data.bounce.bounce_idly)) {
+				wobj->money = 0;
+				if (Game_GetFrame() % 8 == 0) wobj->anim_frame++;
+			} else {
+				wobj->money = 1;
+				if (Game_GetFrame() % 5 == 0) wobj->anim_frame++;
+			}
+			//gospeed = 0.1f;
+		}
+
+		if (!changed_target && def->ai_type == PETAI_WALK) {
+			wobj->money = 1;
+			if (Game_GetFrame() % 5 == 0) wobj->anim_frame++;
+
+			if (!Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 8.0f)) {
+				wobj->money = 2;
+				if (Game_GetFrame() % 3 == 0) wobj->anim_frame++;
+			}
+		} else if (!changed_target) {
+			wobj->money = 1;
+			if (Game_GetFrame() % 5 == 0) wobj->anim_frame++;
+		}
+
+		wobj->x += (target_x - wobj->x) * gospeed;
+		float oy = wobj->y;
+		wobj->y += (target_y - wobj->y) * 0.5f;
+
+		int canbounce = def->ai_data.bounce.bounce_idly;
+		if (def->ai_type == PETAI_BOUNCE) {
+			float min = 100000.0, max = -1000000.0;
+			for (int i = 0; i < PLRPOS_HISTORY; i++) {
+				if (local->py[i] < min) min = local->py[i];
+				if (local->py[i] > max) max = local->py[i];
+			}
+			if (max - min < 128.0f && fabsf(target_x - plr->x) < RENDERER_WIDTH) {
+				if (!changed_target) canbounce = CNM_TRUE;
+				changed_target = CNM_TRUE;
+			}
+		}
+
+		if (changed_target) {
+			wobj->y = oy;
+			wobj->vel_y += 0.5f;
+			wobj->vel_x = 0.0f;
+			const float ox = wobj->x;
+			WobjPhysics_EndUpdate(wobj);
+			wobj->x = ox;
+			if (def->ai_type == PETAI_WALK && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 8.0f)) {
+				wobj->money = 2;
+				if (Game_GetFrame() % 3 == 0) wobj->anim_frame++;
+			}
+			if (def->ai_type == PETAI_BOUNCE && Wobj_IsGrounded(wobj) && canbounce) {
+				wobj->vel_y = -def->ai_data.bounce.jump_height;
+			}
+			//wobj->y += wobj->vel_y;
+		}
+	}
+
+	if (wobj->x > plr->x) wobj->flags |= WOBJ_HFLIP;
+	else wobj->flags &= ~WOBJ_HFLIP;
+}
+static int get_petanim_frame(int petid, int anim, int anim_frame) {
+	const PetDef *pet = &g_petdefs[petid];
+
+	int animbase = 0;
+	switch (pet->ai_type) {
+	case PETAI_WALK:
+		if (anim >= 1) animbase += pet->ai_data.walk.idle_frames;
+		if (anim >= 2) animbase += pet->ai_data.walk.walk_frames;
+		break;
+	case PETAI_BOUNCE:
+		if (anim >= 1) animbase += pet->ai_data.bounce.idle_frames;
+		break;
+	default:
+		break;
+	}
+
+	int numframes = 1;
+	switch (pet->ai_type) {
+	case PETAI_WALK:
+		switch (anim) {
+		case 0: numframes = pet->ai_data.walk.idle_frames; break;
+		case 1: numframes = pet->ai_data.walk.walk_frames; break;
+		case 2: numframes = pet->ai_data.walk.fall_frames; break;
+		}
+		break;
+	case PETAI_FLY:
+		numframes = pet->ai_data.fly.fly_frames;
+		break;
+	case PETAI_BOUNCE:
+		switch (anim) {
+		case 0: numframes = pet->ai_data.bounce.idle_frames; break;
+		case 1: numframes = pet->ai_data.bounce.bounce_frames; break;
+		}
+		break;
+	}
+
+	return animbase + (anim_frame % numframes);
+}
+static void WobjPet_Draw(WOBJ *wobj, int camx, int camy) {
+	int basex = (g_petdefs[wobj->custom_ints[0]].basex + get_petanim_frame(wobj->custom_ints[0], wobj->money, wobj->anim_frame)) * 32;
+	int basey = g_petdefs[wobj->custom_ints[0]].basey * 32;
+
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)ceilf(wobj->y) - camy,
+		&(CNM_RECT) {
+			.x = basex,
+			.y = basey,
+			.w = 32,
+			.h = 32,
+		},
+		0,
+		Blocks_GetCalculatedBlockLight((int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
+	);
 }
 
 #define LUAOBJ_DEF {\
@@ -3725,6 +3951,34 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		0, // Money reward
 		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 154: Player Pet Skin Unlock Object
+		Wobj_Trigger32x32_Create, // Create
+		NULL, // Update
+		WobjPetUnlock_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{ 0, 0, 32, 32, },
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 155: Player Pet Object
+		WobjPet_Create, // Create
+		WobjPet_Update, // Update
+		WobjPet_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{ 0, 0, 32, 32, },
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
 		CNM_FALSE, // Can respawn?
 		0, // Score reward
 	},

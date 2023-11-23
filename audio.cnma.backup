@@ -89,6 +89,8 @@ MODE SOUNDS
 60 sounds/land.wav
 61 sounds/fly.wav
 62 sounds/flydive.wav
+63 sounds/super_slide.wav
+64 sounds/normstomp.wav
 MODE MUSIC_VOLUME_OVERRIDE
 MODE LEVELSELECT_ORDER
 race 0
@@ -279,3 +281,7 @@ function LUA_UPDATE1(w)
 	ApplyPlayerWeaponDamage(w)
 end
 __ENDLUA__
+MODE PETDEFS
+"SLMWALK" 7 58 10 19 -1 b 1 3 0 7
+"SPIKER" 8 56 11 19 -1 w 1 2 1
+ENDPETS
