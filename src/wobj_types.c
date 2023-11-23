@@ -2742,7 +2742,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{128, 512, 32, 32},
-			{128, 512 + 32, 32, 32}
+			{160, 512, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
