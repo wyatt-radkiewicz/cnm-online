@@ -87,6 +87,7 @@ static void Command_SetLives(const char *args, int from_player);
 static void Command_Skin(const char *args, int from_player);
 static void Command_ClPos(const char *args, int from_player);
 static void Command_God(const char *args, int from_player);
+static void Command_Pet(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -155,6 +156,7 @@ static const char *const command_names[] =
 	"hitbox",
 	"nc",
 	"god",
+	"pet",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -224,6 +226,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_DebugHitboxes,
 	Command_Noclip,
 	Command_God,
+	Command_Pet,
 };
 
 static int can_run_cheat1(int from_player) {
@@ -774,5 +777,9 @@ static void Command_ClPos(const char *args, int from_player) {
 static void Command_God(const char *args, int from_player) {
 	if (!can_run_cheat1(from_player)) return;
 	Game_GetVar(GAME_VAR_GOD)->data.integer = !Game_GetVar(GAME_VAR_GOD)->data.integer;
+}
+static void Command_Pet(const char *args, int from_player) {
+	if (!can_run_cheat1(from_player)) return;
+	Player_ChangePet(Game_GetVar(GAME_VAR_PLAYER)->data.pointer, atoi(Command_ExtractArg(args, 0)));
 }
 

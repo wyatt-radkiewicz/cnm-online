@@ -2680,3 +2680,14 @@ void Player_LoadFromSave(WOBJ *player, const savedata_t *data) {
 	player->strength = (float)data->strength / 100.0f;
 	//strcpy();
 }
+void Player_ChangePet(WOBJ *wobj, int petid) {
+	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
+	if (local_data->pet) Interaction_DestroyWobj(local_data->pet);
+	if (petid != -1) {
+		local_data->pet = Interaction_CreateWobj(WOBJ_PLAYER_PET, wobj->x, wobj->y, petid, 0.0f);
+		local_data->pet->link_node = wobj->node_id;
+		local_data->pet->link_uuid = wobj->uuid;
+	} else {
+		local_data->pet = NULL;
+	}
+}

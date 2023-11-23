@@ -1729,7 +1729,7 @@ static void WobjPetUnlock_Draw(WOBJ *wobj, int camx, int camy) {
 	);
 }
 
-#define PLRPOS_HISTORY (20)
+#define PLRPOS_HISTORY (15)
 typedef struct PetLocalData {
 	float px[PLRPOS_HISTORY];
 	float py[PLRPOS_HISTORY];
@@ -1764,11 +1764,6 @@ static void WobjPet_Update(WOBJ *wobj) {
 	}
 
 	if (def->ai_type == PETAI_FLY) {
-		if (wobj->custom_ints[1]-- <= 0) {
-			wobj->custom_floats[0] = Util_RandFloat() * 8.0f - 4.0f;
-			wobj->custom_floats[1] = Util_RandFloat() * 10.0f - 5.0f;
-			wobj->custom_ints[1] = 10;
-		}
 		float target_y = plr->y - 32 + wobj->custom_floats[1];
 		float target_x = ((~plr->flags & WOBJ_HFLIP) ? plr->x - plr->hitbox.x - 50 - wobj->hitbox.w : plr->x + plr->hitbox.w + 50) + wobj->custom_floats[1];
 		if (Blocks_IsCollidingWithSolidFlags(
@@ -1796,14 +1791,13 @@ static void WobjPet_Update(WOBJ *wobj) {
 		}
 		local->i = (local->i + 1) % PLRPOS_HISTORY;
 		float target_x = local->px[local->i];
-		float gospeed = 0.1f;
 		float target_y = local->py[local->i];
 		local->px[local->i] = plr->x;
 		local->py[local->i] = plr->y;
 
 		int changed_target = CNM_FALSE;
 
-		if (fabsf(target_x - plr->x) < 16.0f && fabsf(target_y - plr->y) < 64.0f && Wobj_IsGrounded(plr)) {
+		if (fabsf(target_x - plr->x) < 32.0f && fabsf(target_y - plr->y) < 64.0f && Wobj_IsGrounded(plr)) {
 			target_x = (~plr->flags & WOBJ_HFLIP) ? plr->x - plr->hitbox.x - 16 - wobj->hitbox.w : plr->x + plr->hitbox.w + 16;
 			changed_target = CNM_TRUE;
 			if (fabsf(target_x - wobj->x) < 8.0f && (def->ai_type == PETAI_WALK || !def->ai_data.bounce.bounce_idly)) {
@@ -1813,7 +1807,9 @@ static void WobjPet_Update(WOBJ *wobj) {
 				wobj->money = 1;
 				if (Game_GetFrame() % 5 == 0) wobj->anim_frame++;
 			}
-			//gospeed = 0.1f;
+			wobj->custom_ints[1]++;
+		} else {
+			wobj->custom_ints[1] = 0;
 		}
 
 		if (!changed_target && def->ai_type == PETAI_WALK) {
@@ -1829,6 +1825,8 @@ static void WobjPet_Update(WOBJ *wobj) {
 			if (Game_GetFrame() % 5 == 0) wobj->anim_frame++;
 		}
 
+		float gospeed = 0.2f;
+		if (wobj->custom_ints[1] > 5) gospeed = 0.08f;
 		wobj->x += (target_x - wobj->x) * gospeed;
 		float oy = wobj->y;
 		wobj->y += (target_y - wobj->y) * 0.5f;
