@@ -453,7 +453,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->level_end_rank = (int)((float)(local_data->level_end_score + local_data->level_end_time_score) / (float)par * 4.0);
 		if (local_data->level_end_rank > 4) local_data->level_end_rank = 4;
 		if (local_data->level_end_rank < 0) local_data->level_end_rank = 0;
-		if (!Game_GetVar(GAME_VAR_NOSAVE)->data.integer || Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+		if ((!Game_GetVar(GAME_VAR_NOSAVE)->data.integer || Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) &&
+			Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
 			// Save rank and time
 			int id = -1;
 			for (int i = 0; i < globalsave_get_num_levels(&g_globalsave); i++) {
