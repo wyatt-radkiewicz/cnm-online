@@ -1265,6 +1265,7 @@ static int delete_mode;
 static int joining_timer, is_joining;
 static int is_loading_save, loading_save_timer;
 static int num_secrets_cached, num_found_cached;
+static int num_comp_cached, num_comp_total_cached;
 static int saves_add_y, levels_add_y;
 #define SAVE_SLOT_WIDTH 112
 #define SAVE_SLOT_PADDING 16
@@ -1370,7 +1371,7 @@ void draw_play_gui_nologic(void) {
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, completion_basey, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, completion_basey, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
 	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4, trans2, RENDERER_LIGHT, "TOTAL COMPLETION %%:");
-	sprintf(text, "%d%%", (int)((float)num_found_cached / (float)FileSystem_NumLevels() * 100.0f));
+	sprintf(text, "%d%%", (int)((float)num_comp_cached / (float)num_comp_total_cached * 100.0f));
 	Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - (strlen(text)*8), completion_basey + 4, trans2, RENDERER_LIGHT, "%s", text);
 	Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 20, completion_basey + 4 + (8*1), trans2, RENDERER_LIGHT, "LEVELS FOUND:");
 	sprintf(text, "%d/%d", num_found_cached, FileSystem_NumLevels());
@@ -1686,6 +1687,7 @@ void draw_main_gui(void) {
 		last_gui_state = gui_state;
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = CNM_FALSE;
+		int num_a_ranks = 0;
 		switch (options_num) {
 		case 0:
 			gui_state = GUI_PLAYER_SETUP;
@@ -1716,8 +1718,13 @@ void draw_main_gui(void) {
 			levels_add_y = -RENDERER_HEIGHT+128;
 			Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = CNM_FALSE;
 			//save_slot_basey = -128;
-			num_secrets_cached = globalsave_get_num_secrets(&g_globalsave);
+			num_secrets_cached = globalsave_get_num_secrets(&g_globalsave) + globalsave_get_num_pets(&g_globalsave) + globalsave_get_num_skins(&g_globalsave) - 1;
 			num_found_cached = globalsave_get_num_levels(&g_globalsave);
+			for (int i = 0; i < sizeof(g_globalsave.best_ranks) / sizeof(g_globalsave.best_ranks[0]); i++) {
+				if (g_globalsave.best_ranks[i] == 4) num_a_ranks++;
+			}
+			num_comp_cached = num_found_cached + globalsave_get_num_pets(&g_globalsave) + globalsave_get_num_skins(&g_globalsave) + num_a_ranks;
+			num_comp_total_cached = FileSystem_NumLevels() + g_num_petdefs + PLAYER_MAX_SKINS + FileSystem_NumLevels();
 			if (!num_found_cached && current_save_slot == -1) current_save_slot = 0;
 			if (current_save_slot == SAVE_SLOTS) current_save_slot = SAVE_SLOTS - 1;
 			ps_pos = current_save_slot * SAVE_SLOT_EXTENT;

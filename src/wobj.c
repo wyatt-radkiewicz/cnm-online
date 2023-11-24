@@ -1113,9 +1113,11 @@ float Wobj_GetGroundAngle(const WOBJ *wobj) {
 	const float ang1 = Blocks_GetAngle(wobj->x + wobj->hitbox.x + wobj->hitbox.w, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 2.0f);
 	const float ang2 = Blocks_GetAngle(wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 2.0f);
 	const float ang3 = Blocks_GetAngle(wobj->x + wobj->hitbox.x, wobj->y + wobj->hitbox.y + wobj->hitbox.h + 2.0f);
+	const float ang4 = Blocks_GetAngle(wobj->x + wobj->hitbox.x, wobj->y + wobj->hitbox.y + wobj->hitbox.h / 2.0f);
 	if (ang1) return ang1;
 	else if (ang2) return ang2;
-	else return ang3;
+	else if (ang3) return ang3;
+	else return ang4;
 }
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy)
