@@ -705,12 +705,25 @@ void WobjSlimeWalker_Create(WOBJ *wobj)
 	wobj->hitbox.w = 48.0f;
 	wobj->hitbox.h = 48.0f;
 	wobj->money = 100;
+	wobj->item = 0;
 	wobj->custom_ints[0] = Util_RandInt(10, 30 * 3);
 	wobj->custom_ints[1] = 0;
 	wobj->custom_floats[0] = (float)(Util_RandInt(0, 1) * 2 - 1) * wobj->speed;
 }
 void WobjSlimeWalker_Update(WOBJ *wobj)
 {
+	if (wobj->item == 0) {
+		WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+		if (Interaction_GetDistanceToWobj(wobj, closest_player) <= (float)256.0f) {
+			wobj->item = 1;
+		}
+		Wobj_DoEnemyCry(wobj, 45);
+		WobjPhysics_BeginUpdate(wobj);
+		wobj->vel_y += 0.5f;
+		WobjPhysics_EndUpdate(wobj);
+		return;
+	}
+
 	Wobj_DoEnemyCry(wobj, 45);
 	WobjPhysics_BeginUpdate(wobj);
 	if (wobj->custom_ints[1] == 0)
