@@ -436,8 +436,8 @@
       "type_data": {
         "CustomizeableMoveablePlatform": {
           "bitmap_x32": [
-            13,
-            214
+            10,
+            89
           ],
           "target_relative": [
             96.0,
@@ -850,8 +850,8 @@
           "dist": 128,
           "speed": 4.0,
           "despawn": false,
-          "bitmapx": 10,
-          "bitmapy": 222
+          "bitmapx": 0,
+          "bitmapy": 94
         }
       },
       "spawning_criteria": {
@@ -873,8 +873,8 @@
           "dist": -128,
           "speed": 4.0,
           "despawn": false,
-          "bitmapx": 10,
-          "bitmapy": 222
+          "bitmapx": 0,
+          "bitmapy": 94
         }
       },
       "spawning_criteria": {
@@ -887,7 +887,7 @@
     },
     {
       "pos": [
-        3152.0,
+        3152.3054,
         1176.0
       ],
       "type_data": {
@@ -896,8 +896,8 @@
           "dist": 128,
           "speed": 4.0,
           "despawn": false,
-          "bitmapx": 10,
-          "bitmapy": 222
+          "bitmapx": 0,
+          "bitmapy": 94
         }
       },
       "spawning_criteria": {
@@ -919,8 +919,8 @@
           "dist": -128,
           "speed": 4.0,
           "despawn": false,
-          "bitmapx": 10,
-          "bitmapy": 222
+          "bitmapx": 0,
+          "bitmapy": 94
         }
       },
       "spawning_criteria": {
@@ -940,10 +940,10 @@
         "MovingFire": {
           "vertical": true,
           "dist": 128,
-          "speed": 4.0,
+          "speed": 3.0,
           "despawn": false,
-          "bitmapx": 10,
-          "bitmapy": 222
+          "bitmapx": 0,
+          "bitmapy": 94
         }
       },
       "spawning_criteria": {
@@ -1416,16 +1416,16 @@
     },
     {
       "pos": [
-        5168.0,
-        960.0
+        5167.6914,
+        960.3036
       ],
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
           "dist": 128.0,
           "speed": 2.0,
-          "bitmapx": 13,
-          "bitmapy": 214,
+          "bitmapx": 10,
+          "bitmapy": 89,
           "jumpthrough": false
         }
       },
@@ -1447,8 +1447,8 @@
           "vertical": false,
           "dist": 128.0,
           "speed": -2.0,
-          "bitmapx": 13,
-          "bitmapy": 214,
+          "bitmapx": 10,
+          "bitmapy": 89,
           "jumpthrough": false
         }
       },
@@ -1462,7 +1462,7 @@
     },
     {
       "pos": [
-        6112.0,
+        6112.642,
         800.0
       ],
       "type_data": {
@@ -1470,8 +1470,8 @@
           "vertical": true,
           "dist": 96.0,
           "speed": -2.0,
-          "bitmapx": 13,
-          "bitmapy": 214,
+          "bitmapx": 10,
+          "bitmapy": 89,
           "jumpthrough": false
         }
       },
@@ -1493,8 +1493,8 @@
           "vertical": true,
           "dist": 96.0,
           "speed": 2.0,
-          "bitmapx": 13,
-          "bitmapy": 214,
+          "bitmapx": 10,
+          "bitmapy": 89,
           "jumpthrough": false
         }
       },
@@ -1509,15 +1509,15 @@
     {
       "pos": [
         6176.0,
-        720.0
+        722.54816
       ],
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
           "dist": 96.0,
           "speed": -2.0,
-          "bitmapx": 13,
-          "bitmapy": 214,
+          "bitmapx": 10,
+          "bitmapy": 89,
           "jumpthrough": false
         }
       },
@@ -1540,8 +1540,8 @@
       "angle": 0,
       "frames": [
         [
-          10,
-          218
+          2,
+          90
         ]
       ],
       "collision_data": {
@@ -1561,8 +1561,8 @@
       "angle": 0,
       "frames": [
         [
-          11,
-          218
+          3,
+          90
         ]
       ],
       "collision_data": {
@@ -1582,8 +1582,8 @@
       "angle": 0,
       "frames": [
         [
-          11,
-          217
+          3,
+          89
         ]
       ],
       "collision_data": {
@@ -1603,8 +1603,8 @@
       "angle": 0,
       "frames": [
         [
-          10,
-          217
+          2,
+          89
         ]
       ],
       "collision_data": {
@@ -1624,8 +1624,8 @@
       "angle": 0,
       "frames": [
         [
-          12,
-          218
+          4,
+          90
         ]
       ],
       "collision_data": {
@@ -1645,8 +1645,8 @@
       "angle": 45,
       "frames": [
         [
-          12,
-          217
+          4,
+          89
         ]
       ],
       "collision_data": {
@@ -1694,8 +1694,8 @@
       "angle": 315,
       "frames": [
         [
-          13,
-          217
+          5,
+          89
         ]
       ],
       "collision_data": {
@@ -1743,8 +1743,8 @@
       "angle": 0,
       "frames": [
         [
-          13,
-          218
+          5,
+          90
         ]
       ],
       "collision_data": {
@@ -1764,8 +1764,8 @@
       "angle": 23,
       "frames": [
         [
-          8,
-          217
+          0,
+          89
         ]
       ],
       "collision_data": {
@@ -1813,8 +1813,8 @@
       "angle": 23,
       "frames": [
         [
-          9,
-          217
+          1,
+          89
         ]
       ],
       "collision_data": {
@@ -1862,8 +1862,8 @@
       "angle": 0,
       "frames": [
         [
-          8,
-          218
+          0,
+          90
         ]
       ],
       "collision_data": {
@@ -1883,8 +1883,8 @@
       "angle": 0,
       "frames": [
         [
-          9,
-          218
+          1,
+          90
         ]
       ],
       "collision_data": {
@@ -1904,8 +1904,8 @@
       "angle": 337,
       "frames": [
         [
-          14,
-          217
+          6,
+          89
         ]
       ],
       "collision_data": {
@@ -1953,8 +1953,8 @@
       "angle": 337,
       "frames": [
         [
-          15,
-          217
+          7,
+          89
         ]
       ],
       "collision_data": {
@@ -2002,8 +2002,8 @@
       "angle": 0,
       "frames": [
         [
-          14,
-          218
+          6,
+          90
         ]
       ],
       "collision_data": {
@@ -2023,8 +2023,8 @@
       "angle": 0,
       "frames": [
         [
-          15,
-          218
+          7,
+          90
         ]
       ],
       "collision_data": {
@@ -2044,8 +2044,8 @@
       "angle": 0,
       "frames": [
         [
-          11,
-          216
+          3,
+          88
         ]
       ],
       "collision_data": {
@@ -2065,8 +2065,8 @@
       "angle": 0,
       "frames": [
         [
-          12,
-          216
+          4,
+          88
         ]
       ],
       "collision_data": {
@@ -2086,8 +2086,8 @@
       "angle": 0,
       "frames": [
         [
-          10,
-          216
+          2,
+          88
         ]
       ],
       "collision_data": {
@@ -2107,8 +2107,8 @@
       "angle": 0,
       "frames": [
         [
-          12,
-          215
+          9,
+          88
         ]
       ],
       "collision_data": {
@@ -2128,8 +2128,8 @@
       "angle": 0,
       "frames": [
         [
-          11,
-          215
+          8,
+          88
         ]
       ],
       "collision_data": {
@@ -2149,8 +2149,29 @@
       "angle": 0,
       "frames": [
         [
-          13,
-          216
+          5,
+          88
+        ]
+      ],
+      "collision_data": {
+        "Box": {
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32
+        }
+      }
+    },
+    {
+      "solid": false,
+      "transparency": 0,
+      "damage_type": "None",
+      "anim_speed": 1,
+      "angle": 0,
+      "frames": [
+        [
+          0,
+          88
         ]
       ],
       "collision_data": {
@@ -2171,49 +2192,7 @@
       "frames": [
         [
           13,
-          215
-        ]
-      ],
-      "collision_data": {
-        "Box": {
-          "x": 0,
-          "y": 0,
-          "w": 32,
-          "h": 32
-        }
-      }
-    },
-    {
-      "solid": false,
-      "transparency": 0,
-      "damage_type": "None",
-      "anim_speed": 1,
-      "angle": 0,
-      "frames": [
-        [
-          14,
-          214
-        ]
-      ],
-      "collision_data": {
-        "Box": {
-          "x": 0,
-          "y": 0,
-          "w": 32,
-          "h": 32
-        }
-      }
-    },
-    {
-      "solid": false,
-      "transparency": 0,
-      "damage_type": "None",
-      "anim_speed": 1,
-      "angle": 0,
-      "frames": [
-        [
-          14,
-          213
+          91
         ]
       ],
       "collision_data": {
@@ -2234,7 +2213,7 @@
       "frames": [
         [
           13,
-          211
+          90
         ]
       ],
       "collision_data": {
@@ -2254,29 +2233,8 @@
       "angle": 0,
       "frames": [
         [
-          14,
-          211
-        ]
-      ],
-      "collision_data": {
-        "Box": {
-          "x": 0,
-          "y": 0,
-          "w": 32,
-          "h": 32
-        }
-      }
-    },
-    {
-      "solid": false,
-      "transparency": 0,
-      "damage_type": "None",
-      "anim_speed": 1,
-      "angle": 0,
-      "frames": [
-        [
-          15,
-          211
+          12,
+          88
         ]
       ],
       "collision_data": {
@@ -2297,7 +2255,7 @@
       "frames": [
         [
           13,
-          212
+          88
         ]
       ],
       "collision_data": {
@@ -2318,7 +2276,7 @@
       "frames": [
         [
           14,
-          212
+          88
         ]
       ],
       "collision_data": {
@@ -2338,8 +2296,8 @@
       "angle": 0,
       "frames": [
         [
-          15,
-          212
+          12,
+          89
         ]
       ],
       "collision_data": {
@@ -2359,8 +2317,8 @@
       "angle": 0,
       "frames": [
         [
-          9,
-          216
+          13,
+          89
         ]
       ],
       "collision_data": {
@@ -2381,7 +2339,49 @@
       "frames": [
         [
           14,
-          216
+          89
+        ]
+      ],
+      "collision_data": {
+        "Box": {
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32
+        }
+      }
+    },
+    {
+      "solid": false,
+      "transparency": 0,
+      "damage_type": "None",
+      "anim_speed": 1,
+      "angle": 0,
+      "frames": [
+        [
+          1,
+          88
+        ]
+      ],
+      "collision_data": {
+        "Box": {
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32
+        }
+      }
+    },
+    {
+      "solid": false,
+      "transparency": 0,
+      "damage_type": "None",
+      "anim_speed": 1,
+      "angle": 0,
+      "frames": [
+        [
+          6,
+          88
         ]
       ],
       "collision_data": {
@@ -2401,8 +2401,8 @@
       "angle": 0,
       "frames": [
         [
-          15,
-          216
+          7,
+          88
         ]
       ],
       "collision_data": {
@@ -2423,19 +2423,19 @@
       "frames": [
         [
           15,
-          213
+          88
         ],
         [
           15,
-          214
+          89
         ],
         [
           15,
-          215
+          90
         ],
         [
-          14,
-          215
+          15,
+          91
         ]
       ],
       "collision_data": {
@@ -2455,20 +2455,20 @@
       "angle": 0,
       "frames": [
         [
-          9,
-          214
-        ],
-        [
-          10,
-          214
+          8,
+          89
         ],
         [
           9,
-          215
+          89
         ],
         [
-          10,
-          215
+          8,
+          90
+        ],
+        [
+          9,
+          90
         ]
       ],
       "collision_data": {
@@ -2488,8 +2488,8 @@
       "angle": 0,
       "frames": [
         [
-          13,
-          214
+          10,
+          89
         ]
       ],
       "collision_data": {
@@ -2511,8 +2511,8 @@
       "angle": 0,
       "frames": [
         [
-          13,
-          213
+          10,
+          88
         ]
       ],
       "collision_data": {
@@ -2584,10 +2584,10 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 199,
-          "y": 7064,
-          "w": 166,
-          "h": 33
+          "x": 8,
+          "y": 2968,
+          "w": 160,
+          "h": 32
         }
       },
       "transparency": 0,
@@ -2618,9 +2618,9 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 267,
-          "y": 7048,
-          "w": 99,
+          "x": 72,
+          "y": 2952,
+          "w": 104,
           "h": 16
         }
       },
@@ -2652,9 +2652,9 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 267,
-          "y": 7048,
-          "w": 99,
+          "x": 72,
+          "y": 2952,
+          "w": 104,
           "h": 16
         }
       },
@@ -2686,8 +2686,8 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 368,
-          "y": 7048,
+          "x": 176,
+          "y": 2952,
           "w": 144,
           "h": 48
         }
@@ -2720,8 +2720,8 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 192,
-          "y": 7008,
+          "x": 0,
+          "y": 2912,
           "w": 320,
           "h": 40
         }
@@ -2754,8 +2754,8 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 384,
-          "y": 6776,
+          "x": 352,
+          "y": 2840,
           "w": 32,
           "h": 8
         }
@@ -2788,8 +2788,8 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 384,
-          "y": 6784,
+          "x": 352,
+          "y": 2848,
           "w": 32,
           "h": 16
         }
@@ -2822,8 +2822,8 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 384,
-          "y": 6800,
+          "x": 352,
+          "y": 2872,
           "w": 32,
           "h": 32
         }
@@ -2856,10 +2856,10 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 384,
-          "y": 6832,
+          "x": 352,
+          "y": 2904,
           "w": 32,
-          "h": 48
+          "h": 40
         }
       },
       "transparency": 0,
