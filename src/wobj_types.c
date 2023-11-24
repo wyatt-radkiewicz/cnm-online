@@ -2803,7 +2803,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		{ // Animation Frames
 			{416, 2048, 32, 32},
 			{128, 512, 32, 32},
-			{128, 512 + 32, 32, 32}
+			{128+32, 512, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
