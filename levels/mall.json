@@ -198,14 +198,14 @@
     },
     {
       "pos": [
-        16064.0,
+        16063.764,
         3872.0
       ],
       "type_data": {
         "CustomizeableMoveablePlatform": {
           "bitmap_x32": [
-            14,
-            51
+            8,
+            103
           ],
           "target_relative": [
             0.0,
@@ -232,8 +232,8 @@
       "type_data": {
         "CustomizeableMoveablePlatform": {
           "bitmap_x32": [
-            14,
-            51
+            8,
+            103
           ],
           "target_relative": [
             0.0,
@@ -260,8 +260,8 @@
       "type_data": {
         "CustomizeableMoveablePlatform": {
           "bitmap_x32": [
-            14,
-            51
+            8,
+            103
           ],
           "target_relative": [
             0.0,
@@ -282,14 +282,14 @@
     },
     {
       "pos": [
-        16160.0,
+        16160.247,
         3872.0
       ],
       "type_data": {
         "CustomizeableMoveablePlatform": {
           "bitmap_x32": [
-            14,
-            51
+            8,
+            103
           ],
           "target_relative": [
             0.0,
