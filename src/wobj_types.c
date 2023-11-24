@@ -1797,7 +1797,7 @@ static void WobjPet_Update(WOBJ *wobj) {
 
 		int changed_target = CNM_FALSE;
 
-		if (fabsf(target_x - plr->x) < 32.0f && fabsf(target_y - plr->y) < 64.0f && Wobj_IsGrounded(plr)) {
+		if (fabsf(target_x - plr->x) < 32.0f && Wobj_IsGrounded(plr)) {
 			target_x = (~plr->flags & WOBJ_HFLIP) ? plr->x - plr->hitbox.x - 16 - wobj->hitbox.w : plr->x + plr->hitbox.w + 16;
 			changed_target = CNM_TRUE;
 			if (fabsf(target_x - wobj->x) < 8.0f && (def->ai_type == PETAI_WALK || !def->ai_data.bounce.bounce_idly)) {
@@ -1810,6 +1810,7 @@ static void WobjPet_Update(WOBJ *wobj) {
 			wobj->custom_ints[1]++;
 		} else {
 			wobj->custom_ints[1] = 0;
+			wobj->vel_y = 0.0f;
 		}
 
 		if (!changed_target && def->ai_type == PETAI_WALK) {
