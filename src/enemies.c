@@ -73,6 +73,13 @@ void WobjSlime_Draw(WOBJ *wobj, int camx, int camy)
 	WobjGeneric_Draw(wobj, camx, camy);
 }
 
+typedef struct FlyingSlimeAI {
+	float spawnx, spawny;
+	float tx, ty;
+} FlyingSlimeAI;
+void WobjFlyingSlime_OnDestroy(WOBJ *wobj) {
+	free(wobj->local_data);
+}
 void WobjFlyingSlime_Create(WOBJ *wobj)
 {
 	wobj->hitbox.x = 0.0f;
@@ -80,34 +87,73 @@ void WobjFlyingSlime_Create(WOBJ *wobj)
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 32.0f;
 	wobj->custom_ints[0] = 0;
-	wobj->custom_ints[1] = 3;
+	wobj->custom_ints[1] = 0;
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 1.6666667f;
 	wobj->anim_frame = 0;
 	wobj->health = 6.0f;
-	wobj->speed = 3.0f;
+	FlyingSlimeAI *ai = calloc(1, sizeof(*ai));
+	wobj->local_data = ai;
+	ai->spawnx = wobj->x;
+	ai->spawny = wobj->y;
+	//wobj->speed = 3.0f;
 }
 void WobjFlyingSlime_Update(WOBJ *wobj)
 {
+	WOBJ *player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+	FlyingSlimeAI *ai = wobj->local_data;
+	if (!player) return;
 	Wobj_DoEnemyCry(wobj, 45);
-	wobj->x += wobj->speed;
-	wobj->y -= wobj->speed / 2.0f;
+	WobjPhysics_BeginUpdate(wobj);
 
-	wobj->anim_frame = (Game_GetFrame() / 15) % 2;
-	if (wobj->custom_ints[0]++ >= 30 * 2)
-	{
-		wobj->speed *= -1.0f;
-		wobj->custom_ints[0] = 0;
+	if (Game_GetFrame() % 5 == 0) wobj->anim_frame = (wobj->anim_frame + 1) & 1;
+
+	if (Interaction_GetDistanceToWobj(wobj, player) > (float)RENDERER_WIDTH * 2.0f) {
+		// Go to patrol mode
+		ai->tx = ai->spawnx;
+		ai->ty = ai->spawny;
+		wobj->custom_ints[0] = 2;
+	} else {
+		if (wobj->custom_ints[0] == 2) {
+			wobj->custom_ints[0] = 0;
+			wobj->custom_ints[1] = 25;
+			ai->tx = player->x + ((float)Util_RandInt(0, 1) * 2.0f - 1.0f) * 128.0f;
+			ai->ty = player->y - 128.0f;
+		}
 	}
 
-	if (Game_GetFrame() % 15 == 0 && Util_RandInt(0, 100) < 50)
-		Interaction_PlaySound(wobj, 18);
-
-	if (Game_GetFrame() % 30 * 2 == 0 && wobj->custom_ints[1] > 0)
-	{
-		wobj->custom_ints[1]--;
-		Interaction_CreateWobj(WOBJ_SLIME, wobj->x, wobj->y, 0, 0.0f);
+	if (wobj->custom_ints[0] == 0) {
+		// Fly upwards
+		if (wobj->custom_ints[1]-- <= 0) {
+			// Now dive shit
+			wobj->custom_ints[0] = 1;
+			wobj->custom_ints[1] = 90;
+		}
+	} else if (wobj->custom_ints[0] == 1) {
+		// Dive
+		ai->tx = player->x;
+		ai->ty = player->y;
+		if (wobj->custom_ints[1]-- <= 0 || Interaction_GetDistanceToWobj(player, wobj) < 55.0f) {
+			wobj->custom_ints[0] = 0;
+			wobj->custom_ints[1] = 25;
+			ai->tx = player->x + ((float)Util_RandInt(0, 1) * 2.0f - 1.0f) * 128.0f;
+			ai->ty = player->y - 128.0f;
+		}
 	}
+
+	// Fly towards target
+	if (wobj->y < ai->ty && wobj->vel_y < 8.0f) {
+		wobj->vel_y += 0.8f;
+	} else if (wobj->y > ai->ty && wobj->vel_y > -5.0f) {
+		wobj->vel_y -= 0.5f;
+	}
+	if (wobj->x < ai->tx && wobj->vel_x < 6.0f) {
+		wobj->vel_x += 0.3f;
+	} else if (wobj->x > ai->tx && wobj->vel_x > -6.0f) {
+		wobj->vel_x -= 0.3f;
+	}
+
+	WobjPhysics_EndUpdate(wobj);
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 

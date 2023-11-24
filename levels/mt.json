@@ -15,8 +15,8 @@
   "spawners": [
     {
       "pos": [
-        1376.0,
-        1120.0
+        1312.0,
+        1128.0
       ],
       "type_data": "PlayerSpawn",
       "spawning_criteria": {
@@ -29,7 +29,7 @@
     },
     {
       "pos": [
-        1328.0,
+        1264.0,
         1136.0
       ],
       "type_data": {
@@ -1320,6 +1320,24 @@
           "bitmapx": 9,
           "bitmapy": 94,
           "jumpthrough": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        3712.0,
+        416.0
+      ],
+      "type_data": {
+        "Slime": {
+          "flying": true
         }
       },
       "spawning_criteria": {
