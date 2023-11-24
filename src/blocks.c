@@ -301,7 +301,9 @@ BLOCK_PROPS *Blocks_IsCollidingWithDamage(const CNM_BOX *b)
 		for (x = (int)b->x / BLOCK_SIZE - 1; x < (int)(b->x + b->w) / BLOCK_SIZE + 1; x++)
 		{
 			BLOCK_PROPS *props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x, y));
-			if (props->dmg_type == BLOCK_DMG_TYPE_NONE) props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, x, y));
+			BLOCK_PROPS *const propsbg = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, x, y));
+			if (propsbg->dmg_type != BLOCK_DMG_TYPE_NONE && props->dmg_type == BLOCK_DMG_TYPE_LAVA) props = propsbg;
+			if (props->dmg_type == BLOCK_DMG_TYPE_NONE) props = propsbg;
 			if (props->dmg_type != BLOCK_DMG_TYPE_NONE && props->coll_type == BLOCKS_COLL_BOX)
 			{
 				block.x = (float)(x * BLOCK_SIZE) + props->coll_data.hitbox.x;
