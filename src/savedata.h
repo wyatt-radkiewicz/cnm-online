@@ -17,6 +17,8 @@ struct globalsave {
 	char levels_found[64][32];
 	int skins_found[32];
 	int pets_found[64];
+	int best_ranks[64];
+	int best_times[64];
 };
 
 #define SAVE_SLOTS 10

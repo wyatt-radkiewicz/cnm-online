@@ -453,6 +453,26 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->level_end_rank = (int)((float)(local_data->level_end_score + local_data->level_end_time_score) / (float)par * 4.0);
 		if (local_data->level_end_rank > 4) local_data->level_end_rank = 4;
 		if (local_data->level_end_rank < 0) local_data->level_end_rank = 0;
+		if (!Game_GetVar(GAME_VAR_NOSAVE)->data.integer || Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+			// Save rank and time
+			int id = -1;
+			for (int i = 0; i < globalsave_get_num_levels(&g_globalsave); i++) {
+				if (strcmp(g_globalsave.levels_found[i], Game_GetVar(GAME_VAR_LEVEL)->data.string) == 0) {
+					id = i;
+					break;
+				}
+			}
+			if (id != -1) {
+				if (local_data->level_end_rank > g_globalsave.best_ranks[id]) {
+					g_globalsave.best_ranks[id] = local_data->level_end_rank;
+				}
+				int secs = local_data->final_time_forscore / 30;
+				if (secs < g_globalsave.best_times[id]) {
+					g_globalsave.best_times[id] = secs;
+				}
+				globalsave_save(&g_globalsave);
+			}
+		}
 	}
 	// Give the player lives
 	if ((wobj->flags & WOBJ_HAS_PLAYER_FINISHED) &&

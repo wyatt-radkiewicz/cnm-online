@@ -718,6 +718,7 @@ void WobjSlimeWalker_Update(WOBJ *wobj)
 		WobjPhysics_BeginUpdate(wobj);
 		wobj->vel_y += 0.5f;
 		WobjPhysics_EndUpdate(wobj);
+		Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 		return;
 	}
 

@@ -137,6 +137,10 @@ void globalsave_clear(struct globalsave *gs) {
 	for (int i = 0; i < sizeof(gs->pets_found) / sizeof(gs->pets_found[0]); i++) {
 		gs->pets_found[i] = -1;
 	}
+	for (int i = 0; i < sizeof(gs->best_times) / sizeof(gs->best_times[0]); i++) {
+		gs->best_times[i] = 99*60+59;
+		gs->best_ranks[i] = 0;
+	}
 	gs->skins_found[0] = 10;
 	gs->saves_created = 0;
 	gs->titlebg = 0;
@@ -205,6 +209,10 @@ void globalsave_load(struct globalsave *gs) {
 	if (entry) lparse_get_data(lp, entry, 0, sizeof(gs->skins_found) / sizeof(gs->skins_found[0]), &gs->skins_found);
 	entry = lparse_get_entry(lp, "TITLEBG");
 	if (entry) lparse_get_data(lp, entry, 0, 1, &gs->titlebg);
+	entry = lparse_get_entry(lp, "RANKS");
+	if (entry) lparse_get_data(lp, entry, 0, sizeof(gs->best_ranks) / sizeof(gs->best_ranks[0]), &gs->best_ranks);
+	entry = lparse_get_entry(lp, "TIMES");
+	if (entry) lparse_get_data(lp, entry, 0, sizeof(gs->best_times) / sizeof(gs->best_times[0]), &gs->best_times);
 
 	lparse_close(lp);
 	fclose(fp);
@@ -237,6 +245,10 @@ void globalsave_save(const struct globalsave *gs) {
 	lparse_set_data(lp, entry, 0, sizeof(gs->skins_found) / sizeof(gs->skins_found[0]), &gs->skins_found);
 	entry = lparse_make_entry(lp, "TITLEBG", lparse_i32, 1);
 	lparse_set_data(lp, entry, 0, 1, &gs->titlebg);
+	entry = lparse_make_entry(lp, "RANKS", lparse_i32, sizeof(gs->best_ranks) / sizeof(gs->best_ranks[0]));
+	lparse_set_data(lp, entry, 0, sizeof(gs->best_ranks) / sizeof(gs->best_ranks[0]), &gs->best_ranks);
+	entry = lparse_make_entry(lp, "TIMES", lparse_i32, sizeof(gs->best_times) / sizeof(gs->best_times[0]));
+	lparse_set_data(lp, entry, 0, sizeof(gs->best_times) / sizeof(gs->best_times[0]), &gs->best_times);
 
 	lparse_close(lp);
 	fclose(fp);
