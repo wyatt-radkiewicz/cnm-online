@@ -1733,7 +1733,7 @@ static void WobjPetUnlock_Draw(WOBJ *wobj, int camx, int camy) {
 typedef struct PetLocalData {
 	float px[PLRPOS_HISTORY];
 	float py[PLRPOS_HISTORY];
-	int i, didinit;
+	int i, didinit, bounce_goto;
 } PetLocalData;
 static void WobjPet_OnDestroy(WOBJ *wobj) {
 	free(wobj->local_data);
@@ -1751,6 +1751,7 @@ static void WobjPet_Create(WOBJ *wobj) {
 	local->didinit = CNM_FALSE;
 	wobj->on_destroy = WobjPet_OnDestroy;
 	wobj->item = Util_RandInt(30*1, 30*30);
+	local->bounce_goto = CNM_FALSE;
 }
 static void WobjPet_Update(WOBJ *wobj) {
 	WOBJ *plr = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
@@ -1810,7 +1811,7 @@ static void WobjPet_Update(WOBJ *wobj) {
 			wobj->custom_ints[1]++;
 		} else {
 			wobj->custom_ints[1] = 0;
-			wobj->vel_y = 0.0f;
+			if (def->ai_type == PETAI_WALK) wobj->vel_y = 0.0f;
 		}
 
 		if (!changed_target && def->ai_type == PETAI_WALK) {
@@ -1834,14 +1835,24 @@ static void WobjPet_Update(WOBJ *wobj) {
 
 		int canbounce = def->ai_data.bounce.bounce_idly;
 		if (def->ai_type == PETAI_BOUNCE) {
-			float min = 100000.0, max = -1000000.0;
-			for (int i = 0; i < PLRPOS_HISTORY; i++) {
-				if (local->py[i] < min) min = local->py[i];
-				if (local->py[i] > max) max = local->py[i];
-			}
-			if (max - min < 128.0f && fabsf(target_x - plr->x) < RENDERER_WIDTH) {
-				if (!changed_target) canbounce = CNM_TRUE;
-				changed_target = CNM_TRUE;
+			if (local->bounce_goto) {
+				if (fabsf(wobj->x - plr->x) < 128.0f &&
+					fabsf(wobj->y - plr->y) < 24.0f) {
+					local->bounce_goto = CNM_FALSE;
+				}
+			} else {
+				float min = 100000.0, max = -1000000.0;
+				for (int i = 0; i < PLRPOS_HISTORY; i++) {
+					if (local->py[i] < min) min = local->py[i];
+					if (local->py[i] > max) max = local->py[i];
+				}
+				if (max - min < 128.0f && fabsf(wobj->x - plr->x) < (float)RENDERER_WIDTH / 2.0f &&
+					fabsf(wobj->y - plr->y) < (float)RENDERER_HEIGHT / 2.0f) {
+					if (!changed_target) canbounce = CNM_TRUE;
+					changed_target = CNM_TRUE;
+				} else {
+					local->bounce_goto = CNM_TRUE;
+				}
 			}
 		}
 
