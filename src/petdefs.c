@@ -38,6 +38,7 @@ PetDef petdef_from_line(const char *line) {
 	line++;
 	for (int i = 0; i < sizeof(pet.name) - 1 && *line && *line != '"'; i++, line++) {
 		pet.name[i] = *line;
+		if (*line == '_') pet.name[i] = ' ';
 		pet.name[i+1] = '\0';
 	}
 	if (*line == '\0') {

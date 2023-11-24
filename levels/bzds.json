@@ -970,7 +970,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -990,7 +990,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1010,7 +1010,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1030,7 +1030,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1050,7 +1050,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1070,7 +1070,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1090,7 +1090,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1110,7 +1110,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1130,7 +1130,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3278,7 +3278,9 @@
           "vertical": true,
           "dist": 128,
           "speed": 5.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3371,7 +3373,9 @@
           "vertical": false,
           "dist": 610,
           "speed": 5.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3392,7 +3396,9 @@
           "vertical": false,
           "dist": 610,
           "speed": 5.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3413,7 +3419,9 @@
           "vertical": false,
           "dist": 610,
           "speed": 2.5,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3434,7 +3442,9 @@
           "vertical": false,
           "dist": 610,
           "speed": 2.5,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3455,7 +3465,9 @@
           "vertical": true,
           "dist": 128,
           "speed": 5.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3476,7 +3488,9 @@
           "vertical": true,
           "dist": 128,
           "speed": 4.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3497,7 +3511,9 @@
           "vertical": true,
           "dist": 128,
           "speed": 7.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3518,7 +3534,9 @@
           "vertical": true,
           "dist": 128,
           "speed": 8.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3539,7 +3557,9 @@
           "vertical": true,
           "dist": 128,
           "speed": 11.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -3728,7 +3748,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3748,7 +3768,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3768,7 +3788,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3788,7 +3808,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3808,7 +3828,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3828,7 +3848,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3848,7 +3868,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3868,7 +3888,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3888,7 +3908,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3908,7 +3928,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3929,7 +3949,9 @@
           "vertical": false,
           "dist": -3489,
           "speed": 3.0,
-          "despawn": true
+          "despawn": true,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7200,7 +7222,9 @@
           "vertical": false,
           "dist": -3489,
           "speed": 3.0,
-          "despawn": true
+          "despawn": true,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7221,7 +7245,9 @@
           "vertical": false,
           "dist": -3489,
           "speed": 3.0,
-          "despawn": true
+          "despawn": true,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7242,7 +7268,9 @@
           "vertical": false,
           "dist": -3489,
           "speed": 3.0,
-          "despawn": true
+          "despawn": true,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7263,7 +7291,9 @@
           "vertical": false,
           "dist": -3489,
           "speed": 3.0,
-          "despawn": true
+          "despawn": true,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7284,7 +7314,9 @@
           "vertical": false,
           "dist": -3489,
           "speed": 3.0,
-          "despawn": true
+          "despawn": true,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7305,7 +7337,9 @@
           "vertical": false,
           "dist": -3489,
           "speed": 3.0,
-          "despawn": true
+          "despawn": true,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7346,7 +7380,7 @@
             6942.454
           ],
           "start_activated": false,
-          "teleport_players": true,
+          "teleport_players": false,
           "link_id": 5
         }
       },
@@ -7387,7 +7421,9 @@
           "vertical": true,
           "dist": 176,
           "speed": 3.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7408,7 +7444,9 @@
           "vertical": true,
           "dist": -176,
           "speed": 3.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -7429,7 +7467,9 @@
           "vertical": true,
           "dist": 176,
           "speed": 3.0,
-          "despawn": false
+          "despawn": false,
+          "bitmapx": 10,
+          "bitmapy": 70
         }
       },
       "spawning_criteria": {
@@ -10235,8 +10275,8 @@
       "angle": 0,
       "frames": [
         [
-          0,
-          214
+          10,
+          88
         ]
       ],
       "collision_data": {
@@ -10257,7 +10297,7 @@
       "frames": [
         [
           4,
-          213
+          88
         ]
       ],
       "collision_data": {
@@ -10277,8 +10317,8 @@
       "angle": 0,
       "frames": [
         [
-          1,
-          214
+          11,
+          88
         ]
       ],
       "collision_data": {
