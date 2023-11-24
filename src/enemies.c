@@ -383,9 +383,6 @@ void WobjBozoPin_Draw(WOBJ *wobj, int camx, int camy)
 #define BOZO_WAYPOINTS_MAX 32
 static float bzx[BOZO_WAYPOINTS_MAX], bzy[BOZO_WAYPOINTS_MAX];
 static int bznum;
-void Enemies_Reset(void) {
-	bznum = 0;
-}
 void WobjBozoWaypoint_Create(WOBJ *wobj) {
 	if (bznum >= BOZO_WAYPOINTS_MAX) return;
 	bzx[bznum] = wobj->x;
@@ -1581,12 +1578,14 @@ void WobjMovingFire_Draw(WOBJ *wobj, int camx, int camy) {
 
 // TODO: Update super dragon
 #define MAX_SUPER_DRAGONS 32
+#define MAX_SD_LANDS 32
 typedef struct _SUPER_DRAGON_DATA
 {
 	int state;
 	int state_timer;
-	float land_x;
-	float land_y;
+	int land_idx, num_lands;
+	float land_x[MAX_SD_LANDS];
+	float land_y[MAX_SD_LANDS];
 	float origin_x;
 	float origin_y;
 	float shooting_dir;
@@ -1615,6 +1614,7 @@ void WobjSuperDragonBoss_Create(WOBJ *wobj)
 	super_dragons[wobj->custom_ints[0]].origin_x = wobj->x;
 	super_dragons[wobj->custom_ints[0]].origin_y = wobj->y;
 	super_dragons[wobj->custom_ints[0]].shooting_dir = 1.0f;
+	super_dragons[wobj->custom_ints[0]].land_idx = 0;
 }
 void WobjSuperDragonBoss_Update(WOBJ *wobj)
 {
@@ -1639,16 +1639,16 @@ void WobjSuperDragonBoss_Update(WOBJ *wobj)
 	if (data->state == SUPER_DRAGON_STATE_LANDING)
 	{
 		const float spd = 4.5f;
-		if (wobj->x > data->land_x)
+		if (wobj->x > data->land_x[data->land_idx])
 			wobj->x -= spd;
-		if (wobj->x < data->land_x)
+		if (wobj->x < data->land_x[data->land_idx])
 			wobj->x += spd;
-		if (wobj->y > data->land_y)
+		if (wobj->y > data->land_y[data->land_idx])
 			wobj->y -= spd;
-		if (wobj->y < data->land_y)
+		if (wobj->y < data->land_y[data->land_idx])
 			wobj->y += spd;
 
-		if (fabsf(wobj->x - data->land_x) < spd * 1.5f && fabsf(wobj->y - data->land_y) < spd * 1.5f)
+		if (fabsf(wobj->x - data->land_x[data->land_idx]) < spd * 1.5f && fabsf(wobj->y - data->land_y[data->land_idx]) < spd * 1.5f)
 		{
 			data->state = SUPER_DRAGON_STATE_SHOOTING;
 			data->state_timer = 0;
@@ -1729,6 +1729,7 @@ void WobjSuperDragonBoss_Update(WOBJ *wobj)
 		if (data->state_timer++ >= 30 * 20)
 		{
 			data->state = SUPER_DRAGON_STATE_LANDING;
+			data->land_idx = Util_RandInt(0, data->num_lands-1);
 			data->state_timer = 0;
 		}
 	}
@@ -1755,8 +1756,9 @@ void WobjSuperDragonBoss_Update(WOBJ *wobj)
 }
 void WobjSuperDragonLandingZone_Create(WOBJ *wobj)
 {
-	super_dragons[wobj->custom_ints[0]].land_x = wobj->x;
-	super_dragons[wobj->custom_ints[0]].land_y = wobj->y;
+	SUPER_DRAGON_DATA *data = &super_dragons[wobj->custom_ints[0]];
+	data->land_x[data->num_lands] = wobj->x;
+	data->land_y[data->num_lands++] = wobj->y;
 }
 
 void WobjBozoLaserMinion_Create(WOBJ *wobj)
@@ -2676,4 +2678,11 @@ void WobjSupervirus_Update(WOBJ *wobj)
 void WobjSupervirus_Draw(WOBJ *wobj, int camx, int camy)
 {
 	supervirus_render((int)wobj->x - camx, (int)wobj->y - camy);
+}
+
+void Enemies_Reset(void) {
+	bznum = 0;
+	for (int i = 0; i < MAX_SUPER_DRAGONS; i++) {
+		super_dragons[i].num_lands = 0;
+	}
 }
