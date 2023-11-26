@@ -1373,106 +1373,8 @@
     },
     {
       "pos": [
-        2736.0,
-        896.0
-      ],
-      "type_data": "SilverSlime",
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2856.0,
-        744.0
-      ],
-      "type_data": "SilverSlime",
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2720.0,
-        880.0
-      ],
-      "type_data": "SilverSlime",
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
         2720.0,
         904.0
-      ],
-      "type_data": "SilverSlime",
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2752.0,
-        904.0
-      ],
-      "type_data": "SilverSlime",
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2880.0,
-        704.0
-      ],
-      "type_data": "SilverSlime",
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2872.0,
-        816.0
-      ],
-      "type_data": "SilverSlime",
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2736.0,
-        872.0
       ],
       "type_data": "SilverSlime",
       "spawning_criteria": {
@@ -1852,8 +1754,8 @@
     },
     {
       "pos": [
-        2688.0,
-        542.7725
+        1704.0,
+        1096.0
       ],
       "type_data": {
         "Checkpoint": {
@@ -1894,39 +1796,6 @@
       "type_data": {
         "Slime": {
           "flying": true
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2760.0,
-        640.0
-      ],
-      "type_data": "RockGuySlider",
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": "KeyGreen",
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        3136.0,
-        576.0
-      ],
-      "type_data": {
-        "LockedBlock": {
-          "color": "Green",
-          "consume_key": true
         }
       },
       "spawning_criteria": {
@@ -2162,7 +2031,7 @@
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
+        "max_concurrent_spawns": 1
       },
       "dropped_item": null,
       "spawner_group": null
@@ -2729,42 +2598,6 @@
     },
     {
       "pos": [
-        352.0,
-        480.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "SpeedPotion"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "PlayerCountBased",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        352.0,
-        512.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "SpeedPotion"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "PlayerCountBased",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
         320.0,
         512.0
       ],
@@ -2867,7 +2700,7 @@
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
+        "max_concurrent_spawns": 1
       },
       "dropped_item": null,
       "spawner_group": null
@@ -3025,96 +2858,6 @@
       "pos": [
         1740.0,
         632.0
-      ],
-      "type_data": {
-        "RockGuy": {
-          "rock_guy_type": "Small1"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        1768.0,
-        632.0
-      ],
-      "type_data": {
-        "RockGuy": {
-          "rock_guy_type": "Small1"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        1796.0,
-        632.0
-      ],
-      "type_data": {
-        "RockGuy": {
-          "rock_guy_type": "Small1"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        1800.0,
-        600.0
-      ],
-      "type_data": {
-        "RockGuy": {
-          "rock_guy_type": "Small1"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        1768.0,
-        600.0
-      ],
-      "type_data": {
-        "RockGuy": {
-          "rock_guy_type": "Small1"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        1736.0,
-        600.0
       ],
       "type_data": {
         "RockGuy": {
@@ -3385,24 +3128,6 @@
       "pos": [
         2880.0,
         1280.0
-      ],
-      "type_data": {
-        "SpiderWalker": {
-          "speed": 4.0
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        3168.0,
-        1184.0
       ],
       "type_data": {
         "SpiderWalker": {
@@ -3766,6 +3491,24 @@
           "next_level": "",
           "extra_unlocked_level": null,
           "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2688.0,
+        544.0
+      ],
+      "type_data": {
+        "Checkpoint": {
+          "checkpoint_num": 1
         }
       },
       "spawning_criteria": {
