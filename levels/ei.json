@@ -2283,150 +2283,6 @@
     },
     {
       "pos": [
-        6784.0,
-        960.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "Cake"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6752.0,
-        992.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "FissionGun"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6752.0,
-        960.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "GoldenShotgun"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6752.0,
-        928.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "LaserRifle"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6720.0,
-        928.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "RocketLauncher"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6720.0,
-        960.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "Minigun"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6720.0,
-        992.0
-      ],
-      "type_data": {
-        "DroppedItem": {
-          "item": "Flamethrower"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6816.0,
-        1024.0
-      ],
-      "type_data": {
-        "SpringBoard": {
-          "jump_velocity": 12.0
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
         5824.0,
         544.0
       ],
@@ -2451,42 +2307,6 @@
       "type_data": {
         "Checkpoint": {
           "checkpoint_num": 3
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6848.0,
-        864.0
-      ],
-      "type_data": {
-        "UpgradeTrigger": {
-          "trigger_type": "Vortex"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        6752.0,
-        864.0
-      ],
-      "type_data": {
-        "UpgradeTrigger": {
-          "trigger_type": "CrystalWings"
         }
       },
       "spawning_criteria": {
@@ -3906,6 +3726,46 @@
           "remove_red": false,
           "remove_green": true,
           "remove_blue": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6656.0,
+        1024.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6688.0,
+        1024.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {

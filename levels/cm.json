@@ -4400,7 +4400,7 @@
       "type_data": {
         "LavaDragonHead": {
           "len": 10,
-          "health": 500.0
+          "health": 50.0
         }
       },
       "spawning_criteria": {
@@ -4408,7 +4408,7 @@
         "mode": "MultiAndSingleplayer",
         "max_concurrent_spawns": 0
       },
-      "dropped_item": "LaserRifle",
+      "dropped_item": "KeyRed",
       "spawner_group": null
     },
     {
@@ -4615,6 +4615,200 @@
         3072.0
       ],
       "type_data": "InvisBlock",
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6400.0,
+        1536.0
+      ],
+      "type_data": {
+        "LockedBlock": {
+          "color": "Red",
+          "consume_key": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6400.0,
+        1504.0
+      ],
+      "type_data": {
+        "LockedBlock": {
+          "color": "Red",
+          "consume_key": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6400.0,
+        1472.0
+      ],
+      "type_data": {
+        "LockedBlock": {
+          "color": "Red",
+          "consume_key": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6432.0,
+        1472.0
+      ],
+      "type_data": {
+        "LockedBlock": {
+          "color": "Red",
+          "consume_key": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6464.0,
+        1472.0
+      ],
+      "type_data": {
+        "LockedBlock": {
+          "color": "Red",
+          "consume_key": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6496.0,
+        1472.0
+      ],
+      "type_data": {
+        "LockedBlock": {
+          "color": "Red",
+          "consume_key": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6448.0,
+        1488.0
+      ],
+      "type_data": {
+        "KeyRemover": {
+          "remove_red": true,
+          "remove_green": true,
+          "remove_blue": true
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6448.0,
+        1536.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6480.0,
+        1536.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        6512.0,
+        1536.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",

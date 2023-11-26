@@ -3657,8 +3657,8 @@
     },
     {
       "pos": [
-        3648.0,
-        1376.0
+        3744.0,
+        1392.0
       ],
       "type_data": {
         "TextSpawner": {
@@ -4379,6 +4379,66 @@
       "type_data": {
         "HealthSetTrigger": {
           "target_health": 100.0
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        3712.0,
+        1376.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        3712.0,
+        1344.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "",
+          "extra_unlocked_level": null,
+          "is_secret": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        3712.0,
+        1312.0
+      ],
+      "type_data": {
+        "FinishTrigger": {
+          "next_level": "",
+          "extra_unlocked_level": null,
+          "is_secret": false
         }
       },
       "spawning_criteria": {
