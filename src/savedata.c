@@ -217,8 +217,7 @@ void globalsave_load(struct globalsave *gs) {
 	lparse_close(lp);
 	fclose(fp);
 }
-void globalsave_save(const struct globalsave *gs) {
-	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return;
+static void _globalsave_save(const struct globalsave *gs) {
 	FILE *fp = fopen(SAVE_DIR"gameinfo.lps", "wb");
 	if (!fp) {
 		Console_Print("Can't open the game info file: "SAVE_DIR"gameinfo.lps""! ERROR");
@@ -252,6 +251,13 @@ void globalsave_save(const struct globalsave *gs) {
 
 	lparse_close(lp);
 	fclose(fp);
+}
+void globalsave_save(const struct globalsave *gs) {
+	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return;
+	_globalsave_save(gs);
+}
+void globalsave_save_override(const struct globalsave *gs) {
+	_globalsave_save(gs);
 }
 int globalsave_get_num_secrets(const struct globalsave *gs) {
 	int num = 0;

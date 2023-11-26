@@ -471,7 +471,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 				if (secs < g_globalsave.best_times[id]) {
 					g_globalsave.best_times[id] = secs;
 				}
-				globalsave_save(&g_globalsave);
+				Console_Print("Saving new best times and ranks...");
+				globalsave_save_override(&g_globalsave);
 			}
 		}
 	}

@@ -38,6 +38,7 @@ int globalsave_visit_skin(struct globalsave *gs, int skinid);
 int globalsave_visit_pet(struct globalsave *gs, int petid);
 void globalsave_load(struct globalsave *gs);
 void globalsave_save(const struct globalsave *gs);
+void globalsave_save_override(const struct globalsave *gs);
 int globalsave_get_num_secrets(const struct globalsave *gs);
 int globalsave_get_num_levels(const struct globalsave *gs);
 int globalsave_get_num_skins(const struct globalsave *gs);
