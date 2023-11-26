@@ -389,6 +389,8 @@ void WobjBozoPin_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
 	WobjPhysics_BeginUpdate(wobj);
+	wobj->vel_x = 0.0f;
+	wobj->vel_y = 0.0f;
 	WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
 	if (Interaction_GetDistanceToWobj(wobj, closest_player) < (float)320.0f && !wobj->item)
 	{
@@ -396,8 +398,8 @@ void WobjBozoPin_Update(WOBJ *wobj)
 		float tang = atan2f(closest_player->y - wobj->y, closest_player->x - wobj->x);
 		if (wobj->custom_ints[0] > 30*4) wobj->speed += (0.5f - wobj->speed) * 0.5f;
 		if (wobj->custom_ints[0] > 30*6) {
-			wobj->x += Util_RandFloat() * 2.0f - 1.0f;
-			wobj->y += Util_RandFloat() * 2.0f - 1.0f;
+			wobj->vel_x = Util_RandFloat() * 2.0f - 1.0f;
+			wobj->vel_y = Util_RandFloat() * 2.0f - 1.0f;
 			if (wobj->custom_ints[0] > 30*7) {
 				if (tang > wobj->custom_floats[1]) wobj->custom_floats[1] += 7.0f / 180.0f * CNM_PI;
 				else wobj->custom_floats[1] -= 7.0f / 180.0f * CNM_PI;
@@ -411,8 +413,8 @@ void WobjBozoPin_Update(WOBJ *wobj)
 		if (wobj->custom_ints[0] < 30*7) {
 			wobj->custom_floats[1] = tang;
 		}
-		wobj->vel_x = cosf(wobj->custom_floats[1]) * wobj->speed;
-		wobj->vel_y = sinf(wobj->custom_floats[1]) * wobj->speed;
+		wobj->vel_x += cosf(wobj->custom_floats[1]) * wobj->speed;
+		wobj->vel_y += sinf(wobj->custom_floats[1]) * wobj->speed;
 	}
 	WobjPhysics_EndUpdate(wobj);
 
