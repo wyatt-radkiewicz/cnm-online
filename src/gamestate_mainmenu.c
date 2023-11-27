@@ -85,9 +85,9 @@ typedef struct _XMAS_SNOWFLAKE
 	short x, y;
 	char xdir, alive;
 } XMAS_SNOWFLAKE;
-static unsigned char xmas_static_snow[RENDERER_HEIGHT][RENDERER_WIDTH];
-static unsigned char xmas_static_snow_colors[RENDERER_HEIGHT][RENDERER_WIDTH];
-static unsigned char xmas_obstacles[RENDERER_HEIGHT][RENDERER_WIDTH];
+static unsigned char xmas_static_snow[RENDERER_MAX_HEIGHT][RENDERER_MAX_WIDTH];
+static unsigned char xmas_static_snow_colors[RENDERER_MAX_HEIGHT][RENDERER_MAX_WIDTH];
+static unsigned char xmas_obstacles[RENDERER_MAX_HEIGHT][RENDERER_MAX_WIDTH];
 static XMAS_SNOWFLAKE xmas_snowflakes[NUM_SNOWFLAKES];
 static int next_snowflake;
 
@@ -1006,7 +1006,7 @@ static void cache_titlebgs(void) {
 
 void draw_player_setup(void) {
 	CNM_RECT r, r2;
-	static int quit_posx = RENDERER_WIDTH / 2 - 112 + 20 - 10;
+	static int quit_posx = RENDERER_MAX_WIDTH / 2 - 112 + 20 - 10;
 
 	int trans = 7 - ps_trans / 2;
 	if (trans < 2) trans = 2;
@@ -1144,6 +1144,10 @@ void draw_player_setup(void) {
 		gui_text_box_draw(&options_mserv, ps_selected == 3, RENDERER_WIDTH / 2 + r.w - 20 - (14 * 8), RENDERER_HEIGHT / 2 + 16 + 12+(12*4), trans2);
 		Util_SetRect(&r2, 312, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - r.w + 8, RENDERER_HEIGHT / 2 + 16 + 24 + ps_selected_pos, &r2, trans2, RENDERER_LIGHT);
+
+		Renderer_DrawText(RENDERER_WIDTH / 2 - r.w + 12+8, RENDERER_HEIGHT / 2 + 16 + 12+(12*5), trans2, RENDERER_LIGHT, "WIDESCREEN: ");
+		Renderer_DrawText(RENDERER_WIDTH / 2 + r.w - 20 - 3*8, RENDERER_HEIGHT / 2 + 16 + 12+(12*5), trans2, RENDERER_LIGHT,
+			(Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer ? "YES" : " NO"));
 	}
 
 	if (last_gui_state == GUI_TITLEBG_STATE || gui_state == GUI_TITLEBG_STATE) {
@@ -2047,7 +2051,7 @@ void draw_options_gui(void) {
 	gui_text_box_update(&options_mserv, ps_selected == 3);
 	draw_player_setup();
 
-	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 3) {
+	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 4) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected++;
 	}
@@ -2069,6 +2073,13 @@ void draw_options_gui(void) {
 		int *hires = &Game_GetVar(GAME_VAR_HIRESMODE)->data.integer;
 		*hires = !(*hires);
 		Renderer_SetHiResMode(*hires);
+	}
+	if (ps_selected == 4 && change_button) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		int *widescreen = &Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer;
+		*widescreen = !(*widescreen);
+		Renderer_WidescreenMode(*widescreen);
+		side_blob_x = RENDERER_WIDTH;
 	}
 	if (ps_selected == 2) {
 		if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING) && Audio_GetGlobalVolume() < 1.0f) {

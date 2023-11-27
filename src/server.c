@@ -496,18 +496,18 @@ void Server_Tick(void)
 #define PLAYER_SEND_PAD 5.0f
 				cplayer = node_iter2->client_player;
 				if (cplayer != NULL && (cplayer->x / OBJGRID_SIZE) > (node_iter->x / OBJGRID_SIZE) - PLAYER_SEND_PAD &&
-					(cplayer->x / OBJGRID_SIZE) < ((node_iter->x+RENDERER_WIDTH) / OBJGRID_SIZE) + PLAYER_SEND_PAD &&
+					(cplayer->x / OBJGRID_SIZE) < ((node_iter->x+RENDERER_MAX_WIDTH) / OBJGRID_SIZE) + PLAYER_SEND_PAD &&
 					(cplayer->y / OBJGRID_SIZE) > (node_iter->y / OBJGRID_SIZE) - PLAYER_SEND_PAD &&
-					(cplayer->y / OBJGRID_SIZE) < ((node_iter->y+RENDERER_HEIGHT) / OBJGRID_SIZE) + PLAYER_SEND_PAD &&
+					(cplayer->y / OBJGRID_SIZE) < ((node_iter->y+RENDERER_MAX_HEIGHT) / OBJGRID_SIZE) + PLAYER_SEND_PAD &&
 					buffer.num_objects < bufsize &&
 					cplayer->node_id != node_iter->id)
 					buffer.wobjs[buffer.num_objects++] = cplayer;
 				NetGame_Iterate(&node_iter2);
 			}
 
-			for (gx = (int)(node_iter->x / OBJGRID_SIZE) - 2; gx < (int)((node_iter->x + RENDERER_WIDTH) / OBJGRID_SIZE) + 2; gx++)
+			for (gx = (int)(node_iter->x / OBJGRID_SIZE) - 2; gx < (int)((node_iter->x + RENDERER_MAX_WIDTH) / OBJGRID_SIZE) + 2; gx++)
 			{
-				for (gy = (int)(node_iter->y / OBJGRID_SIZE) - 2; gy < (int)((node_iter->y + RENDERER_HEIGHT) / OBJGRID_SIZE) + 2; gy++)
+				for (gy = (int)(node_iter->y / OBJGRID_SIZE) - 2; gy < (int)((node_iter->y + RENDERER_MAX_HEIGHT) / OBJGRID_SIZE) + 2; gy++)
 				{
 					Wobj_InitGridIteratorOwned(&iter, gx, gy);
 					

@@ -22,6 +22,10 @@ static CNM_RECT renderer_font;
 static int renderer_fullscreen;
 static int renderer_initialized = CNM_FALSE;
 static int renderer_hires_mode;
+static int renderer_widescreen;
+
+int RENDERER_WIDTH;
+int RENDERER_HEIGHT;
 
 //extern unsigned char *_renderer_asm_scr_pixels;
 //extern unsigned char *_renderer_asm_gfx_pixels;
@@ -35,10 +39,14 @@ static void Renderer_SetPixel(int x, int y, int color, int trans, int light);
 #define MAX_SVBIN 512
 static int supervirus_binary_pos[MAX_SVBIN][3];
 
-void Renderer_Init(int start_fullscreen, int hi_res)
+void Renderer_Init(int start_fullscreen, int hi_res, int widescreen)
 {
+	RENDERER_WIDTH = widescreen ? 424 : 320;
+	RENDERER_HEIGHT = 240;
+	
 	renderer_fullscreen = start_fullscreen;
 	renderer_hires_mode = hi_res;
+	renderer_widescreen = widescreen;
 	renderer_hires_temp = NULL;
 	Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer = start_fullscreen;
 	Game_GetVar(GAME_VAR_HIRESMODE)->data.integer = hi_res;
@@ -138,10 +146,24 @@ void Renderer_Update(void)
 		if (renderer_fullscreen) {
 			SDL_DisplayMode dm;
 			SDL_GetCurrentDisplayMode(0, &dm);
-			r.h = dm.h;
-			r.w = dm.h / 3 * 4;
-			r.x = (dm.w - r.w) / 2;
-			r.y = 0;
+			if (!renderer_widescreen) {
+				r.h = dm.h;
+				r.w = dm.h / 3 * 4;
+				r.x = (dm.w - r.w) / 2;
+				r.y = 0;
+			} else {
+				if ((float)r.w / (float)r.h < 16.0f/9.0f) {
+					r.w = dm.w;
+					r.h = dm.w / 16 * 9;
+					r.y = (dm.h - r.h) / 2;
+					r.x = 0;
+				} else {
+					r.h = dm.h;
+					r.w = dm.h / 9 * 16;
+					r.x = (dm.w - r.w) / 2;
+					r.y = 0;
+				}
+			}
 		}
 		SDL_BlitScaled(renderer_hires_temp, NULL, winsurf, &r);
 		//SDL_Surface *temp_scr = SDL_CreateRGBSurface(0, RENDERER_WIDTH * 2, RENDERER_HEIGHT * 2, 32, 0, 0, 0, 0);
@@ -221,25 +243,38 @@ void Renderer_SetHiResMode(int hi_res)
 	renderer_hires_mode = hi_res;
 	Renderer_UpdateWindowFromSettings();
 }
+void Renderer_WidescreenMode(int widescreen)
+{
+	if (!renderer_initialized || renderer_widescreen == widescreen)
+		return;
+	renderer_widescreen = widescreen;
+	Renderer_UpdateWindowFromSettings();
+}
 void Renderer_RestartWindow(void)
 {
 	if (!renderer_initialized)
 		return;
 	Renderer_UpdateWindowFromSettings();
 }
-void Renderer_SetScreenModeFull(int fullscreen, int hi_res)
+void Renderer_SetScreenModeFull(int fullscreen, int hi_res, int widescreen)
 {
 	int old_mode[2] = {renderer_fullscreen, renderer_hires_mode};
-	if (!renderer_initialized || (old_mode[1] == hi_res && old_mode[0] == fullscreen))
+	if (!renderer_initialized || (old_mode[1] == hi_res && old_mode[0] == fullscreen && renderer_widescreen == widescreen))
 		return;
 	renderer_hires_mode = hi_res;
 	renderer_fullscreen = fullscreen;
+	renderer_widescreen = widescreen;
 	Renderer_UpdateWindowFromSettings();
 }
 static void Renderer_UpdateWindowFromSettings(void)
 {
 	Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer = renderer_fullscreen;
 	Game_GetVar(GAME_VAR_HIRESMODE)->data.integer = renderer_hires_mode;
+	Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer = renderer_widescreen;
+
+	RENDERER_WIDTH = renderer_widescreen ? 424 : 320;
+	RENDERER_HEIGHT = 240;
+
 	char windowname[128];
 	strcpy(windowname, "Cnm Online ");
 	strcat(windowname, CNM_VERSION_STRING);
@@ -269,6 +304,14 @@ static void Renderer_UpdateWindowFromSettings(void)
 		height,
 		SDL_WINDOW_SHOWN | (renderer_fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
 	);
+	if (renderer_gfx) {
+		if (renderer_scr) SDL_FreeSurface(renderer_scr);
+		if (renderer_effects_buf) SDL_FreeSurface(renderer_effects_buf);
+		renderer_scr = SDL_CreateRGBSurfaceWithFormat(0, RENDERER_WIDTH, RENDERER_HEIGHT, 8, SDL_PIXELFORMAT_INDEX8);
+		SDL_SetPaletteColors(renderer_scr->format->palette, renderer_gfx->format->palette->colors, 0, 0x100);
+		renderer_effects_buf = SDL_CreateRGBSurfaceWithFormat(0, RENDERER_WIDTH, RENDERER_HEIGHT, 8, SDL_PIXELFORMAT_INDEX8);
+		SDL_SetPaletteColors(renderer_effects_buf->format->palette, renderer_gfx->format->palette->colors, 0, 0x100);
+	}
 	if (!renderer_hires_mode)
 		SDL_ConvertSurfaceFormat(SDL_GetWindowSurface(renderer_win), SDL_PIXELFORMAT_INDEX8, 0);
 	else
@@ -1088,7 +1131,7 @@ void Renderer_PlotPixel2(int x, int y, int color, int trans, int light) {
 void Renderer_DrawText(int x, int y, int trans, int light, const char *format, ...)
 {
 	CNM_RECT src;
-	char buffer[RENDERER_WIDTH + 1] = {'\0'};
+	char buffer[RENDERER_MAX_WIDTH + 1] = {'\0'};
 	int c, i;
 	va_list args;
 	if (!renderer_initialized)

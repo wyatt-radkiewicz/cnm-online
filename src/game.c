@@ -239,6 +239,7 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_FORCE_NOSAVE].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_CL_POS].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_GOD].data.integer = CNM_FALSE;
+	game_vars[GAME_VAR_WIDESCREEN].data.integer = CNM_FALSE;
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
@@ -276,7 +277,8 @@ void GameState_Base_Init(void)
 	if (!dgame_info.dedicated && !dgame_info.master_server)
 	{
 		Renderer_Init(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
-					  Game_GetVar(GAME_VAR_HIRESMODE)->data.integer);
+					  Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
+					  Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer);
 		Renderer_LoadBitmap("gfx.bmp");
 		Renderer_BuildTables();
 		Renderer_SetFont(384, 448, 8, 8);

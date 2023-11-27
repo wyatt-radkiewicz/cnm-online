@@ -141,7 +141,7 @@ void Serial_SaveConfig(void)
 		fprintf(fp, "%d\n%d\n%d\n%d\n",
 				Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
 				Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
-				0,
+				Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer,
 				(int)(Audio_GetGlobalVolume()*100.0f));
 		fputc('\"', fp);
 		fputs(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string, fp);
@@ -172,19 +172,19 @@ void Serial_LoadConfig(void)
 	FILE *fp = fopen("config.txt", "r");
 	if (fp != NULL)
 	{
-		int dummy;
 		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string);
 		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string);
 		fscanf(fp, "\n%d\n%d\n%d\n%d",
 			   &Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
 			   &Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
-			   &dummy,
+			   &Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer,
 			   &Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.integer);
 		Serial_LoadQuotedString(fp, Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string);
 		//Renderer_SetFullscreen(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer);
 		//Renderer_SetHiResMode(Game_GetVar(GAME_VAR_HIRESMODE)->data.integer);
 		Renderer_SetScreenModeFull(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
-								   Game_GetVar(GAME_VAR_HIRESMODE)->data.integer);
+								   Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
+								   Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer);
 		//Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.decimal = (float)Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.integer / 100.0f;
 		fclose(fp);
 	}

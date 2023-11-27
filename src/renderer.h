@@ -2,19 +2,25 @@
 #define _renderer_h_
 #include "utility.h"
 
-#define RENDERER_WIDTH 320
-#define RENDERER_HEIGHT 240
+//#define RENDERER_WIDTH 320
+//#define RENDERER_HEIGHT 240
+#define RENDERER_MAX_WIDTH 424
+#define RENDERER_MAX_HEIGHT 240
 #define RENDERER_TRANS 0
 #define RENDERER_LIGHT 3
 
-void Renderer_Init(int start_fullscreen, int hi_res);
+extern int RENDERER_WIDTH;
+extern int RENDERER_HEIGHT;
+
+void Renderer_Init(int start_fullscreen, int hi_res, int widescreen);
 void Renderer_Quit(void);
 void Renderer_SetFullscreen(int fullscreen);
 //void Renderer_StartDrawing(void);
 void Renderer_Update(void);
 void Renderer_SetHiResMode(int hi_res);
+void Renderer_WidescreenMode(int widescreen);
 void Renderer_RestartWindow(void);
-void Renderer_SetScreenModeFull(int fullscreen, int hi_res);
+void Renderer_SetScreenModeFull(int fullscreen, int hi_res, int widescreen);
 
 void Renderer_LoadBitmap(const char *gfx_file);
 void Renderer_BuildTables(void);

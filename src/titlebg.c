@@ -258,9 +258,9 @@ void titlebg_draw(void(*mid_callback)(void)) {
 		}
 	}
 	for (int i = MAX_TITLE_CARDS - 1; i > 0; i--) {
-		Renderer_DrawBitmap(160 - (304 / 2), _title_card_y[i], &title_card, 6, RENDERER_LIGHT);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 - (304 / 2), _title_card_y[i], &title_card, 6, RENDERER_LIGHT);
 	}
-	Renderer_DrawBitmap(160 - (304 / 2), _title_card_y[0], &title_card, 0, RENDERER_LIGHT);
+	Renderer_DrawBitmap(RENDERER_WIDTH / 2 - (304 / 2), _title_card_y[0], &title_card, 0, RENDERER_LIGHT);
 
 }
 

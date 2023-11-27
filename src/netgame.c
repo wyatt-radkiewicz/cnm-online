@@ -139,15 +139,15 @@ void NetGame_GenInterpCanidates(int from_node)
 	}
 
 	nodes[from_node].interps_size = 0;
-	for (gx = (int)floorf((float)camx / OBJGRID_SIZE) - 1; gx < (int)ceilf(((float)(camx + RENDERER_WIDTH)) / OBJGRID_SIZE); gx++)
+	for (gx = (int)floorf((float)camx / OBJGRID_SIZE) - 1; gx < (int)ceilf(((float)(camx + RENDERER_MAX_WIDTH)) / OBJGRID_SIZE); gx++)
 	{
-		for (gy = (int)floorf((float)camy / OBJGRID_SIZE) - 1; gy < (int)ceilf(((float)(camy + RENDERER_HEIGHT)) / OBJGRID_SIZE); gy++)
+		for (gy = (int)floorf((float)camy / OBJGRID_SIZE) - 1; gy < (int)ceilf(((float)(camy + RENDERER_MAX_HEIGHT)) / OBJGRID_SIZE); gy++)
 		{
 			Wobj_InitGridIteratorUnowned(&iter, gx, gy);
 			while (iter.wobj != NULL)
 			{
-				if ((int)iter.wobj->x + (int)iter.wobj->hitbox.w > (camx - pad) && (int)iter.wobj->x < (camx + RENDERER_WIDTH + pad) &&
-					(int)iter.wobj->y + (int)iter.wobj->hitbox.h > (camy - pad) && (int)iter.wobj->y < (camy + RENDERER_HEIGHT + pad) &&
+				if ((int)iter.wobj->x + (int)iter.wobj->hitbox.w > (camx - pad) && (int)iter.wobj->x < (camx + RENDERER_MAX_WIDTH + pad) &&
+					(int)iter.wobj->y + (int)iter.wobj->hitbox.h > (camy - pad) && (int)iter.wobj->y < (camy + RENDERER_MAX_HEIGHT + pad) &&
 					nodes[from_node].interps_size < NETGAME_MAX_INTERP_UNOWNEDS &&
 					wobj_types[iter.wobj->type].do_interp)
 				{
