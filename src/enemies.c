@@ -1493,8 +1493,12 @@ void WobjRotatingFireColunmPiece_Draw(WOBJ *wobj, int camx, int camy)
 	WobjGeneric_Draw(wobj, camx, camy);
 }
 
-void WobjMovingFireVertical_Create(WOBJ *wobj)
-{
+struct movingfirev_data {
+	float spawnx, spawny;
+	float cf;
+	int ci;
+};
+void init_moving_firev(WOBJ *wobj) {
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 25.0f;
 
@@ -1520,6 +1524,17 @@ void WobjMovingFireVertical_Create(WOBJ *wobj)
 	wobj->vel_y = 0.0f;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
+void WobjMovingFireVertical_Create(WOBJ *wobj)
+{
+	wobj->local_data = calloc(1, sizeof(struct movingfirev_data));
+	wobj->on_destroy = Wobj_OnDestroyLocalData;
+	struct movingfirev_data *local_data = wobj->local_data;
+	local_data->spawnx = wobj->x;
+	local_data->spawny = wobj->y;
+	local_data->cf = wobj->custom_floats[0];
+	local_data->ci = wobj->custom_ints[0];
+	init_moving_firev(wobj);
+}
 void WobjMovingFireVertical_Update(WOBJ *wobj)
 {
 	wobj->y += wobj->vel_y;
@@ -1543,9 +1558,15 @@ void WobjMovingFireVertical_Update(WOBJ *wobj)
 				Interaction_DestroyWobj(wobj);
 		}
 	}
+
+	if (Wobj_TryTeleportWobj(wobj, CNM_TRUE)) {
+		struct movingfirev_data *local_data = wobj->local_data;
+		wobj->custom_floats[0] = local_data->cf;
+		wobj->custom_ints[0] = local_data->ci;
+		init_moving_firev(wobj);
+	}
 }
-void WobjMovingFireHorizontal_Create(WOBJ *wobj)
-{
+void init_moving_fireh(WOBJ *wobj) {
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->strength = 25.0f;
 
@@ -1571,6 +1592,16 @@ void WobjMovingFireHorizontal_Create(WOBJ *wobj)
 	wobj->vel_x = 0.0f;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
+void WobjMovingFireHorizontal_Create(WOBJ *wobj) {
+	wobj->local_data = calloc(1, sizeof(struct movingfirev_data));
+	wobj->on_destroy = Wobj_OnDestroyLocalData;
+	struct movingfirev_data *local_data = wobj->local_data;
+	local_data->spawnx = wobj->x;
+	local_data->spawny = wobj->y;
+	local_data->cf = wobj->custom_floats[0];
+	local_data->ci = wobj->custom_ints[0];
+	init_moving_fireh(wobj);
+}
 void WobjMovingFireHorizontal_Update(WOBJ *wobj)
 {
 	wobj->x += wobj->vel_x;
@@ -1592,6 +1623,13 @@ void WobjMovingFireHorizontal_Update(WOBJ *wobj)
 				(wobj->speed < 0.0f && wobj->vel_x > 0.0f))
 				Interaction_DestroyWobj(wobj);
 		}
+	}
+
+	if (Wobj_TryTeleportWobj(wobj, CNM_TRUE)) {
+		struct movingfirev_data *local_data = wobj->local_data;
+		wobj->custom_floats[0] = local_data->cf;
+		wobj->custom_ints[0] = local_data->ci;
+		init_moving_fireh(wobj);
 	}
 }
 void WobjMovingFire_Draw(WOBJ *wobj, int camx, int camy) {

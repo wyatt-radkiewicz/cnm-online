@@ -323,6 +323,8 @@ void Wobj_UpdateGridPos(WOBJ *wobj);
 void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound);
 float Wobj_GetGroundAngle(const WOBJ *wobj);
 
+void Wobj_OnDestroyLocalData(WOBJ *wobj);
+
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);
 void WobjGenericAttack_Update(WOBJ *wobj);
 

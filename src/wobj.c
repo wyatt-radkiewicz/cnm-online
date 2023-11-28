@@ -868,6 +868,11 @@ WOBJ *Wobj_GetAnyWOBJFromUUIDAndNode(int node, int uuid)
 	else
 		return Wobj_GetUnownedWobjFromUUID(node, uuid);*/
 }
+void Wobj_OnDestroyLocalData(WOBJ *wobj) {
+	if (wobj->local_data) {
+		free(wobj->local_data);
+	}
+}
 int Wobj_TryTeleportWobj(WOBJ *wobj, int only_telearea2)
 {
 	int i = 0, tryed = CNM_FALSE;
