@@ -66,6 +66,7 @@ typedef struct _CLIENT_CAMERA_POSITION
 #define CLIENT_WOBJ_UPDATE_HEALTH 2
 #define CLIENT_WOBJ_UPDATE_DESTROY 1
 #define CLIENT_WOBJ_UPDATE_LOCATION 3
+#define CLIENT_WOBJ_UPDATE_FLAGS 4
 typedef struct _CLIENT_WOBJ_UPDATE_REQUEST
 {
 	int node;
@@ -74,6 +75,8 @@ typedef struct _CLIENT_WOBJ_UPDATE_REQUEST
 	int mode;
 
 	float posx, posy;
+
+	int flag_set_mask, flag_clear_mask;
 
 	float hp_taken_away;
 } CLIENT_WOBJ_UPDATE_REQUEST;
@@ -157,6 +160,7 @@ void NetGame_Update(void);
 void NetGame_AttemptWobjAudioPlayback(WOBJ *wobj);
 
 void NetGame_ForceUnownedWobjsPosition(WOBJ *wobj, float x, float y);
+void NetGame_ForceUnownedWobjsFlags(WOBJ *wobj, int set_flag_mask, int clear_flag_mask);
 void NetGame_SendMiscWobjForcedChanges(int node);
 
 void NetGame_DamageUnownedWobj(WOBJ *wobj, float damage);

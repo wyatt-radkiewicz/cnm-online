@@ -536,6 +536,36 @@ void Interaction_ForceWobjPosition(WOBJ *wobj, float x, float y)
 		break;
 	}
 }
+void Interaction_SetWobjFlag(WOBJ *wobj, int flags) {
+	switch (interaction_mode)
+	{
+	case INTERACTION_MODE_HOSTED_SERVER:
+	case INTERACTION_MODE_CLIENT:
+		if (!wobj->internal.owned)
+		{
+			NetGame_ForceUnownedWobjsFlags(wobj, flags, -1);
+			break;
+		}
+	case INTERACTION_MODE_SINGLEPLAYER:
+		wobj->flags |= flags;
+		break;
+	}
+}
+void Interaction_ClearWobjFlag(WOBJ *wobj, int flags) {
+	switch (interaction_mode)
+	{
+	case INTERACTION_MODE_HOSTED_SERVER:
+	case INTERACTION_MODE_CLIENT:
+		if (!wobj->internal.owned)
+		{
+			NetGame_ForceUnownedWobjsFlags(wobj, 0, ~flags);
+			break;
+		}
+	case INTERACTION_MODE_SINGLEPLAYER:
+		wobj->flags &= ~flags;
+		break;
+	}
+}
 void Interaction_GameOver(void) {
 	switch (interaction_mode)
 	{

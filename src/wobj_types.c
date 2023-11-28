@@ -554,6 +554,7 @@ static void WobjIceAttack_Update(WOBJ *wobj)
 			wobj->link_uuid = other->uuid;
 			wobj->custom_ints[1] = -30*5;
 			wobj->custom_ints[0] = 1;
+			Interaction_SetWobjFlag(other, WOBJ_BEING_ICED);
 		}
 	}
 	else if (wobj->custom_ints[0] == 1)
@@ -562,6 +563,7 @@ static void WobjIceAttack_Update(WOBJ *wobj)
 		if (other != NULL)
 		{
 			if (other->type == WOBJ_PLAYER && other->flags & WOBJ_PLAYER_IS_RESPAWNING) {
+				Interaction_ClearWobjFlag(other, WOBJ_BEING_ICED);
 				Interaction_DestroyWobj(wobj);
 				return;
 			}
@@ -580,8 +582,13 @@ static void WobjIceAttack_Update(WOBJ *wobj)
 		}
 	}
 
-	if (wobj->custom_ints[1] >= 30*10)
+	if (wobj->custom_ints[1] >= 30*10) {
+		WOBJ *other = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
+		if (other) {
+			Interaction_ClearWobjFlag(other, WOBJ_BEING_ICED);
+		}
 		Interaction_DestroyWobj(wobj);
+	}
 }
 
 static void WobjCloudPlatform_Create(WOBJ *wobj)

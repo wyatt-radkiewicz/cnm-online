@@ -244,6 +244,8 @@ void Server_Update(NET_PACKET *packet)
 			WOBJ *wobj = Wobj_GetOwnedWobjFromUUID(req->obj_uuid);
 			if (wobj != NULL)
 			{
+				wobj->flags |= req->flag_set_mask;
+				wobj->flags &= req->flag_clear_mask;
 				switch (req->mode)
 				{
 				case CLIENT_WOBJ_UPDATE_DESTROY:

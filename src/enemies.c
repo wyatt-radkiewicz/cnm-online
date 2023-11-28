@@ -700,8 +700,8 @@ void WobjTTMinionBig_Update(WOBJ *wobj)
 		WOBJ *cp = wobj->local_data;
 		if ((Game_GetFrame() / 60) % 2 == 0)
 		{
-			wobj->x = cp->x + cosf(wobj->custom_floats[0]) * 96.0f;
-			wobj->y = cp->y + sinf(wobj->custom_floats[0]) * 96.0f;
+			if (~wobj->flags & WOBJ_BEING_ICED) wobj->x = cp->x + cosf(wobj->custom_floats[0]) * 96.0f;
+			if (~wobj->flags & WOBJ_BEING_ICED) wobj->y = cp->y + sinf(wobj->custom_floats[0]) * 96.0f;
 			wobj->custom_floats[0] += wobj->custom_floats[1];
 			wobj->custom_floats[1] += CNM_2RAD(0.5f);
 

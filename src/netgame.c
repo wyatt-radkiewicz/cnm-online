@@ -414,9 +414,21 @@ static void NetGame_InitForcedUpdateRequest(CLIENT_WOBJ_UPDATE_REQUEST *req, WOB
 {
 	req->obj_node = wobj->node_id;
 	req->obj_uuid = wobj->uuid;
+	req->flag_set_mask = 0;
+	req->flag_clear_mask = -1;
 	req->mode = mode;
 }
 
+void NetGame_ForceUnownedWobjsFlags(WOBJ *wobj, int set_flag_mask, int clear_flag_mask) {
+	// Find the node we need
+	CLIENT_WOBJ_UPDATE_REQUEST *req = NetGame_GetFreeForcedChange(wobj);
+	if (req != NULL)
+	{
+		NetGame_InitForcedUpdateRequest(req, wobj, CLIENT_WOBJ_UPDATE_FLAGS);
+		req->flag_set_mask = set_flag_mask;
+		req->flag_clear_mask = clear_flag_mask;
+	}
+}
 void NetGame_ForceUnownedWobjsPosition(WOBJ *wobj, float x, float y)
 {
 	// Find the node we need

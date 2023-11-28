@@ -34,5 +34,7 @@ void Interaction_ResetAudioUUID(void);
 WOBJ *Interaction_GetNearestPlayerToPoint(float px, float py);
 float Interaction_GetDistanceToWobj(WOBJ *a, WOBJ *b);
 void Interaction_ForceWobjPosition(WOBJ *wobj, float x, float y);
+void Interaction_SetWobjFlag(WOBJ *wobj, int flags);
+void Interaction_ClearWobjFlag(WOBJ *wobj, int flags);
 
 #endif
