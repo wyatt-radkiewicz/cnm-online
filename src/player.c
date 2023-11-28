@@ -454,7 +454,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (local_data->level_end_rank > 4) local_data->level_end_rank = 4;
 		if (local_data->level_end_rank < 0) local_data->level_end_rank = 0;
 		if ((!Game_GetVar(GAME_VAR_NOSAVE)->data.integer || Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) &&
-			Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
+			Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer) {
 			// Save rank and time
 			int id = -1;
 			for (int i = 0; i < globalsave_get_num_levels(&g_globalsave); i++) {
