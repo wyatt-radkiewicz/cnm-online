@@ -1072,6 +1072,7 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 
 static void ItemUnboundWand_Update(ITEM *wand, WOBJ *player)
 {
+	int old_type = wand->type;
 	if (Wobj_GetWobjCollidingWithType(player, WOBJ_ICE_RUNE))
 	{
 		wand->type = ITEM_TYPE_ICE_WAND;
@@ -1095,6 +1096,8 @@ static void ItemUnboundWand_Update(ITEM *wand, WOBJ *player)
 
 	return;
 got_wand:
+	wand->durability = (wand->durability / item_types[old_type].max_durability) * item_types[wand->type].max_durability;
+	if (item_types[wand->type].max_durability <= 0.01f) wand->durability = 100.0f;
 	player->item = wand->type;
 	if (item_types[wand->type].on_pickup != NULL)
 		item_types[wand->type].on_pickup(wand, player);
