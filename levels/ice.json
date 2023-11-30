@@ -1785,7 +1785,7 @@
     },
     {
       "pos": [
-        2384.0,
+        2383.7659,
         1168.0
       ],
       "type_data": {
@@ -1808,7 +1808,7 @@
       ],
       "type_data": {
         "Checkpoint": {
-          "checkpoint_num": 0
+          "checkpoint_num": 1
         }
       },
       "spawning_criteria": {
@@ -4749,62 +4749,6 @@
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
         "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        1880.12,
-        344.0
-      ],
-      "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            9,
-            140
-          ],
-          "target_relative": [
-            611.375,
-            -469.0
-          ],
-          "speed": 5.7503395,
-          "start_paused": false,
-          "ty": "Normal"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2504.0,
-        240.0
-      ],
-      "type_data": {
-        "CustomizeableMoveablePlatform": {
-          "bitmap_x32": [
-            9,
-            140
-          ],
-          "target_relative": [
-            -200.0,
-            0.0
-          ],
-          "speed": 2.0,
-          "start_paused": false,
-          "ty": "Normal"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
       },
       "dropped_item": null,
       "spawner_group": null
