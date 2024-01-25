@@ -1026,6 +1026,13 @@ void Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int li
 		}
 	}
 
+	if (src.y + src.h > renderer_gfx->h) {
+#ifdef DEBUG
+		Console_Print("Don't use out of bounds gfx DUMBASS!");
+#endif
+		return;
+	}
+
 	src_pixel = ((unsigned char *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x);
 	dest_pixel = ((unsigned char *)renderer_scr->pixels) + (_y * RENDERER_WIDTH + _x);
 	gfx_width = renderer_gfx->w - src.w;
