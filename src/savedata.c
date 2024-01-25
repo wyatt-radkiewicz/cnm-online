@@ -41,7 +41,7 @@ void save_game(int slot, const savedata_t *data) {
 	LParse *lp = lparse_open_from_file(fp, lparse_write);
 	save_data(lp, data);
 	lparse_close(lp);
-	fclose(fp);
+	//fclose(fp);
 }
 void load_game(int slot, savedata_t *data) {
 	assert(slot > -1 && slot < SAVE_SLOTS);
@@ -58,7 +58,7 @@ void load_game(int slot, savedata_t *data) {
 	LParse *lp = lparse_open_from_file(fp, lparse_read);
 	load_data(lp, data);
 	lparse_close(lp);
-	fclose(fp);
+	//fclose(fp);
 }
 
 static void save_data(LParse *lp, const savedata_t *data) {
@@ -215,7 +215,7 @@ void globalsave_load(struct globalsave *gs) {
 	if (entry) lparse_get_data(lp, entry, 0, sizeof(gs->best_times) / sizeof(gs->best_times[0]), &gs->best_times);
 
 	lparse_close(lp);
-	fclose(fp);
+	//fclose(fp);
 }
 static void _globalsave_save(const struct globalsave *gs) {
 	FILE *fp = fopen(SAVE_DIR"gameinfo.lps", "wb");
@@ -250,7 +250,7 @@ static void _globalsave_save(const struct globalsave *gs) {
 	lparse_set_data(lp, entry, 0, sizeof(gs->best_times) / sizeof(gs->best_times[0]), &gs->best_times);
 
 	lparse_close(lp);
-	fclose(fp);
+	//fclose(fp);
 }
 void globalsave_save(const struct globalsave *gs) {
 	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) return;
