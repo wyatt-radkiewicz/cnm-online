@@ -95,6 +95,13 @@ void Serial_LoadBlocks(const char *cnmb_file)
 		Background_GetLayer(i)->bottom3d = 0;
 		Background_GetLayer(i)->height3d = 0;
 	}
+	e = lparse_get_entry(lp, "BG_FLAGS");
+	if (e != NULL) {
+		for (i = 0; i < BACKGROUND_MAX_LAYERS; i++) {
+			lparse_get_data(lp, e, i, 1, &Background_GetLayer(i)->flags);
+		}
+	}
+	else for (i = 0; i < BACKGROUND_MAX_LAYERS; i++) Background_GetLayer(i)->flags = BGFLAG_SHOW43 | BGFLAG_SHOW169;
 
 	e = lparse_get_entry(lp, "BLOCKS_HEADER");
 	lparse_get_data(lp, e, 0, 1, &w);
@@ -234,6 +241,10 @@ void Serial_SaveBlocks(const char *cnmb_file)
 		lparse_set_data(lp, e, i*3+0, 1, &Background_GetLayer(i)->top3d);
 		lparse_set_data(lp, e, i*3+1, 1, &Background_GetLayer(i)->bottom3d);
 		lparse_set_data(lp, e, i*3+2, 1, &Background_GetLayer(i)->height3d);
+	}
+	e = lparse_make_entry(lp, "BG_FLAGS", lparse_i32, BACKGROUND_MAX_LAYERS);
+	for (i = 0; i < BACKGROUND_MAX_LAYERS; i++) {
+		lparse_set_data(lp, e, i, 1, &Background_GetLayer(i)->flags);
 	}
 
 	e = lparse_make_entry(lp, "BLOCKS_HEADER", lparse_i32, 3);

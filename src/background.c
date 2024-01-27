@@ -181,6 +181,11 @@ static void draw_bg_3d(const float pos[2]) {
 void Background_DrawLayer(int layer, int camx, int camy)
 {
 	BACKGROUND_LAYER *l = &bglayers[layer];
+
+	const int widescreen = Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer;
+	if (!widescreen && (~l->flags & BGFLAG_SHOW43)) return;
+	if (widescreen && (~l->flags & BGFLAG_SHOW169)) return;
+
 	float pos[2];
 	float cam_scrolled[2];
 	if (l->clear_color == 0)

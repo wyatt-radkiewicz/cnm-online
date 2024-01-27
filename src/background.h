@@ -11,6 +11,9 @@
 
 #define SERIAL_BACKGROUND_SIZE 68
 
+#define BGFLAG_SHOW43 1
+#define BGFLAG_SHOW169 2
+
 typedef struct _BACKGROUND_LAYER
 {
 	float pos[2];
@@ -24,6 +27,7 @@ typedef struct _BACKGROUND_LAYER
 	int clear_color;
 	int high;
 	int transparency;
+	int flags;
 	int top3d, bottom3d, height3d;
 } BACKGROUND_LAYER;
 

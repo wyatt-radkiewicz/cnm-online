@@ -88,6 +88,7 @@ static void Command_Skin(const char *args, int from_player);
 static void Command_ClPos(const char *args, int from_player);
 static void Command_God(const char *args, int from_player);
 static void Command_Pet(const char *args, int from_player);
+static void Command_Wide(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -157,6 +158,7 @@ static const char *const command_names[] =
 	"nc",
 	"god",
 	"pet",
+	"wide",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -227,6 +229,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_Noclip,
 	Command_God,
 	Command_Pet,
+	Command_Wide,
 };
 
 static int can_run_cheat1(int from_player) {
@@ -747,6 +750,13 @@ static void Command_LocalMap(const char *args, int from_player) {
 		World_Stop();
 		World_Start(WORLD_MODE_HOSTED_SERVER);
 	} else {
+		if (from_player) {
+			Console_Print("Using changemap in singleplayer,");
+			Console_Print("turning off saving for rest of game");
+			Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer = CNM_TRUE;
+			Game_GetVar(GAME_VAR_NOSAVE)->data.integer = CNM_TRUE;
+		}
+
 		int id = Filesystem_GetLevelIdFromFileName(Command_ExtractArg(args, 0));
 		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
 		Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
@@ -781,5 +791,13 @@ static void Command_God(const char *args, int from_player) {
 static void Command_Pet(const char *args, int from_player) {
 	if (!can_run_cheat1(from_player)) return;
 	Player_ChangePet(Game_GetVar(GAME_VAR_PLAYER)->data.pointer, atoi(Command_ExtractArg(args, 0)));
+}
+static void Command_Wide(const char *args, int from_player) {
+	Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer = !Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer;
+	Renderer_SetScreenModeFull(
+		Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,
+		Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
+		Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer
+	);
 }
 
