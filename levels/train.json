@@ -3308,7 +3308,7 @@
             2368.0
           ],
           "start_activated": true,
-          "teleport_players": true,
+          "teleport_players": false,
           "link_id": 0
         }
       },
@@ -3332,7 +3332,7 @@
             2368.0
           ],
           "start_activated": true,
-          "teleport_players": true,
+          "teleport_players": false,
           "link_id": 0
         }
       },
@@ -3356,7 +3356,7 @@
             1408.0
           ],
           "start_activated": true,
-          "teleport_players": true,
+          "teleport_players": false,
           "link_id": 0
         }
       },
@@ -3380,7 +3380,7 @@
             1408.0
           ],
           "start_activated": true,
-          "teleport_players": true,
+          "teleport_players": false,
           "link_id": 0
         }
       },
@@ -4875,7 +4875,7 @@
       "type_data": {
         "MovingPlatform": {
           "vertical": true,
-          "dist": 128.0,
+          "dist": 126.0,
           "speed": 3.0,
           "bitmapx": 15,
           "bitmapy": 87,
@@ -4946,7 +4946,7 @@
     },
     {
       "pos": [
-        3935.1272,
+        3936.0,
         1216.0
       ],
       "type_data": {
@@ -4956,10 +4956,10 @@
             87
           ],
           "target_relative": [
-            1973.0,
+            1732.9375,
             0.0
           ],
-          "speed": 8.5,
+          "speed": 7.4375,
           "start_paused": false,
           "ty": "Despawn"
         }
@@ -5116,10 +5116,10 @@
             87
           ],
           "target_relative": [
-            1973.0,
+            1732.9375,
             0.0
           ],
-          "speed": 8.5,
+          "speed": 7.4375,
           "start_paused": false,
           "ty": "Despawn"
         }
@@ -5905,7 +5905,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -5939,7 +5940,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -5973,7 +5975,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6007,7 +6010,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6041,7 +6045,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6075,7 +6080,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6109,7 +6115,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6143,7 +6150,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6177,7 +6185,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6211,7 +6220,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6245,7 +6255,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6279,7 +6290,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6313,7 +6325,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6347,7 +6360,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6381,7 +6395,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6415,7 +6430,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6449,7 +6465,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6483,7 +6500,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6517,7 +6535,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6551,7 +6570,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6585,7 +6605,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6619,7 +6640,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6653,7 +6675,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6687,7 +6710,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6721,7 +6745,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6755,7 +6780,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6789,7 +6815,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6823,7 +6850,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6857,7 +6885,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6891,7 +6920,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6925,7 +6955,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -6959,7 +6990,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     }
   ]
 }

@@ -261,7 +261,7 @@ static void WobjScMovingPlatform_Update(WOBJ *wobj)
 static void WobjMovingPlatform_Draw(WOBJ *wobj, int camx, int camy) {
 	Renderer_DrawBitmap2
 	(
-		(int)wobj->x - camx,
+		(int)floorf(wobj->x) - camx,
 		(int)ceilf(wobj->y) - camy,
 		&(CNM_RECT){
 			.x = (wobj->item >> 12) * 32,
