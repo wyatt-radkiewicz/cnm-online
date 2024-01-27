@@ -1719,8 +1719,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 		float px, py;
 		WobjCalculate_InterpolatedPos(plat, &px, &py);
 
-		if (wobj->x + wobj->hitbox.x > px + plat->hitbox.x + plat->hitbox.w ||
-			wobj->x + wobj->hitbox.x + wobj->hitbox.w < px + plat->hitbox.x) {
+		float plry = wobj->y;
+		wobj->y += 2.0f;
+		int not_on_platform = !Wobj_GetWobjColliding(wobj, WOBJ_IS_MOVESTAND);
+		wobj->y = plry;
+		if ((wobj->x + wobj->hitbox.x > px + plat->hitbox.x + plat->hitbox.w ||
+			wobj->x + wobj->hitbox.x + wobj->hitbox.w < px + plat->hitbox.x) && not_on_platform) {
 			player_launch_from_platinfo(wobj);
 			goto search_platinfos;
 		}
@@ -1733,11 +1737,21 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->y = py + plat->hitbox.y - wobj->hitbox.h - wobj->hitbox.y;
 		wobj->vel_y = 0.0f;
 		wobj->flags |= WOBJ_IS_GROUNDED;
+
+		if (Blocks_IsCollidingWithSolid(&(CNM_BOX){
+			.x = wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f,
+			.y = wobj->y + wobj->hitbox.y + wobj->hitbox.h + 1.5f,
+			.w = 1.0f,
+			.h = 1.0f,
+		}, CNM_TRUE)) {
+			local_data->platinfo.active = CNM_FALSE;
+		}
 	}
 search_platinfos:
 	{
 		//if (local_data->platinfo.active) goto plat_velx_application;
 		if (!Wobj_IsGrounded(wobj)) goto plat_velx_application;
+		if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 3.0f)) goto plat_velx_application;
 		float plry = wobj->y;
 		wobj->y += 2.0f;
 		WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_MOVESTAND);

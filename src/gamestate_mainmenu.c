@@ -341,6 +341,8 @@ static void swap_title_bg(const char *lvl) {
 
 void GameState_MainMenu_Init(void)
 {
+	Game_GetVar(GAME_VAR_GOD)->data.integer = CNM_FALSE;
+
 	GUI_FRAME_PROPS props;
 
 	FileSystem_SearchForLevels(CNM_TRUE);
