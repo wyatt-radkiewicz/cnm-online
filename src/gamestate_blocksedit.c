@@ -132,7 +132,7 @@ void GameState_BlocksEdit_Update(void)
 }
 void GameState_BlocksEdit_Draw(void)
 {
-	Renderer_Clear(Renderer_MakeColor(128, 128, 255));
+	Renderer_Clear(RCOL_LIGHT_BLUE);
 	Blocks_DrawBlocks(BLOCKS_BG, (int)cx, (int)cy);
 	Blocks_DrawBlocks(BLOCKS_FG, (int)cx, (int)cy);
 	Blocks_DrawBlock(10, 50, block, RENDERER_LIGHT);
@@ -153,12 +153,12 @@ void GameState_BlocksEdit_Draw(void)
 	cross_rect.y = 120 - 4;
 	cross_rect.w = 2;
 	cross_rect.h = 8;
-	Renderer_DrawRect(&cross_rect, Renderer_MakeColor(255, 0, 0), 4, RENDERER_LIGHT);
+	Renderer_DrawRect(&cross_rect, RCOL_RED, 4, RENDERER_LIGHT);
 	cross_rect.x = 160 - 4;
 	cross_rect.y = 120 - 1;
 	cross_rect.w = 8;
 	cross_rect.h = 2;
-	Renderer_DrawRect(&cross_rect, Renderer_MakeColor(255, 0, 0), 4, RENDERER_LIGHT);
+	Renderer_DrawRect(&cross_rect, RCOL_RED, 4, RENDERER_LIGHT);
 	Gui_Draw();
 	GameConsole_Draw();
 	Renderer_Update();

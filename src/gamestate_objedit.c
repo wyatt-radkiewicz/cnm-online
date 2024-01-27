@@ -1077,15 +1077,15 @@ void GameState_ObjEdit_Update(void)
 void GameState_ObjEdit_Draw(void)
 {
 	float cx, cy;
-	Renderer_Clear(Renderer_MakeColor(128, 128, 255));
+	Renderer_Clear(RCOL_LIGHT_BLUE);
 	Blocks_DrawBlocks(BLOCKS_BG, (int)camx, (int)camy);
 	Blocks_DrawBlocks(BLOCKS_FG, (int)camx, (int)camy);
 	Spawners_DrawSpawners((int)camx, (int)camy);
 
 	Util_SetRect(&cross_rect, 160-1, 120-4, 2, 8);
-	Renderer_DrawRect(&cross_rect, Renderer_MakeColor(255, 0, 0), 4, RENDERER_LIGHT);
+	Renderer_DrawRect(&cross_rect, RCOL_RED, 4, RENDERER_LIGHT);
 	Util_SetRect(&cross_rect, 160 - 4, 120 - 1, 8, 2);
-	Renderer_DrawRect(&cross_rect, Renderer_MakeColor(255, 0, 0), 4, RENDERER_LIGHT);
+	Renderer_DrawRect(&cross_rect, RCOL_RED, 4, RENDERER_LIGHT);
 
 	CNM_RECT r;
 	int x, y;
@@ -1103,7 +1103,7 @@ void GameState_ObjEdit_Draw(void)
 				(int)OBJGRID_SIZE,
 				(int)OBJGRID_SIZE
 			);
-			Renderer_DrawEmptyRect(&r, Renderer_MakeColor(0, 0, 255), 0, RENDERER_LIGHT);
+			Renderer_DrawEmptyRect(&r, RCOL_BLUE, 0, RENDERER_LIGHT);
 
 			// Grid position helpers
 			if (Game_GetVar(GAME_VAR_SHOW_GRIDPOS)->data.integer)

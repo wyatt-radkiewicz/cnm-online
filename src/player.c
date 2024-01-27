@@ -1736,7 +1736,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	}
 search_platinfos:
 	{
-		if (local_data->platinfo.active) goto plat_velx_application;
+		//if (local_data->platinfo.active) goto plat_velx_application;
 		if (!Wobj_IsGrounded(wobj)) goto plat_velx_application;
 		float plry = wobj->y;
 		wobj->y += 2.0f;
@@ -2222,7 +2222,7 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 	{
 		Util_SetRect(&r, (int)(wobj->x + wobj->hitbox.x) - camx, (int)(wobj->y + wobj->hitbox.y) - camy,
 					 (int)wobj->hitbox.w, (int)wobj->hitbox.h);
-		Renderer_DrawRect(&r, Renderer_MakeColor(255, 0, 255), 2, RENDERER_LIGHT);
+		Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
 	}
 
 	if (Game_GetVar(GAME_VAR_SHOW_GRIDPOS)->data.integer)
@@ -2378,11 +2378,11 @@ static void DrawParticle(int x, int y, int dt) {
 		j = 7;
 	}
 
-	Renderer_PlotPixel2(x, y, Renderer_MakeColor(255, 255, 255), t, 0);
-	Renderer_PlotPixel2(x-1, y, Renderer_MakeColor(255, 255, 255), j, 0);
-	Renderer_PlotPixel2(x+1, y, Renderer_MakeColor(255, 255, 255), j, 0);
-	Renderer_PlotPixel2(x, y-1, Renderer_MakeColor(255, 255, 255), j, 0);
-	Renderer_PlotPixel2(x, y+1, Renderer_MakeColor(255, 255, 255), j, 0);
+	Renderer_PlotPixel2(x, y, RCOL_WHITE, t, 0);
+	Renderer_PlotPixel2(x-1, y, RCOL_WHITE, j, 0);
+	Renderer_PlotPixel2(x+1, y, RCOL_WHITE, j, 0);
+	Renderer_PlotPixel2(x, y-1, RCOL_WHITE, j, 0);
+	Renderer_PlotPixel2(x, y+1, RCOL_WHITE, j, 0);
 }
 
 #define MAXP 128

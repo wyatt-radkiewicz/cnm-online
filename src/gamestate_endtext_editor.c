@@ -104,7 +104,7 @@ void GameState_EndTextEditor_Update(void)
 }
 void GameState_EndTextEditor_Draw(void)
 {
-	Renderer_Clear(Renderer_MakeColor(128, 128, 255));
+	Renderer_Clear(RCOL_LIGHT_BLUE);
 	Gui_Draw();
 	GameConsole_Draw();
 	Renderer_Update();

@@ -9,6 +9,17 @@
 #define RENDERER_TRANS 0
 #define RENDERER_LIGHT 3
 
+typedef enum rcol {
+	RCOL_WHITE = 4,
+	RCOL_YELLOW = 231,
+	RCOL_PINK = 251,
+	RCOL_RED = 176,
+	RCOL_BLUE = 200,
+	RCOL_BLACK = 247,
+	RCOL_LIGHT_BLUE = 196,
+	RCOL_PAUSE_COLOR = 206,
+} rcol_t;
+
 extern int RENDERER_WIDTH;
 extern int RENDERER_HEIGHT;
 
@@ -24,7 +35,7 @@ void Renderer_SetScreenModeFull(int fullscreen, int hi_res, int widescreen);
 
 void Renderer_LoadBitmap(const char *gfx_file);
 void Renderer_BuildTables(void);
-int Renderer_MakeColor(int r, int g, int b);
+//int Renderer_MakeColor(int r, int g, int b);
 int Renderer_GetBitmapHeight(void);
 int Renderer_GetBitmapPixel(int x, int y);
 

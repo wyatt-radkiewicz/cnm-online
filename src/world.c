@@ -288,7 +288,7 @@ void World_Draw(int mode)
 					(int)OBJGRID_SIZE,
 					(int)OBJGRID_SIZE
 				);
-				Renderer_DrawEmptyRect(&r, Renderer_MakeColor(0, 0, 255), 0, RENDERER_LIGHT);
+				Renderer_DrawEmptyRect(&r, RCOL_BLUE, 0, RENDERER_LIGHT);
 
 				// Grid position helpers
 				if (Game_GetVar(GAME_VAR_SHOW_GRIDPOS)->data.integer)

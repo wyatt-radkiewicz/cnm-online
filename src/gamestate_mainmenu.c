@@ -549,8 +549,7 @@ void GameState_MainMenu_Init(void)
 	{
 		for (x = 0; x < RENDERER_WIDTH; x++)
 		{
-			i = (255 - (rand() % 32));
-			xmas_static_snow_colors[y][x] = Renderer_MakeColor(i, i, i);
+			xmas_static_snow_colors[y][x] = 80 + (rand() % 8);
 		}
 	}
 }
@@ -2142,14 +2141,14 @@ void GameState_MainMenu_Draw(void)
 {
 	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) {
 		int x, y, z;
-		Renderer_Clear(Renderer_MakeColor(0, 0, 0));
+		Renderer_Clear(RCOL_BLACK);
 		for (y = 0; y < RENDERER_HEIGHT; y++) {
 			for (x = 0; x < RENDERER_WIDTH; x++) {
 				xmas_obstacles[y][x] = CNM_FALSE;//(Renderer_GetPixel(x, y) != Renderer_MakeColor(0, 0, 0));
 			}
 		}
 
-		Renderer_Clear(Renderer_MakeColor(0, 0, 0));
+		Renderer_Clear(RCOL_BLACK);
 
 		for (y = 0; y < RENDERER_HEIGHT; y++) {
 			for (x = 0; x < RENDERER_WIDTH; x++) {
@@ -2160,7 +2159,7 @@ void GameState_MainMenu_Draw(void)
 
 		for (x = 0; x < NUM_SNOWFLAKES; x++) {
 			if (xmas_snowflakes[x].alive)
-				Renderer_PlotPixel(xmas_snowflakes[x].x, xmas_snowflakes[x].y, Renderer_MakeColor(255, 255, 255));
+				Renderer_PlotPixel(xmas_snowflakes[x].x, xmas_snowflakes[x].y, RCOL_WHITE);
 		}
 	}
 

@@ -458,7 +458,7 @@ void GameState_BlockPropsEdit_Update(void)
 void GameState_BlockPropsEdit_Draw(void)
 {
 	CNM_RECT r;
-	Renderer_Clear(Renderer_MakeColor(128, 128, 255));
+	Renderer_Clear(RCOL_LIGHT_BLUE);
 	Gui_Draw();
 
 	if (finding)
@@ -484,7 +484,7 @@ void GameState_BlockPropsEdit_Draw(void)
 		r.y = 128 + Blocks_GetBlockProp(block)->coll_data.hitbox.y;
 		r.w = Blocks_GetBlockProp(block)->coll_data.hitbox.w;
 		r.h = Blocks_GetBlockProp(block)->coll_data.hitbox.h;
-		Renderer_DrawRect(&r, Renderer_MakeColor(255, 0, 255), 4, RENDERER_LIGHT);
+		Renderer_DrawRect(&r, RCOL_PINK, 4, RENDERER_LIGHT);
 	}
 
 	if (editing_heightmap)

@@ -585,7 +585,7 @@ void Wobj_DrawWobjs(int camx, int camy)
 						{
 							Util_SetRect(&r, (int)(other->x + other->hitbox.x) - camx, (int)(other->y + other->hitbox.y) - camy,
 										 (int)other->hitbox.w, (int)other->hitbox.h);
-							Renderer_DrawRect(&r, Renderer_MakeColor(255, 0, 255), 2, RENDERER_LIGHT);
+							Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
 						}
 
 						if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer)
@@ -1165,7 +1165,7 @@ void WobjGeneric_Draw(WOBJ *obj, int camx, int camy)
 	{
 		Util_SetRect(&r, (int)(obj->x + obj->hitbox.x) - camx, (int)(obj->y + obj->hitbox.y) - camy,
 					 (int)obj->hitbox.w, (int)obj->hitbox.h);
-		Renderer_DrawRect(&r, Renderer_MakeColor(255, 0, 255), 2, RENDERER_LIGHT);
+		Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
 	}
 
 	if (Game_GetVar(GAME_VAR_SHOW_GRIDPOS)->data.integer)

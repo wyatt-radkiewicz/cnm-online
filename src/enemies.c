@@ -1656,7 +1656,7 @@ void WobjMovingFire_Draw(WOBJ *wobj, int camx, int camy) {
 					 (int)wobj->hitbox.w, (int)wobj->hitbox.h);
 		Renderer_DrawRect(
 			&r,
-			Renderer_MakeColor(255, 0, 255),
+			RCOL_PINK,
 			2,
 			RENDERER_LIGHT
 		);

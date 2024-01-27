@@ -552,7 +552,7 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 					.w = prop->coll_data.hitbox.w,
 					.h = prop->coll_data.hitbox.h,
 				},
-				prop->dmg_type == BLOCK_DMG_TYPE_NONE ? (prop->coll_type == BLOCKS_COLL_JT ? Renderer_MakeColor(255, 255, 0) : Renderer_MakeColor(255, 0, 255)) : Renderer_MakeColor(255, 0, 0),
+				prop->dmg_type == BLOCK_DMG_TYPE_NONE ? (prop->coll_type == BLOCKS_COLL_JT ? RCOL_YELLOW : RCOL_PINK) : RCOL_RED,
 				1,
 				RENDERER_LIGHT
 			);
@@ -565,7 +565,7 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 						.w = 1,
 						.h = prop->coll_data.heightmap[i],
 					},
-					Renderer_MakeColor(0, 0, 255),
+					RCOL_BLUE,
 					1,
 					RENDERER_LIGHT
 				);

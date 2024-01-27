@@ -282,7 +282,7 @@ static void WobjMovingPlatform_Draw(WOBJ *wobj, int camx, int camy) {
 					 (int)wobj->hitbox.w, (int)wobj->hitbox.h);
 		Renderer_DrawRect(
 			&r,
-			(wobj->flags & WOBJ_IS_JUMPTHROUGH) ? Renderer_MakeColor(255, 255, 0) : Renderer_MakeColor(255, 0, 255),
+			(wobj->flags & WOBJ_IS_JUMPTHROUGH) ? RCOL_YELLOW : RCOL_PINK,
 			2,
 			RENDERER_LIGHT
 		);

@@ -478,7 +478,7 @@ void GameState_BgEdit_Draw(void)
 	}
 	else if (is_finding)
 	{
-		Renderer_Clear(Renderer_MakeColor(128, 128, 255));
+		Renderer_Clear(RCOL_LIGHT_BLUE);
 		Util_SetRect(&r, finding_cam_x, finding_cam_y, RENDERER_WIDTH, RENDERER_HEIGHT);
 		Renderer_DrawBitmap(0, 0, &r, 0, RENDERER_LIGHT);
 		if (finding_state == FINDING_STATE_SIZE)
@@ -491,7 +491,7 @@ void GameState_BgEdit_Draw(void)
 				finding_x - finding_origin_x,
 				finding_y - finding_origin_y
 			);
-			Renderer_DrawRect(&r, Renderer_MakeColor(255, 255, 0), 5, RENDERER_LIGHT);
+			Renderer_DrawRect(&r, RCOL_YELLOW, 5, RENDERER_LIGHT);
 		}
 		Util_SetRect(&r, 376, 1248, 8, 8);
 		Renderer_DrawBitmap
@@ -506,7 +506,7 @@ void GameState_BgEdit_Draw(void)
 	}
 	else
 	{
-		Renderer_Clear(Renderer_MakeColor(128, 128, 255));
+		Renderer_Clear(RCOL_LIGHT_BLUE);
 	}
 
 	Gui_Draw();

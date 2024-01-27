@@ -98,13 +98,13 @@ void Fadeout_StepFade(void)
 void Fadeout_ApplyFade(void)
 {
 	CNM_RECT r = {0, 0, RENDERER_WIDTH, RENDERER_HEIGHT};
-	int lvl, fc = Renderer_MakeColor(0, 0, 0), offsx = 0, offsy = 0;
+	int lvl, fc = RCOL_BLACK, offsx = 0, offsy = 0;
 	if (!fade_total)
 		return;
 	switch (fade_type)
 	{
 	case TYPE_WHITE:
-		fc = Renderer_MakeColor(255, 255, 255);
+		fc = RCOL_WHITE;
 	case TYPE_BLACK:
 		if (fade_counter < fade_in)
 			lvl = 7 - (int)((float)fade_counter / (float)fade_in * 7.0f);
@@ -144,7 +144,7 @@ void Fadeout_ApplyFade(void)
 	case TYPE_GAMEOVER:
 		if (fade_counter <= fade_in) lvl = (1.0f - ((float)fade_counter / (float)fade_in)) * 7.0f;
 		else lvl = 0;
-		fc = Renderer_MakeColor(0, 0, 0);
+		fc = RCOL_BLACK;
 		Util_SetRect(&r, 0, 0, RENDERER_WIDTH, RENDERER_HEIGHT);
 		Renderer_DrawRect(&r, fc, lvl, RENDERER_LIGHT);
 		Util_SetRect(&r, 400, 1408, 112, 48);
@@ -152,7 +152,7 @@ void Fadeout_ApplyFade(void)
 		if (fade_counter >= fade_in + fade_time + fade_out) lvl = 0;
 		else if (fade_counter >= fade_in + fade_time) lvl = (1.0f - ((float)(fade_counter - fade_in - fade_time) / (float)fade_out)) * 7.0f;
 		else lvl = 7;
-		fc = Renderer_MakeColor(255, 255, 255);
+		fc = RCOL_WHITE;
 		Util_SetRect(&r, 0, 0, RENDERER_WIDTH, RENDERER_HEIGHT);
 		Renderer_DrawRect(&r, fc, lvl, RENDERER_LIGHT);
 		break;

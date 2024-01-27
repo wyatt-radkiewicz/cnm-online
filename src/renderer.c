@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <SDL.h>
 #include <SDL_surface.h>
 #include <SDL_video.h>
@@ -8,14 +9,12 @@
 #include "game.h"
 
 #define RENDERER_LEVELS 8
-#define RENDERER_DEPTH 5
 
 static SDL_Window *renderer_win;
 static SDL_Surface *renderer_scr;
 static SDL_Surface *renderer_gfx;
 static SDL_Surface *renderer_hires_temp;
 static SDL_Surface *renderer_effects_buf;
-static unsigned char renderer_conv[1<<RENDERER_DEPTH][1<<RENDERER_DEPTH][1<<RENDERER_DEPTH];
 static unsigned char renderer_trans[256][256][RENDERER_LEVELS]; /* Source color, Destination Color, Transparency level */
 static unsigned char renderer_light[256][RENDERER_LEVELS]; /* Color, Light level */
 static CNM_RECT renderer_font;
@@ -31,8 +30,9 @@ int RENDERER_HEIGHT;
 //extern unsigned char *_renderer_asm_gfx_pixels;
 
 static int Abs(int i);
-static void Renderer_BuildConvTable(void);
+//static void Renderer_BuildConvTable(void);
 static void Renderer_UpdateWindowFromSettings(void);
+static int get_nearest_color(int r, int g, int b);
 
 static void Renderer_SetPixel(int x, int y, int color, int trans, int light);
 
@@ -454,7 +454,23 @@ void Renderer_DrawStetchedSpan(int x, int y, int w, int srcx, int srcy, int srcw
 	}
 }
 
+static int get_nearest_color(int r, int g, int b) {
+	int closest_index = 1, closest_dist = INT_MAX;
+	for (int i = 1; i < 0x100; i++)
+	{
+		if (i >= renderer_scr->format->palette->ncolors)
+			continue;
 
+		SDL_Color cur_color = renderer_scr->format->palette->colors[i];
+		int dist = abs(r - cur_color.r) + abs(g - cur_color.g) + abs(b - cur_color.b);
+		if (dist < closest_dist)
+		{
+			closest_dist = dist;
+			closest_index = i;
+		}
+	}
+	return closest_index;
+}
 
 void Renderer_BuildTables(void)
 {
@@ -464,7 +480,7 @@ void Renderer_BuildTables(void)
 	if (!renderer_initialized)
 		return;
 
-	Renderer_BuildConvTable();
+	//Renderer_BuildConvTable();
 	/* Build the transparency tables */
 	for (s = 0; s < 256; s++)
 	{
@@ -482,7 +498,7 @@ void Renderer_BuildTables(void)
 			for (l = 1; l < RENDERER_LEVELS - 1; l++)
 			{
 				r += rs; g += gs; b += bs;
-				renderer_trans[s][d][l] = Renderer_MakeColor((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
+				renderer_trans[s][d][l] = get_nearest_color((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
 				if (!s)
 					renderer_trans[s][d][l] = d;
 			}
@@ -500,11 +516,11 @@ void Renderer_BuildTables(void)
 		rs = (1.0f - r) / (float)(RENDERER_LIGHT);
 		gs = (1.0f - g) / (float)(RENDERER_LIGHT);
 		bs = (1.0f - b) / (float)(RENDERER_LIGHT);
-		renderer_light[s][0] = Renderer_MakeColor(255, 255, 255);
+		renderer_light[s][0] = get_nearest_color(255, 255, 255);
 		for (l = RENDERER_LIGHT - 1; l > 0; l--)
 		{
 			r += rs; g += gs; b += bs;
-			renderer_light[s][l] = Renderer_MakeColor((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
+			renderer_light[s][l] = get_nearest_color((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
 		}
 		renderer_light[s][RENDERER_LIGHT] = s;
 		r = (float)sc.r / 255.0f; g = (float)sc.g / 255.0f; b = (float)sc.b / 255.0f;
@@ -514,55 +530,55 @@ void Renderer_BuildTables(void)
 		for (l = RENDERER_LIGHT + 1; l < RENDERER_LEVELS - 1; l++)
 		{
 			r += rs; g += gs; b += bs;
-			renderer_light[s][l] = Renderer_MakeColor((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
+			renderer_light[s][l] = get_nearest_color((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
 		}
-		renderer_light[s][RENDERER_LEVELS - 1] = Renderer_MakeColor(0, 0, 0);
+		renderer_light[s][RENDERER_LEVELS - 1] = get_nearest_color(0, 0, 0);
 	}
 }
-static void Renderer_BuildConvTable(void)
-{
-	int r, g, b;
-	int closest_index, closest_match, i, cur_match;
-	SDL_Color cur_color;
-	if (!renderer_initialized)
-		return;
-
-	for (r = 0; r < (1 << RENDERER_DEPTH); r++)
-	{
-		for (g = 0; g < (1 << RENDERER_DEPTH); g++)
-		{
-			for (b = 0; b < (1 << RENDERER_DEPTH); b++)
-			{
-				closest_index = 1;
-				closest_match = 0x100*3;
-				for (i = 1; i < 0x100; i++)
-				{
-					if (i >= renderer_scr->format->palette->ncolors)
-						continue;
-
-					cur_color = renderer_scr->format->palette->colors[i];
-					cur_match =
-						Abs((r << (8 - RENDERER_DEPTH)) - cur_color.r) +
-						Abs((g << (8 - RENDERER_DEPTH)) - cur_color.g) +
-						Abs((b << (8 - RENDERER_DEPTH)) - cur_color.b);
-					if (cur_match < closest_match)
-					{
-						closest_match = cur_match;
-						closest_index = i;
-					}
-				}
-				renderer_conv[r][g][b] = closest_index;
-			}
-		}
-	}
-}
-int Renderer_MakeColor(int r, int g, int b)
-{
-	if (!renderer_initialized)
-		return 0;
-
-	return renderer_conv[r >> (8 - RENDERER_DEPTH)][g >> (8 - RENDERER_DEPTH)][b >> (8 - RENDERER_DEPTH)];
-}
+//static void Renderer_BuildConvTable(void)
+//{
+//	int r, g, b;
+//	int closest_index, closest_match, i, cur_match;
+//	SDL_Color cur_color;
+//	if (!renderer_initialized)
+//		return;
+//
+//	for (r = 0; r < (1 << RENDERER_DEPTH); r++)
+//	{
+//		for (g = 0; g < (1 << RENDERER_DEPTH); g++)
+//		{
+//			for (b = 0; b < (1 << RENDERER_DEPTH); b++)
+//			{
+//				closest_index = 1;
+//				closest_match = 0x100*3;
+//				for (i = 1; i < 0x100; i++)
+//				{
+//					if (i >= renderer_scr->format->palette->ncolors)
+//						continue;
+//
+//					cur_color = renderer_scr->format->palette->colors[i];
+//					cur_match =
+//						Abs((r << (8 - RENDERER_DEPTH)) - cur_color.r) +
+//						Abs((g << (8 - RENDERER_DEPTH)) - cur_color.g) +
+//						Abs((b << (8 - RENDERER_DEPTH)) - cur_color.b);
+//					if (cur_match < closest_match)
+//					{
+//						closest_match = cur_match;
+//						closest_index = i;
+//					}
+//				}
+//				renderer_conv[r][g][b] = closest_index;
+//			}
+//		}
+//	}
+//}
+//int Renderer_MakeColor(int r, int g, int b)
+//{
+//	if (!renderer_initialized)
+//		return 0;
+//
+//	return renderer_conv[r >> (8 - RENDERER_DEPTH)][g >> (8 - RENDERER_DEPTH)][b >> (8 - RENDERER_DEPTH)];
+//}
 int Renderer_GetBitmapHeight(void)
 {
 	if (renderer_initialized && renderer_gfx != NULL)

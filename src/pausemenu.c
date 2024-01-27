@@ -189,7 +189,7 @@ void pause_menu_draw(void) {
 	if (trans < min) trans = min;
 	if (trans > 7) trans = 7;
 	Util_SetRect(&r, 0, 0, RENDERER_WIDTH, RENDERER_HEIGHT);
-	Renderer_DrawRect(&r, Renderer_MakeColor(0, 32, 64), trans, RENDERER_LIGHT);
+	Renderer_DrawRect(&r, RCOL_PAUSE_COLOR, trans, RENDERER_LIGHT);
 
 	int text_mode;
 	switch (Interaction_GetMode()) {
