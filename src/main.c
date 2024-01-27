@@ -71,7 +71,9 @@ int main(int argc, char **argv)
 {
 	Parse_Args(argc, argv);
 
+#ifdef DEBUG
 	run_tests();
+#endif
 	Game_Init(&gi);
 	Game_Quit();
 	return 0;
@@ -130,9 +132,5 @@ static void run_tests(void) {
 		//int cmp = memcmp(&test, &test2, sizeof(struct wobjdata));
 		//assert(cmp == 0);
 	}
-}
-#else
-static void run_tests(void) {
-	return;
 }
 #endif
