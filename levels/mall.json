@@ -20200,7 +20200,8 @@
       "in_foreground": false,
       "bottom3d": 2,
       "top3d": 256,
-      "height3d": 146
+      "height3d": 146,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20234,7 +20235,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20268,7 +20270,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20289,8 +20292,8 @@
       ],
       "image": {
         "Bitmap": {
-          "x": 256,
-          "y": 7256,
+          "x": 496,
+          "y": 3288,
           "w": 16,
           "h": 8
         }
@@ -20302,7 +20305,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20336,7 +20340,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20370,7 +20375,8 @@
       "in_foreground": false,
       "bottom3d": 256,
       "top3d": 2,
-      "height3d": 180
+      "height3d": 180,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20404,7 +20410,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20438,7 +20445,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20472,7 +20480,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20506,7 +20515,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20540,7 +20550,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20574,7 +20585,8 @@
       "in_foreground": false,
       "bottom3d": 2,
       "top3d": 256,
-      "height3d": 256
+      "height3d": 256,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20608,7 +20620,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20642,7 +20655,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20676,7 +20690,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20710,7 +20725,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20744,7 +20760,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20778,7 +20795,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20812,7 +20830,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20846,7 +20865,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20880,7 +20900,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20914,7 +20935,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20948,7 +20970,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -20982,7 +21005,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -21016,7 +21040,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -21050,7 +21075,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -21084,7 +21110,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -21118,7 +21145,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -21152,7 +21180,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -21186,7 +21215,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -21220,7 +21250,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     },
     {
       "origin": [
@@ -21254,7 +21285,8 @@
       "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
-      "height3d": 0
+      "height3d": 0,
+      "flags": "ShowOn4By3 | ShowOn16By9"
     }
   ]
 }
