@@ -930,6 +930,7 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 					player->vel_x -= 10.0f;
 				player->vel_y = -10.0f;
 				player->y -= 1.0f;
+				player_launch_from_platinfo(player);
 			}
 		}
 		Interaction_DestroyWobj(wobj);

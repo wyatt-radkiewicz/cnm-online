@@ -153,5 +153,6 @@ void Player_SetSkinInstant(WOBJ *player, int skinid);
 void Player_SwapOffhand(WOBJ *player);
 void Player_TryTitlePopup(void);
 void Player_ChangePet(WOBJ *player, int petid);
+void player_launch_from_platinfo(WOBJ *wobj);
 
 #endif

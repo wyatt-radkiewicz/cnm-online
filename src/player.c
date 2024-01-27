@@ -407,7 +407,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	}
 }
 
-static void player_launch_from_platinfo(WOBJ *wobj) {
+void player_launch_from_platinfo(WOBJ *wobj) {
 	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
 	if (!local_data->platinfo.active) return;
 	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 1.0f)) return;
