@@ -21,6 +21,12 @@ release_with_debug: $(BUILD_DIR)/$(TARGET_NAME)
 # Build commands
 run: $(BUILD_DIR)/$(TARGET_NAME)
 	$(BUILD_DIR)/$(TARGET_NAME)
+runrel: CFLAGS += -O2
+runrel: $(BUILD_DIR)/$(TARGET_NAME)
+	$(BUILD_DIR)/$(TARGET_NAME)
+rundbg: CFLAGS += -DDEBUG -g -O0
+rundbg: $(BUILD_DIR)/$(TARGET_NAME)
+	$(BUILD_DIR)/$(TARGET_NAME)
 $(BUILD_DIR)/$(TARGET_NAME): $(OBJS)
 	mkdir -p $(dir $@)
 	$(CC) $^ $(LDFLAGS) -o $@

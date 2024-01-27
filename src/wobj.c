@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -15,14 +16,18 @@
 #include "player.h"
 
 #define GET_WOBJ(iter) ((WOBJ *)((unsigned char *)(iter) - offsetof(WOBJ, internal.obj)))
-#define WOBJ_SEARCH_MAP_SIZE (1 << 11)
+//#define WOBJ_SEARCH_MAP_SIZE (1 << 11)
+#define SMAPSZ 64
+
+// Debug prints
+#define DBGLRU 0
 
 //static POOL *wobj_pool;
 static OBJGRID *owned_grid;
 static OBJGRID *unowned_grid;
 static int owned_uuid;
 static int wobj_node_id;
-static WOBJ *deleted_owned[4096];
+static WOBJ *deleted_owned[64];
 static int deleted_size;
 static int major_reset;
 
@@ -30,7 +35,19 @@ static WOBJ *owned;
 static WOBJ unowned[WOBJ_MAX_UNOWNED_WOBJS];
 static int unowned_size;
 
-static WOBJ *search_map[WOBJ_SEARCH_MAP_SIZE];
+//static WOBJ *search_map[WOBJ_SEARCH_MAP_SIZE];
+typedef struct smaplru {
+	struct smaplru *last, *next;
+	WOBJ *wobj;
+} smaplru_t;
+typedef struct smapent {
+	int psl;
+	smaplru_t *lru;
+} smapent_t;
+static smapent_t _smap_owned[SMAPSZ], _smap_unowned[SMAPSZ];
+static int _smap_owned_sz, _smap_unowned_sz;
+static smaplru_t *_lru_owned_head, *_lru_owned_tail;
+static smaplru_t *_lru_unowned_head, *_lru_unowned_tail;
 
 static void Wobj_FreeOwnedWobjAndRemove(WOBJ *wobj);
 
@@ -190,6 +207,7 @@ void Wobj_DestroyWobj(WOBJ *wobj)
 
 	if (wobj->internal.owned)
 	{
+		if (deleted_size >= sizeof(deleted_owned)/sizeof(deleted_owned[0])) return;
 		for (int i = 0; i < deleted_size; i++)
 		{
 			if (deleted_owned[i] == wobj)
@@ -244,6 +262,15 @@ void Wobj_DestroyUnownedWobjs(void)
 }
 void Wobj_DestroyOwnedWobjs(void)
 {
+#if DBGLRU >= 1
+	smaplru_t *lru = _lru_owned_head;
+	while (lru) {
+		smaplru_t *const next = lru->next;
+		Console_Print("lru %d %d", lru->wobj->node_id, lru->wobj->uuid);
+		lru = next;
+	}
+#endif
+
 	WOBJ *wobj, *next;
 	wobj = owned;
 	major_reset = CNM_TRUE;
@@ -864,8 +891,28 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely)
 		}
 	}
 }
+static void print_smap_data(void) {
+	//Console_Print("smap print frame: %d", Game_GetFrame());
+	Console_Print("owned size: %d", _smap_owned_sz);
+	//for (int i = 0; i < SMAPSZ; i++) {
+	//	if (_smap_owned[i].wobj) {
+	//		Console_Print("psl: %d, node: %d, uuid: %d", _smap_owned[i].psl, _smap_owned[i].wobj->node_id, _smap_owned[i].wobj->uuid);
+	//	} else {
+	//		Console_Print("null");
+	//	}
+	//}
+	//Console_Print("unowned size: %d", _smap_unowned_sz);
+	//for (int i = 0; i < SMAPSZ; i++) {
+	//	if (_smap_unowned[i].wobj) {
+	//		Console_Print("psl: %d, node: %d, uuid: %d", _smap_unowned[i].psl, _smap_unowned[i].wobj->node_id, _smap_unowned[i].wobj->uuid);
+	//	} else {
+	//		Console_Print("null");
+	//	}
+	//}
+}
 WOBJ *Wobj_GetOwnedWobjFromUUID(int uuid)
 {
+	//print_smap_data();
 	return WobjSearch_FindEntry(wobj_node_id, uuid);
 	/*WOBJ *wobj = owned;
 	while (wobj != NULL)
@@ -878,6 +925,7 @@ WOBJ *Wobj_GetOwnedWobjFromUUID(int uuid)
 }
 WOBJ *Wobj_GetAnyWOBJFromUUIDAndNode(int node, int uuid)
 {
+	//print_smap_data();
 	return WobjSearch_FindEntry(node, uuid);
 	/*if (node == wobj_node_id)
 		return Wobj_GetOwnedWobjFromUUID(uuid);
@@ -1207,57 +1255,250 @@ void WobjGenericAttack_Update(WOBJ *wobj)
 	Interaction_DamageOtherPlayers(wobj);
 }
 
-static int WobjSearch_GetCalculatedHash(int node, int uuid)
+static uint32_t WobjSearch_GetCalculatedHash(int node, int uuid)
 {
-	return ((node * 120340) + (uuid ^ 134)) % WOBJ_SEARCH_MAP_SIZE;
+	return ((node * 120340) + (uuid ^ 134)) % SMAPSZ;
 }
-
-static WOBJ *WobjSearch_FindEntry(int node, int uuid)
-{
-	int hash = WobjSearch_GetCalculatedHash(node, uuid);
-	if (search_map[hash] != NULL && search_map[hash]->node_id == node && search_map[hash]->uuid == uuid)
+static WOBJ *_find_wobj(int node, int uuid) {
+#if DBGLRU >= 1
+	Console_Print("slow find on %d %d", node, uuid);
+#endif
+	if (node == wobj_node_id)
 	{
-		return search_map[hash];
+		WOBJ *wobj = owned;
+		while (wobj != NULL)
+		{
+			if (wobj->uuid == uuid)
+				return wobj;
+			wobj = wobj->internal.next;
+		}
 	}
 	else
 	{
-		if (node == wobj_node_id)
+		for (int i = 0; i < unowned_size; i++)
 		{
-			WOBJ *wobj = owned;
-			while (wobj != NULL)
-			{
-				if (wobj->uuid == uuid)
-					return wobj;
-				wobj = wobj->internal.next;
-			}
-		}
-		else
-		{
-			for (int i = 0; i < unowned_size; i++)
-			{
-				if (unowned[i].type && unowned[i].node_id == node && unowned[i].uuid == uuid)
-					return unowned + i;
-			}
+			if (unowned[i].type && unowned[i].node_id == node && unowned[i].uuid == uuid)
+				return unowned + i;
 		}
 	}
 
 	return NULL;
 }
+static void remove_from_lru(smaplru_t *const lru) {
+#if DBGLRU >= 2
+	Console_Print("removing %d %d", lru->wobj->node_id, lru->wobj->uuid);
+#endif
+	if (lru->last) {
+		lru->last->next = lru->next;
+	} else {
+		if (lru->wobj->node_id == wobj_node_id) _lru_owned_head = lru->next;
+		else _lru_unowned_head = lru->next;
+	}
+	if (lru->next) {
+		lru->next->last = lru->last;
+	} else {
+		if (lru->wobj->node_id == wobj_node_id) _lru_owned_tail = lru->last;
+		else _lru_unowned_tail = lru->last;
+	}
+	lru->last = NULL;
+	lru->next = NULL;
+}
+static void add_to_head_lru(smaplru_t *const lru) {
+#if DBGLRU >= 2
+	Console_Print("pushing to head %d %d", lru->wobj->node_id, lru->wobj->uuid);
+#endif
+	smaplru_t **head = lru->wobj->node_id == wobj_node_id ? &_lru_owned_head : &_lru_unowned_head;
+	smaplru_t **tail = lru->wobj->node_id == wobj_node_id ? &_lru_owned_tail : &_lru_unowned_tail;
+
+	if (*head) {
+		(*head)->last = lru;
+		lru->next = *head;
+	} else {
+		*tail = lru;
+		lru->next = NULL;
+	}
+	*head = lru;
+	lru->last = NULL;
+}
+static smaplru_t *alloc_linkless_lru(int node, int uuid) {
+	WOBJ *wobj = _find_wobj(node, uuid);
+	if (!wobj) return NULL;
+	smaplru_t *lru = malloc(sizeof(*lru));
+	*lru = (smaplru_t){
+		.wobj = wobj,
+		.next = NULL,
+		.last = NULL,
+	};
+	return lru;
+}
+static int pop_lru(int node) {
+	if (node == wobj_node_id && _smap_owned_sz == SMAPSZ) {
+		WobjSearch_DestoryEntry(_lru_owned_tail->wobj->node_id, _lru_owned_tail->wobj->uuid);
+		return 1;
+	}
+	if (node != wobj_node_id && _smap_unowned_sz == SMAPSZ) {
+		WobjSearch_DestoryEntry(_lru_unowned_tail->wobj->node_id, _lru_unowned_tail->wobj->uuid);
+		return 1;
+	}
+	return 0;
+}
+
+#ifdef DEBUG
+static int _hit_limits = 0;
+#endif
+static WOBJ *WobjSearch_FindEntry(const int node, const int uuid)
+{
+	smapent_t *const map = node == wobj_node_id ? _smap_owned : _smap_unowned;
+
+	uint32_t i;
+	smaplru_t *v = NULL;
+	int vpsl;
+	WOBJ *added_wobj = NULL;
+
+search_start:
+	i = WobjSearch_GetCalculatedHash(node, uuid);
+	vpsl = 0;
+
+	while (map[i].lru) {
+		if (map[i].lru->wobj->uuid == uuid && map[i].lru->wobj->node_id == node) {
+			remove_from_lru(map[i].lru);
+			add_to_head_lru(map[i].lru);
+#if DBGLRU >= 2
+			Console_Print("Found %d %d", map[i].lru->wobj->node_id, map[i].lru->wobj->uuid);
+#endif
+			return map[i].lru->wobj;
+		}
+
+		if (vpsl > map[i].psl) {
+			if (!v) {
+				// remove if we're at limit
+				if (pop_lru(node)) {
+#ifdef DEBUG
+					//Console_Print("Hit limit at %d %d", node, uuid);
+					Console_Print("Hit search limit %d times", ++_hit_limits);
+#endif
+					goto search_start;
+				}
+				v = alloc_linkless_lru(node, uuid);
+				if (!v) return NULL;
+				add_to_head_lru(v);
+				added_wobj = v->wobj;
+			}
+
+			smaplru_t *tmp = v;
+			v = map[i].lru;
+			map[i].lru = tmp;
+
+			int tmp_psl = vpsl;
+			vpsl = map[i].psl;
+			map[i].psl = tmp_psl;
+		}
+
+		i = (i+1) % SMAPSZ;
+		vpsl++;
+	}
+	
+	if (!v) {
+		if (node == wobj_node_id) assert(_smap_owned_sz < SMAPSZ);
+		else assert(_smap_unowned_sz < SMAPSZ);
+		v = alloc_linkless_lru(node, uuid);
+		if (!v) return NULL;
+		add_to_head_lru(v);
+		added_wobj = v->wobj;
+	}
+#if DBGLRU >= 1
+	Console_Print("Adding new search entry %d on %d %d", i, node, uuid);
+#endif
+	if (node == wobj_node_id) _smap_owned_sz++;
+	else _smap_unowned_sz++;
+	map[i].psl = vpsl;
+	map[i].lru = v;
+	return added_wobj;
+}
 static void WobjSearch_DestoryEntry(int node, int uuid)
 {
-	int hash = WobjSearch_GetCalculatedHash(node, uuid);
-	if (search_map[hash] != NULL && search_map[hash]->node_id == node && search_map[hash]->uuid == uuid)
-		search_map[hash] = NULL;
+	smapent_t *const map = node == wobj_node_id ? _smap_owned : _smap_unowned;
+	uint32_t i = WobjSearch_GetCalculatedHash(node, uuid);
+	int vpsl = 0;
+
+	// Find the wobj first
+	while (map[i].lru && vpsl <= map[i].psl) {
+		if (map[i].lru->wobj->uuid == uuid && map[i].lru->wobj->node_id == node) {
+			goto found;
+		}
+
+		i = (i+1) % SMAPSZ;
+		vpsl++;
+	}
+	return;
+
+found:
+#if DBGLRU >= 1
+	Console_Print("Removing search entry %d on %d %d", i, node, uuid);
+#endif
+	if (node == wobj_node_id) _smap_owned_sz--;
+	else _smap_unowned_sz--;
+
+	// Remove from lru cache
+	remove_from_lru(map[i].lru);
+	free(map[i].lru);
+
+	// Do backward shift deletion
+	map[i].lru = NULL;
+	map[i].psl = 0;
+	uint32_t nexti = (i+1) % SMAPSZ;
+	while (map[nexti].lru && map[nexti].psl > 0) {
+		map[i].psl = map[nexti].psl - 1;
+		map[i].lru = map[nexti].lru;
+		map[nexti].psl = 0;
+		map[nexti].lru = NULL;
+		i = nexti;
+		nexti = (i+1) % SMAPSZ;
+	}
+
+
+	//if (search_map[hash] != NULL && search_map[hash]->node_id == node && search_map[hash]->uuid == uuid)
+	//	search_map[hash] = NULL;
 }
 static void WobjSearch_Reset(void)
 {
-	memset(search_map, 0, sizeof(search_map));
+	//memset(search_map, 0, sizeof(search_map));
+	memset(_smap_owned, 0, sizeof(_smap_owned));
+	_smap_owned_sz = 0;
+
+	smaplru_t *lru = _lru_owned_head;
+	while (lru) {
+		smaplru_t *const next = lru->next;
+		free(lru);
+		lru = next;
+	}
+	_lru_owned_head = NULL;
+	_lru_owned_tail = NULL;
+#ifdef DEBUG
+	_hit_limits = 0;
+#endif
+
+	WobjSearch_DestroyUnownedEntries();
+	//memset(_smap_unowned, 0, sizeof(_smap_unowned));
+	//_smap_unowned_sz = 0;
+
 }
 static void WobjSearch_DestroyUnownedEntries(void)
 {
-	for (int i = 0; i < WOBJ_SEARCH_MAP_SIZE; i++)
-	{
-		if (search_map[i] != NULL && search_map[i]->node_id != wobj_node_id)
-			search_map[i] = NULL;
+	memset(_smap_unowned, 0, sizeof(_smap_unowned));
+	_smap_unowned_sz = 0;
+
+	smaplru_t *lru = _lru_unowned_head;
+	while (lru) {
+		smaplru_t *const next = lru->next;
+		free(lru);
+		lru = next;
 	}
+	_lru_unowned_head = NULL;
+	_lru_unowned_tail = NULL;
+	//for (int i = 0; i < WOBJ_SEARCH_MAP_SIZE; i++)
+	//{
+	//	if (search_map[i] != NULL && search_map[i]->node_id != wobj_node_id)
+	//		search_map[i] = NULL;
+	//}
 }
