@@ -390,13 +390,15 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->stored_slide_speed = 0.0f;
 	local_data->slide_super_jump_timer = 0;
 
-	local_data->stored_plat_velx = 0.0f;
+	//local_data->stored_plat_velx = 0.0f;
 	local_data->been_jumping_timer = 0;
 	local_data->skip_jumpthrough_timer = 0;
 
+	local_data->platinfo.active = false;
+
 	PlayerSpawn_SetWobjLoc(&wobj->x);
 
-	if (Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer != -1) {
+	if (Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer != -1 && wobj->internal.owned) {
 		local_data->pet = Interaction_CreateWobj(WOBJ_PLAYER_PET, wobj->x, wobj->y, Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer, 0.0f);
 		local_data->pet->link_node = wobj->node_id;
 		local_data->pet->link_uuid = wobj->uuid;
@@ -404,6 +406,16 @@ void WobjPlayer_Create(WOBJ *wobj)
 		local_data->pet = NULL;
 	}
 }
+
+static void player_launch_from_platinfo(WOBJ *wobj) {
+	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
+	if (!local_data->platinfo.active) return;
+	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 1.0f)) return;
+	wobj->vel_x += local_data->platinfo.last_velx;
+	wobj->vel_y += local_data->platinfo.last_vely;
+	local_data->platinfo.active = false;
+}
+
 void WobjPlayer_Update(WOBJ *wobj)
 {
 	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
@@ -539,12 +551,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 	float final_grav;
 	float final_jmp;
 	//float final_strength;
-	int apply_plat_velx = CNM_FALSE;//!Wobj_IsGrounded(wobj);
+	//int apply_plat_velx = CNM_FALSE;//!Wobj_IsGrounded(wobj);
 
 	final_speed = wobj->speed;
 	final_jmp = wobj->jump;
 	final_grav = local_data->grav + local_data->grav_add;
-	local_data->stored_plat_velx = 0.0f;
+	//local_data->stored_plat_velx = 0.0f;
 
 	if (local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER)
 	{
@@ -854,7 +866,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
 			wobj->y = oy;
 			if (plat) {
-				local_data->stored_plat_velx = plat->vel_x;
+				//local_data->stored_plat_velx = plat->vel_x;
 				if (plat->vel_y > 0.0f) wobj->vel_y += plat->vel_y;
 				else if (plat->vel_y < -4.0f) wobj->vel_y -= 2.0f;
 			}
@@ -1091,6 +1103,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			local_data->been_jumping_timer = 0;
 		}
 		//Console_Print("%d", local_data->been_jumping_timer);
+		//
 
 		{
 			if (Wobj_IsGrounded(wobj)) {
@@ -1100,10 +1113,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 				if (!plat && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH)) plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
 				wobj->y = oy;
 				if (plat) {
-					local_data->stored_plat_velx = plat->vel_x;
+					//local_data->stored_plat_velx = plat->vel_x;
 				}
 			}
 		}
+
 		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
 		if (local_data->is_grounded_buffer > 0 || (local_data->upgrade_state == PLAYER_UPGRADE_NONE && local_data->in_water))//Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f) || other != NULL)
@@ -1123,19 +1137,17 @@ void WobjPlayer_Update(WOBJ *wobj)
 				float jmp_speed = final_jmp;
 				if (local_data->in_water)
 					jmp_speed /= 1.5f;
-				const float oy = wobj->y;
-				wobj->y += 10.0f;
-				WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
-				if (!plat && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH)) plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
-				wobj->y = oy;
 				local_data->jump_init_yspd = 0.0f;
-				if (plat != NULL)
+				if (local_data->platinfo.active)
 				{
+					jmp_speed -= local_data->platinfo.last_vely;
+					local_data->jump_init_yspd = local_data->platinfo.last_vely;
+					float vy = wobj->vel_y;
+					player_launch_from_platinfo(wobj);
+					wobj->vel_y = vy;
 					//wobj->vel_x += plat->vel_x;
 					// Look further down for vel_x change
-					apply_plat_velx = CNM_TRUE;
-					jmp_speed -= plat->vel_y;
-					local_data->jump_init_yspd = plat->vel_y;
+					//apply_plat_velx = CNM_TRUE;
 				}
 				const float ang = Wobj_GetGroundAngle(wobj);
 				//wobj->vel_y = -jmp_speed * cosf(ang);
@@ -1696,14 +1708,56 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (!local_data->vortexed_mode)
 		WobjPhysics_EndUpdate(wobj);
 
-	apply_plat_velx |= !Wobj_IsGrounded(wobj);
-	if (local_data->stored_plat_velx != 0.0f && apply_plat_velx) {
-		wobj->vel_x = local_data->stored_plat_velx;
-		//if (wobj->vel_x < fabsf(local_data->stored_plat_velx) && wobj->vel_x > -fabsf()) wobj->vel_x = local_data->stored_plat_velx;
-		local_data->stored_plat_velx = 0.0f;
-	}
+	// Search for player platforms (platinfo)
+	{
+		if (!local_data->platinfo.active) goto search_platinfos;
+		WOBJ *plat = Wobj_GetAnyWOBJFromUUIDAndNode(local_data->platinfo.node, local_data->platinfo.uuid);
+		if (!plat) {
+			player_launch_from_platinfo(wobj);
+			goto search_platinfos;
+		}
+		float px, py;
+		WobjCalculate_InterpolatedPos(plat, &px, &py);
 
-	//wobj->y += stored_movestand_yvel;
+		if (wobj->x + wobj->hitbox.x > px + plat->hitbox.x + plat->hitbox.w ||
+			wobj->x + wobj->hitbox.x + wobj->hitbox.w < px + plat->hitbox.x) {
+			player_launch_from_platinfo(wobj);
+			goto search_platinfos;
+		}
+
+		local_data->platinfo.last_velx = plat->vel_x;
+		local_data->platinfo.last_vely = plat->vel_y;
+		local_data->platinfo.relx += wobj->vel_x;
+
+		wobj->x = px + local_data->platinfo.relx;
+		wobj->y = py + plat->hitbox.y - wobj->hitbox.h - wobj->hitbox.y;
+		wobj->vel_y = 0.0f;
+		wobj->flags |= WOBJ_IS_GROUNDED;
+	}
+search_platinfos:
+	{
+		if (local_data->platinfo.active) goto plat_velx_application;
+		if (!Wobj_IsGrounded(wobj)) goto plat_velx_application;
+		float plry = wobj->y;
+		wobj->y += 2.0f;
+		WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_MOVESTAND);
+		wobj->y = plry;
+		if (!plat) goto plat_velx_application;
+		if (wobj->vel_y < plat->vel_y) goto plat_velx_application;
+
+		local_data->platinfo.active = true;
+		local_data->platinfo.node = plat->node_id;
+		local_data->platinfo.uuid = plat->uuid;
+		local_data->platinfo.relx = wobj->x - plat->x;
+	}
+plat_velx_application:
+	//if (local_data->platinfo.active) {
+	//	Console_Print("true %d %d", local_data->platinfo.node, local_data->platinfo.uuid);
+	//} else {
+	//	Console_Print("false n/a n/a");
+	//}
+	//Console_Print("%f %f", wobj->vel_x, wobj->vel_y);
+	//Console_Print("%d", Wobj_IsGrounded(wobj));
 
 	// HPCOST from MAXPOWER upgrade
 	if (local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER && local_data->finish_timer <= 0) {

@@ -1,5 +1,7 @@
 #ifndef _player_h_
 #define _player_h_
+#include <stdbool.h>
+
 #include "wobj.h"
 #include "savedata.h"
 
@@ -45,6 +47,15 @@ typedef struct _PLAYER_MAXPOWER_INFO
 } PLAYER_MAXPOWER_INFO;
 
 extern PLAYER_MAXPOWER_INFO maxpowerinfos[32];
+
+typedef struct player_platform_info {
+	bool active;
+	int node;
+	int uuid;
+	float last_velx;
+	float last_vely;
+	float relx;
+} player_platform_info_t;
 
 typedef struct _PLAYER_LOCAL_DATA
 {
@@ -116,11 +127,12 @@ typedef struct _PLAYER_LOCAL_DATA
 	float stored_slide_speed;
 	int slide_super_jump_timer;
 
-	float stored_plat_velx;
 	int been_jumping_timer;
 	int skip_jumpthrough_timer;
 
 	WOBJ *pet;
+
+	player_platform_info_t platinfo;
 	//int game_over_active//, game_over_timer;
 	//float item_durability;
 	//float stored_yvel;

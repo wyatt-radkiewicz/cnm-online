@@ -265,7 +265,7 @@ static void WobjMovingPlatform_Draw(WOBJ *wobj, int camx, int camy) {
 		(int)ceilf(wobj->y) - camy,
 		&(CNM_RECT){
 			.x = (wobj->item >> 12) * 32,
-			.y = (wobj->item & 0xfff) * 32,
+			.y = (wobj->item & 0xfff) * 32 + (wobj->internal.owned ? 0 : 1),
 			.w = 32,
 			.h = 32,
 		},

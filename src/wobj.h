@@ -303,7 +303,7 @@ void wobj_move_and_hit_blocks(WOBJ *obj);
 void WobjPhysics_BeginUpdate(WOBJ *wobj);
 void WobjPhysics_EndUpdate(WOBJ *wobj);
 void WobjPhysics_ApplyWindForces(WOBJ *wobj);
-void Wobj_ResolveObjectsCollision(WOBJ *obj);
+void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely);
 WOBJ *Wobj_GetOwnedWobjFromUUID(int uuid);
 WOBJ *Wobj_GetAnyWOBJFromUUIDAndNode(int node, int uuid);
 int Wobj_TryTeleportWobj(WOBJ *wobj, int only_telearea2);
@@ -322,7 +322,7 @@ void Wobj_CalculateLightForScreen(int camx, int camy);
 void Wobj_UpdateGridPos(WOBJ *wobj);
 void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound);
 float Wobj_GetGroundAngle(const WOBJ *wobj);
-
+void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py);
 void Wobj_OnDestroyLocalData(WOBJ *wobj);
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);

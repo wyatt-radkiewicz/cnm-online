@@ -12,6 +12,7 @@
 #include "game.h"
 #include "netgame.h"
 #include "spawners.h"
+#include "player.h"
 
 #define GET_WOBJ(iter) ((WOBJ *)((unsigned char *)(iter) - offsetof(WOBJ, internal.obj)))
 #define WOBJ_SEARCH_MAP_SIZE (1 << 11)
@@ -33,7 +34,6 @@ static WOBJ *search_map[WOBJ_SEARCH_MAP_SIZE];
 
 static void Wobj_FreeOwnedWobjAndRemove(WOBJ *wobj);
 
-static void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py);
 static WOBJ *WobjSearch_FindEntry(int node, int uuid);
 static void WobjSearch_DestoryEntry(int node, int uuid);
 static void WobjSearch_Reset(void);
@@ -467,8 +467,8 @@ void Wobj_GetCollisionsWithType(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISI
 	Wobj_GetCollisionsGeneral(subject, collisions, type, WobjCollisionTypeCriteria);
 }
 // Calculates interpolated positions for moving platforms for better netplay
-static void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py) {
-	if (!wobj->interpolate || ~wobj->flags & WOBJ_IS_MOVESTAND || ~wobj->flags & WOBJ_IS_SOLID || Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_HOSTED_SERVER || Game_TopState() == GAME_STATE_DEDICATED_SERVER) {
+void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py) {
+	if (!wobj->interpolate || ~wobj->flags & WOBJ_IS_MOVESTAND || ~wobj->flags & WOBJ_IS_SOLID || wobj->internal.owned) {
 		*px = wobj->x; *py = wobj->y;
 		return;
 	}
@@ -639,8 +639,13 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 		}
 	}
 	wobj->y -= 1.0f;
-	float ycomp = 0.0f;//wobj->type == WOBJ_PLAYER && other != NULL ? -other->vel_y : 0.0f;
-	const int touching_plat = other != NULL && other->y + other->hitbox.y + ycomp + 1.0f > wobj->y + wobj->hitbox.y + wobj->hitbox.h;
+	int touching_plat = 0;
+	if (other) {
+		float ycomp = other->internal.owned ? 0.0f : 0.0f;
+		float ox, oy;
+		WobjCalculate_InterpolatedPos(other, &ox, &oy);
+		touching_plat = oy + other->hitbox.y + ycomp + 1.0f > wobj->y + wobj->hitbox.y + wobj->hitbox.h;
+	}
 	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 1.0f) || touching_plat || jump_through != NULL)
 		return CNM_TRUE;
 	else
@@ -697,7 +702,15 @@ void WobjPhysics_BeginUpdate(WOBJ *wobj)
 void WobjPhysics_EndUpdate(WOBJ *wobj)
 {
 	wobj_move_and_hit_blocks(wobj);
-	Wobj_ResolveObjectsCollision(wobj);
+	int set_velx = CNM_TRUE, set_vely = CNM_TRUE;
+	if (wobj->type == WOBJ_PLAYER) {
+		PLAYER_LOCAL_DATA *lc = wobj->local_data;
+		if (lc->platinfo.active) {
+			set_velx = CNM_FALSE;
+			set_vely = CNM_FALSE;
+		}
+	}
+	Wobj_ResolveObjectsCollision(wobj, set_velx, set_vely);
 
 	// Stick to ground with slopes
 	if ((Wobj_IsGrounded(wobj) || WobjPhysics_IsGrounded(wobj)) && wobj->vel_y >= 0.0f)
@@ -711,24 +724,27 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 		wobj->x = h.x - wobj->hitbox.x;
 		wobj->y = h.y - wobj->hitbox.y;
 	}
-	if (Wobj_IsGrounded(wobj)) {
-		stick_to_moving_platforms(wobj);
-	}
 
-	// Stick to ground with moving platforms
-	wobj->y += 1.0f;
-	WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
-	if (plat != NULL)
-	{
-		if (plat->flags & WOBJ_IS_MOVESTAND) wobj->x += plat->vel_x;
-	}
-	if (plat == NULL && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH)) {
-		plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
-		if (plat && (plat->flags & WOBJ_IS_MOVESTAND) && wobj->vel_y - plat->vel_y > -0.1f && (wobj->y + wobj->hitbox.y) < (plat->y + plat->hitbox.y + 8.0f)) {
-			wobj->x += plat->vel_x;
+	if (wobj->type != WOBJ_PLAYER) {
+		if (Wobj_IsGrounded(wobj)) {
+			stick_to_moving_platforms(wobj);
 		}
+
+		// Stick to ground with moving platforms
+		wobj->y += 1.0f;
+		WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+		if (plat != NULL)
+		{
+			if (plat->flags & WOBJ_IS_MOVESTAND) wobj->x += plat->vel_x;
+		}
+		if (plat == NULL && !(wobj->flags & WOBJ_SKIP_JUMPTHROUGH)) {
+			plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
+			if (plat && (plat->flags & WOBJ_IS_MOVESTAND) && wobj->vel_y - plat->vel_y > -0.1f && (wobj->y + wobj->hitbox.y) < (plat->y + plat->hitbox.y + 8.0f)) {
+				wobj->x += plat->vel_x;
+			}
+		}
+		wobj->y -= 1.0f;
 	}
-	wobj->y -= 1.0f;
 
 	wobj->flags &= ~WOBJ_IS_GROUNDED;
 	wobj->flags |= WobjPhysics_IsGrounded(wobj) ? WOBJ_IS_GROUNDED : 0;
@@ -783,7 +799,7 @@ int Wobj_ResolveObjectsCollisionSortFunc(const void *a, const void *b)
 	if (da > db) return 1;
 	return 0;
 }
-void Wobj_ResolveObjectsCollision(WOBJ *obj)
+void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely)
 {
 	int i, num_indexes = 0;
 	WOBJ_COLINFO_HELPER infos[WOBJ_MAX_COLLISIONS];
@@ -831,9 +847,9 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 			Util_ResolveAABBCollision(&h, &other_h, &x, &y);
 			obj->x = h.x - obj->hitbox.x;
 			obj->y = h.y - obj->hitbox.y;
-			if (x)
+			if (x && set_velx)
 				obj->vel_x = collider->vel_x;
-			if (y) {
+			if (y && set_vely) {
 				obj->vel_y = collider->vel_y;
 			}
 		}
@@ -842,7 +858,7 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj)
 			if (obj->vel_y - collider->vel_y > 0.1f && (obj->y + obj->hitbox.y) < (collider->y + collider->hitbox.y))
 			{
 				obj->y = (collider->y + collider->hitbox.y) - (obj->hitbox.h + obj->hitbox.y);
-				obj->vel_y = collider->vel_y;
+				if (set_vely) obj->vel_y = collider->vel_y;
 				//obj->vel_x = collider->vel_x;
 			}
 		}
