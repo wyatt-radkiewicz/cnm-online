@@ -1,7 +1,7 @@
 #ifndef _petdefs_h_
 #define _petdefs_h_
 
-#define MAX_PETDEFS 64
+#define MAX_PETDEFS 24
 
 typedef enum PetAIType {
 	PETAI_NULL,

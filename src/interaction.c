@@ -14,7 +14,7 @@
 #include "ending_text.h"
 #include "fadeout.h"
 
-#define NETGAME_MAX_WOBJ_UPDATES 64
+#define NETGAME_MAX_WOBJ_UPDATES 32
 
 typedef struct _WOBJ_HURT_ENTRY
 {

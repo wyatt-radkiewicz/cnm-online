@@ -80,38 +80,59 @@ typedef void(*GAME_STATE_QUIT)(void);
 typedef void(*GAME_STATE_UPDATE)(void);
 typedef void(*GAME_STATE_DRAW)(void);
 
+#ifndef _OLD
+#define GAME_STATE_BLOCKSEDIT -100
+#define GAME_STATE_BLOCKPROPSEDIT -100
+#define GAME_STATE_OBJEDIT -100
+#define GAME_STATE_LIGHT_EDITOR -100
+#define GAME_STATE_ENDTEXT_EDITOR -100
+//#define GAME_STATE_CLIENT_DOWNLOADING -100
+#define GAME_STATE_BGEDIT -100
+#define GAME_STATE_BITMAP_BENCH -100
+#define GAME_STATE_MINIGAME1_TEST -100
+#endif
+
 typedef enum _GAME_STATES
 {
 	GAME_STATE_NULL,
 	GAME_STATE_BASE,
+#ifdef _OLD
 	GAME_STATE_BLOCKSEDIT,
+#endif
 	GAME_STATE_MAINMENU,
+#ifdef _OLD
 	GAME_STATE_BLOCKPROPSEDIT,
 	GAME_STATE_OBJEDIT,
+#endif
 	GAME_STATE_SINGLEPLAYER,
 	GAME_STATE_CLIENT,
 	GAME_STATE_HOSTED_SERVER,
 	GAME_STATE_DEDICATED_SERVER,
 	GAME_STATE_CLIENT_CONNECTING,
+#ifdef _OLD
 	GAME_STATE_LIGHT_EDITOR,
 	GAME_STATE_ENDTEXT_EDITOR,
 	GAME_STATE_CLIENT_DOWNLOADING,
 	GAME_STATE_BGEDIT,
 	GAME_STATE_BITMAP_BENCH,
 	GAME_STATE_MINIGAME1_TEST,
+#endif
 	GAME_STATE_MASTER_SERVER
 } GAME_STATES;
 
 void GameState_Base_Init(void);
 void GameState_Base_Quit(void);
+#ifdef _OLD
 void GameState_BlocksEdit_Init(void);
 void GameState_BlocksEdit_Quit(void);
 void GameState_BlocksEdit_Update(void);
 void GameState_BlocksEdit_Draw(void);
+#endif
 void GameState_MainMenu_Init(void);
 void GameState_MainMenu_Quit(void);
 void GameState_MainMenu_Update(void);
 void GameState_MainMenu_Draw(void);
+#ifdef _OLD
 void GameState_BlockPropsEdit_Init(void);
 void GameState_BlockPropsEdit_Quit(void);
 void GameState_BlockPropsEdit_Update(void);
@@ -120,6 +141,7 @@ void GameState_ObjEdit_Init(void);
 void GameState_ObjEdit_Quit(void);
 void GameState_ObjEdit_Update(void);
 void GameState_ObjEdit_Draw(void);
+#endif
 void GameState_Singleplayer_Init(void);
 void GameState_Singleplayer_Quit(void);
 void GameState_Singleplayer_Update(void);
@@ -140,6 +162,7 @@ void GameState_ClientConnecting_Init(void);
 void GameState_ClientConnecting_Quit(void);
 void GameState_ClientConnecting_Update(void);
 void GameState_ClientConnecting_Draw(void);
+#ifdef _OLD
 void GameState_LightEditor_Init(void);
 void GameState_LightEditor_Quit(void);
 void GameState_LightEditor_Update(void);
@@ -160,6 +183,7 @@ void GameState_BitmapBench_Init(void);
 void GameState_BitmapBench_Quit(void);
 void GameState_BitmapBench_Update(void);
 void GameState_BitmapBench_Draw(void);
+#endif
 void GameState_MasterServer_Init(void);
 void GameState_MasterServer_Quit(void);
 void GameState_MasterServer_Update(void);

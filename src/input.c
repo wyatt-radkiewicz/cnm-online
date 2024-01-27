@@ -6,7 +6,7 @@
 #include "console.h"
 #include "game_console.h"
 
-#define INPUT_MAX_STATES 32
+#define INPUT_MAX_STATES 6
 
 static int input_last_buttons[INPUT_BUTTONS_MAX];
 static int input_buttons[INPUT_BUTTONS_MAX];

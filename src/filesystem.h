@@ -42,10 +42,10 @@ file_size_result_t file_size(const file_t *file);
 
 // Release build is "stable" debug build is not
 #ifndef REFACTOR
-#define FILESYSTEM_MAX_LEVELS 48
-#define FILESYSTEM_MAX_MIDIS 48
-#define FILESYSTEM_MAX_WAVS 96
-#define FILESYSTEM_MAX_LENGTH 64
+#define FILESYSTEM_MAX_LEVELS 32
+#define FILESYSTEM_MAX_MIDIS 36
+#define FILESYSTEM_MAX_WAVS 80
+#define FILESYSTEM_MAX_LENGTH 52
 
 typedef struct _FILESYSTEM_REGISTERED_FILE
 {

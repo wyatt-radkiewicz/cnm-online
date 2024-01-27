@@ -5,6 +5,8 @@
 #define B 0xf7
 #define W 0x04
 
+#define MAX_SUPERVIRUSES 8
+
 unsigned char _supervirus_bitmap[] = {
 	T, T, B, W, W, W, W, W, W, W, W, W, B, T,
 	T, B, W, W, W, W, W, W, B, B, W, W, B, T,
@@ -37,10 +39,10 @@ unsigned char _supervirus_bitmap[] = {
 };
 
 static int num = 0;
-static int _x[32], _y[32];
+static int _x[MAX_SUPERVIRUSES], _y[MAX_SUPERVIRUSES];
 
 void supervirus_render(int x, int y) {
-	if (num < 32) {
+	if (num < MAX_SUPERVIRUSES) {
 		_x[num] = x;
 		_y[num] = y;
 		num++;

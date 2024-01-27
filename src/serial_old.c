@@ -112,7 +112,7 @@ void Serial_LoadSpawnersLevelName_Old(const char *cnms_file, char *name_buf)
 		fseek
 		(
 			f,
-			(PLAYER_SPAWNS_MAX * PLAYER_SPAWN_TYPE_MAX * sizeof(float) * 2) +
+			(OLD_PLAYER_SPAWNS_MAX * PLAYER_SPAWN_TYPE_MAX * sizeof(float) * 2) +
 			(TELEPORT_INFOS_MAX_TELEPORTS_SERIALOLD * SERIAL_TELEPORT_INFO_SIZE) +
 			((ENDING_TEXT_MAX_LINES - 1) * ENDING_TEXT_MAX_WIDTH),
 			SEEK_SET

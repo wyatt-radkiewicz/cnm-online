@@ -11,7 +11,7 @@
 #include "net.h"
 #include "server.h"
 #include "audio.h"
-#include "net_file.h"
+//#_include "net_file.h"
 #include "world.h"
 #include "pausemenu.h"
 #include "fadeout.h"
@@ -37,7 +37,7 @@ void GameState_HostedServer_Init(void)
 	pause_menu_setcallback(PAUSE_MENU_CONTINUE, GoBackToPlaying);
 	pause_menu_setcallback(PAUSE_MENU_EXIT, GoBackToMainMenu);
 	Server_Create();
-	NetFile_AddServerNetCallback();
+	//NetFile_AddServerNetCallback();
 	World_Start(WORLD_MODE_HOSTED_SERVER);
 }
 void GameState_HostedServer_Quit(void)
@@ -45,13 +45,13 @@ void GameState_HostedServer_Quit(void)
 	Console_Print("Shutting Down Server....");
 
 	World_Stop();
-	NetFile_RemoveNetCallbacks();
+	//NetFile_RemoveNetCallbacks();
 	Server_Destroy();
 }
 void GameState_HostedServer_Update(void)
 {
 	Net_InitAvgUDPOutgoingBandwidth();
-	NetFile_TickServer();
+	//NetFile_TickServer();
 	NetGame_Update();
 	Server_Tick();
 	Net_PollPackets(64);

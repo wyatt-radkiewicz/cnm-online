@@ -19,6 +19,7 @@
 #include "logic_links.h"
 #include "gamelua.h"
 #include "petdefs.h"
+#include "player_spawns.h"
 
 static void WobjGeneric_Hurt(WOBJ *victim, WOBJ *inflictor)
 {
@@ -942,6 +943,13 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 }
 static void WobjCheckpoint_Create(WOBJ *wobj)
 {
+	// Change spawn id
+	{
+		int j = wobj->custom_ints[0] / OLD_PLAYER_SPAWNS_MAX;
+		int k = wobj->custom_ints[0] % OLD_PLAYER_SPAWNS_MAX;
+		wobj->custom_ints[0] = j * PLAYER_SPAWNS_MAX + k;
+	}
+
 	wobj->anim_frame = 0;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
@@ -2983,7 +2991,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{32, 64, 16, 16}
+			{32, 64, 32, 32}
 		},
 		0.0f, // Strength reward
 		0, // Money reward

@@ -369,10 +369,17 @@ void Serial_LoadSpawners(const char *cnms_file)
 	PlayerSpawn_ClearAllSpawns();
 	ee[0] = lparse_get_entry(lp, "PLAYERSPAWNX");
 	ee[1] = lparse_get_entry(lp, "PLAYERSPAWNY");
-	for (i = 0; i < (int)lparse_get_size(ee[0]); i++) {
-		lparse_get_data(lp, ee[0], i, 1, &tmp1);
-		lparse_get_data(lp, ee[1], i, 1, &tmp3);
-		PlayerSpawns_SetSpawnLoc(i, tmp1, tmp3);
+	//for (i = 0; i < (int)lparse_get_size(ee[0]); i++) {
+	//	lparse_get_data(lp, ee[0], i, 1, &tmp1);
+	//	lparse_get_data(lp, ee[1], i, 1, &tmp3);
+	//	PlayerSpawns_SetSpawnLoc(i, tmp1, tmp3);
+	//}
+	for (int j = 0; j < PLAYER_SPAWN_TYPE_MAX; j++) {
+		for (int k = 0; k < OLD_PLAYER_SPAWNS_MAX; k++) {
+			lparse_get_data(lp, ee[0], j * OLD_PLAYER_SPAWNS_MAX + k, 1, &tmp1);
+			lparse_get_data(lp, ee[1], j * OLD_PLAYER_SPAWNS_MAX + k, 1, &tmp3);
+			if (k < PLAYER_SPAWNS_MAX) PlayerSpawns_SetSpawnLoc(j * PLAYER_SPAWNS_MAX + k, tmp1, tmp3);
+		}
 	}
 
 	ee[0] = lparse_get_entry(lp, "TI_NAME");
@@ -381,7 +388,8 @@ void Serial_LoadSpawners(const char *cnms_file)
 	ee[3] = lparse_get_entry(lp, "TI_ALLOCED");
 	for (i = 0; i < TELEPORT_INFOS_MAX_TELEPORTS; i++) {
 		ti = TeleportInfos_GetTeleport(i);
-		lparse_get_data(lp, ee[0], i*TELEPORT_NAMESZ, TELEPORT_NAMESZ, ti->name);
+		lparse_get_data(lp, ee[0], i*OLD_TELEPORT_NAMESZ, TELEPORT_NAMESZ, ti->name);
+		ti->name[TELEPORT_NAMESZ-1] = '\0';
 		lparse_get_data(lp, ee[1], i, 1, &ti->cost);
 		lparse_get_data(lp, ee[2], i*2, 1, &ti->x);
 		lparse_get_data(lp, ee[2], i*2+1, 1, &ti->y);
@@ -452,24 +460,48 @@ void Serial_SaveSpawners(const char *cnms_file)
 		return;
 
 	if (!Serial_GetWriteLParser(cnms_file, &lp)) return;
-	e = lparse_make_entry(lp, "PLAYERSPAWNX", lparse_float, PLAYER_SPAWNS_MAX * PLAYER_SPAWN_TYPE_MAX);
-	for (i = 0; i < (int)lparse_get_size(e); i++) {
-		tmp1 = PlayerSpawn_GetSpawnLocX(i);
-		lparse_set_data(lp, e, i, 1, &tmp1);
+	e = lparse_make_entry(lp, "PLAYERSPAWNX", lparse_float, OLD_PLAYER_SPAWNS_MAX * PLAYER_SPAWN_TYPE_MAX);
+	for (int j = 0; j < PLAYER_SPAWN_TYPE_MAX; j++) {
+		for (int k = 0; k < OLD_PLAYER_SPAWNS_MAX; k++) {
+			tmp1 = 0.0f;
+			if (k < PLAYER_SPAWNS_MAX) tmp1 = PlayerSpawn_GetSpawnLocX(j * PLAYER_SPAWNS_MAX + k);
+			lparse_set_data(lp, e, j * OLD_PLAYER_SPAWNS_MAX + k, 1, &tmp1);
+		}
 	}
-	e = lparse_make_entry(lp, "PLAYERSPAWNY", lparse_float, PLAYER_SPAWNS_MAX * PLAYER_SPAWN_TYPE_MAX);
-	for (i = 0; i < (int)lparse_get_size(e); i++) {
-		tmp1 = PlayerSpawn_GetSpawnLocY(i);
-		lparse_set_data(lp, e, i, 1, &tmp1);
+	//for (i = 0; i < (int)lparse_get_size(e); i++) {
+	//	tmp1 = PlayerSpawn_GetSpawnLocX(i);
+	//	lparse_set_data(lp, e, i, 1, &tmp1);
+	//}
+	e = lparse_make_entry(lp, "PLAYERSPAWNY", lparse_float, OLD_PLAYER_SPAWNS_MAX * PLAYER_SPAWN_TYPE_MAX);
+	for (int j = 0; j < PLAYER_SPAWN_TYPE_MAX; j++) {
+		for (int k = 0; k < OLD_PLAYER_SPAWNS_MAX; k++) {
+			tmp1 = 0.0f;
+			if (k < PLAYER_SPAWNS_MAX) tmp1 = PlayerSpawn_GetSpawnLocY(j * PLAYER_SPAWNS_MAX + k);
+			lparse_set_data(lp, e, j * OLD_PLAYER_SPAWNS_MAX + k, 1, &tmp1);
+		}
 	}
+	//for (i = 0; i < (int)lparse_get_size(e); i++) {
+	//	tmp1 = PlayerSpawn_GetSpawnLocY(i);
+	//	lparse_set_data(lp, e, i, 1, &tmp1);
+	//}
 
-	ee[0] = lparse_make_entry(lp, "TI_NAME", lparse_u8, TELEPORT_INFOS_MAX_TELEPORTS * TELEPORT_NAMESZ);
-	ee[1] = lparse_make_entry(lp, "TI_COST", lparse_i32, TELEPORT_INFOS_MAX_TELEPORTS);
-	ee[2] = lparse_make_entry(lp, "TI_POS", lparse_float, TELEPORT_INFOS_MAX_TELEPORTS * 2);
-	ee[3] = lparse_make_entry(lp, "TI_ALLOCED", lparse_u8, TELEPORT_INFOS_MAX_TELEPORTS);
-	for (i = 0; i < TELEPORT_INFOS_MAX_TELEPORTS; i++) {
-		ti = TeleportInfos_GetTeleport(i);
-		lparse_set_data(lp, ee[0], i*TELEPORT_NAMESZ, TELEPORT_NAMESZ, ti->name);
+	ee[0] = lparse_make_entry(lp, "TI_NAME", lparse_u8, OLD_TELEPORT_INFOS_MAX_TELEPORTS * OLD_TELEPORT_NAMESZ);
+	ee[1] = lparse_make_entry(lp, "TI_COST", lparse_i32, OLD_TELEPORT_INFOS_MAX_TELEPORTS);
+	ee[2] = lparse_make_entry(lp, "TI_POS", lparse_float, OLD_TELEPORT_INFOS_MAX_TELEPORTS * 2);
+	ee[3] = lparse_make_entry(lp, "TI_ALLOCED", lparse_u8, OLD_TELEPORT_INFOS_MAX_TELEPORTS);
+	for (i = 0; i < OLD_TELEPORT_INFOS_MAX_TELEPORTS; i++) {
+		TELEPORT_INFO dummy = (TELEPORT_INFO){
+			.allocated = false,
+			.index = i,
+		};
+		if (i < TELEPORT_INFOS_MAX_TELEPORTS) {
+			ti = TeleportInfos_GetTeleport(i);
+		} else {
+			ti = &dummy;
+		}
+		char tiname_zero[OLD_TELEPORT_NAMESZ] = {0};
+		lparse_set_data(lp, ee[0], i*OLD_TELEPORT_NAMESZ, OLD_TELEPORT_NAMESZ, tiname_zero);
+		lparse_set_data(lp, ee[0], i*OLD_TELEPORT_NAMESZ, TELEPORT_NAMESZ, ti->name);
 		lparse_set_data(lp, ee[1], i, 1, &ti->cost);
 		lparse_set_data(lp, ee[2], i*2, 1, &ti->x);
 		lparse_set_data(lp, ee[2], i*2+1, 1, &ti->y);

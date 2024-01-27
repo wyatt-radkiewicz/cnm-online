@@ -4,7 +4,7 @@
 #include "renderer.h"
 #include "utility.h"
 
-#define GAMECONSOLE_HISTORY 32
+#define GAMECONSOLE_HISTORY 16
 
 #define GAMECONSOLE_INPUT_NONE 0
 #define GAMECONSOLE_INPUT_TOGGLE 1

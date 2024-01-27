@@ -1,7 +1,7 @@
 #ifndef _audio_h_
 #define _audio_h_
 
-#define AUDIO_MAX_IDS 96
+#define AUDIO_MAX_IDS 80
 
 void Audio_Init(void);
 void Audio_Quit(void);

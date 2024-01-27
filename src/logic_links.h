@@ -1,7 +1,7 @@
 #ifndef _logic_links_h_
 #define _logic_links_h_
 
-#define LOGIC_LINKS_MAX 256
+#define LOGIC_LINKS_MAX 128
 
 typedef struct _WOBJ WOBJ;
 

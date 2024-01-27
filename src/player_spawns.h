@@ -2,7 +2,8 @@
 #define _player_spawns_h_
 #include "netgame.h"
 
-#define PLAYER_SPAWNS_MAX 128
+#define PLAYER_SPAWNS_MAX 48
+#define OLD_PLAYER_SPAWNS_MAX 128
 #define PLAYER_SPAWN_TYPE_NORMAL_MODES			0
 #define PLAYER_SPAWN_TYPE_SINGLEPLAYER_ONLY		1
 #define PLAYER_SPAWN_TYPE_CHECKPOINTS			2

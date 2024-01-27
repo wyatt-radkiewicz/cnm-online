@@ -456,14 +456,15 @@ static void Command_DebugShowGridPoses(const char *args, int from_player)
 static void Command_Connect(const char *args, int from_player)
 {
 	strcpy(Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string, Command_ExtractArg(args, 0));
-	if (!Game_GetVar(GAME_VAR_NODOWNLOAD)->data.integer)
-	{
-		//Game_SwitchState(GAME_STATE_CLIENT_DOWNLOADING);
-	}
-	else
-	{
-		Game_SwitchState(GAME_STATE_CLIENT_CONNECTING);
-	}
+	Game_SwitchState(GAME_STATE_CLIENT_CONNECTING);
+	//if (!Game_GetVar(GAME_VAR_NODOWNLOAD)->data.integer)
+	//{
+	//	//Game_SwitchState(GAME_STATE_CLIENT_DOWNLOADING);
+	//}
+	//else
+	//{
+	//	Game_SwitchState(GAME_STATE_CLIENT_CONNECTING);
+	//}
 }
 static void Command_PrintConnectedPlayers(const char *args, int from_player)
 {

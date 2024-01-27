@@ -10,7 +10,11 @@
 
 static int net_initialized = CNM_FALSE;
 #define NET_MAX_POLLING_FUNCS 8
+#ifdef DEBUG
 #define NET_MAX_FAKEDPINGERS 2048
+#else
+#define NET_MAX_FAKEDPINGERS 16
+#endif
 
 typedef struct _NET_SAFE
 {

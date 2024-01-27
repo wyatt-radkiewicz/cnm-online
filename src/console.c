@@ -9,7 +9,7 @@
 
 static FILE *console_file;
 static CONSOLE_CALLBACK console_callback;
-static char printbuf[2048];
+static char printbuf[1024 + 512 + 1];
 
 void Console_Init(const char *file)
 {

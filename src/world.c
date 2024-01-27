@@ -26,7 +26,7 @@
 #include "player.h"
 #include "item.h"
 
-#define TITLE_CARD_MAX_LINES 6
+#define TITLE_CARD_MAX_LINES 3
 
 static WOBJ *player;
 

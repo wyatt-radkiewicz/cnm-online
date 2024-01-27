@@ -24,7 +24,7 @@
 #include "gamelua.h"
 #include "savedata.h"
 
-#define GAME_MAX_STATES 32
+#define GAME_MAX_STATES 8
 
 typedef struct _GAME_STATE_TYPE
 {
@@ -37,21 +37,27 @@ static GAME_STATE_TYPE game_states[] =
 {
 	{NULL, NULL, NULL, NULL},
 	{GameState_Base_Init, GameState_Base_Quit, NULL, NULL},
+#ifdef _OLD
 	{GameState_BlocksEdit_Init, GameState_BlocksEdit_Quit, GameState_BlocksEdit_Update, GameState_BlocksEdit_Draw},
+#endif
 	{GameState_MainMenu_Init, GameState_MainMenu_Quit, GameState_MainMenu_Update, GameState_MainMenu_Draw},
+#ifdef _OLD
 	{GameState_BlockPropsEdit_Init, GameState_BlockPropsEdit_Quit, GameState_BlockPropsEdit_Update, GameState_BlockPropsEdit_Draw},
 	{GameState_ObjEdit_Init, GameState_ObjEdit_Quit, GameState_ObjEdit_Update, GameState_ObjEdit_Draw},
+#endif
 	{GameState_Singleplayer_Init, GameState_Singleplayer_Quit, GameState_Singleplayer_Update, GameState_Singleplayer_Draw},
 	{GameState_Client_Init, GameState_Client_Quit, GameState_Client_Update, GameState_Client_Draw},
 	{GameState_HostedServer_Init, GameState_HostedServer_Quit, GameState_HostedServer_Update, GameState_HostedServer_Draw},
 	{GameState_DedicatedServer_Init, GameState_DedicatedServer_Quit, GameState_DedicatedServer_Update, GameState_DedicatedServer_Draw},
 	{GameState_ClientConnecting_Init, GameState_ClientConnecting_Quit, GameState_ClientConnecting_Update, GameState_ClientConnecting_Draw},
+#ifdef _OLD
 	{GameState_LightEditor_Init, GameState_LightEditor_Quit, GameState_LightEditor_Update, GameState_LightEditor_Draw},
 	{GameState_EndTextEditor_Init, GameState_EndTextEditor_Quit, GameState_EndTextEditor_Update, GameState_EndTextEditor_Draw},
 	{GameState_ClientDownloading_Init, GameState_ClientDownloading_Quit, GameState_ClientDownloading_Update, GameState_ClientDownloading_Draw},
 	{GameState_BgEdit_Init, GameState_BgEdit_Quit, GameState_BgEdit_Update, GameState_BgEdit_Draw},
 	{GameState_BitmapBench_Init, GameState_BitmapBench_Quit, GameState_BitmapBench_Update, GameState_BitmapBench_Draw},
 	{GameState_ClientDownloading_Init, GameState_ClientDownloading_Quit, GameState_ClientDownloading_Update, GameState_ClientDownloading_Draw},
+#endif
 	{GameState_MasterServer_Init, GameState_MasterServer_Quit, GameState_MasterServer_Update, NULL}
 };
 static GAME_VAR game_vars[GAME_VAR_MAX];
