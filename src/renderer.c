@@ -1166,6 +1166,7 @@ void Renderer_DrawText(int x, int y, int trans, int light, const char *format, .
 	for (c = 0; c < (int)strlen(buffer); c++)
 	{
 		i = (int)buffer[c];
+		const int yoffset = (i >= 'a' && i <= 'z') * 2;
 		src.w = renderer_font.w;
 		src.h = renderer_font.h;
 		src.x = (i % 16 * renderer_font.w) + renderer_font.x;
@@ -1173,7 +1174,7 @@ void Renderer_DrawText(int x, int y, int trans, int light, const char *format, .
 		Renderer_DrawBitmap
 		(
 			c * renderer_font.w + x,
-			y,
+			y + yoffset,
 			&src,
 			trans,
 			light

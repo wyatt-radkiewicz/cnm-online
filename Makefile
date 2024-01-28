@@ -30,6 +30,10 @@ rundbg: $(BUILD_DIR)/$(TARGET_NAME)
 $(BUILD_DIR)/$(TARGET_NAME): $(OBJS)
 	mkdir -p $(dir $@)
 	$(CC) $^ $(LDFLAGS) -o $@
+tools_dbg:
+	$(CC) $(SOURCE_DIR)/ibapply/ibapply.c -DDEBUG -g -O0 -o $(BUILD_DIR)/ibapply
+tools:
+	$(CC) $(SOURCE_DIR)/ibapply/ibapply.c -o $(BUILD_DIR)/ibapply
 
 define BUILD_SRC
 $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(1))): $(1) $(addprefix $(SOURCE_DIR)/,$(2))
