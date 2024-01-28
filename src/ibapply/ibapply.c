@@ -198,7 +198,7 @@ static bool is_correct_file(struct dirent *ent, bool levelty) {
 	if (ent->d_type != DT_REG) return false;
 	const char *ext = strrchr(ent->d_name, '.');
 	if (!ext || strcmp(ext, ".bmp") != 0) return false;
-	const bool is_level = strncmp(ent->d_name, TITLE_PREFIX, sizeof(TITLE_PREFIX)) != 0;
+	const bool is_level = strncmp(ent->d_name, TITLE_PREFIX, sizeof(TITLE_PREFIX)-1) != 0;
 	return is_level == levelty;
 }
 
@@ -218,8 +218,9 @@ static char **get_level_bmps(const char *dirpath, bool levelty) {
 	bmps = malloc(sizeof(*bmps) * (nfiles + 1));
 	while ((ent = readdir(dir))) {
 		if (!is_correct_file(ent, levelty)) continue;
-		bmps[i] = malloc(strlen(ent->d_name) + 1);
-		strcpy(bmps[i], ent->d_name);
+		bmps[i] = malloc(strlen(dirpath) + strlen(ent->d_name) + 1);
+		strcpy(bmps[i], dirpath);
+		strcat(bmps[i], ent->d_name);
 		i++;
 	}
 	bmps[i] = NULL;
@@ -243,7 +244,7 @@ int main(int argc, char **argv) {
 	} sect;
 	for (int i = 2; i < 6; i++) {
 		const char *c = argv[i];
-		while (c) {
+		while (*c) {
 			if (!isdigit(*(c++))) {
 				print_help();
 				return 1;
@@ -251,6 +252,22 @@ int main(int argc, char **argv) {
 		}
 		sect.arr[i-2] = atoi(argv[i]);
 	}
+
+	char input;
+	do {
+		if (sect.x % 8 == 0 && sect.y % 8 == 0 && sect.w % 8 == 0 && sect.h % 8 == 0) {
+			printf("Section aligned to 8x8 grid.\n");
+		} else {
+			printf("Section NOT aligned to 8x8 grid.\n");
+		}
+		printf("Are you sure you want to do this?");
+		input = tolower(getc(stdin));
+	} while (input != 'y' && input != 'n');
+	if (input == 'n') {
+		printf("aborting...\n");
+		return 0;
+	}
+	printf("Applying section updates...\n");
 
 	bool levelty = strcmp(argv[1], "level") == 0;
 	if (!levelty && strcmp(argv[1], "title") != 0) {
