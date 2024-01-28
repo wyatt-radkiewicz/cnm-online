@@ -188,6 +188,7 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 				NetGame_DamageUnownedWobj(victim, inflictor->strength * 5.0f);
 				// This damage multiplication is done because players have the highest health in the game...
 				// For instance, most bosses have 80 HP...
+				// Laser minion has 15 hp and lava monster has 16 hp (but wider)
 		}
 		break;
 	}

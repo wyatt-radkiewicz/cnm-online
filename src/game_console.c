@@ -11,6 +11,7 @@
 #include "server.h"
 #include "audio.h"
 #include "game.h"
+#include "mem.h"
 
 #define GAMECONSOLE_STATE_BACK 0x0000
 #define GAMECONSOLE_STATE_ROLLUP 0x1001
@@ -223,8 +224,17 @@ void GameConsole_Draw(void)
 	if (!gameconsole_initialized)
 		return;
 
+	if (Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer) {
+		if (Game_TopState() == GAME_STATE_MAINMENU) Renderer_SetFont(288, 416, 8, 8);
+		else Renderer_SetFont(256, 192, 8, 8);
+
+		Renderer_DrawText(0, 50, 0, RENDERER_LIGHT, "arena %dK/%dK", arena_used_mem() / 1024, ARENA_SIZE / 1024);
+		Renderer_DrawText(0, 58, 0, RENDERER_LIGHT, "data seg todo");
+	}
+
 	if (Game_TopState() == GAME_STATE_MAINMENU) Renderer_SetFont(288, 480, 8, 8);
 	else Renderer_SetFont(256, 256, 8, 8);
+
 	y = ((GAMECONSOLE_HISTORY + 1) * -8) + gameconsole_y;
 	for (l = GAMECONSOLE_HISTORY - 1; l > -1; l--)
 	{

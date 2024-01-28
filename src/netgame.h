@@ -107,6 +107,7 @@ typedef struct _NETGAME_DAMAGE_ENTRY
 	int obj_node;
 	int obj_uuid;
 	float damage_dealt;
+	struct _NETGAME_DAMAGE_ENTRY *next, *last;
 } NETGAME_DAMAGE_ENTRY;
 
 typedef struct netgame_playerfinish {

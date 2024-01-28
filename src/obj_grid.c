@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "obj_grid.h"
+#include "mem.h"
+#include "console.h"
 
 typedef struct _OBJGRID_CHUNK
 {
 	OBJGRID_OBJECT *first;
 	int x, y;
-	OBJGRID *grid;
 } OBJGRID_CHUNK;
 typedef struct _OBJGRID
 {
@@ -14,7 +15,7 @@ typedef struct _OBJGRID
 	int w, h;
 } OBJGRID;
 
-static OBJGRID_CHUNK *ObjGrid_GetChunk(OBJGRID *grid, int x, int y);
+static OBJGRID_CHUNK *ObjGrid_GetChunk(const OBJGRID *grid, int x, int y);
 
 static int objgrid_uuid = 0;
 
@@ -23,8 +24,8 @@ OBJGRID *ObjGrid_Create(int w, int h)
 	int x, y;
 	OBJGRID *grid;
 	OBJGRID_CHUNK *chunk;
-	grid = malloc(sizeof(OBJGRID));
-	grid->chunks = malloc(w * (size_t)h * sizeof(OBJGRID_CHUNK));
+	grid = arena_global_alloc(sizeof(OBJGRID));
+	grid->chunks = arena_global_alloc(w * (size_t)h * sizeof(OBJGRID_CHUNK));
 	grid->w = w;
 	grid->h = h;
 	for (y = 0; y < h; y++)
@@ -33,7 +34,6 @@ OBJGRID *ObjGrid_Create(int w, int h)
 		{
 			chunk = ObjGrid_GetChunk(grid, x, y);
 			chunk->first = NULL;
-			chunk->grid = grid;
 			chunk->x = x;
 			chunk->y = y;
 		}
@@ -43,8 +43,8 @@ OBJGRID *ObjGrid_Create(int w, int h)
 void ObjGrid_Destroy(OBJGRID *grid)
 {
 	ObjGrid_Clear(grid);
-	free(grid->chunks);
-	free(grid);
+	//free(grid->chunks);
+	//free(grid);
 }
 void ObjGrid_Clear(OBJGRID *grid)
 {
@@ -154,7 +154,7 @@ int ObjGrid_AdvanceIter(OBJGRID_ITER *iter)
 	}
 }
 
-static OBJGRID_CHUNK *ObjGrid_GetChunk(OBJGRID *grid, int x, int y)
+static OBJGRID_CHUNK *ObjGrid_GetChunk(const OBJGRID *grid, int x, int y)
 {
 	if (x > -1 && x < grid->w && y > -1 && y < grid->h)
 		return &grid->chunks[y * grid->w + x];

@@ -17,6 +17,7 @@
 #include "item.h"
 #include "utility.h"
 #include "supervirus.h"
+#include "mem.h"
 
 void WobjSlime_Create(WOBJ *wobj)
 {
@@ -77,8 +78,12 @@ typedef struct FlyingSlimeAI {
 	float spawnx, spawny;
 	float tx, ty;
 } FlyingSlimeAI;
-void WobjFlyingSlime_OnDestroy(WOBJ *wobj) {
-	free(wobj->local_data);
+
+static dynpool_t _ldpool_flyingslime_movingfire;
+
+void WobjFlyingSlimeMovingFire_DestroyLocalData(WOBJ *wobj) {
+	dynpool_free(_ldpool_flyingslime_movingfire, wobj->local_data);
+	//free(wobj->local_data);
 }
 void WobjFlyingSlime_Create(WOBJ *wobj)
 {
@@ -92,7 +97,8 @@ void WobjFlyingSlime_Create(WOBJ *wobj)
 	wobj->strength = 1.6666667f;
 	wobj->anim_frame = 0;
 	wobj->health = 6.0f;
-	FlyingSlimeAI *ai = calloc(1, sizeof(*ai));
+	FlyingSlimeAI *ai = dynpool_alloc(_ldpool_flyingslime_movingfire);
+	wobj->on_destroy = WobjFlyingSlimeMovingFire_DestroyLocalData;
 	wobj->local_data = ai;
 	ai->spawnx = wobj->x;
 	ai->spawny = wobj->y;
@@ -896,6 +902,8 @@ typedef struct _LAVADRAGON_DATA
 	int history_index;
 } LAVADRAGON_DATA;
 
+static dynpool_t _ldpool_lavadragon;
+
 void WobjLavaDragonHead_Death(WOBJ *wobj)
 {
 	LAVADRAGON_DATA *data = wobj->local_data;
@@ -907,12 +915,13 @@ void WobjLavaDragonHead_Death(WOBJ *wobj)
 		data->links[i] = NULL;
 	}
 
-	free(data);
+	//free(data);
+	dynpool_free(_ldpool_lavadragon, data);
 }
 void WobjLavaDragonHead_Create(WOBJ *wobj)
 {
 	if (wobj->internal.owned) {
-		LAVADRAGON_DATA *data = malloc(sizeof(LAVADRAGON_DATA));
+		LAVADRAGON_DATA *data = dynpool_alloc(_ldpool_lavadragon);
 		wobj->local_data = data;
 		data->tx_spd = 0.0f;
 		data->ty_spd = 0.0f;
@@ -1526,8 +1535,8 @@ void init_moving_firev(WOBJ *wobj) {
 }
 void WobjMovingFireVertical_Create(WOBJ *wobj)
 {
-	wobj->local_data = calloc(1, sizeof(struct movingfirev_data));
-	wobj->on_destroy = Wobj_OnDestroyLocalData;
+	wobj->local_data = dynpool_alloc(_ldpool_flyingslime_movingfire);
+	wobj->on_destroy = WobjFlyingSlimeMovingFire_DestroyLocalData;
 	struct movingfirev_data *local_data = wobj->local_data;
 	local_data->spawnx = wobj->x;
 	local_data->spawny = wobj->y;
@@ -1593,8 +1602,8 @@ void init_moving_fireh(WOBJ *wobj) {
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
 }
 void WobjMovingFireHorizontal_Create(WOBJ *wobj) {
-	wobj->local_data = calloc(1, sizeof(struct movingfirev_data));
-	wobj->on_destroy = Wobj_OnDestroyLocalData;
+	wobj->local_data = dynpool_alloc(_ldpool_flyingslime_movingfire);
+	wobj->on_destroy = WobjFlyingSlimeMovingFire_DestroyLocalData;
 	struct movingfirev_data *local_data = wobj->local_data;
 	local_data->spawnx = wobj->x;
 	local_data->spawny = wobj->y;
@@ -2773,3 +2782,12 @@ void Enemies_Reset(void) {
 		super_dragons[i].num_lands = 0;
 	}
 }
+void Enemies_ZoneAllocLocalDataPools(void) {
+	_ldpool_flyingslime_movingfire = dynpool_init(
+		16,
+		CNM_MAX(sizeof(FlyingSlimeAI), sizeof(struct movingfirev_data)),
+		arena_alloc
+	);
+	_ldpool_lavadragon = dynpool_init(4, sizeof(LAVADRAGON_DATA), arena_alloc);
+}
+

@@ -1,15 +1,17 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "console.h"
 #include "utility.h"
+#include "mem.h"
 
 // this is one file where we DO want to use raw fopen so we disable new.h's saftey bars
 #undef fopen
 
 static FILE *console_file;
 static CONSOLE_CALLBACK console_callback;
-static char printbuf[1024 + 512 + 1];
+//static char printbuf[512 + 1];
 
 void Console_Init(const char *file)
 {
@@ -35,11 +37,17 @@ void Console_Print(const char *format, ...)
 	va_start(args, format);
 	vprintf(format, args);
 	va_start(args, format);
-	vsnprintf(printbuf, sizeof(printbuf), format, args);
+
+	int bufsz = vsnprintf(NULL, 0, format, args) + 1;
+	assert(bufsz > 0);
+	char *buf = arena_alloc(bufsz);
+	vsnprintf(buf, bufsz, format, args);
+
 	va_end(args);
 	printf("\n");
 	if (console_callback != NULL)
-		console_callback(printbuf);//format, args);
+		console_callback(buf);//format, args);
+	arena_popfree(buf);
 }
 void Console_SetCallback(CONSOLE_CALLBACK callback)
 {

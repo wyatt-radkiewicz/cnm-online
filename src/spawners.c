@@ -5,10 +5,10 @@
 #include "spawners.h"
 #include "console.h"
 #include "renderer.h"
-#include "pool.h"
 #include "wobj.h"
 #include "teleport_infos.h"
 #include "netgame.h"
+#include "mem.h"
 
 #define GET_SPAWNER(i) ((SPAWNER *)((unsigned char *)(i) - offsetof(SPAWNER, grid_object)))
 
@@ -16,12 +16,14 @@ static OBJGRID *spawners_grid;
 static SPAWNER *spawners_head;
 static SPAWNER *spawner_groups[MAX_SPAWNER_GROUPS][MAX_SPAWNERS_PER_GROUP];
 //static POOL *spawners_pool;
+static dynpool_t _pool;
 static int spawners_mode;
 static int spawners_last_num_players, spawners_num_players, spawners_count_change;
 
 void Spawners_Init(void)
 {
 	//spawners_pool = Pool_Create(sizeof(SPAWNER));
+	_pool = dynpool_init(512, sizeof(SPAWNER), arena_global_alloc);
 	spawners_head = NULL;
 	spawners_grid = ObjGrid_Create(256, 256);
 	spawners_mode = SPAWNER_SINGLEPLAYER;
@@ -35,6 +37,7 @@ void Spawners_Quit(void)
 {
 	Spawners_UnloadSpawners();
 	ObjGrid_Destroy(spawners_grid);
+	dynpool_deinit(_pool);
 	//Pool_Destroy(spawners_pool);
 }
 void Spawners_UnloadSpawners(void)
@@ -45,17 +48,19 @@ void Spawners_UnloadSpawners(void)
 	while (spawner != NULL)
 	{
 		next = spawner->alloc.next;
-		free(spawner);
+		dynpool_free(_pool, spawner);
 		//Pool_Free(spawners_pool, spawner);
 		spawner = next;
 	}
 	spawners_head = NULL;
 	memset(spawner_groups, 0, sizeof(spawner_groups));
+
+	dynpool_fast_clear(_pool);
+	assert(dynpool_empty(_pool));
 }
 SPAWNER *Spawners_CreateSpawner(float x, float y, int wobj_type, int duration, int max, char spawner_group)
 {
-	//SPAWNER *spawner = Pool_Alloc(spawners_pool);
-	SPAWNER *spawner = malloc(sizeof(SPAWNER));
+	SPAWNER *spawner = dynpool_alloc(_pool);
 	memset(spawner, 0, sizeof(SPAWNER));
 	spawner->alloc.next = spawners_head;
 	spawner->alloc.last = NULL;
@@ -75,6 +80,7 @@ SPAWNER *Spawners_CreateSpawner(float x, float y, int wobj_type, int duration, i
 	assert(spawner_group >= -1 && spawner_group < MAX_SPAWNER_GROUPS);
 	spawner->spawner_group = spawner_group;
 	if (spawner->spawner_group > -1) {
+		assert(spawner->spawner_group < MAX_SPAWNER_GROUPS);
 		for (int i = 0; i < MAX_SPAWNERS_PER_GROUP; i++) {
 			if (!spawner_groups[spawner_group][i]) {
 				//Console_Print("Adding spawner to group %d at id %d", spawner_group, i);
@@ -177,7 +183,7 @@ void Spawners_DestroySpawner(SPAWNER *spawner)
 	}
 	ObjGrid_RemoveObject(spawners_grid, &spawner->grid_object);
 	//Pool_Free(spawners_pool, spawner);
-	free(spawner);
+	dynpool_free(_pool, spawner);
 }
 void Spawners_DrawSpawners(int camx, int camy)
 {

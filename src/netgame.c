@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,12 +13,11 @@
 #include "player.h"
 #include "packet.h"
 #include "item.h"
-
-#define DAMAGES_HASH_INC 4
+#include "mem.h"
 
 static NETGAME_NODE nodes[NETGAME_MAX_NODES];
 static NETGAME_DAMAGE_ENTRY *damages[NETGAME_MAX_OBJECTS];
-static int damages_size[NETGAME_MAX_OBJECTS];
+static dynpool_t _damagepool;
 static int damages_packet_num = 0;
 
 static int num_forced_changes = 0;
@@ -38,11 +38,11 @@ void NetGame_Init(void)
 {
 	int i;
 	memset(nodes, 0, sizeof(nodes));
+	_damagepool = dynpool_init(32, sizeof(NETGAME_DAMAGE_ENTRY), arena_global_alloc);
 	for (i = 0; i < NETGAME_MAX_OBJECTS; i++)
 	{
-		damages_size[i] = DAMAGES_HASH_INC;
-		damages[i] = malloc(damages_size[i] * sizeof(NETGAME_DAMAGE_ENTRY));
-		memset(damages[i], 0, sizeof(*damages[i]));
+		damages[i] = NULL;//dynpool_alloc(_damagepool);
+		//memset(damages[i], 0, sizeof(*damages[i]));
 	}
 	for (i = 0; i < NETGAME_MAX_NODES; i++)
 	{
@@ -64,9 +64,15 @@ void NetGame_Init(void)
 }
 void NetGame_Quit(void)
 {
-	int i;
-	for (i = 0; i < NETGAME_MAX_OBJECTS; i++)
-		free(damages[i]);
+	for (int i = 0; i < NETGAME_MAX_OBJECTS; i++) {
+		NETGAME_DAMAGE_ENTRY *ent = damages[i];
+		while (ent) {
+			NETGAME_DAMAGE_ENTRY *next = ent->next;
+			dynpool_free(_damagepool, ent);
+			ent = next;
+		}
+	}
+	assert(dynpool_empty(_damagepool));
 }
 int NetGame_GetNumActiveNodes(void)
 {
@@ -222,36 +228,27 @@ void NetGame_AttemptWobjAudioPlayback(WOBJ *wobj)
 static NETGAME_DAMAGE_ENTRY *find_damage(WOBJ *wobj, int s)
 {
 	unsigned short hash = DAMAGE_HASH(wobj);
-	int i, free_loc;
 
 	// Find the wobj
-	free_loc = -1; // Index of a free hash bucket
-	for (i = 0; i < damages_size[hash]; i++)
-	{
-		if (damages[hash][i].damage_dealt != 0.0f && damages[hash][i].obj_node == wobj->node_id && damages[hash][i].obj_uuid == wobj->uuid)
-			goto wobj_found;
-		else if (damages[hash][i].damage_dealt == 0.0f)
-			free_loc = i;
+	//free_loc = -1; // Index of a free hash bucket
+	NETGAME_DAMAGE_ENTRY *ent = damages[hash];
+	while (ent) {
+		if (ent->obj_node == wobj->node_id && ent->obj_uuid == wobj->uuid) return ent;
+		ent = ent->next;
 	}
 
 	if (!s) // If this isn't a garenteed safe search, then just die
 		return NULL;
 
-	// Create a new hash entry using floc (if it isnt -1)
-	if (free_loc == -1)
-	{
-		// Expand the hash bucket
-		free_loc = damages_size[hash];
-		damages_size[hash] += DAMAGES_HASH_INC;
-		damages[hash] = realloc(damages[hash], damages_size[hash] * sizeof(NETGAME_DAMAGE_ENTRY));
-	}
-
-	damages[hash][free_loc].obj_node = wobj->node_id;
-	damages[hash][free_loc].obj_uuid = wobj->uuid;
-	i = free_loc;
-
-wobj_found:
-	return &damages[hash][i];
+	ent = dynpool_alloc(_damagepool);
+	ent->obj_node = wobj->node_id;
+	ent->obj_uuid = wobj->uuid;
+	ent->damage_dealt = 0.0f;
+	if (damages[hash]) damages[hash]->last = ent;
+	ent->next = damages[hash];
+	ent->last = NULL;
+	damages[hash] = ent;
+	return ent;
 }
 void NetGame_DamageUnownedWobj(WOBJ *wobj, float damage)
 {
@@ -263,11 +260,13 @@ float NetGame_GetClientWobjHealth(WOBJ *w)
 	return w->health - (e ? e->damage_dealt : 0.0f);
 }
 static void clear_all_damages(void) {
-	int i;
-	for (i = 0; i < NETGAME_MAX_OBJECTS; i++)
-	{
-		memset(damages[i], 0, sizeof(NETGAME_DAMAGE_ENTRY) * damages_size[i]);
-	}
+	memset(damages, 0, sizeof(damages));
+	dynpool_fast_clear(_damagepool);
+	//int i;
+	//for (i = 0; i < NETGAME_MAX_OBJECTS; i++)
+	//{
+	//	memset(damages[i], 0, sizeof(NETGAME_DAMAGE_ENTRY) * damages_size[i]);
+	//}
 }
 static void send_damages(int n, int m) //	Yes this was made by ShadowRealm9, I just like this way of formatting better,
 //									although this is still a comprimise. I have a much better idea of formmating in my
@@ -284,19 +283,20 @@ static void send_damages(int n, int m) //	Yes this was made by ShadowRealm9, I j
 //									wonder if most big projects end up this way, atleast one-man-team ones)
 {
 ////
-	int i, j;
-
 	NET_PACKET *p = Net_CreatePacket(NET_DAMAGED_OBJECTS, CNM_TRUE, &NetGame_GetNode(m)->addr, 0, NULL);
 	NETGAME_DAMAGE_PACKET d;
 	d.num_entries = 0;
 	NETGAME_DAMAGE_ENTRY o[NETGAME_MAX_OBJECTS];
 
-	for (i = 0; i < NETGAME_MAX_OBJECTS; i++)
+	for (int i = 0; i < NETGAME_MAX_OBJECTS; i++)
 	{
-		for (j = 0; j < damages_size[i]; j++)
-			if (damages[i][j].damage_dealt != 0.0f && d.num_entries < NETGAME_MAX_OBJECTS &&
-				(damages[i][j].obj_node == n || n == -1))
-				memcpy(&o[d.num_entries++], &damages[i][j], sizeof(NETGAME_DAMAGE_ENTRY));
+		NETGAME_DAMAGE_ENTRY *ent = damages[i];
+		while (ent) {
+			if (ent->damage_dealt != 0.0f && d.num_entries < NETGAME_MAX_OBJECTS &&
+				(ent->obj_node == n || n == -1))
+				memcpy(&o[d.num_entries++], ent, sizeof(NETGAME_DAMAGE_ENTRY));
+			ent = ent->next;
+		}
 	}
 	if (d.num_entries)
 	{
@@ -304,7 +304,7 @@ static void send_damages(int n, int m) //	Yes this was made by ShadowRealm9, I j
 		//p->hdr.size = d->num_entries * sizeof(NETGAME_DAMAGE_ENTRY) + sizeof(NETGAME_DAMAGE_PACKET);
 		int head = 0;
 		serialize_damage_packet(p->data, d.packet_number, d.num_entries, &head);
-		for (i = 0; i < d.num_entries; i++) {
+		for (int i = 0; i < d.num_entries; i++) {
 			serialize_damage_entry(p->data, o + i, &head);
 		}
 		p->hdr.size = packet_bytecount(head);

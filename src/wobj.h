@@ -287,6 +287,8 @@ void Wobj_DestroyOwnedWobjs(void);
 void Wobj_DestroyOwnedObjectsFromLastFrame(void);
 void Wobj_UpdateOwnedWobjs(void);
 
+void WobjDbg_CheckMemLeaks(void);
+
 void Wobj_RecordWobjHistory(int newframe);
 void Wobj_MarkForBeingSent(WOBJ *wobj, int to_node, int frame);
 int Wobj_HasHistoryForNode(WOBJ *wobj, int node, int frame);
@@ -323,11 +325,13 @@ void Wobj_UpdateGridPos(WOBJ *wobj);
 void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound);
 float Wobj_GetGroundAngle(const WOBJ *wobj);
 void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py);
-void Wobj_OnDestroyLocalData(WOBJ *wobj);
+//void Wobj_OnDestroyLocalData(WOBJ *wobj);
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);
 void WobjGenericAttack_Update(WOBJ *wobj);
 
 void BreakPart_CreateParts(float x, float y, float yspd_start, int srcx, int srcy, int w, int h);
+
+void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void);
 
 #endif

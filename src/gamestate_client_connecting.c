@@ -7,7 +7,7 @@
 #include "serial.h"
 #include "game_console.h"
 #include "input.h"
-#include "gui.h"
+//#_include "gui.h"
 #include "command.h"
 #include "wobj.h"
 #include "spawners.h"
@@ -15,6 +15,7 @@
 #include "net.h"
 #include "client.h"
 #include "titlebg.h"
+#include "mem.h"
 
 void GameState_ClientConnecting_Init(void)
 {
@@ -24,6 +25,7 @@ void GameState_ClientConnecting_Init(void)
 void GameState_ClientConnecting_Quit(void)
 {
 	titlebg_cleanup();
+	arena_pop_zone();
 }
 void GameState_ClientConnecting_Update(void)
 {

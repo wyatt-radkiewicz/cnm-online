@@ -89,6 +89,7 @@ static void Command_ClPos(const char *args, int from_player);
 static void Command_God(const char *args, int from_player);
 static void Command_Pet(const char *args, int from_player);
 static void Command_Wide(const char *args, int from_player);
+static void Command_MemStat(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -159,6 +160,7 @@ static const char *const command_names[] =
 	"god",
 	"pet",
 	"wide",
+	"memstat"
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -230,6 +232,7 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_God,
 	Command_Pet,
 	Command_Wide,
+	Command_MemStat,
 };
 
 static int can_run_cheat1(int from_player) {
@@ -800,5 +803,8 @@ static void Command_Wide(const char *args, int from_player) {
 		Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
 		Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer
 	);
+}
+static void Command_MemStat(const char *args, int from_player) {
+	Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer = !Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer;
 }
 

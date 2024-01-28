@@ -5,8 +5,7 @@
 #include "utility.h"
 #include "console.h"
 #include "game.h"
-#include "pool.h"
-
+#include "mem.h"
 
 static int net_initialized = CNM_FALSE;
 #define NET_MAX_POLLING_FUNCS 8
@@ -34,6 +33,7 @@ static uint32_t net_avg_incoming[30];
 static uint32_t net_avg_outgoing[30];
 static int net_id;
 static NET_POLL_FUNC polling_funcs[NET_MAX_POLLING_FUNCS];
+static dynpool_t _packetpool, _safepool;
 //static POOL *net_pool;
 
 #ifndef __EMSCRIPTEN__
@@ -49,6 +49,9 @@ static void Net_DestroySafe(NET_SAFE *s);
 
 void Net_Init(void)
 {
+	_packetpool = dynpool_init(32, sizeof(NET_PACKET), arena_global_alloc);
+	_safepool = dynpool_init(32, sizeof(NET_SAFE), arena_global_alloc);
+
 	int i, base_port;
 	net_id = 0;
 	net_initialized = CNM_TRUE;
@@ -111,6 +114,9 @@ void Net_Quit(void)
 	net_socket = NULL;
 	SDLNet_Quit();
 	net_initialized = CNM_FALSE;
+
+	dynpool_deinit(_packetpool);
+	dynpool_deinit(_safepool);
 }
 
 void Net_FakeLoss(int percent) {
@@ -201,13 +207,13 @@ static void Net_Send2(const NET_PACKET *packet, int is_new, int do_send, int del
 		fakedpinger_t *pinger = _pingers + _num_pingers++;
 		pinger->frames_left = _pingframes - _total_pingframes;
 		_total_pingframes += pinger->frames_left;
-		pinger->packet = malloc(sizeof(NET_PACKET));
+		pinger->packet = dynpool_alloc(_packetpool);
 		memcpy(pinger->packet, packet, sizeof(*packet));
 	}
 
 	if (packet->hdr.safe && is_new)
 	{
-		s = malloc(sizeof(NET_SAFE));
+		s = dynpool_alloc(_safepool);
 		s->times_sent = -5;
 		s->last = NULL;
 		s->next = net_head;
@@ -227,13 +233,13 @@ NET_PACKET *Net_Recv2(int get_packet)
 	NET_PACKET *packet, *ack;
 	if (SDLNet_UDP_Recv(net_socket, net_packet) == 0)
 		return NULL;
-	packet = malloc(sizeof(NET_PACKET));
+	packet = dynpool_alloc(_packetpool);
 	memcpy(packet, net_packet->data, net_packet->len);
 	packet->hdr.addr.host = net_packet->address.host;
 	packet->hdr.addr.port = net_packet->address.port;
 
 	if (!get_packet) {
-		free(packet);
+		dynpool_free(_packetpool, packet);
 		return NULL;
 	}
 
@@ -305,7 +311,7 @@ static void Net_DestroySafe(NET_SAFE *s)
 		net_head = s->next;
 	if (s->next != NULL)
 		s->next->last = s->last;
-	free(s);
+	dynpool_free(_safepool, s);
 }
 void Net_PollPackets(int max_num)
 {
@@ -374,7 +380,7 @@ int Net_GetAvgUDPIncomingBandwidth(void) {
 	for (i = 0; i < 30; i++) {
 		avg += net_avg_incoming[i];
 	}
-	return avg / 30;
+	return avg;
 }
 int Net_GetAvgUDPOutgoingBandwidth(void) {
 	int avg = 0, i;
@@ -383,7 +389,7 @@ int Net_GetAvgUDPOutgoingBandwidth(void) {
 	{
 		avg += net_avg_outgoing[i];
 	}
-	return avg / 30;
+	return avg;
 }
 void Net_InitAvgUDPOutgoingBandwidth(void) {
 	net_avg_outgoing[Game_GetFrame() % 30] = 0;
@@ -677,7 +683,7 @@ void NetTcp_Send(const NET_PACKET *p) {
 
 NET_PACKET *Net_CreatePacket(int type, int safe, const NET_ADDR *addr, int size, const void *data)
 {
-	NET_PACKET *packet = malloc(sizeof(NET_PACKET));
+	NET_PACKET *packet = dynpool_alloc(_packetpool);
 	packet->hdr.type = type;
 	packet->hdr.safe = safe;
 	if (size > NET_DATA_SIZE)
@@ -694,5 +700,5 @@ NET_PACKET *Net_CreatePacket(int type, int safe, const NET_ADDR *addr, int size,
 }
 void Net_DestroyPacket(NET_PACKET *packet)
 {
-	free(packet);
+	dynpool_free(_packetpool, packet);
 }

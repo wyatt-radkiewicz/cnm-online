@@ -9,7 +9,7 @@
 #include "spawners.h"
 #include "input.h"
 #include "game.h"
-#include "gui.h"
+//#_include "gui.h"
 #include "utility.h"
 #include "command.h"
 #include "wobj.h"
@@ -23,6 +23,7 @@
 #include "ending_text.h"
 #include "player.h"
 #include "petdefs.h"
+#include "mem.h"
 
 #define SB_START 4
 
@@ -74,7 +75,6 @@ static const char *mission_difs[] =
 	"*********_ - DEATH!!!",
 	"********** - ULTRA DEATH!"
 };
-static GUI_FRAME *options, *root, *startnewgame, *joingame_ip, *hostgame, *playersetup, *serverbrowser;
 
 static int cleanup_bg;
 static int playbit0_x, playbit1_x;
@@ -91,223 +91,39 @@ static unsigned char xmas_obstacles[RENDERER_MAX_HEIGHT][RENDERER_MAX_WIDTH];
 static XMAS_SNOWFLAKE xmas_snowflakes[NUM_SNOWFLAKES];
 static int next_snowflake;
 
-static void PopulateGuiLevelSelector(GUI_ELEMENT *elem, int index);
-
-static void CyaManButton(GUI_ELEMENT *elem, int index)
-{
-	Game_Stop();
-}
-static void FullscreenGuiFunc(GUI_ELEMENT *elem, int index)
-{
-	Renderer_SetFullscreen(elem->props.set_index);
-	Serial_SaveConfig();
-}
-static void HiresGuiFunc(GUI_ELEMENT *elem, int index)
-{
-	Renderer_SetHiResMode(elem->props.set_index);
-	Serial_SaveConfig();
-}
-static void ChangeMainMenuSpecial(GUI_ELEMENT *elem, int index)
-{
-	editor_cheat = (strcmp(elem->props.set[elem->props.set_index], "ENABLED") == 0);
-
-	if (editor_cheat)
-		Gui_GetRoot()->num_elements = 13;
-	else
-		Gui_GetRoot()->num_elements = 7;
-}
-static void BlockEditorButton(GUI_ELEMENT *elem, int index)
-{
-	Command_Execute("start_blockedit", CNM_FALSE);
-}
-static void LightEditorButton(GUI_ELEMENT *elem, int index)
-{
-	Command_Execute("start_lightedit", CNM_FALSE);
-}
-static void BlockPropsEditorButton(GUI_ELEMENT *elem, int index)
-{
-	Game_SwitchState(GAME_STATE_BLOCKPROPSEDIT);
-}
-static void ObjectEditorButton(GUI_ELEMENT *elem, int index)
-{
-	Game_SwitchState(GAME_STATE_OBJEDIT);
-}
-static void EndingTextEditorButton(GUI_ELEMENT *elem, int index)
-{
-	Game_SwitchState(GAME_STATE_ENDTEXT_EDITOR);
-}
-static void BackgroundEditorButton(GUI_ELEMENT *elem, int index)
-{
-	Game_SwitchState(GAME_STATE_BGEDIT);
-}
-static void StartNewGame(GUI_ELEMENT *elem, int index)
-{
-	int id = FileSystem_GetLevelFromLevelOrder(startnewgame->elements[9].props.set_index);
-	strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
-	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
-	Game_SwitchState(GAME_STATE_SINGLEPLAYER);
-}
-static void JoinGameIpCallback(GUI_ELEMENT *elem, int index)
-{
-	char buffer[64] = {'\0'};
-	strcpy(buffer, "connect ");
-	strcat(buffer, elem->frame->elements[index - 1].props.string);
-	Console_Print(buffer);
-	Command_Execute(buffer, CNM_FALSE);
-}
-static void HostGameCallback(GUI_ELEMENT *elem, int index)
-{
-	strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(FileSystem_GetLevelFromLevelOrder(hostgame->elements[9].props.set_index)));
-	Game_SwitchState(GAME_STATE_HOSTED_SERVER);
-}
-static void ChangePlayerName(GUI_ELEMENT *elem, int index)
-{
-	strcpy(Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string, elem->props.string);
-	Serial_SaveConfig();
-}
-static void IpAddrCallback(GUI_ELEMENT *elem, int index)
-{
-	strcpy(Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string, elem->props.string);
-	Serial_SaveConfig();
-}
-static void PlayerSkinCallback(GUI_ELEMENT *elem, int index)
-{
-	GUI_ELEMENT *bitmap = elem->frame->elements + index + 1;
-	int skinno = Gui_GetNumberElementInt(elem->frame, index);
-	Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer = skinno;
-	memcpy(&bitmap->props.bitmap, &wobj_types[WOBJ_PLAYER].frames[skinno], sizeof(CNM_RECT));
-	memcpy(&bitmap->props.bitmap, skin_bases[skinno], sizeof(int)*2);
-	bitmap->props.bitmap.w = 32;
-	bitmap->props.bitmap.h = 32;
-	Serial_SaveConfig();
-}
-static void PopulateGuiLevelSelector(GUI_ELEMENT *elem, int index)
-{
-	int i = 0;
-	for (i = 0; i < FileSystem_NumLevels(); i++)
-	{
-		Gui_AddItemToSet(elem->frame, index, FileSystem_GetLevelName(FileSystem_GetLevelFromLevelOrder(i)));
-	}
-}
-static void HostgameSwitchLevel(GUI_ELEMENT *elem, int index)
-{
-	memcpy(&hostgame->elements[1].props.bitmap, FileSystem_GetLevelPreview(FileSystem_GetLevelFromLevelOrder(elem->props.set_index)), sizeof(CNM_RECT));
-}
-static void SingleplayerSwitchLevel(GUI_ELEMENT *elem, int index)
-{
-	char mission_num[16];
-	sprintf(mission_num, "MISSION: %d", elem->props.set_index + 1);
-	memcpy(&startnewgame->elements[1].props.bitmap, FileSystem_GetLevelPreview(FileSystem_GetLevelFromLevelOrder(elem->props.set_index)), sizeof(CNM_RECT));
-	strcpy(startnewgame->elements[10].name, mission_num);
-	char mission_dif[64];
-	sprintf(mission_dif, "DIFFICULTY %s", mission_difs[FileSystem_GetLevelDifficulty(FileSystem_GetLevelFromLevelOrder(elem->props.set_index))]);
-	strcpy(startnewgame->elements[11].name, mission_dif);
-}
-static void ChangeGameVolume(GUI_ELEMENT *elem, int index)
-{
-	char cmd[100];
-	sprintf(cmd, "volume %d", Gui_GetNumberElementInt(elem->frame, index));
-	Command_Execute(cmd, CNM_FALSE);
-	Serial_SaveConfig();
-	//Audio_SetGlobalVolume();
-}
-static void NoDownloadButtonCallback(GUI_ELEMENT *elem, int index) {
-	Game_GetVar(GAME_VAR_NODOWNLOAD)->data.integer = elem->props.set_index;//options->elements[4].props.set_index;
-}
-static void HostgameChangePvpMode(GUI_ELEMENT *elem, int index) {
-	Game_GetVar(GAME_VAR_ENABLE_SERVER_PVP)->data.integer = elem->props.set_index;
-}
-static void HostGameChangeServerName(GUI_ELEMENT *elem, int index) {
-	char *sname = Game_GetVar(GAME_VAR_SERVER_NAME)->data.string;
-	if (strlen(elem->props.string) < 3)
-		strcpy(sname, "NAME TOO SMALL");
-	else
-		strcpy(sname, elem->props.string);
-}
-static void HostGameChangeAdvertisingMode(GUI_ELEMENT *elem, int index) {
-	Game_GetVar(GAME_VAR_ADVERTISE_SERVER)->data.integer = elem->props.set_index;
-}
-static void MasterServerAddrCallback(GUI_ELEMENT *elem, int index) {
-	strcpy(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string, elem->props.string);
-	Serial_SaveConfig();
-}
-
 MSPAGE_DATA msdata;
 static int refresh_cooldown;
 
-static void ServerBrowserLoadPage(int pageid)
-{
-	msdata.page = pageid;
-	memset(msdata.servers, 0, sizeof(msdata.servers));
-	refresh_cooldown = 30 * 3;
-	int i;
-
-	for (i = 0; i < MSPAGE_SIZE; i++)
-	{
-		msdata.servers[i].num_players = -1;
-		strcpy(serverbrowser->elements[SB_START + i * 4 + 0].props.string, "NAME:");
-		strcpy(serverbrowser->elements[SB_START + i * 4 + 1].props.string, "PLAYERS:");
-		strcpy(serverbrowser->elements[SB_START + i * 4 + 2].props.string, "MAP:");
-		serverbrowser->elements[SB_START + i * 4 + 0].active = CNM_FALSE;
-		serverbrowser->elements[SB_START + i * 4 + 1].active = CNM_FALSE;
-		serverbrowser->elements[SB_START + i * 4 + 2].active = CNM_FALSE;
-		serverbrowser->elements[SB_START + i * 4 + 3].active = CNM_FALSE;
-	}
-	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 1].active = CNM_FALSE;
-	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
-
-	MSPAGE_REQUEST req;
-	NET_ADDR msaddr;
-	req.page = pageid;
-	req.sort = 0;
-	msaddr = Net_GetIpFromString(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string);
-	msaddr.port = Net_HostToNetU16(NET_MSERVER_PORT);
-	NET_PACKET *packet = Net_CreatePacket(NET_MASTER_SERVER_PAGE_REQUEST, 0, &msaddr, sizeof(req), &req);
-	Net_Send(packet);
-}
-static void ServerBrowserButtonCallback(GUI_ELEMENT *elem, int index)
-{
-	msdata.num_pages = 0;
-	ServerBrowserLoadPage(0);
-	sprintf(serverbrowser->elements[1].name, "PAGE: %d/%d", 0, 0);
-}
-static void ServerBrowserRefreshCallback(GUI_ELEMENT *elem, int index)
-{
-	if (refresh_cooldown < 0) {
-		ServerBrowserLoadPage(msdata.page);
-	}
-}
-static void NextPageCallback(GUI_ELEMENT *elem, int index)
-{
-	if (!elem->active) return;
-	if (refresh_cooldown < 0 && msdata.page + 1 < msdata.num_pages)
-	{
-		ServerBrowserLoadPage(msdata.page+1);
-		serverbrowser->active_index = 2;
-		serverbrowser->cam_index = 0;
-	}
-}
-static void LastPageCallback(GUI_ELEMENT *elem, int index)
-{
-	if (!elem->active) return;
-	if (refresh_cooldown < 0 && msdata.page > 0)
-	{
-		ServerBrowserLoadPage(msdata.page-1);
-		serverbrowser->active_index = 2;
-		serverbrowser->cam_index = 0;
-	}
-}
-static void JoinGameBrowserCallback(GUI_ELEMENT *elem, int index)
-{
-	if (!elem->active) return;
-	
-	char buffer[64] = {'\0'};
-	strcpy(buffer, "connect ");
-	strcat(buffer, Net_GetStringFromIp(&msdata.servers[elem->custom_hint].addr));
-	Console_Print(buffer);
-	cleanup_bg = CNM_FALSE;
-	Command_Execute(buffer, CNM_FALSE);
-}
+//static void ServerBrowserLoadPage(int pageid)
+//{
+//	msdata.page = pageid;
+//	memset(msdata.servers, 0, sizeof(msdata.servers));
+//	refresh_cooldown = 30 * 3;
+//	int i;
+//
+//	for (i = 0; i < MSPAGE_SIZE; i++)
+//	{
+//		msdata.servers[i].num_players = -1;
+//		strcpy(serverbrowser->elements[SB_START + i * 4 + 0].props.string, "NAME:");
+//		strcpy(serverbrowser->elements[SB_START + i * 4 + 1].props.string, "PLAYERS:");
+//		strcpy(serverbrowser->elements[SB_START + i * 4 + 2].props.string, "MAP:");
+//		serverbrowser->elements[SB_START + i * 4 + 0].active = CNM_FALSE;
+//		serverbrowser->elements[SB_START + i * 4 + 1].active = CNM_FALSE;
+//		serverbrowser->elements[SB_START + i * 4 + 2].active = CNM_FALSE;
+//		serverbrowser->elements[SB_START + i * 4 + 3].active = CNM_FALSE;
+//	}
+//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 1].active = CNM_FALSE;
+//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
+//
+//	MSPAGE_REQUEST req;
+//	NET_ADDR msaddr;
+//	req.page = pageid;
+//	req.sort = 0;
+//	msaddr = Net_GetIpFromString(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string);
+//	msaddr.port = Net_HostToNetU16(NET_MSERVER_PORT);
+//	NET_PACKET *packet = Net_CreatePacket(NET_MASTER_SERVER_PAGE_REQUEST, 0, &msaddr, sizeof(req), &req);
+//	Net_Send(packet);
+//}
 
 static void MainMenu_OnPacket(NET_PACKET *packet);
 
@@ -341,165 +157,12 @@ static void swap_title_bg(const char *lvl) {
 
 void GameState_MainMenu_Init(void)
 {
+	if (!titlebg_is_init()) arena_push_zone("TITLEBG");
 	Game_GetVar(GAME_VAR_GOD)->data.integer = CNM_FALSE;
-
-	GUI_FRAME_PROPS props;
-
 	FileSystem_SearchForLevels(CNM_TRUE);
 	Fadeout_Setup();
 	Fadeout_FadeFromWhite(10, 25);
-
-	//Util_SetRect(&title_card, 320, 832, 192, 32);
-	//Util_SetRect(&clouds, 0, 832, 320, 240);
-	//Util_SetRect(&clouds, 0, 7200, 256, 320);
-	//cloudsx[0] = 0;
-	//cloudsx[1] = 320;
 	Util_RandSetSeed(0);
-
-	/* Set up the GUI */
-	props.top = RENDERER_HEIGHT - 8*6 - 16;
-	props.line_count = 6;
-	props.align[0] = GUI_ALIGN_CENTER;
-	props.bounds[0] = RENDERER_WIDTH / 2;
-	props.bounds[1] = props.bounds[0];
-	root = Gui_CreateFrame(7, 20, NULL, &props, 0);
-	if (editor_cheat)
-		root->num_elements = 13;
-	props.align[0] = GUI_ALIGN_LEFT;
-	props.bounds[0] = RENDERER_WIDTH / 16;
-	props.align[1] = GUI_ALIGN_RIGHT;
-	props.bounds[1] = RENDERER_WIDTH / 16 * 15;
-	options = Gui_CreateFrame(6, 64, root, &props, 0);
-	props.top = RENDERER_HEIGHT - 8 * 6 - 96;
-	props.line_count = 16;
-	startnewgame = Gui_CreateFrame(13, 20, root, &props, 0);
-	joingame_ip = Gui_CreateFrame(3, 20, root, &props, 0);
-	hostgame = Gui_CreateFrame(14, 20, root, &props, 0);
-	playersetup = Gui_CreateFrame(3, 20, root, &props, 0);
-	serverbrowser = Gui_CreateFrame(SB_START+MSPAGE_SIZE*4+3, 100, NULL, &props, 0);
-	Gui_InitSetElement(options, 0, FullscreenGuiFunc, "FULLSCREEN");
-	Gui_AddItemToSet(options, 0, "NO");
-	Gui_AddItemToSet(options, 0, "YES");
-	options->elements[0].props.set_index = Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer;
-	//Gui_InitStringElement(options, 1, NULL, "PLAYER NAME: ", 15);
-	//Gui_InitFloatElement(options, 2, NULL, "NUMBER FIELD TEST: ", -1.5f, 3.14f, 0);
-	Gui_InitSetElement(options, 3, ChangeMainMenuSpecial, "LEVEL EDIT CHEAT: ");
-	Gui_AddItemToSet(options, 3, "DISABLED");
-	Gui_AddItemToSet(options, 3, "ENABLED");
-	Gui_InitSetElement(options, 1, HiresGuiFunc, "HIRES MODE");
-	Gui_AddItemToSet(options, 1, "NO");
-	Gui_AddItemToSet(options, 1, "YES");
-	Gui_InitNumberElement(options, 2, ChangeGameVolume, "MASTER VOLUME: ", 0, 100, (int)(Audio_GetGlobalVolume() * 100.0f));
-	options->elements[0].props.set_index = Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer;
-	options->elements[1].props.set_index = Game_GetVar(GAME_VAR_HIRESMODE)->data.integer;
-	options->elements[3].props.set_index = editor_cheat;
-	Gui_InitSetElement(options, 4, NoDownloadButtonCallback, "DOWNLOAD SERVER FILES: ");
-	Gui_AddItemToSet(options, 4, "YES");
-	Gui_AddItemToSet(options, 4, "NO");
-	options->elements[4].props.set_index = Game_GetVar(GAME_VAR_NODOWNLOAD)->data.integer;
-	Gui_InitStringElement(options, 5, MasterServerAddrCallback, "MASTER SERVER ADDRESS: ", 18);
-	strcpy(options->elements[5].props.string, Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string);
-
-	Gui_InitHeaderElement(joingame_ip, 0, "JOIN A GAME (SPECIFY IP ADDRESS)");
-	Gui_InitStringElement(joingame_ip, 1, IpAddrCallback, "IP ADDRESS: ", 18);
-	strcpy(joingame_ip->elements[1].props.string, Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string);
-	Gui_InitButtonElement(joingame_ip, 2, JoinGameIpCallback, "CONNECT TO THIS ADDRESS!!!", NULL, CNM_FALSE);
-
-	Gui_InitHeaderElement(hostgame, 0, "HOST A MULTIPLAYER GAME");
-	Gui_InitBitmapElement(hostgame, 1, 64, 0, 1376, 96, 64);
-	memcpy(&hostgame->elements[1].props.bitmap, FileSystem_GetLevelPreview(FileSystem_GetLevelFromLevelOrder(0)), sizeof(CNM_RECT));
-	Gui_InitNullElement(hostgame, 2); // 1
-	Gui_InitNullElement(hostgame, 3); // 2
-	Gui_InitNullElement(hostgame, 4); // 3
-	Gui_InitNullElement(hostgame, 5); // 4
-	Gui_InitNullElement(hostgame, 6); // 5
-	Gui_InitNullElement(hostgame, 7); // 6
-	Gui_InitNullElement(hostgame, 8); // 7
-	Gui_InitSetElement(hostgame, 9, HostgameSwitchLevel, "WORLD MAP: ");
-	PopulateGuiLevelSelector(&hostgame->elements[9], 9);
-	Gui_InitSetElement(hostgame, 10, HostgameChangePvpMode, "ENABLE PVP: ");
-	Gui_AddItemToSet(hostgame, 10, "NO");
-	Gui_AddItemToSet(hostgame, 10, "YES");
-	hostgame->elements[10].props.set_index = Game_GetVar(GAME_VAR_ENABLE_SERVER_PVP)->data.integer;
-	Gui_InitStringElement(hostgame, 11, HostGameChangeServerName, "SERVER NAME: ", 31);
-	strcpy(hostgame->elements[11].props.string, Game_GetVar(GAME_VAR_SERVER_NAME)->data.string);
-	Gui_InitSetElement(hostgame, 12, HostGameChangeAdvertisingMode, "ADVERTISE SERVER: ");
-	Gui_AddItemToSet(hostgame, 12, "NO");
-	Gui_AddItemToSet(hostgame, 12, "YES");
-	hostgame->elements[12].props.set_index = Game_GetVar(GAME_VAR_ADVERTISE_SERVER)->data.integer;
-	Gui_InitButtonElement(hostgame, 13, HostGameCallback, "HOST GAME!!!", NULL, CNM_FALSE);
-
-	Gui_InitHeaderElement(startnewgame, 0, "START A SINGLEPLAYER GAME");
-	Gui_InitBitmapElement(startnewgame, 1, 64, 0, 1376, 96, 64);
-	memcpy(&startnewgame->elements[1].props.bitmap, FileSystem_GetLevelPreview(FileSystem_GetLevelFromLevelOrder(0)), sizeof(CNM_RECT));
-	Gui_InitNullElement(startnewgame, 2); // 1
-	Gui_InitNullElement(startnewgame, 3); // 2
-	Gui_InitNullElement(startnewgame, 4); // 3
-	Gui_InitNullElement(startnewgame, 5); // 4
-	Gui_InitNullElement(startnewgame, 6); // 5
-	Gui_InitNullElement(startnewgame, 7); // 6
-	Gui_InitNullElement(startnewgame, 8); // 7
-	Gui_InitSetElement(startnewgame, 9, SingleplayerSwitchLevel, "WORLD MAP: ");
-	PopulateGuiLevelSelector(&startnewgame->elements[9], 9);
-	Gui_InitHeaderElement(startnewgame, 10, "MISSION: 1");
-	char mission_dif[64];
-	sprintf(mission_dif, "DIFFICULTY %s", mission_difs[FileSystem_GetLevelDifficulty(FileSystem_GetLevelFromLevelOrder(0))]);
-	Gui_InitHeaderElement(startnewgame, 11, mission_dif);
-	Gui_InitButtonElement(startnewgame, 12, StartNewGame, "*START!!!*", NULL, CNM_FALSE);
-
-	Gui_InitStringElement(playersetup, 0, ChangePlayerName, "PLAYER NAME: ", 15);
-	strcpy(playersetup->elements[0].props.string, Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string);
-	playersetup->elements[0].props.allow_spaces = CNM_FALSE;
-	//Gui_InitNumberElement(playersetup, 1, PlayerSkinCallback, "PLAYER SKIN: ", 0, 9, 0);
-	Gui_InitBitmapElement(playersetup, 2, 64, 0, 0, 32, 32);
-	//int skinno = Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer;
-	//Gui_SetNumberElementInt(playersetup, 1, skinno);
-	//memcpy(&playersetup->elements[2].props.bitmap, &wobj_types[WOBJ_PLAYER].frames[skinno], sizeof(CNM_RECT));
-	//memcpy(&playersetup->elements[2].props.bitmap, skin_bases[skinno], sizeof(CNM_RECT) / 2);
-	playersetup->elements[2].props.bitmap.w = 32;
-	playersetup->elements[2].props.bitmap.h = 32;
-
-	refresh_cooldown = 0;
-	Gui_InitHeaderElement(serverbrowser, 0, "-- SERVER BROWSER --");
-	Gui_InitHeaderElement(serverbrowser, 1, "PAGE: 0/0");
-	Gui_InitButtonElement(serverbrowser, 2, ServerBrowserRefreshCallback, "<REFRESH PAGE>", NULL, CNM_FALSE);
-	Gui_InitNullElement(serverbrowser, 3);
-	int i, x;
-	x = 0;
-	for (i = SB_START; i < MSPAGE_SIZE*4+ SB_START; i += 4)
-	{
-		Gui_InitHeaderElement(serverbrowser, i, "NAME: ");
-		serverbrowser->elements[i].active = CNM_FALSE;
-		Gui_InitHeaderElement(serverbrowser, i+1, "PLAYERS: ");
-		serverbrowser->elements[i+1].active = CNM_FALSE;
-		Gui_InitHeaderElement(serverbrowser, i+2, "MAP: ");
-		serverbrowser->elements[i+2].active = CNM_FALSE;
-		Gui_InitButtonElement(serverbrowser, i+3, JoinGameBrowserCallback, "-- JOIN SERVER --", NULL, CNM_FALSE);
-		serverbrowser->elements[i+3].custom_hint = x;
-		serverbrowser->elements[i+3].active = CNM_FALSE;
-		x++;
-	}
-	Gui_InitNullElement(serverbrowser, i++);
-	Gui_InitButtonElement(serverbrowser, i++, NextPageCallback, "NEXT PAGE", NULL, CNM_FALSE);
-	Gui_InitButtonElement(serverbrowser, i, LastPageCallback, "LAST PAGE", NULL, CNM_FALSE);
-	serverbrowser->elements[i - 1].active = CNM_FALSE;
-	serverbrowser->elements[i].active = CNM_FALSE;
-
-	Gui_SetRoot(root);
-	Gui_InitButtonElement(root, 0, NULL, "START NEW GAME", startnewgame, CNM_FALSE);
-	Gui_InitButtonElement(root, 1, NULL, "HOST NEW GAME", hostgame, CNM_FALSE);
-	Gui_InitButtonElement(root, 2, NULL, "JOIN GAME (SPECIFY IP)", joingame_ip, CNM_FALSE);
-	Gui_InitButtonElement(root, 3, ServerBrowserButtonCallback, "SERVER BROWSER", serverbrowser, CNM_FALSE);
-	Gui_InitButtonElement(root, 4, NULL, "OPTIONS", options, CNM_FALSE);
-	Gui_InitButtonElement(root, 5, NULL, "PLAYER SETUP", playersetup, CNM_FALSE);
-	Gui_InitButtonElement(root, 6, CyaManButton, "SEE YA MAN...", NULL, CNM_FALSE);
-	Gui_InitButtonElement(root, 7, BlockEditorButton, "BLOCK EDITOR", NULL, CNM_FALSE);
-	Gui_InitButtonElement(root, 8, BlockPropsEditorButton, "BLOCK PROPERTIES EDITOR", NULL, CNM_FALSE);
-	Gui_InitButtonElement(root, 9, ObjectEditorButton, "OBJECT PLACEMENT EDITOR", NULL, CNM_FALSE);
-	Gui_InitButtonElement(root, 10, LightEditorButton, "LIGHT EDITOR", NULL, CNM_FALSE);
-	Gui_InitButtonElement(root, 11, EndingTextEditorButton, "ENDING TEXT EDITOR", NULL, CNM_FALSE);
-	Gui_InitButtonElement(root, 12, BackgroundEditorButton, "BACKGROUND EDITOR", NULL, CNM_FALSE);
-	//Gui_Focus();
 
 	Net_AddPollingFunc(MainMenu_OnPacket);
 
@@ -538,7 +201,7 @@ void GameState_MainMenu_Init(void)
 	memset(xmas_obstacles, 0, sizeof(xmas_obstacles));
 	next_snowflake = 0;
 
-	int y;
+	int x, y, i;
 	for (i = 0; i < NUM_SNOWFLAKES; i++) {
 		xmas_snowflakes[next_snowflake].alive = 1;
 		xmas_snowflakes[next_snowflake].x = rand() % RENDERER_WIDTH;
@@ -557,17 +220,11 @@ void GameState_MainMenu_Init(void)
 }
 void GameState_MainMenu_Quit(void)
 {
-	if (cleanup_bg) titlebg_cleanup();
-	
 	Net_RemovePollingFunc(MainMenu_OnPacket);
-
-	Gui_Reset();
-	Gui_DestroyFrame(options);
-	Gui_DestroyFrame(root);
-	Gui_DestroyFrame(startnewgame);
-	Gui_DestroyFrame(joingame_ip);
-	Gui_DestroyFrame(hostgame);
-	Gui_DestroyFrame(playersetup);
+	if (cleanup_bg) {
+		titlebg_cleanup();
+		arena_pop_zone();
+	}
 }
 
 void SetSnow(XMAS_SNOWFLAKE *sf, int x, int y) {
@@ -607,38 +264,38 @@ static void MainMenu_OnPacket(NET_PACKET *packet)
 		memcpy(&msdata, dat, sizeof(msdata));
 		displayed_page = dat->page;
 		if (dat->num_pages) displayed_page++;
-		sprintf(serverbrowser->elements[1].name, "PAGE: %d/%d", displayed_page, dat->num_pages);
+		//sprintf(serverbrowser->elements[1].name, "PAGE: %d/%d", displayed_page, dat->num_pages);
 
-		if (msdata.page + 1 >= msdata.num_pages)
-			serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 1].active = CNM_FALSE;
-		if (msdata.page <= 0)
-			serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
+		//if (msdata.page + 1 >= msdata.num_pages)
+		//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 1].active = CNM_FALSE;
+		//if (msdata.page <= 0)
+		//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
 
-		int i;
-		for (i = 0; i < MSPAGE_SIZE; i++) 
-		{
-			if (dat->servers[i].addr.host == Net_GetIpFromString("127.0.0.1").host)
-				msdata.servers[i].addr.host = packet->hdr.addr.host;
+		//int i;
+		//for (i = 0; i < MSPAGE_SIZE; i++) 
+		//{
+		//	if (dat->servers[i].addr.host == Net_GetIpFromString("127.0.0.1").host)
+		//		msdata.servers[i].addr.host = packet->hdr.addr.host;
 
-			if (dat->servers[i].num_players == -1) {
-				strcpy(serverbrowser->elements[SB_START+i*4+0].name, "NAME:");
-				strcpy(serverbrowser->elements[SB_START+i*4+1].name, "PLAYERS:");
-				strcpy(serverbrowser->elements[SB_START+i*4+2].name, "MAP:");
-				serverbrowser->elements[SB_START + i * 4 + 0].active = CNM_FALSE;
-				serverbrowser->elements[SB_START + i * 4 + 1].active = CNM_FALSE;
-				serverbrowser->elements[SB_START + i * 4 + 2].active = CNM_FALSE;
-				serverbrowser->elements[SB_START + i * 4 + 3].active = CNM_FALSE;
-			}
-			else {
-				sprintf(serverbrowser->elements[SB_START + i * 4 + 0].name, "NAME:    %s", dat->servers[i].name);
-				sprintf(serverbrowser->elements[SB_START + i * 4 + 1].name, "PLAYERS: %d", dat->servers[i].num_players);
-				sprintf(serverbrowser->elements[SB_START + i * 4 + 2].name, "MAP:     %s", dat->servers[i].level);
-				serverbrowser->elements[SB_START + i * 4 + 0].active = CNM_TRUE;
-				serverbrowser->elements[SB_START + i * 4 + 1].active = CNM_TRUE;
-				serverbrowser->elements[SB_START + i * 4 + 2].active = CNM_TRUE;
-				serverbrowser->elements[SB_START + i * 4 + 3].active = CNM_TRUE;
-			}
-		}
+		//	if (dat->servers[i].num_players == -1) {
+		//		strcpy(serverbrowser->elements[SB_START+i*4+0].name, "NAME:");
+		//		strcpy(serverbrowser->elements[SB_START+i*4+1].name, "PLAYERS:");
+		//		strcpy(serverbrowser->elements[SB_START+i*4+2].name, "MAP:");
+		//		serverbrowser->elements[SB_START + i * 4 + 0].active = CNM_FALSE;
+		//		serverbrowser->elements[SB_START + i * 4 + 1].active = CNM_FALSE;
+		//		serverbrowser->elements[SB_START + i * 4 + 2].active = CNM_FALSE;
+		//		serverbrowser->elements[SB_START + i * 4 + 3].active = CNM_FALSE;
+		//	}
+		//	else {
+		//		sprintf(serverbrowser->elements[SB_START + i * 4 + 0].name, "NAME:    %s", dat->servers[i].name);
+		//		sprintf(serverbrowser->elements[SB_START + i * 4 + 1].name, "PLAYERS: %d", dat->servers[i].num_players);
+		//		sprintf(serverbrowser->elements[SB_START + i * 4 + 2].name, "MAP:     %s", dat->servers[i].level);
+		//		serverbrowser->elements[SB_START + i * 4 + 0].active = CNM_TRUE;
+		//		serverbrowser->elements[SB_START + i * 4 + 1].active = CNM_TRUE;
+		//		serverbrowser->elements[SB_START + i * 4 + 2].active = CNM_TRUE;
+		//		serverbrowser->elements[SB_START + i * 4 + 3].active = CNM_TRUE;
+		//	}
+		//}
 	}
 }
 void GameState_MainMenu_Update(void)
@@ -647,21 +304,20 @@ void GameState_MainMenu_Update(void)
 	Net_Update();
 	Input_Update();
 	GameConsole_Update();
-	Gui_Update();
 
 	refresh_cooldown--;
-	if (refresh_cooldown < 0) {
-		strcpy(serverbrowser->elements[2].name, "<REFRESH PAGE>");
-		if (msdata.page + 1 < msdata.num_pages)
-			serverbrowser->elements[MSPAGE_SIZE*4+SB_START+1].active = CNM_TRUE;
-		if (msdata.page > 0)
-			serverbrowser->elements[MSPAGE_SIZE*4+SB_START+2].active = CNM_TRUE;
-	}
-	else {
-		strcpy(serverbrowser->elements[2].name, "REFRESHING...");
-		serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 1].active = CNM_FALSE;
-		serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
-	}
+	//if (refresh_cooldown < 0) {
+	//	strcpy(serverbrowser->elements[2].name, "<REFRESH PAGE>");
+	//	if (msdata.page + 1 < msdata.num_pages)
+	//		serverbrowser->elements[MSPAGE_SIZE*4+SB_START+1].active = CNM_TRUE;
+	//	if (msdata.page > 0)
+	//		serverbrowser->elements[MSPAGE_SIZE*4+SB_START+2].active = CNM_TRUE;
+	//}
+	//else {
+	//	strcpy(serverbrowser->elements[2].name, "REFRESHING...");
+	//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 1].active = CNM_FALSE;
+	//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
+	//}
 
 	titlebg_update();
 
@@ -1690,7 +1346,7 @@ void draw_main_gui(void) {
 	}
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
 		last_gui_state = gui_state;
-		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		if (options_num != 5) Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer = CNM_FALSE;
 		int num_a_ranks = 0;
 		switch (options_num) {
@@ -1763,14 +1419,15 @@ void draw_main_gui(void) {
 			titlebg_set_card_movement(4, 0, CNM_FALSE);
 			break;
 		case 5:
-			msdata.num_pages = 0;
-			ServerBrowserLoadPage(0);
-			sprintf(serverbrowser->elements[1].name, "PAGE: %d/%d", 0, 0);
-			Gui_Focus();
-			Gui_SetRoot(serverbrowser);
-			gui_state = GUI_BROWSE_STATE;
-			gui_timer = 0;
-			titlebg_set_card_movement(4, 0, CNM_FALSE);
+			//msdata.num_pages = 0;
+			//ServerBrowserLoadPage(0);
+			//sprintf(serverbrowser->elements[1].name, "PAGE: %d/%d", 0, 0);
+			//Gui_Focus();
+			//Gui_SetRoot(serverbrowser);
+			//gui_state = GUI_BROWSE_STATE;
+			//gui_timer = 0;
+			//titlebg_set_card_movement(4, 0, CNM_FALSE);
+			Audio_PlaySound(40, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			break;
 		case 6:
 			cache_titlebgs();
@@ -2168,8 +1825,6 @@ void GameState_MainMenu_Draw(void)
 	titlebg_draw(draw_play_gui_bg);
 
 	draw_new_gui();
-
-	Gui_Draw();
 
 	Fadeout_StepFade();
 	Fadeout_ApplyFade();

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -5,6 +6,7 @@
 #include "blocks.h"
 #include "game.h"
 #include "console.h"
+#include "mem.h"
 
 typedef struct _BLOCKS_WORLD
 {
@@ -22,7 +24,7 @@ static int Blocks_IsBlockDamageable(int x, int y);
 
 void Blocks_Unload(void)
 {
-	free(blocks_props);
+	//free(blocks_props);
 	blocks_props = NULL;
 	blocks_props_count = 0;
 	Blocks_SetWorldSize(0, 0);
@@ -32,9 +34,10 @@ void Blocks_GenBlockProps(int count)
 {
 	int i;
 
-	if (blocks_props != NULL)
-		free(blocks_props);
-	blocks_props = malloc(count * sizeof(BLOCK_PROPS));
+	//if (blocks_props != NULL)
+		//free(blocks_props);
+	//blocks_props = m_alloc(count * sizeof(BLOCK_PROPS));
+	blocks_props = arena_alloc(count * sizeof(BLOCK_PROPS));
 	blocks_props_count = count;
 
 	for (i = 0; i < count; i++)
@@ -57,7 +60,7 @@ void Blocks_GenBlockProps(int count)
 }
 void Blocks_LoadBlockProps(const BLOCK_PROPS *props, int count)
 {
-	blocks_props = malloc(count * sizeof(BLOCK_PROPS));
+	blocks_props = arena_alloc(count * sizeof(BLOCK_PROPS));
 	blocks_props_count = count;
 	if (props != NULL)
 	{
@@ -85,10 +88,6 @@ void Blocks_SetWorldSize(int w, int h)
 	int x, y;
 
 	/* Free the blocks */
-	free(blocks_world.blocks[0]);
-	free(blocks_world.blocks[1]);
-	free(blocks_world.light[0]);
-	free(blocks_world.light[1]);
 	memset(&blocks_world, 0, sizeof(BLOCKS_WORLD));
 
 	if (w && h)
@@ -96,11 +95,11 @@ void Blocks_SetWorldSize(int w, int h)
 		/* Create a new layer */
 		blocks_world.w = w;
 		blocks_world.h = h;
-		blocks_world.blocks[0] = malloc(w * (size_t)h * sizeof(BLOCK));
-		blocks_world.light[0] = malloc(w * (size_t)h);
+		blocks_world.blocks[0] = arena_alloc(w * (size_t)h * sizeof(BLOCK));
+		blocks_world.light[0] = arena_alloc(w * (size_t)h);
 		memset(blocks_world.blocks[0], 0, w * (size_t)h * sizeof(BLOCK));
-		blocks_world.blocks[1] = malloc(w * (size_t)h * sizeof(BLOCK));
-		blocks_world.light[1] = malloc(w * (size_t)h);
+		blocks_world.blocks[1] = arena_alloc(w * (size_t)h * sizeof(BLOCK));
+		blocks_world.light[1] = arena_alloc(w * (size_t)h);
 		memset(blocks_world.blocks[1], 0, w * (size_t)h * sizeof(BLOCK));
 		for (y = 0; y < h; y++)
 		{
@@ -116,16 +115,18 @@ void Blocks_ResizeWorld(int w, int h) {
 	BLOCKS_WORLD world;
 	int x, y, mx, my;
 
+	assert(0 && "Don't use Blocks_ResizeWorld!");
+
 	memset(&world, 0, sizeof(world));
 	world.w = w;
 	world.h = h;
 	if (w && h)
 	{
 		/* Create a new layer */
-		world.blocks[0] = malloc(w * (size_t)h * sizeof(BLOCK));
-		world.light[0] = malloc(w * (size_t)h);
-		world.blocks[1] = malloc(w * (size_t)h * sizeof(BLOCK));
-		world.light[1] = malloc(w * (size_t)h);
+		//world.blocks[0] = m_alloc(w * (size_t)h * sizeof(BLOCK));
+		//world.light[0] = m_alloc(w * (size_t)h);
+		//world.blocks[1] = m_alloc(w * (size_t)h * sizeof(BLOCK));
+		//world.light[1] = m_alloc(w * (size_t)h);
 		mx = CNM_MIN(w, blocks_world.w);
 		my = CNM_MIN(h, blocks_world.h);
 		memset(world.blocks[0], 0, w * (size_t)h);
@@ -148,10 +149,10 @@ void Blocks_ResizeWorld(int w, int h) {
 	}
 
 	/* Free the blocks */
-	free(blocks_world.blocks[0]);
-	free(blocks_world.blocks[1]);
-	free(blocks_world.light[0]);
-	free(blocks_world.light[1]);
+	//free(blocks_world.blocks[0]);
+	//free(blocks_world.blocks[1]);
+	//free(blocks_world.light[0]);
+	//free(blocks_world.light[1]);
 	memcpy(&blocks_world, &world, sizeof(world));
 }
 int Blocks_GetWorldWidth(void)

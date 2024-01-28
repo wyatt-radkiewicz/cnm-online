@@ -8,7 +8,7 @@
 #include "audio.h"
 #include "filesystem.h"
 #include "player.h"
-#include "gamelua.h"
+//#_include "gamelua.h"
 #include "petdefs.h"
 
 void Serial_LoadAudioCfg(const char *cnma_file)

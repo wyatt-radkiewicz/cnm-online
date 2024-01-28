@@ -25,6 +25,7 @@
 #include "logic_links.h"
 #include "player.h"
 #include "item.h"
+#include "mem.h"
 
 #define TITLE_CARD_MAX_LINES 3
 
@@ -36,6 +37,7 @@ static int title_card_num_lines;
 
 void World_Start(int mode)
 {
+	arena_push_zone("WORLD");
 	char buffer[UTIL_MAX_TEXT_WIDTH * 2];
 
 	// Initialize the interaction modes first
@@ -51,6 +53,8 @@ void World_Start(int mode)
 	}
 
 	// Initialize things to defualt values
+	Wobj_NormalWobjs_ZoneAllocLocalDataPools();
+	Enemies_ZoneAllocLocalDataPools();
 	Enemies_Reset();
 	Item_Reset();
 	LogicLinks_ResetLinks();
@@ -165,10 +169,12 @@ void World_Stop(void)
 	PlayerSpawn_ClearAllSpawns();
 	TeleportInfos_FreeLegacyLevelInfo();
 	EndingText_ClearAllLines();
+	WobjDbg_CheckMemLeaks();
 
 	// Setting global variables to NULL values
 	Game_GetVar(GAME_VAR_PLAYER)->data.pointer = NULL;
 	//memset(Game_GetVar(GAME_VAR_LEVEL)->data.string, 0, UTIL_MAX_TEXT_WIDTH + 1);
+	arena_pop_zone();
 }
 void World_Update(int mode)
 {

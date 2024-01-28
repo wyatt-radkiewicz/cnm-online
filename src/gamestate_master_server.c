@@ -3,6 +3,7 @@
 #include "net.h"
 #include "game.h"
 #include "master_server.h"
+#include "mem.h"
 
 SERVER_INFO *server_infos;
 
@@ -13,7 +14,8 @@ static int MasterServer_GetNumPages(void);
 
 void GameState_MasterServer_Init(void)
 {
-	server_infos = malloc(sizeof(SERVER_INFO)*MAX_SERVERS);
+	arena_push_zone("MSERV");
+	server_infos = arena_alloc(sizeof(SERVER_INFO)*MAX_SERVERS);
 	memset(server_infos, 0, sizeof(SERVER_INFO) * MAX_SERVERS);
 	int i;
 	for (i = 0; i < MAX_SERVERS; i++) {
@@ -25,7 +27,7 @@ void GameState_MasterServer_Init(void)
 void GameState_MasterServer_Quit(void)
 {
 	Net_RemovePollingFunc(MasterServer_OnPacket);
-	free(server_infos);
+	arena_pop_zone();
 }
 static void MasterServer_OnPacket(NET_PACKET *packet)
 {

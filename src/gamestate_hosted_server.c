@@ -15,6 +15,7 @@
 #include "world.h"
 #include "pausemenu.h"
 #include "fadeout.h"
+#include "mem.h"
 
 static void GoBackToPlaying(void)
 {
@@ -32,6 +33,7 @@ static void Respawn()
 
 void GameState_HostedServer_Init(void)
 {
+	arena_push_zone("HOSTEDSERV");
 	pause_menu_init();
 	pause_menu_setcallback(PAUSE_MENU_RESPAWN, Respawn);
 	pause_menu_setcallback(PAUSE_MENU_CONTINUE, GoBackToPlaying);
@@ -47,6 +49,7 @@ void GameState_HostedServer_Quit(void)
 	World_Stop();
 	//NetFile_RemoveNetCallbacks();
 	Server_Destroy();
+	arena_pop_zone();
 }
 void GameState_HostedServer_Update(void)
 {

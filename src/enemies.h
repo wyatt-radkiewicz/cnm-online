@@ -4,6 +4,7 @@
 typedef struct _WOBJ WOBJ;
 
 void Enemies_Reset(void);
+void Enemies_ZoneAllocLocalDataPools(void);
 
 // Slimes
 void WobjSlime_Create(WOBJ *wobj);

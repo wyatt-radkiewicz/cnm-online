@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include "teleport_infos.h"
 #include "console.h"
@@ -25,7 +26,8 @@ void TeleportInfos_FreeLegacyLevelInfo(void) {
 void TeleportInfos_AllocLegacyLevelInfo(void) {
 	int i;
 	if (infos != infosbuf) return;
-	infos = malloc(sizeof(TELEPORT_INFO)*TELEPORT_INFOS_MAX_TELEPORTS_SERIALOLD);
+	assert(0 && "FIXME @ TeleportInfos_AllocLegacyLevelInfo");
+	//infos = m_alloc(sizeof(TELEPORT_INFO)*TELEPORT_INFOS_MAX_TELEPORTS_SERIALOLD);
 	for (i = 0; i < TELEPORT_INFOS_MAX_TELEPORTS_SERIALOLD; i++)
 	{
 		infos[i].index = i;

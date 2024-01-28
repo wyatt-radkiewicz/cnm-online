@@ -167,7 +167,7 @@ void Serial_LoadBlocks(const char *cnmb_file)
 	}
 	FileSystem_RegisterBlocks(cnmb_file);
 
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 }
 void Serial_CondenceBlockFileAndSave(const char *cnmb_file)
 {
@@ -305,7 +305,7 @@ void Serial_SaveBlocks(const char *cnmb_file)
 	e = lparse_make_entry(lp, "BP_COLLTYPE", lparse_i32, numprops);
 	for (i = 0; i < numprops; i++) lparse_set_data(lp, e, i, 1, &Blocks_GetBlockProp(i)->coll_type);
 
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 }
 void Serial_LoadBlocksLevelPreview(const char *cnmb_file, CNM_RECT *r, int *dif, int *type)
 {
@@ -329,7 +329,7 @@ void Serial_LoadBlocksLevelPreview(const char *cnmb_file, CNM_RECT *r, int *dif,
 	lparse_get_data(lp, e, 256, 1, dif);
 	e = lparse_get_entry(lp, "BP_ANIM_SPEED");
 	lparse_get_data(lp, e, 256, 1, type);
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 }
 void Serial_LoadSpawnersLevelName(const char *cnms_file, char *name_buf)
 {
@@ -347,7 +347,7 @@ void Serial_LoadSpawnersLevelName(const char *cnms_file, char *name_buf)
 	while ((lb = strchr(buf, '\\')) != NULL)
 		*lb = ' ';
 	strcpy(name_buf, buf);
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 }
 void Serial_LoadSpawners(const char *cnms_file)
 {
@@ -444,7 +444,7 @@ void Serial_LoadSpawners(const char *cnms_file)
 	}
 	FileSystem_RegisterSpawners(cnms_file);
 	
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 }
 void Serial_SaveSpawners(const char *cnms_file)
 {
@@ -548,7 +548,7 @@ void Serial_SaveSpawners(const char *cnms_file)
 	e = lparse_make_entry(lp, "NUM_SPAWNERS", lparse_i32, 1);
 	lparse_set_data(lp, e, 0, 1, &num_spawners);
 
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 }
 
 
@@ -560,7 +560,7 @@ static int Serial_GetLParser(const char *cnm_file, LParse **lp) {
 		//Console_Print("Cannot load the level file: \"%s\"!", cnm_file);
 		return 0;
 	}
-	*lp = lparse_open_from_file(fp, lparse_read);
+	*lp = lparse_open_from_file_inplace(global_lparse, fp, lparse_read);
 	if (*lp == NULL) {
 		Console_Print("Level file \"%s\" uses outdated data format!", cnm_file);
 		return -1;
@@ -575,7 +575,7 @@ static int Serial_GetWriteLParser(const char *cnm_file, LParse **lp) {
 		Console_Print("Cannot write the level file: \"%s\"!", cnm_file);
 		return 0;
 	}
-	*lp = lparse_open_from_file(fp, lparse_write);
+	*lp = lparse_open_from_file_inplace(global_lparse, fp, lparse_write);
 	return 1;
 }
 void Serial_LoadLevelGfx(const char *level_path) {

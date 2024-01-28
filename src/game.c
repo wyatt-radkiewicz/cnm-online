@@ -10,7 +10,6 @@
 #include "serial.h"
 #include "renderer.h"
 #include "utility.h"
-#include "gui.h"
 #include "wobj.h"
 #include "spawners.h"
 #include "teleport_infos.h"
@@ -21,8 +20,9 @@
 #include "filesystem.h"
 #include "interaction.h"
 #include "background.h"
-#include "gamelua.h"
+//#_include "gamelua.h"
 #include "savedata.h"
+#include "mem.h"
 
 #define GAME_MAX_STATES 8
 
@@ -246,6 +246,7 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_CL_POS].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_GOD].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_WIDESCREEN].data.integer = CNM_FALSE;
+	game_vars[GAME_VAR_MEM_STATUS].data.integer = CNM_FALSE;
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
@@ -258,6 +259,7 @@ static void Game_InitGameVars(void)
 
 void GameState_Base_Init(void)
 {
+	arena_init("_BASE_STATE");
 	Console_Init("cnm_log.txt");
 	if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK) != 0)
 	{
@@ -268,8 +270,8 @@ void GameState_Base_Init(void)
 
 	Game_InitGameVars();
 	FileSystem_Init();
-	Blocks_SetWorldSize(512, 256);
-	Blocks_GenBlockProps(1024);
+	//Blocks_SetWorldSize(512, 256);
+	//Blocks_GenBlockProps(1024);
 	TeleportInfos_Init();
 	Spawners_Init();
 	Wobj_Init();
@@ -298,7 +300,7 @@ void GameState_Base_Init(void)
 		Audio_SetGlobalVolume((float)Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.integer / 100.0f);
 	}
 	Background_ResetBackgrounds();
-	Gui_Init();
+	//Gui_Init();
 	FileSystem_RegisterGfx("gfx.bmp");
 	FileSystem_SearchForLevels(CNM_FALSE);
 	Serial_LoadAudioCfg("audio.cnma");
@@ -347,12 +349,13 @@ void GameState_Base_Quit(void)
 	Wobj_Quit();
 	Spawners_Quit();
 	Blocks_Unload();
-	Gui_Reset();
+	//Gui_Reset();
 	Audio_Quit();
 	Input_Quit();
 	Renderer_Quit();
 	SDL_Quit();
 	Console_Quit();
+	arena_deinit();
 }
 
 

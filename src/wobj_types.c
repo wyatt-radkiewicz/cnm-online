@@ -17,9 +17,10 @@
 #include "bossbar.h"
 #include "ending_text.h"
 #include "logic_links.h"
-#include "gamelua.h"
+//#_include "gamelua.h"
 #include "petdefs.h"
 #include "player_spawns.h"
+#include "mem.h"
 
 static void WobjGeneric_Hurt(WOBJ *victim, WOBJ *inflictor)
 {
@@ -418,6 +419,17 @@ static void WobjDroppedItem_Create(WOBJ *wobj)
 
 	// Setting the durability
 	wobj->custom_floats[0] = item_types[wobj->item].max_durability;
+
+	if ((wobj->item == ITEM_TYPE_KEY_RED ||
+		wobj->item == ITEM_TYPE_KEY_BLUE ||
+		wobj->item == ITEM_TYPE_KEY_GREEN) &&
+		Blocks_IsCollidingWithSolid(&(CNM_BOX){ .x = wobj->x + 15.0f, .y = wobj->y + 15.0f, .w = 1.0, .h = 1.0f }, 0)) {
+		WOBJ *closest = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+		if (closest) {
+			wobj->x = closest->x;
+			wobj->y = closest->y;
+		}
+	}
 }
 static void WobjDroppedItem_Update(WOBJ *wobj) {
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
@@ -1751,8 +1763,11 @@ typedef struct PetLocalData {
 	float py[PLRPOS_HISTORY];
 	int i, didinit, bounce_goto;
 } PetLocalData;
+static dynpool_t _ldpool_pet;
+
 static void WobjPet_OnDestroy(WOBJ *wobj) {
-	free(wobj->local_data);
+	dynpool_free(_ldpool_pet, wobj->local_data);
+	//free(wobj->local_data);
 	//Console_Print("freed");
 }
 static void WobjPet_Create(WOBJ *wobj) {
@@ -1761,7 +1776,7 @@ static void WobjPet_Create(WOBJ *wobj) {
 	wobj->anim_frame = 0;
 	wobj->vel_x = 0.0f;
 	wobj->vel_y = 0.0f;
-	wobj->local_data = malloc(sizeof(PetLocalData));
+	wobj->local_data = dynpool_alloc(_ldpool_pet);
 	PetLocalData *local = wobj->local_data;
 	local->i = 0;
 	local->didinit = CNM_FALSE;
@@ -1953,6 +1968,10 @@ static void WobjPet_Draw(WOBJ *wobj, int camx, int camy) {
 }
 static void Wobj_KeyRemover_Create(WOBJ *wobj) {
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 64.0f, 96.0f);
+}
+
+void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void) {
+	_ldpool_pet = dynpool_init(4, sizeof(PetLocalData), arena_alloc);
 }
 
 #define LUAOBJ_DEF {\

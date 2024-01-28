@@ -7,7 +7,7 @@
 #include "serial.h"
 #include "game_console.h"
 #include "input.h"
-//#include "gui.h"
+//#_include "gui.h"
 #include "command.h"
 //#include "wobj.h"
 //#include "spawners.h"
@@ -22,6 +22,7 @@
 #include "world.h"
 #include "pausemenu.h"
 #include "fadeout.h"
+#include "mem.h"
 
 static int *camx, *camy;
 static WOBJ *player;
@@ -42,6 +43,7 @@ static void Respawn()
 
 void GameState_Client_Init(void)
 {
+	arena_push_zone("CLIENT");
 	pause_menu_init();
 	pause_menu_setcallback(PAUSE_MENU_RESPAWN, Respawn);
 	pause_menu_setcallback(PAUSE_MENU_CONTINUE, GoBackToPlaying);
@@ -53,6 +55,7 @@ void GameState_Client_Quit(void)
 {
 	Client_Destory();
 	World_Stop();
+	arena_pop_zone();
 }
 void GameState_Client_Update(void)
 {

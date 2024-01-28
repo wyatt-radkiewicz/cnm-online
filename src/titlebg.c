@@ -10,6 +10,7 @@
 #include "game.h"
 #include "console.h"
 #include "wobj.h"
+#include "mem.h"
 
 static int controlling;
 static int ai_xdir;
@@ -29,8 +30,10 @@ static int _cam_list_len, _next_cam_target;
 #define MAX_TITLE_CARDS 4
 static int _title_card_ticker, _title_card_y[MAX_TITLE_CARDS];
 static int title_target_y, title_card_stagger;
+static int _inited = CNM_FALSE;
 
 void titlebg_init(void) {
+	_inited = CNM_TRUE;
 	controlling = 0;
 	ai_xdir = Util_RandInt(0, 1) * 2 - 1;
 	ai_ydir = Util_RandInt(0, 1) * 2 - 1;
@@ -56,8 +59,8 @@ void titlebg_init(void) {
 		spawner = Spawners_Iterate(spawner);
 	}
 	if (!_cam_list_len) _cam_list_len = 2;
-	_camx_list = malloc(sizeof(*_camx_list) * _cam_list_len);
-	_camy_list = malloc(sizeof(*_camy_list) * _cam_list_len);
+	_camx_list = arena_alloc(sizeof(*_camx_list) * _cam_list_len);
+	_camy_list = arena_alloc(sizeof(*_camy_list) * _cam_list_len);
 	spawner = Spawners_Iterate(NULL);
 	while (spawner) {
 		if (spawner->wobj_type == TT_BOSS_WAYPOINT)	{
@@ -86,11 +89,15 @@ void titlebg_init(void) {
 		_title_card_y[i] = -title_card.h - 2;
 	}
 }
+int titlebg_is_init(void) {
+	return _inited;
+}
 void titlebg_cleanup(void) {
+	_inited = CNM_FALSE;
 	//Console_Print("cleanup!");
-	if (_camx_list) free(_camx_list);
+	//if (_camx_list) free(_camx_list);
 	_camx_list = NULL;
-	if (_camy_list) free(_camy_list);
+	//if (_camy_list) free(_camy_list);
 	_camy_list = NULL;
 }
 void titlebg_update(void) {

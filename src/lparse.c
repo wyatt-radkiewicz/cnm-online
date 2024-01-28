@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "lparse.h"
 #include "utility.h"
+#include "mem.h"
 
 static int type_sizes[lparse_type_max] = {
 	0, //lparse_null 0
@@ -38,11 +39,16 @@ typedef struct LParse_s {
 	LParseEntry entries[LPARSE_MAX_ENTRIES];
 } LParse;
 
+LParse _lparse;
+LParse *global_lparse = &_lparse;
+
 static int lparse_read_entries(LParse *lp);
 
 LParse		*lparse_open_from_file(void *fp, LParseMode m) {
-	LParse *lp = malloc(sizeof(LParse));
-
+	LParse *lp = arena_alloc(sizeof(LParse));
+	return lparse_open_from_file_inplace(lp, fp, m);
+}
+LParse		*lparse_open_from_file_inplace(LParse *lp, void *fp, LParseMode m) {
 	lp->mode = m;
 	lp->fp = fp;
 	lp->end_offs = sizeof(LParseHeader) + sizeof(lp->entries);
@@ -78,9 +84,12 @@ void			lparse_set_version(LParse *lp, int version) {
 	fseek(lp->fp, 0, SEEK_SET);
 	fwrite(&hdr, sizeof(LParseHeader), 1, lp->fp);
 }
-void		lparse_close(LParse *lp) {
+void lparse_close_inplace(LParse *lp) {
 	if (lp->fp != NULL) fclose(lp->fp);
-	free(lp);
+}
+void		lparse_close(LParse *lp) {
+	lparse_close_inplace(lp);
+	arena_popfree(lp);
 }
 
 LParseEntry	*lparse_get_entry(LParse *lp, const char *name) {

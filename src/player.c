@@ -25,6 +25,7 @@
 #include "pausemenu.h"
 #include "serial.h"
 #include "petdefs.h"
+#include "mem.h"
 
 PLAYER_MAXPOWER_INFO maxpowerinfos[32] = {0};
 
@@ -308,7 +309,7 @@ static int player_is_on_spring(WOBJ *wobj) {
 void WobjPlayer_Create(WOBJ *wobj)
 {
 	PLAYER_LOCAL_DATA *local_data;
-	wobj->local_data = malloc(sizeof(PLAYER_LOCAL_DATA));
+	wobj->local_data = arena_alloc(sizeof(PLAYER_LOCAL_DATA));
 	memset(wobj->local_data, 0, sizeof(PLAYER_LOCAL_DATA));
 	local_data = wobj->local_data;
 	local_data->beastchurger_music = 0;
@@ -1719,16 +1720,6 @@ void WobjPlayer_Update(WOBJ *wobj)
 		float px, py;
 		WobjCalculate_InterpolatedPos(plat, &px, &py);
 
-		float plry = wobj->y;
-		wobj->y += 2.0f;
-		int not_on_platform = !Wobj_GetWobjColliding(wobj, WOBJ_IS_MOVESTAND);
-		wobj->y = plry;
-		if ((wobj->x + wobj->hitbox.x > px + plat->hitbox.x + plat->hitbox.w ||
-			wobj->x + wobj->hitbox.x + wobj->hitbox.w < px + plat->hitbox.x) && not_on_platform) {
-			player_launch_from_platinfo(wobj);
-			goto search_platinfos;
-		}
-
 		local_data->platinfo.last_velx = plat->vel_x;
 		local_data->platinfo.last_vely = plat->vel_y;
 		local_data->platinfo.relx += wobj->vel_x;
@@ -1745,7 +1736,21 @@ void WobjPlayer_Update(WOBJ *wobj)
 			.h = 1.0f,
 		}, CNM_TRUE)) {
 			local_data->platinfo.active = CNM_FALSE;
+			goto search_platinfos;
 		}
+
+		float plry = wobj->y;
+		wobj->y += 2.0f;
+		int not_on_platform = !Wobj_GetWobjColliding(wobj, WOBJ_IS_MOVESTAND);
+		wobj->y = plry;
+		if ((wobj->x + wobj->hitbox.x > px + plat->hitbox.x + plat->hitbox.w ||
+			wobj->x + wobj->hitbox.x + wobj->hitbox.w < px + plat->hitbox.x) && not_on_platform) {
+			player_launch_from_platinfo(wobj);
+			goto search_platinfos;
+		}
+
+		//Wobj_ResolveObjectsCollision(wobj, 0, 0);
+		Wobj_ResolveBlocksCollision(wobj);
 	}
 search_platinfos:
 	{

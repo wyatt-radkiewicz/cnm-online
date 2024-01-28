@@ -14,6 +14,7 @@
 #include "fadeout.h"
 #include "savedata.h"
 #include "player.h"
+#include "mem.h"
 
 static void GoBackToPlaying(void)
 {
@@ -33,6 +34,7 @@ static void Respawn(void)
 
 void GameState_Singleplayer_Init(void)
 {
+	arena_push_zone("SPLAY");
 	pause_menu_init();
 	pause_menu_setcallback(PAUSE_MENU_RESPAWN, Respawn);
 	pause_menu_setcallback(PAUSE_MENU_CONTINUE, GoBackToPlaying);
@@ -42,6 +44,7 @@ void GameState_Singleplayer_Init(void)
 void GameState_Singleplayer_Quit(void)
 {
 	World_Stop();
+	arena_pop_zone();
 }
 void GameState_Singleplayer_Update(void)
 {

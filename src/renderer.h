@@ -17,7 +17,7 @@ typedef enum rcol {
 	RCOL_BLUE = 200,
 	RCOL_BLACK = 247,
 	RCOL_LIGHT_BLUE = 196,
-	RCOL_PAUSE_COLOR = 206,
+	RCOL_PAUSE_COLOR = 240,
 } rcol_t;
 
 extern int RENDERER_WIDTH;

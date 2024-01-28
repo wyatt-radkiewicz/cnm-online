@@ -38,9 +38,9 @@ void save_game(int slot, const savedata_t *data) {
 		Console_Print("Can't open the save file: %s! ERROR", filename);
 		return;
 	}
-	LParse *lp = lparse_open_from_file(fp, lparse_write);
+	LParse *lp = lparse_open_from_file_inplace(global_lparse, fp, lparse_write);
 	save_data(lp, data);
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 	//fclose(fp);
 }
 void load_game(int slot, savedata_t *data) {
@@ -55,9 +55,9 @@ void load_game(int slot, savedata_t *data) {
 		new_save(data);
 		return;
 	}
-	LParse *lp = lparse_open_from_file(fp, lparse_read);
+	LParse *lp = lparse_open_from_file_inplace(global_lparse, fp, lparse_read);
 	load_data(lp, data);
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 	//fclose(fp);
 }
 
@@ -188,7 +188,7 @@ void globalsave_load(struct globalsave *gs) {
 		if (fp) fclose(fp);
 		return;
 	}
-	LParse *lp = lparse_open_from_file(fp, lparse_read);
+	LParse *lp = lparse_open_from_file_inplace(global_lparse, fp, lparse_read);
 	if (!lp) {
 		fclose(fp);
 		return;
@@ -214,7 +214,7 @@ void globalsave_load(struct globalsave *gs) {
 	entry = lparse_get_entry(lp, "TIMES");
 	if (entry) lparse_get_data(lp, entry, 0, sizeof(gs->best_times) / sizeof(gs->best_times[0]), &gs->best_times);
 
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 	//fclose(fp);
 }
 static void _globalsave_save(const struct globalsave *gs) {
@@ -223,7 +223,7 @@ static void _globalsave_save(const struct globalsave *gs) {
 		Console_Print("Can't open the game info file: "SAVE_DIR"gameinfo.lps""! ERROR");
 		return;
 	}
-	LParse *lp = lparse_open_from_file(fp, lparse_write);
+	LParse *lp = lparse_open_from_file_inplace(global_lparse, fp, lparse_write);
 	if (!lp) {
 		fclose(fp);
 		return;
@@ -249,7 +249,7 @@ static void _globalsave_save(const struct globalsave *gs) {
 	entry = lparse_make_entry(lp, "TIMES", lparse_i32, sizeof(gs->best_times) / sizeof(gs->best_times[0]));
 	lparse_set_data(lp, entry, 0, sizeof(gs->best_times) / sizeof(gs->best_times[0]), &gs->best_times);
 
-	lparse_close(lp);
+	lparse_close_inplace(lp);
 	//fclose(fp);
 }
 void globalsave_save(const struct globalsave *gs) {

@@ -5,6 +5,7 @@
 #include "serial.h"
 #include "console.h"
 #include "xmacro_impl.h"
+#include "mem.h"
 //#include "blocks.h"
 
 // due to new.h's making fopen deprecated
@@ -153,14 +154,15 @@ static void FileSystem_RegisterFile(const char *file_name, FILESYSTEM_REGISTERED
 		fseek(fp, 0, SEEK_END);
 		rf->size = (unsigned int)ftell(fp);
 		rewind(fp);
+		if (rf->size > 1024*1024*2) rf->size = 1024*1024*2;
 		strcpy(rf->name, file_name);
-		byte_buffer = malloc(rf->size);
+		byte_buffer = arena_alloc(rf->size);
 		fread(byte_buffer, rf->size, 1, fp);
 
 		rf->checksum = 0;
 		for (int i = 0; i < rf->size; i++) rf->checksum += byte_buffer[i];
 
-		free(byte_buffer);
+		arena_popfree(byte_buffer);
 		fclose(fp);
 	}
 }
