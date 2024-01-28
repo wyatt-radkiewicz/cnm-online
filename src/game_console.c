@@ -225,14 +225,14 @@ void GameConsole_Draw(void)
 		return;
 
 	if (Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer) {
-		if (Game_TopState() == GAME_STATE_MAINMENU) Renderer_SetFont(288, 416, 8, 8);
+		if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_CLIENT_CONNECTING) Renderer_SetFont(288, 416, 8, 8);
 		else Renderer_SetFont(256, 192, 8, 8);
 
 		Renderer_DrawText(0, 50, 0, RENDERER_LIGHT, "arena %dK/%dK", arena_used_mem() / 1024, ARENA_SIZE / 1024);
 		Renderer_DrawText(0, 58, 0, RENDERER_LIGHT, "data seg todo");
 	}
 
-	if (Game_TopState() == GAME_STATE_MAINMENU) Renderer_SetFont(288, 480, 8, 8);
+	if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_CLIENT_CONNECTING) Renderer_SetFont(288, 480, 8, 8);
 	else Renderer_SetFont(256, 256, 8, 8);
 
 	y = ((GAMECONSOLE_HISTORY + 1) * -8) + gameconsole_y;
@@ -263,7 +263,7 @@ void GameConsole_Draw(void)
 		else
 			Renderer_DrawText(c * 8, gameconsole_y, f, RENDERER_LIGHT, " ");
 	}
-	if (Game_TopState() == GAME_STATE_MAINMENU) Renderer_SetFont(288, 416, 8, 8);
+	if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_CLIENT_CONNECTING) Renderer_SetFont(288, 416, 8, 8);
 	else Renderer_SetFont(256, 192, 8, 8);
 }
 int GameConsole_IsOpen(void)

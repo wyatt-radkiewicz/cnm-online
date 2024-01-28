@@ -5,6 +5,8 @@
 #include "console.h"
 #include "mem.h"
 
+#define DBGARENA 0
+
 dynpool_t dynpool_init(size_t initial_chunks, size_t elemsz, alloc_pfn allocer) {
 	elemsz = ((elemsz - 1) / sizeof(dynpool_chunk_t) + 2) * sizeof(dynpool_chunk_t);
 	dynpool_t self = allocer(sizeof(*self) + sizeof(dynpool_block_t) + initial_chunks * elemsz);
@@ -204,7 +206,7 @@ void arena_popfree(void *blk) {
 	assert(_arena_head == blk);
 }
 void arena_push_zone(const char *dbgname) {
-#ifdef DEBUG
+#if defined(DEBUG) && DBGARENA == 1
 	Console_Print("push zone %s", dbgname);
 #endif
 	assert(_stack_top + 1 < ARENA_STACK_SIZE);
@@ -212,7 +214,7 @@ void arena_push_zone(const char *dbgname) {
 	_stack_dbgnames[_stack_top] = dbgname;
 }
 void arena_pop_zone(void) {
-#ifdef DEBUG
+#if defined(DEBUG) && DBGARENA == 1
 	Console_Print("pop zone %s", _stack_dbgnames[_stack_top]);
 #endif
 	assert(_stack_top > 0);

@@ -142,6 +142,9 @@ static void scan_and_play_music(void) {
 static void swap_title_bg(const char *lvl) {
 	char pathbuf[32];
 
+	arena_pop_zone();
+	arena_push_zone("TITLEBG");
+
 	// Load in the graphics for the level
 	Serial_LoadLevelGfx(lvl);
 	sprintf(pathbuf, "%s.cnmb", lvl);
