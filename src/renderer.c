@@ -1,3 +1,5 @@
+#include <assert.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -721,6 +723,7 @@ void Renderer_DrawRect(const CNM_RECT *_rect, int color, int trans, int light) {
 	if (!renderer_initialized)
 		return;
 
+	if (!color) return;
 	memcpy(&rect, _rect, sizeof(CNM_RECT));
 	if (rect.x < 0) {
 		rect.w += rect.x;
@@ -737,13 +740,20 @@ void Renderer_DrawRect(const CNM_RECT *_rect, int color, int trans, int light) {
 	if (rect.y >= RENDERER_HEIGHT) return;
 	if (rect.y + rect.h >= RENDERER_HEIGHT) rect.h = RENDERER_HEIGHT - rect.y;
 
+	if (trans == 0 && light == RENDERER_LIGHT) {
+		for (y = rect.y; y < rect.y + rect.h; y++) {
+			memset(&((unsigned char *)renderer_scr->pixels)[rect.x + y * RENDERER_WIDTH], color, rect.w);
+		}
+		return;
+	}
+
 	for (y = rect.y; y < rect.y + rect.h; y++)
 	{
 		for (x = rect.x; x < rect.x + rect.w; x++)
 		{
 			last_color = ((unsigned char *)renderer_scr->pixels)[x + y * RENDERER_WIDTH];
-			if (color)
-				((unsigned char *)renderer_scr->pixels)[x + y * RENDERER_WIDTH] = renderer_trans[renderer_light[color][light]][last_color][trans];
+			//if (color)
+			((unsigned char *)renderer_scr->pixels)[x + y * RENDERER_WIDTH] = renderer_trans[renderer_light[color][light]][last_color][trans];
 		}
 	}
 }
@@ -984,60 +994,63 @@ void Renderer_DrawEmptyRect(const CNM_RECT *rect, int color, int trans, int ligh
 //#endif
 //}
 //#else
+
+inline static uint64_t passthru(uint64_t src, uint64_t dst) {
+    union bytes {
+        uint64_t i;
+        uint8_t b[8];
+    };
+    const union bytes srcu = (union bytes){ .i = src },
+		dstu = (union bytes){ .i = dst };
+
+    return ((union bytes){
+        .b[0] = srcu.b[0] ? srcu.b[0] : dstu.b[0],
+        .b[1] = srcu.b[1] ? srcu.b[1] : dstu.b[1],
+        .b[2] = srcu.b[2] ? srcu.b[2] : dstu.b[2],
+        .b[3] = srcu.b[3] ? srcu.b[3] : dstu.b[3],
+        .b[4] = srcu.b[4] ? srcu.b[4] : dstu.b[4],
+        .b[5] = srcu.b[5] ? srcu.b[5] : dstu.b[5],
+        .b[6] = srcu.b[6] ? srcu.b[6] : dstu.b[6],
+        .b[7] = srcu.b[7] ? srcu.b[7] : dstu.b[7],
+    }).i;
+}
+
 void Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int light) {
-	int x, y;
 	CNM_RECT src;
-	unsigned char *src_pixel, *dest_pixel;
-	int gfx_width, src_width;
 	if (!renderer_initialized)
 		return;
 
-	memcpy(&src, _src, sizeof(CNM_RECT));
-	if (_y < 0)
-	{
-		if (_y + src.h < 0)
-		{
+	src = *_src;
+	//memcpy(&src, _src, sizeof(CNM_RECT));
+	if (_y < 0) {
+		if (_y + src.h < 0) {
 			return;
-		}
-		else
-		{
+		} else {
 			src.y -= _y;
 			src.h += _y;
 			_y = 0;
 		}
 	}
-	if (_y + src.h > RENDERER_HEIGHT)
-	{
-		if (_y >= RENDERER_HEIGHT)
-		{
+	if (_y + src.h > RENDERER_HEIGHT) {
+		if (_y >= RENDERER_HEIGHT) {
 			return;
-		}
-		else
-		{
+		} else {
 			src.h = RENDERER_HEIGHT - _y;
 		}
 	}
-	if (_x < 0)
-	{
-		if (_x + src.w < 0)
-		{
+	if (_x < 0) {
+		if (_x + src.w < 0) {
 			return;
-		}
-		else
-		{
+		} else {
 			src.x -= _x;
 			src.w += _x;
 			_x = 0;
 		}
 	}
-	if (_x + src.w > RENDERER_WIDTH)
-	{
-		if (_x >= RENDERER_WIDTH)
-		{
+	if (_x + src.w > RENDERER_WIDTH) {
+		if (_x >= RENDERER_WIDTH) {
 			return;
-		}
-		else
-		{
+		} else {
 			src.w = RENDERER_WIDTH - _x;
 		}
 	}
@@ -1049,45 +1062,131 @@ void Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int li
 		return;
 	}
 
-	src_pixel = ((unsigned char *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x);
-	dest_pixel = ((unsigned char *)renderer_scr->pixels) + (_y * RENDERER_WIDTH + _x);
-	gfx_width = renderer_gfx->w - src.w;
-	src_width = RENDERER_WIDTH - src.w;
-	for (y = 0; y < src.h; y++)
-	{
-		for (x = 0; x < src.w; x++)
-		{
-			//if (*src_pixel)
+	if (light == RENDERER_LIGHT && trans == 0 && src.x % 8 == 0 && src.w >= 16) {
+		const uint64_t *restrict src_pixel = (uint64_t *)(((uint8_t *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x));
+		const int grid_x = _x / 8;
+		const int grid_srcw = (src.w - 1) / 8 + 1;
+		uint64_t *restrict dest_pixel = (uint64_t *)(((uint8_t *)renderer_scr->pixels) + (_y * RENDERER_WIDTH + grid_x*8));
+		const int grid_destw = ((_x + src.w - 1) / 8 + 1) - grid_x;
+
+		const int dest_mod = (_x - grid_x*8) * 8;
+		const uint64_t start_set_mask = ((uint64_t)-1) << dest_mod;
+		const uint64_t end_set_mask = ((uint64_t)-1) >> (64 - ((_x + src.w) % 8)*8);
+		const bool dirty_end = end_set_mask != (uint64_t)-1;
+		const bool clean_start = _x == grid_x*8;
+
+		const int src_pitch = renderer_gfx->w / sizeof(uint64_t) - grid_srcw + (!clean_start && !dirty_end);
+		const int gfx_pitch = RENDERER_WIDTH / sizeof(uint64_t) - grid_destw;
+
+		for (int y = 0; y < src.h; y++) {
+			uint64_t srcload = rol64(*src_pixel, dest_mod);
+			*dest_pixel = passthru((srcload & start_set_mask) | (*dest_pixel & ~start_set_mask), *dest_pixel);
+			
+			for (int x = 1+dirty_end; x < grid_destw; x++) {
+				dest_pixel++;
+				src_pixel++;
+				srcload &= ~start_set_mask;
+				srcload |= *src_pixel << dest_mod;
+				*dest_pixel = passthru(srcload, *dest_pixel);
+				srcload = *src_pixel >> (64 - dest_mod);
+			}
+
+			if (dirty_end) {
+				dest_pixel++;
+				src_pixel++;
+				if (clean_start) srcload = *src_pixel;
+				*dest_pixel = passthru((srcload & end_set_mask) | (*dest_pixel & ~end_set_mask), *dest_pixel);
+			}
+
+			src_pixel += src_pitch+clean_start;
+			dest_pixel += gfx_pitch+1; // Make up for not consuming last dest pixel
+		}
+		return;
+	}
+
+#ifdef DEBUG
+	if (_src->x % 8 != 0 && _src->w > RENDERER_MAX_WIDTH / 2) {
+		Console_Print("warning: slow normal draw because of unaligned source x");
+	}
+#endif
+
+	const uint8_t *restrict src_pixel = ((unsigned char *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x);
+	uint8_t *restrict dest_pixel = ((unsigned char *)renderer_scr->pixels) + (_y * RENDERER_WIDTH + _x);
+	const int src_width = renderer_gfx->w - src.w;
+	const int gfx_width = RENDERER_WIDTH - src.w;
+
+	for (int y = 0; y < src.h; y++) {
+		for (int x = 0; x < src.w; x++) {
 			*dest_pixel = renderer_trans[renderer_light[*src_pixel][light]][*dest_pixel][trans];
 			dest_pixel++;
 			src_pixel++;
 		}
-		src_pixel += gfx_width;
-		dest_pixel += src_width;
+		src_pixel += src_width;
+		dest_pixel += gfx_width;
 	}
 }
 //#endif
-void Renderer_DrawBitmap2(int _x, int _y, const CNM_RECT *src, int trans, int light, int hflip, int vflip)
+void Renderer_DrawBitmap2(int _x, int _y, const CNM_RECT *_src, int trans, int light, int hflip, int vflip)
 {
 	int x, y, tx, ty;
 	if (!renderer_initialized)
 		return;
+	if (!hflip && !vflip) {
+		Renderer_DrawBitmap(_x, _y, _src, trans, light);
+		return;
+	}
+
+	CNM_RECT src = *_src;
+
+	if (_y < 0) {
+		if (_y + src.h < 0) {
+			return;
+		} else {
+			if (!vflip) src.y -= _y;
+			src.h += _y;
+			_y = 0;
+		}
+	}
+	if (_y + src.h > RENDERER_HEIGHT) {
+		if (_y >= RENDERER_HEIGHT) {
+			return;
+		} else {
+			if (vflip) src.y += src.h - (RENDERER_WIDTH - _y);
+			src.h = RENDERER_HEIGHT - _y;
+		}
+	}
+	if (_x < 0) {
+		if (_x + src.w < 0) {
+			return;
+		} else {
+			if (!hflip) src.x -= _x;
+			src.w += _x;
+			_x = 0;
+		}
+	}
+	if (_x + src.w > RENDERER_WIDTH) {
+		if (_x >= RENDERER_WIDTH) {
+			return;
+		} else {
+			if (hflip) src.x += src.w - (RENDERER_WIDTH - _x);
+			src.w = RENDERER_WIDTH - _x;
+		}
+	}
 
 	int tx_start, ty_start, tx_step, ty_step;
-	tx_start = (hflip) ? (src->x + src->w - 1) : (src->x);
-	ty_start = (vflip) ? (src->y + src->h - 1) : (src->y);
+	tx_start = (hflip) ? (src.x + src.w - 1) : (src.x);
+	ty_start = (vflip) ? (src.y + src.h - 1) : (src.y);
 	tx_step = hflip ? -1 : 1;
 	ty_step = vflip ? -1 : 1;
 
-	for (y = _y, ty = ty_start; y < _y + src->h; y++, ty += ty_step)
+	for (y = _y, ty = ty_start; y < _y + src.h; y++, ty += ty_step)
 	{
-		for (x = _x, tx = tx_start; x < _x + src->w; x++, tx += tx_step)
+		uint8_t *dst_color = &((unsigned char *)renderer_scr->pixels)[_x + y * RENDERER_WIDTH];
+		const uint8_t *src_color = &((unsigned char *)renderer_gfx->pixels)[ty * renderer_gfx->w + tx_start];
+		for (x = _x, tx = tx_start; x < _x + src.w; x++, tx += tx_step, dst_color++, src_color += tx_step)
 		{
-			//if (tx > -1 && tx < renderer_gfx->w && ty > -1 && ty < renderer_gfx->h)
-			if (x > -1 && x < RENDERER_WIDTH && y > -1 && y < RENDERER_HEIGHT)
-				Renderer_SetPixel(x, y, ((unsigned char *)renderer_gfx->pixels)[ty * renderer_gfx->w + tx], trans, light);
-			//else
-			//	Renderer_SetPixel(x, y, Renderer_MakeColor(255, 0, 255), 0, RENDERER_LIGHT);
+			const uint8_t color = renderer_trans[renderer_light[*src_color][light]][*dst_color][trans];
+			*dst_color = *src_color ? color : *dst_color;
 		}
 	}
 }

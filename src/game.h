@@ -89,7 +89,7 @@ typedef void(*GAME_STATE_DRAW)(void);
 #define GAME_STATE_ENDTEXT_EDITOR -100
 //#define GAME_STATE_CLIENT_DOWNLOADING -100
 #define GAME_STATE_BGEDIT -100
-#define GAME_STATE_BITMAP_BENCH -100
+//#define GAME_STATE_BITMAP_BENCH -100
 #define GAME_STATE_MINIGAME1_TEST -100
 #endif
 
@@ -115,9 +115,9 @@ typedef enum _GAME_STATES
 	GAME_STATE_ENDTEXT_EDITOR,
 	GAME_STATE_CLIENT_DOWNLOADING,
 	GAME_STATE_BGEDIT,
-	GAME_STATE_BITMAP_BENCH,
 	GAME_STATE_MINIGAME1_TEST,
 #endif
+	GAME_STATE_BITMAP_BENCH,
 	GAME_STATE_MASTER_SERVER
 } GAME_STATES;
 
@@ -180,11 +180,11 @@ void GameState_BgEdit_Init(void);
 void GameState_BgEdit_Quit(void);
 void GameState_BgEdit_Update(void);
 void GameState_BgEdit_Draw(void);
+#endif
 void GameState_BitmapBench_Init(void);
 void GameState_BitmapBench_Quit(void);
 void GameState_BitmapBench_Update(void);
 void GameState_BitmapBench_Draw(void);
-#endif
 void GameState_MasterServer_Init(void);
 void GameState_MasterServer_Quit(void);
 void GameState_MasterServer_Update(void);

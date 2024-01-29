@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #ifdef __EMSCRIPTEN__
 #define CNM_NO_X86ASSEMBLY
@@ -24,6 +25,25 @@
 #define CNM_MAJOR_VERSION 1
 #define CNM_MINOR_VERSION 5
 #define CNM_VERSION_STRING CNM_VERSION_PREFIX " " XSTRINGIZE(CNM_MAJOR_VERSION)"."XSTRINGIZE(CNM_MINOR_VERSION)
+
+inline static uint16_t ror16(uint16_t x, uint16_t n) {
+	return (x >> n) | (x << (16-n));
+}
+inline static uint16_t rol16(uint16_t x, uint16_t n) {
+	return (x << n) | (x >> (16-n));
+}
+inline static uint32_t ror32(uint32_t x, uint32_t n) {
+	return (x >> n) | (x << (32-n));
+}
+inline static uint32_t rol32(uint32_t x, uint32_t n) {
+	return (x << n) | (x >> (32-n));
+}
+inline static uint64_t ror64(uint64_t x, uint64_t n) {
+	return (x >> n) | (x << (64-n));
+}
+inline static uint64_t rol64(uint64_t x, uint64_t n) {
+	return (x << n) | (x >> (64-n));
+}
 
 typedef struct _CNM_RECT
 {

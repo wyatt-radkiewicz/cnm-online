@@ -55,9 +55,9 @@ static GAME_STATE_TYPE game_states[] =
 	{GameState_EndTextEditor_Init, GameState_EndTextEditor_Quit, GameState_EndTextEditor_Update, GameState_EndTextEditor_Draw},
 	{GameState_ClientDownloading_Init, GameState_ClientDownloading_Quit, GameState_ClientDownloading_Update, GameState_ClientDownloading_Draw},
 	{GameState_BgEdit_Init, GameState_BgEdit_Quit, GameState_BgEdit_Update, GameState_BgEdit_Draw},
-	{GameState_BitmapBench_Init, GameState_BitmapBench_Quit, GameState_BitmapBench_Update, GameState_BitmapBench_Draw},
 	{GameState_ClientDownloading_Init, GameState_ClientDownloading_Quit, GameState_ClientDownloading_Update, GameState_ClientDownloading_Draw},
 #endif
+	{GameState_BitmapBench_Init, GameState_BitmapBench_Quit, GameState_BitmapBench_Update, GameState_BitmapBench_Draw},
 	{GameState_MasterServer_Init, GameState_MasterServer_Quit, GameState_MasterServer_Update, NULL}
 };
 static GAME_VAR game_vars[GAME_VAR_MAX];

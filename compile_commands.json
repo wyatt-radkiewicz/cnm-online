@@ -14,56 +14,34 @@
       "-I",
       "/usr/local/include",
       "-o",
+      "build/camera.o",
+      "src/camera.c"
+    ],
+    "directory": "/Users/wyatt/Documents/cnm-online",
+    "file": "/Users/wyatt/Documents/cnm-online/src/camera.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/camera.o"
+  },
+  {
+    "arguments": [
+      "/opt/homebrew/bin/gcc-13",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-I./src",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-I",
+      "/opt/homebrew/include",
+      "-I",
+      "/usr/local/include",
+      "-o",
       "build/audio.o",
       "src/audio.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
     "file": "/Users/wyatt/Documents/cnm-online/src/audio.c",
     "output": "/Users/wyatt/Documents/cnm-online/build/audio.o"
-  },
-  {
-    "arguments": [
-      "/opt/homebrew/bin/gcc-13",
-      "-I/opt/homebrew/include/SDL2",
-      "-D_THREAD_SAFE",
-      "-I./src",
-      "-DDEBUG",
-      "-g",
-      "-O0",
-      "-c",
-      "-I",
-      "/opt/homebrew/include",
-      "-I",
-      "/usr/local/include",
-      "-o",
-      "build/background.o",
-      "src/background.c"
-    ],
-    "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/background.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/background.o"
-  },
-  {
-    "arguments": [
-      "/opt/homebrew/bin/gcc-13",
-      "-I/opt/homebrew/include/SDL2",
-      "-D_THREAD_SAFE",
-      "-I./src",
-      "-DDEBUG",
-      "-g",
-      "-O0",
-      "-c",
-      "-I",
-      "/opt/homebrew/include",
-      "-I",
-      "/usr/local/include",
-      "-o",
-      "build/blocks.o",
-      "src/blocks.c"
-    ],
-    "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/blocks.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/blocks.o"
   },
   {
     "arguments": [
@@ -102,34 +80,12 @@
       "-I",
       "/usr/local/include",
       "-o",
-      "build/camera.o",
-      "src/camera.c"
+      "build/blocks.o",
+      "src/blocks.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/camera.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/camera.o"
-  },
-  {
-    "arguments": [
-      "/opt/homebrew/bin/gcc-13",
-      "-I/opt/homebrew/include/SDL2",
-      "-D_THREAD_SAFE",
-      "-I./src",
-      "-DDEBUG",
-      "-g",
-      "-O0",
-      "-c",
-      "-I",
-      "/opt/homebrew/include",
-      "-I",
-      "/usr/local/include",
-      "-o",
-      "build/client.o",
-      "src/client.c"
-    ],
-    "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/client.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/client.o"
+    "file": "/Users/wyatt/Documents/cnm-online/src/blocks.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/blocks.o"
   },
   {
     "arguments": [
@@ -190,12 +146,34 @@
       "-I",
       "/usr/local/include",
       "-o",
-      "build/ending_text.o",
-      "src/ending_text.c"
+      "build/background.o",
+      "src/background.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/ending_text.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/ending_text.o"
+    "file": "/Users/wyatt/Documents/cnm-online/src/background.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/background.o"
+  },
+  {
+    "arguments": [
+      "/opt/homebrew/bin/gcc-13",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-I./src",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-I",
+      "/opt/homebrew/include",
+      "-I",
+      "/usr/local/include",
+      "-o",
+      "build/client.o",
+      "src/client.c"
+    ],
+    "directory": "/Users/wyatt/Documents/cnm-online",
+    "file": "/Users/wyatt/Documents/cnm-online/src/client.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/client.o"
   },
   {
     "arguments": [
@@ -234,56 +212,12 @@
       "-I",
       "/usr/local/include",
       "-o",
-      "build/fadeout.o",
-      "src/fadeout.c"
-    ],
-    "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/fadeout.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/fadeout.o"
-  },
-  {
-    "arguments": [
-      "/opt/homebrew/bin/gcc-13",
-      "-I/opt/homebrew/include/SDL2",
-      "-D_THREAD_SAFE",
-      "-I./src",
-      "-DDEBUG",
-      "-g",
-      "-O0",
-      "-c",
-      "-I",
-      "/opt/homebrew/include",
-      "-I",
-      "/usr/local/include",
-      "-o",
       "build/filesystem.o",
       "src/filesystem.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
     "file": "/Users/wyatt/Documents/cnm-online/src/filesystem.c",
     "output": "/Users/wyatt/Documents/cnm-online/build/filesystem.o"
-  },
-  {
-    "arguments": [
-      "/opt/homebrew/bin/gcc-13",
-      "-I/opt/homebrew/include/SDL2",
-      "-D_THREAD_SAFE",
-      "-I./src",
-      "-DDEBUG",
-      "-g",
-      "-O0",
-      "-c",
-      "-I",
-      "/opt/homebrew/include",
-      "-I",
-      "/usr/local/include",
-      "-o",
-      "build/game.o",
-      "src/game.c"
-    ],
-    "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/game.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/game.o"
   },
   {
     "arguments": [
@@ -322,12 +256,56 @@
       "-I",
       "/usr/local/include",
       "-o",
-      "build/gamelua.o",
-      "src/gamelua.c"
+      "build/ending_text.o",
+      "src/ending_text.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/gamelua.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/gamelua.o"
+    "file": "/Users/wyatt/Documents/cnm-online/src/ending_text.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/ending_text.o"
+  },
+  {
+    "arguments": [
+      "/opt/homebrew/bin/gcc-13",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-I./src",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-I",
+      "/opt/homebrew/include",
+      "-I",
+      "/usr/local/include",
+      "-o",
+      "build/game.o",
+      "src/game.c"
+    ],
+    "directory": "/Users/wyatt/Documents/cnm-online",
+    "file": "/Users/wyatt/Documents/cnm-online/src/game.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/game.o"
+  },
+  {
+    "arguments": [
+      "/opt/homebrew/bin/gcc-13",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-I./src",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-I",
+      "/opt/homebrew/include",
+      "-I",
+      "/usr/local/include",
+      "-o",
+      "build/gamestate_bitmapbench.o",
+      "src/gamestate_bitmapbench.c"
+    ],
+    "directory": "/Users/wyatt/Documents/cnm-online",
+    "file": "/Users/wyatt/Documents/cnm-online/src/gamestate_bitmapbench.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/gamestate_bitmapbench.o"
   },
   {
     "arguments": [
@@ -350,6 +328,28 @@
     "directory": "/Users/wyatt/Documents/cnm-online",
     "file": "/Users/wyatt/Documents/cnm-online/src/gamestate_client.c",
     "output": "/Users/wyatt/Documents/cnm-online/build/gamestate_client.o"
+  },
+  {
+    "arguments": [
+      "/opt/homebrew/bin/gcc-13",
+      "-I/opt/homebrew/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-I./src",
+      "-DDEBUG",
+      "-g",
+      "-O0",
+      "-c",
+      "-I",
+      "/opt/homebrew/include",
+      "-I",
+      "/usr/local/include",
+      "-o",
+      "build/fadeout.o",
+      "src/fadeout.c"
+    ],
+    "directory": "/Users/wyatt/Documents/cnm-online",
+    "file": "/Users/wyatt/Documents/cnm-online/src/fadeout.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/fadeout.o"
   },
   {
     "arguments": [
@@ -432,12 +432,12 @@
       "-I",
       "/usr/local/include",
       "-o",
-      "build/gamestate_mainmenu.o",
-      "src/gamestate_mainmenu.c"
+      "build/gamestate_master_server.o",
+      "src/gamestate_master_server.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/gamestate_mainmenu.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/gamestate_mainmenu.o"
+    "file": "/Users/wyatt/Documents/cnm-online/src/gamestate_master_server.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/gamestate_master_server.o"
   },
   {
     "arguments": [
@@ -454,12 +454,12 @@
       "-I",
       "/usr/local/include",
       "-o",
-      "build/gamestate_master_server.o",
-      "src/gamestate_master_server.c"
+      "build/gamestate_mainmenu.o",
+      "src/gamestate_mainmenu.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/gamestate_master_server.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/gamestate_master_server.o"
+    "file": "/Users/wyatt/Documents/cnm-online/src/gamestate_mainmenu.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/gamestate_mainmenu.o"
   },
   {
     "arguments": [
@@ -652,12 +652,12 @@
       "-I",
       "/usr/local/include",
       "-o",
-      "build/net.o",
-      "src/net.c"
+      "build/netgame.o",
+      "src/netgame.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/net.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/net.o"
+    "file": "/Users/wyatt/Documents/cnm-online/src/netgame.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/netgame.o"
   },
   {
     "arguments": [
@@ -674,12 +674,12 @@
       "-I",
       "/usr/local/include",
       "-o",
-      "build/netgame.o",
-      "src/netgame.c"
+      "build/net.o",
+      "src/net.c"
     ],
     "directory": "/Users/wyatt/Documents/cnm-online",
-    "file": "/Users/wyatt/Documents/cnm-online/src/netgame.c",
-    "output": "/Users/wyatt/Documents/cnm-online/build/netgame.o"
+    "file": "/Users/wyatt/Documents/cnm-online/src/net.c",
+    "output": "/Users/wyatt/Documents/cnm-online/build/net.o"
   },
   {
     "arguments": [

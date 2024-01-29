@@ -8,7 +8,7 @@
 #include "game_console.h"
 #include "input.h"
 #include "game.h"
-#include "gui.h"
+//#_include "gui.h"
 #include "utility.h"
 #include "command.h"
 #include "wobj.h"
@@ -33,6 +33,7 @@ void GameState_BitmapBench_Update(void)
 {
 	Input_Update();
 	GameConsole_Update();
+	//Renderer_SetFont(288, 416, 8, 8);
 
 	bench_ticks++;
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING))
@@ -59,10 +60,14 @@ void GameState_BitmapBench_Draw(void)
 	}
 	else
 	{
-		Renderer_DrawBitmap(0, 0, &r, 0, RENDERER_LIGHT);
+		Renderer_Clear(RCOL_LIGHT_BLUE);
 		float score = (float)bench_time / 10.0f;
+		Renderer_DrawBitmap(64, 64, &(CNM_RECT){ .x = 256, .y = 0, .w = 32, .h = 32 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(64, 64+40, &(CNM_RECT){ .x = 256, .y = 0, .w = 31, .h = 32 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(64+41, 64, &(CNM_RECT){ .x = 256, .y = 0, .w = 32, .h = 32 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(64+41, 64+40, &(CNM_RECT){ .x = 256, .y = 0, .w = 31, .h = 32 }, 0, RENDERER_LIGHT);
 		Renderer_DrawText(32, 32, 0, RENDERER_LIGHT, "Bench Complete! Time (ms): %d", (int)score);
-		Renderer_DrawText(32, 32+32, 0, RENDERER_LIGHT, "Efficency Percent: %d", (int)(1000.0f / score * 100.0f));
+		Renderer_DrawText(32, 32+8, 0, RENDERER_LIGHT, "Efficency Percent: %d", (int)(1000.0f / score * 100.0f));
 	}
 	Renderer_DrawText(32, 32+16, 0, RENDERER_LIGHT, "Press enter to abort.");
 	GameConsole_Draw();
