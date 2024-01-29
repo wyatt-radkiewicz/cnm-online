@@ -1082,11 +1082,11 @@ void draw_play_gui_nologic(void) {
 	}
 
 	// Draw the save games
-	for (int i = -2; i <= 2; i++) {
+	for (int i = -4; i <= 4; i++) {
 		int slot = current_save_slot + i;
 		if (slot < 0 || slot > SAVE_SLOTS) continue;
 		const int basey = save_slot_basey + saves_add_y - (slot == current_save_slot ? 6 + loading_save_timer : 0);
-		if (basey < -RENDERER_HEIGHT / 2 || basey > RENDERER_HEIGHT) continue;
+		if (basey < -144 || basey > RENDERER_HEIGHT) continue;
 		int basex, light;
 		draw_save_card(slot, basey, trans, &light, &basex);
 
@@ -1129,11 +1129,11 @@ void draw_play_gui_nologic(void) {
 	}
 
 	// Draw the levels from the selection menu 
-	for (int i = -2; i <= 2; i++) {
+	for (int i = -4; i <= 4; i++) {
 		int slot = current_save_slot + i;
 		if (slot < 0 || slot >= gs_numlvls) continue;
 		const int basey = save_slot_basey + levels_add_y - (slot == current_save_slot ? 6 + loading_save_timer : 0);
-		if (basey < -RENDERER_HEIGHT / 2 || basey > RENDERER_HEIGHT) continue;
+		if (basey < -144 || basey > RENDERER_HEIGHT) continue;
 		int basex, light;
 		draw_save_card(slot, basey, trans, &light, &basex);
 
@@ -1174,10 +1174,10 @@ void draw_play_gui_nologic(void) {
 	ps_pos += ((ps_pos_target + ps_pos_target_add) - ps_pos) * 0.25f;
 
 	if (lvlselect_mode) {
-		saves_add_y += (-RENDERER_HEIGHT - saves_add_y) * 0.25f;
+		saves_add_y += (-(RENDERER_HEIGHT + 16) - saves_add_y) * 0.25f;
 		levels_add_y += (0 - levels_add_y) * 0.25f;
 	} else {
-		levels_add_y += (-RENDERER_HEIGHT - levels_add_y) * 0.25f;
+		levels_add_y += (-(RENDERER_HEIGHT + 16) - levels_add_y) * 0.25f;
 		saves_add_y += (0 - saves_add_y) * 0.25f;
 	}
 }
@@ -1202,7 +1202,14 @@ void draw_play_gui(void) {
 	int num_lvls = globalsave_get_num_levels(&g_globalsave);
 	int *lvlselect = &Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer;
 	int right = *lvlselect ? (num_lvls - 1) : SAVE_SLOTS;
-	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING)) {
+
+	static int move_cooldown = 0;
+	if (--move_cooldown < 0) move_cooldown = 0;
+	if (Input_GetButtonReleased(INPUT_RIGHT, INPUT_STATE_PLAYING) ||
+		Input_GetButtonReleased(INPUT_LEFT, INPUT_STATE_PLAYING)) move_cooldown = 0;
+
+	if (Input_GetButtonPressedRepeated(INPUT_RIGHT, INPUT_STATE_PLAYING) && move_cooldown == 0) {
+		move_cooldown = 2;
 		if (current_save_slot < right) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			current_save_slot++;
@@ -1210,7 +1217,8 @@ void draw_play_gui(void) {
 			ps_pos_target_add = 12;
 		}
 	}
-	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING)) {
+	if (Input_GetButtonPressedRepeated(INPUT_LEFT, INPUT_STATE_PLAYING) && move_cooldown == 0) {
+		move_cooldown = 2;
 		if (current_save_slot > (num_lvls ? -1 : 0)) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			current_save_slot--;

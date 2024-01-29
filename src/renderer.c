@@ -1161,7 +1161,7 @@ void Renderer_DrawBitmap2(int _x, int _y, const CNM_RECT *_src, int trans, int l
 		if (_y >= RENDERER_HEIGHT) {
 			return;
 		} else {
-			if (vflip) src.y += src.h - (RENDERER_WIDTH - _y);
+			if (vflip) src.y += src.h - (RENDERER_HEIGHT - _y);
 			src.h = RENDERER_HEIGHT - _y;
 		}
 	}
