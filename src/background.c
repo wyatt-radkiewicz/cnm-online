@@ -1,17 +1,24 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "background.h"
 #include "game.h"
 #include "renderer.h"
+#include "mem.h"
 
-static BACKGROUND_LAYER bglayers[BACKGROUND_MAX_LAYERS];
+static BACKGROUND_LAYER *bglayers;
 static int bg_start = 0;
 static int bg_end = BACKGROUND_MAX_LAYERS - 1;
 
+static int _dbg = 0;
+
 void Background_ResetBackgrounds(void)
 {
-	memset(bglayers, 0, sizeof(bglayers));
+	assert(_dbg == 0);
+	_dbg = 1;
+	bglayers = arena_global_alloc(sizeof(*bglayers) * BACKGROUND_MAX_LAYERS);
+	memset(bglayers, 0, sizeof(*bglayers) * BACKGROUND_MAX_LAYERS);
 	bg_start = 0;
 	bg_end = BACKGROUND_MAX_LAYERS - 1;
 }

@@ -25,7 +25,7 @@ void GameState_ClientConnecting_Init(void)
 void GameState_ClientConnecting_Quit(void)
 {
 	titlebg_cleanup();
-	arena_pop_zone();
+	arena_pop_zone("TITLEBG");
 }
 void GameState_ClientConnecting_Update(void)
 {

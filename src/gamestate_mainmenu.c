@@ -55,7 +55,7 @@ enum gui_state {
 	GUI_OPTIONS_STATE,
 	GUI_JOIN_STATE,
 	GUI_HOST_STATE,
-	GUI_BROWSE_STATE,
+	GUI_LOCAL_STATE,
 	GUI_PLAY_STATE,
 	GUI_QUIT_STATE,
 	GUI_TITLEBG_STATE,
@@ -85,10 +85,10 @@ typedef struct _XMAS_SNOWFLAKE
 	short x, y;
 	char xdir, alive;
 } XMAS_SNOWFLAKE;
-static unsigned char xmas_static_snow[RENDERER_MAX_HEIGHT][RENDERER_MAX_WIDTH];
-static unsigned char xmas_static_snow_colors[RENDERER_MAX_HEIGHT][RENDERER_MAX_WIDTH];
-static unsigned char xmas_obstacles[RENDERER_MAX_HEIGHT][RENDERER_MAX_WIDTH];
-static XMAS_SNOWFLAKE xmas_snowflakes[NUM_SNOWFLAKES];
+static unsigned char (*xmas_static_snow)[RENDERER_MAX_WIDTH];
+static unsigned char (*xmas_static_snow_colors)[RENDERER_MAX_WIDTH];
+static unsigned char (*xmas_obstacles)[RENDERER_MAX_WIDTH];
+static XMAS_SNOWFLAKE *xmas_snowflakes;
 static int next_snowflake;
 
 MSPAGE_DATA msdata;
@@ -139,10 +139,46 @@ static void scan_and_play_music(void) {
 		iter = Spawners_Iterate(iter);
 	}
 }
+
+static void xmas_init(void) {
+	if (!Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) return;
+
+	arena_push_zone("XMAS_ALLOC");
+
+	// XMAS mode stuff
+	xmas_static_snow = arena_alloc(sizeof(*xmas_static_snow) * RENDERER_MAX_HEIGHT);
+	xmas_snowflakes = arena_alloc(sizeof(*xmas_snowflakes) * RENDERER_MAX_HEIGHT);
+	xmas_obstacles = arena_alloc(sizeof(*xmas_obstacles) * RENDERER_MAX_HEIGHT);
+	xmas_snowflakes = arena_alloc(sizeof(*xmas_snowflakes) * NUM_SNOWFLAKES);
+	memset(xmas_static_snow, 0, sizeof(*xmas_static_snow) * RENDERER_MAX_HEIGHT);
+	memset(xmas_snowflakes, 0, sizeof(*xmas_snowflakes) * RENDERER_MAX_HEIGHT);
+	memset(xmas_obstacles, 0, sizeof(*xmas_obstacles) * RENDERER_MAX_HEIGHT);
+	next_snowflake = 0;
+
+	int x, y, i;
+	for (i = 0; i < NUM_SNOWFLAKES; i++) {
+		xmas_snowflakes[next_snowflake].alive = 1;
+		xmas_snowflakes[next_snowflake].x = rand() % RENDERER_WIDTH;
+		xmas_snowflakes[next_snowflake].y = rand() % (RENDERER_HEIGHT - 5);
+		xmas_snowflakes[next_snowflake].xdir = rand() % 3 - 1;
+		next_snowflake = (next_snowflake + 1) % NUM_SNOWFLAKES;
+	}
+
+	for (y = 0; y < RENDERER_HEIGHT; y++)
+	{
+		for (x = 0; x < RENDERER_WIDTH; x++)
+		{
+			xmas_static_snow_colors[y][x] = 80 + (rand() % 8);
+		}
+	}
+}
+
 static void swap_title_bg(const char *lvl) {
 	char pathbuf[32];
 
-	arena_pop_zone();
+	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) arena_pop_zone("XMAS_ALLOC");
+
+	arena_pop_zone("TITLEBG");
 	arena_push_zone("TITLEBG");
 
 	// Load in the graphics for the level
@@ -156,6 +192,7 @@ static void swap_title_bg(const char *lvl) {
 
 	titlebg_cleanup();
 	titlebg_init();
+	xmas_init();
 }
 
 void GameState_MainMenu_Init(void)
@@ -198,35 +235,16 @@ void GameState_MainMenu_Init(void)
 	globalsave_save(&g_globalsave);
 	//pressed_start = CNM_FALSE;
 
-	// XMAS mode stuff
-	memset(xmas_static_snow, 0, sizeof(xmas_static_snow));
-	memset(xmas_snowflakes, 0, sizeof(xmas_snowflakes));
-	memset(xmas_obstacles, 0, sizeof(xmas_obstacles));
-	next_snowflake = 0;
-
-	int x, y, i;
-	for (i = 0; i < NUM_SNOWFLAKES; i++) {
-		xmas_snowflakes[next_snowflake].alive = 1;
-		xmas_snowflakes[next_snowflake].x = rand() % RENDERER_WIDTH;
-		xmas_snowflakes[next_snowflake].y = rand() % (RENDERER_HEIGHT - 5);
-		xmas_snowflakes[next_snowflake].xdir = rand() % 3 - 1;
-		next_snowflake = (next_snowflake + 1) % NUM_SNOWFLAKES;
-	}
-
-	for (y = 0; y < RENDERER_HEIGHT; y++)
-	{
-		for (x = 0; x < RENDERER_WIDTH; x++)
-		{
-			xmas_static_snow_colors[y][x] = 80 + (rand() % 8);
-		}
-	}
+	xmas_init();
 }
 void GameState_MainMenu_Quit(void)
 {
+	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) arena_pop_zone("XMAS_ALLOC");
+
 	Net_RemovePollingFunc(MainMenu_OnPacket);
 	if (cleanup_bg) {
 		titlebg_cleanup();
-		arena_pop_zone();
+		arena_pop_zone("TITLEBG");
 	}
 }
 
@@ -301,31 +319,8 @@ static void MainMenu_OnPacket(NET_PACKET *packet)
 		//}
 	}
 }
-void GameState_MainMenu_Update(void)
-{
-	Net_PollPackets(64);
-	Net_Update();
-	Input_Update();
-	GameConsole_Update();
 
-	refresh_cooldown--;
-	//if (refresh_cooldown < 0) {
-	//	strcpy(serverbrowser->elements[2].name, "<REFRESH PAGE>");
-	//	if (msdata.page + 1 < msdata.num_pages)
-	//		serverbrowser->elements[MSPAGE_SIZE*4+SB_START+1].active = CNM_TRUE;
-	//	if (msdata.page > 0)
-	//		serverbrowser->elements[MSPAGE_SIZE*4+SB_START+2].active = CNM_TRUE;
-	//}
-	//else {
-	//	strcpy(serverbrowser->elements[2].name, "REFRESHING...");
-	//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 1].active = CNM_FALSE;
-	//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
-	//}
-
-	titlebg_update();
-
-
-
+static void xmas_update(void) {
 	// XMAS MODE!
 	if (!Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) return;
 
@@ -385,6 +380,35 @@ void GameState_MainMenu_Update(void)
 		}
 	}
 }
+
+void GameState_MainMenu_Update(void)
+{
+	Net_PollPackets(64);
+	Net_Update();
+	Input_Update();
+	GameConsole_Update();
+
+	refresh_cooldown--;
+	//if (refresh_cooldown < 0) {
+	//	strcpy(serverbrowser->elements[2].name, "<REFRESH PAGE>");
+	//	if (msdata.page + 1 < msdata.num_pages)
+	//		serverbrowser->elements[MSPAGE_SIZE*4+SB_START+1].active = CNM_TRUE;
+	//	if (msdata.page > 0)
+	//		serverbrowser->elements[MSPAGE_SIZE*4+SB_START+2].active = CNM_TRUE;
+	//}
+	//else {
+	//	strcpy(serverbrowser->elements[2].name, "REFRESHING...");
+	//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 1].active = CNM_FALSE;
+	//	serverbrowser->elements[MSPAGE_SIZE * 4 + SB_START + 2].active = CNM_FALSE;
+	//}
+
+	titlebg_update();
+
+
+
+	xmas_update();
+
+}
 static int gui_timer;
 static int side_blob_x;
 static int side_xstart;
@@ -397,7 +421,7 @@ static const char *option_names[] = {
 	"OPTIONS",
 	"JOIN GAME",
 	"HOST GAME",
-	"BROWSE GAME",
+	"LOCAL CO-OP",
 	"TITLE BG",
 	"SEE YA MAN",
 };
@@ -436,10 +460,10 @@ static const char *help_text[][4] = {
 		"",
 	},
 	{
-		"BROWSE THE",
-		"MASTER",
-		"SERVER FOR",
-		"GAMES",
+		"HOST A",
+		"SPLITSCREEN",
+		"MULTIPLAYER",
+		"GAME",
 	},
 	{
 		"CUSTOMIZE",
@@ -1519,7 +1543,7 @@ void draw_press_start(void) {
 	}
 }
 
-void draw_browser_game_gui(void) {
+void draw_local_game_gui(void) {
 	draw_main_gui_bars();
 
 	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_GUI)) {
@@ -1791,7 +1815,7 @@ void draw_new_gui(void) {
 	case GUI_OPTIONS_STATE: draw_options_gui(); break;
 	case GUI_JOIN_STATE: draw_join_game_gui(); break;
 	case GUI_HOST_STATE: draw_host_game_gui(); break;
-	case GUI_BROWSE_STATE: draw_browser_game_gui(); break;
+	case GUI_LOCAL_STATE: draw_local_game_gui(); break;
 	case GUI_QUIT_STATE: draw_quit_gui(); break;
 	case GUI_TITLEBG_STATE: draw_titlebg_gui(); break;
 	}
@@ -1807,31 +1831,35 @@ void draw_play_gui_bg(void) {
 		Renderer_DrawBitmap(playbit1_x, RENDERER_HEIGHT - r.h, &r, trans, RENDERER_LIGHT);
 	}
 }
-void GameState_MainMenu_Draw(void)
-{
-	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) {
-		int x, y, z;
-		Renderer_Clear(RCOL_BLACK);
-		for (y = 0; y < RENDERER_HEIGHT; y++) {
-			for (x = 0; x < RENDERER_WIDTH; x++) {
-				xmas_obstacles[y][x] = CNM_FALSE;//(Renderer_GetPixel(x, y) != Renderer_MakeColor(0, 0, 0));
-			}
-		}
 
-		Renderer_Clear(RCOL_BLACK);
-
-		for (y = 0; y < RENDERER_HEIGHT; y++) {
-			for (x = 0; x < RENDERER_WIDTH; x++) {
-				z = (255 - (x % 32));
-				if (xmas_static_snow[y][x]) Renderer_PlotPixel(x, y, xmas_static_snow_colors[y][x]);
-			}
-		}
-
-		for (x = 0; x < NUM_SNOWFLAKES; x++) {
-			if (xmas_snowflakes[x].alive)
-				Renderer_PlotPixel(xmas_snowflakes[x].x, xmas_snowflakes[x].y, RCOL_WHITE);
+static void xmas_draw_bg(void) {
+	if (!Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) return;
+	int x, y, z;
+	Renderer_Clear(RCOL_BLACK);
+	for (y = 0; y < RENDERER_HEIGHT; y++) {
+		for (x = 0; x < RENDERER_WIDTH; x++) {
+			xmas_obstacles[y][x] = CNM_FALSE;//(Renderer_GetPixel(x, y) != Renderer_MakeColor(0, 0, 0));
 		}
 	}
+
+	Renderer_Clear(RCOL_BLACK);
+
+	for (y = 0; y < RENDERER_HEIGHT; y++) {
+		for (x = 0; x < RENDERER_WIDTH; x++) {
+			z = (255 - (x % 32));
+			if (xmas_static_snow[y][x]) Renderer_PlotPixel(x, y, xmas_static_snow_colors[y][x]);
+		}
+	}
+
+	for (x = 0; x < NUM_SNOWFLAKES; x++) {
+		if (xmas_snowflakes[x].alive)
+			Renderer_PlotPixel(xmas_snowflakes[x].x, xmas_snowflakes[x].y, RCOL_WHITE);
+	}
+}
+
+void GameState_MainMenu_Draw(void)
+{
+	xmas_draw_bg();
 
 	titlebg_draw(draw_play_gui_bg);
 

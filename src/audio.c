@@ -7,13 +7,14 @@
 #include "utility.h"
 #include "audio.h"
 #include "game.h"
+#include "mem.h"
 
 #define MAX_CHANNELS 8
 
 static int audio_initialized = CNM_FALSE;
-static Mix_Music *audio_musics[AUDIO_MAX_IDS];
+static Mix_Music **audio_musics;
 //static int audio_musvolume;
-static Mix_Chunk *audio_chunks[AUDIO_MAX_IDS];
+static Mix_Chunk **audio_chunks;
 static int audio_x, audio_y;
 static int audio_current_mus = -1;
 static int audio_no_audio = CNM_FALSE;
@@ -30,8 +31,10 @@ void Audio_Init(void)
 	}
 
 	//Mix_AllocateChannels(MAX_CHANNELS);
-	memset(audio_musics, 0, sizeof(audio_musics));
-	memset(audio_chunks, 0, sizeof(audio_chunks));
+	audio_musics = arena_global_alloc(sizeof(*audio_musics) * AUDIO_MAX_IDS);
+	audio_chunks = arena_global_alloc(sizeof(*audio_chunks) * AUDIO_MAX_IDS);
+	memset(audio_musics, 0, sizeof(*audio_musics) * AUDIO_MAX_IDS);
+	memset(audio_chunks, 0, sizeof(*audio_chunks) * AUDIO_MAX_IDS);
 	audio_x = 0;
 	audio_y = 0;
 	audio_current_mus = -1;

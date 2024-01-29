@@ -27,7 +27,7 @@ void GameState_MasterServer_Init(void)
 void GameState_MasterServer_Quit(void)
 {
 	Net_RemovePollingFunc(MasterServer_OnPacket);
-	arena_pop_zone();
+	arena_pop_zone("MSERV");
 }
 static void MasterServer_OnPacket(NET_PACKET *packet)
 {

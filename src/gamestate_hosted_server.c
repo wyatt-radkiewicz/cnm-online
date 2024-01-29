@@ -49,7 +49,7 @@ void GameState_HostedServer_Quit(void)
 	World_Stop();
 	//NetFile_RemoveNetCallbacks();
 	Server_Destroy();
-	arena_pop_zone();
+	arena_pop_zone("HOSTEDSERV");
 }
 void GameState_HostedServer_Update(void)
 {

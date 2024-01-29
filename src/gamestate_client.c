@@ -55,7 +55,7 @@ void GameState_Client_Quit(void)
 {
 	Client_Destory();
 	World_Stop();
-	arena_pop_zone();
+	arena_pop_zone("CLIENT");
 }
 void GameState_Client_Update(void)
 {

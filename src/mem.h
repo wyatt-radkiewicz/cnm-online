@@ -52,14 +52,14 @@ void *fixedpool_alloc(fixedpool_t *self);
 void fixedpool_free(fixedpool_t *self, void *blk);
 int fixedpool_empty(const fixedpool_t *self);
 
-#define ARENA_SIZE (1024*1024*8)
+#define ARENA_SIZE (1024*1024*10)
 
 void arena_init(const char *base_zone_name);
 void arena_deinit(void);
 void *arena_alloc(size_t size);
 void arena_popfree(void *blk);
 void arena_push_zone(const char *zone_name);
-void arena_pop_zone(void);
+void arena_pop_zone(const char *expected_zone);
 void *arena_global_alloc(size_t size);
 void arena_global_popfree(void *blk);
 size_t arena_used_mem(void);

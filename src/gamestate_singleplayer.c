@@ -44,7 +44,7 @@ void GameState_Singleplayer_Init(void)
 void GameState_Singleplayer_Quit(void)
 {
 	World_Stop();
-	arena_pop_zone();
+	arena_pop_zone("SPLAY");
 }
 void GameState_Singleplayer_Update(void)
 {

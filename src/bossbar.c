@@ -4,28 +4,27 @@
 #include "utility.h"
 #include "wobj.h"
 #include "game.h"
+#include "mem.h"
 
 #define MAX_BARS 12
 #define MAX_CONCURRENT_BARS 4
 #define TIMEOUT_DURATION 60
 
-static float maxhps[MAX_BARS];
-static char bossnames[MAX_BARS][UTIL_MAX_TEXT_WIDTH];
-static unsigned int bossnodes[MAX_BARS];
-static unsigned int bossuuids[MAX_BARS];
-static float hps[MAX_BARS];
-static int timeouts[MAX_BARS];
+typedef struct bossbar {
+	float maxhp, hp;
+	int timeout;
+	unsigned int node, uuid;
+	char name[UTIL_MAX_TEXT_WIDTH];
+} bossbar_t;
+
+static bossbar_t *bars;
 
 static int BossBar_GetFreeBar(unsigned int wobj_node, unsigned int wobj_uuid);
 
 void BossBar_Init(void)
 {
-	memset(bossnodes, 0, sizeof(bossnodes));
-	memset(bossuuids, 0, sizeof(bossuuids));
-	memset(bossnames, 0, sizeof(bossnames));
-	memset(maxhps, 0, sizeof(maxhps));
-	memset(hps, 0, sizeof(hps));
-	memset(timeouts, 0, sizeof(timeouts));
+	bars = arena_alloc(sizeof(*bars) * MAX_BARS);
+	memset(bars, 0, sizeof(*bars) * MAX_BARS);
 }
 void BossBar_Update(void)
 {
@@ -35,17 +34,19 @@ void BossBar_Update(void)
 	if (Game_GetFrame() % 8 != 0) return;
 	// Get the hp of all the guys
 	for (i = 0; i < MAX_BARS; i++) {
-		if (timeouts[i] <= 0) continue;
-		w = Wobj_GetAnyWOBJFromUUIDAndNode(bossnodes[i], bossuuids[i]);
+		bossbar_t *bar = &bars[i];
+
+		if (bar->timeout <= 0) continue;
+		w = Wobj_GetAnyWOBJFromUUIDAndNode(bar->node, bar->uuid);
 
 		if (w != NULL) {
-			timeouts[i] = TIMEOUT_DURATION;
-			hps[i] = w->health;
+			bar->timeout = TIMEOUT_DURATION;
+			bar->hp = w->health;
 		}
 		else {
-			timeouts[i] = 0;
+			bar->timeout = 0;
 		}
-		timeouts[i]--;
+		bar->timeout--;
 	}
 }
 void BossBar_Draw(void)
@@ -54,18 +55,20 @@ void BossBar_Draw(void)
 	CNM_RECT src;
 
 	for (i = 0, j = 0; i < MAX_BARS; i++) {
-		if (timeouts[i] > 0) {
-			width = strlen(bossnames[i]) * 8;
+		bossbar_t *bar = &bars[i];
+
+		if (bar->timeout > 0) {
+			width = strlen(bar->name) * 8;
 			x = RENDERER_WIDTH / 2 - width / 2;
 			y = 4 + j * (10+10+4);
 
-			Renderer_DrawText(x, y, 0, RENDERER_LIGHT, bossnames[i]);
+			Renderer_DrawText(x, y, 0, RENDERER_LIGHT, bar->name);
 			x = RENDERER_WIDTH / 2 - 128;
 			y += 10;
-			if (maxhps[0] == 0.0f)
+			if (bar->maxhp == 0.0f)
 				pixels = 0;
 			else
-				pixels = (int)((hps[i] / maxhps[i]) * 256.0f);
+				pixels = (int)((bar->hp / bar->maxhp) * 256.0f);
 			if (pixels < 0) pixels = 0;
 			if (pixels > 256) pixels = 256;
 			Util_SetRect(&src, 256, 1672, 256 - pixels, 8);
@@ -86,15 +89,18 @@ void BossBar_RegisterBar(unsigned int wobj_node, unsigned int wobj_uuid, float m
 	id = BossBar_GetFreeBar(wobj_node, wobj_uuid);
 	if (id > -1)
 	{
+		bossbar_t *bar = &bars[id];
 		if (id & 0x800000) {
 			id &= ~0x800000;
-			hps[id] = maxhp;
-			strcpy(bossnames[id], bossname);
-			maxhps[id] = maxhp;
-			bossnodes[id] = wobj_node;
-			bossuuids[id] = wobj_uuid;
+			bar = &bars[id];
+
+			bar->hp = maxhp;
+			strcpy(bar->name, bossname);
+			bar->maxhp = maxhp;
+			bar->node = wobj_node;
+			bar->uuid = wobj_uuid;
 		}
-		timeouts[id] = TIMEOUT_DURATION;
+		bar->timeout = TIMEOUT_DURATION;
 	}
 }
 
@@ -102,12 +108,12 @@ static int BossBar_GetFreeBar(unsigned int wobj_node, unsigned int wobj_uuid) {
 	int i;
 
 	for (i = 0; i < MAX_BARS; i++) {
-		if (bossnodes[i] == wobj_node && bossuuids[i] == wobj_uuid && timeouts[i] > 0) {
+		if (bars[i].node == wobj_node && bars[i].uuid == wobj_uuid && bars[i].timeout > 0) {
 			return i;
 		}
 	}
 	for (i = 0; i < MAX_BARS; i++) {
-		if (timeouts[i] <= 0)
+		if (bars[i].timeout <= 0)
 		{
 			return i | 0x800000;
 		}

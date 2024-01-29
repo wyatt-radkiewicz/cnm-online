@@ -213,10 +213,15 @@ void arena_push_zone(const char *dbgname) {
 	_stack[++_stack_top] = _arena_head;
 	_stack_dbgnames[_stack_top] = dbgname;
 }
-void arena_pop_zone(void) {
+void arena_pop_zone(const char *expected_zone) {
 #if defined(DEBUG) && DBGARENA == 1
 	Console_Print("pop zone %s", _stack_dbgnames[_stack_top]);
 #endif
+	if (expected_zone && strcmp(expected_zone, _stack_dbgnames[_stack_top]) != 0) {
+		Console_Print("ERROR: Expected arena stack: \"%s\",", expected_zone);
+		Console_Print("but got stack name \"%s\" instead!", _stack_dbgnames[_stack_top]);
+		assert(0);
+	}
 	assert(_stack_top > 0);
 	assert(_arena_head >= _stack[_stack_top]);
 	_arena_head = _stack[_stack_top--];
