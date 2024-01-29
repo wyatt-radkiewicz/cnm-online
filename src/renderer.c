@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "console.h"
 #include "game.h"
+#include "mem.h"
 
 #define RENDERER_LEVELS 8
 
@@ -17,8 +18,8 @@ static SDL_Surface *renderer_scr;
 static SDL_Surface *renderer_gfx;
 static SDL_Surface *renderer_hires_temp;
 static SDL_Surface *renderer_effects_buf;
-static unsigned char renderer_trans[256][256][RENDERER_LEVELS]; /* Source color, Destination Color, Transparency level */
-static unsigned char renderer_light[256][RENDERER_LEVELS]; /* Color, Light level */
+static unsigned char (*renderer_trans)[256][RENDERER_LEVELS]; /* Source color, Destination Color, Transparency level */
+static unsigned char (*renderer_light)[RENDERER_LEVELS]; /* Color, Light level */
 static CNM_RECT renderer_font;
 static int renderer_fullscreen;
 static int renderer_initialized = CNM_FALSE;
@@ -45,6 +46,9 @@ void Renderer_Init(int start_fullscreen, int hi_res, int widescreen)
 {
 	RENDERER_WIDTH = widescreen ? 424 : 320;
 	RENDERER_HEIGHT = 240;
+
+	renderer_trans = arena_global_alloc(sizeof(*renderer_trans) * 256);
+	renderer_light = arena_global_alloc(sizeof(*renderer_light) * 256);
 	
 	renderer_fullscreen = start_fullscreen;
 	renderer_hires_mode = hi_res;
