@@ -1062,47 +1062,57 @@ void Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int li
 		return;
 	}
 
+	// Only go for 32 and above because otherwise its not worth it for speed
+#if 1
 	if (light == RENDERER_LIGHT && trans == 0 && src.x % 8 == 0 && src.w >= 32) {
-		const uint64_t *restrict src_pixel = (uint64_t *)(((uint8_t *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x));
-		const int grid_x = _x / 8;
-		const int grid_srcw = (src.w - 1) / 8 + 1;
-		uint64_t *restrict dest_pixel = (uint64_t *)(((uint8_t *)renderer_scr->pixels) + (_y * RENDERER_WIDTH + grid_x*8));
-		const int grid_destw = ((_x + src.w - 1) / 8 + 1) - grid_x;
+ 		const uint64_t *restrict src_pixel = (uint64_t *)(((uint8_t *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x));
+ 		const int grid_x = _x / 8;
+ 		const int grid_srcw = (src.w - 1) / 8 + 1;
+ 		uint64_t *restrict dest_pixel = (uint64_t *)(((uint8_t *)renderer_scr->pixels) + (_y * RENDERER_WIDTH + grid_x*8));
+ 		const int grid_destw = ((_x + src.w - 1) / 8 + 1) - grid_x;
 
-		const int dest_mod = (_x - grid_x*8) * 8;
-		const uint64_t start_set_mask = ((uint64_t)-1) << dest_mod;
-		const uint64_t end_set_mask = ((uint64_t)-1) >> (64 - ((_x + src.w) % 8)*8);
-		const bool dirty_end = end_set_mask != (uint64_t)-1;
-		const bool clean_start = _x == grid_x*8;
+ 		const int dest_mod = (_x - grid_x*8) * 8;
+ 		const uint64_t start_set_mask = ((uint64_t)-1) << dest_mod;
+		const int end_set_mask_shift = (64 - ((_x + src.w) % 8)*8);
+ 		const uint64_t end_set_mask = ((uint64_t)-1) >> (end_set_mask_shift == 64 ? 0 : end_set_mask_shift);
+ 		const bool dirty_end = end_set_mask != (uint64_t)-1;
+ 		const bool clean_start = _x == grid_x*8;
 
-		const int src_pitch = renderer_gfx->w / sizeof(uint64_t) - grid_srcw + (!clean_start && !dirty_end);
-		const int gfx_pitch = RENDERER_WIDTH / sizeof(uint64_t) - grid_destw;
+ 		const int src_pitch = renderer_gfx->w / sizeof(uint64_t) - grid_srcw + (!clean_start && !dirty_end);
+ 		const int gfx_pitch = RENDERER_WIDTH / sizeof(uint64_t) - grid_destw;
 
-		for (int y = 0; y < src.h; y++) {
-			uint64_t srcload = rol64(*src_pixel, dest_mod);
-			*dest_pixel = passthru((srcload & start_set_mask) | (*dest_pixel & ~start_set_mask), *dest_pixel);
-			
-			for (int x = 1+dirty_end; x < grid_destw; x++) {
-				dest_pixel++;
-				src_pixel++;
-				srcload &= ~start_set_mask;
-				srcload |= *src_pixel << dest_mod;
-				*dest_pixel = passthru(srcload, *dest_pixel);
-				srcload = *src_pixel >> (64 - dest_mod);
-			}
+ 		for (int y = 0; y < src.h; y++) {
+ 			uint64_t srcload = rol64(*src_pixel, dest_mod);
+ 			*dest_pixel = passthru((srcload & start_set_mask) | (*dest_pixel & ~start_set_mask), *dest_pixel);
 
-			if (dirty_end) {
-				dest_pixel++;
-				src_pixel++;
-				if (clean_start) srcload = *src_pixel;
-				*dest_pixel = passthru((srcload & end_set_mask) | (*dest_pixel & ~end_set_mask), *dest_pixel);
-			}
+ 			for (int x = 1+dirty_end; x < grid_destw; x++) {
+ 				dest_pixel++;
+ 				src_pixel++;
+ 				srcload &= ~start_set_mask;
+ 				srcload |= *src_pixel << dest_mod;
+ 				*dest_pixel = passthru(srcload, *dest_pixel);
+ 				srcload = *src_pixel >> (64 - dest_mod);
+ 			}
 
-			src_pixel += src_pitch+clean_start;
-			dest_pixel += gfx_pitch+1; // Make up for not consuming last dest pixel
-		}
-		return;
-	}
+ 			if (dirty_end) {
+ 				dest_pixel++;
+ 				src_pixel++;
+ 				if (clean_start) {
+					srcload = *src_pixel;
+				} else if (src.w % 8 != 0) {
+					// We still have a little left probably to load...
+					src_pixel++;
+					srcload |= *src_pixel << dest_mod;
+				}
+ 				*dest_pixel = passthru((srcload & end_set_mask) | (*dest_pixel & ~end_set_mask), *dest_pixel);
+ 			}
+
+ 			src_pixel += src_pitch+clean_start;
+ 			dest_pixel += gfx_pitch+1; // Make up for not consuming last dest pixel
+ 		}
+ 		return;
+ 	}
+#endif
 
 #ifdef DEBUG
 	if (_src->x % 8 != 0 && _src->w > RENDERER_MAX_WIDTH / 2) {

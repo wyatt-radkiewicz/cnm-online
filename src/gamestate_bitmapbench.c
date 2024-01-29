@@ -62,7 +62,13 @@ void GameState_BitmapBench_Draw(void)
 	{
 		Renderer_Clear(RCOL_LIGHT_BLUE);
 		float score = (float)bench_time / 10.0f;
-		Renderer_DrawBitmap(2, 64, &(CNM_RECT){ .x = 416+8, .y = 1264, .w = 16, .h = 5 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(RENDERER_WIDTH - 8 - 4, 128, &(CNM_RECT){ .x = 256, .y = 256, .w = 128, .h = 64 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(2, 64, &(CNM_RECT){ .x = 416, .y = 1264, .w = 32, .h = 5 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(2, 64+5, &(CNM_RECT){ .x = 416, .y = 1264, .w = 31, .h = 5 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(RENDERER_WIDTH / 2 + 112 - 20 - 85 + 2, RENDERER_HEIGHT / 2 + 16 + 12+(12*3) + 1, &(CNM_RECT){ .x = 416, .y = 1264, .w = 22, .h = 5 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(2, 64+15, &(CNM_RECT){ .x = 416, .y = 1264, .w = 33, .h = 5 }, 0, RENDERER_LIGHT);
+		Renderer_DrawBitmap(2, 64+20, &(CNM_RECT){ .x = 416, .y = 1264, .w = 34, .h = 5 }, 0, RENDERER_LIGHT);
+		Renderer_DrawRect(&(CNM_RECT){ .x = 2, .y = 63, .w = 17, .h = 1 }, RCOL_RED, 0, RENDERER_LIGHT);
 		Renderer_DrawBitmap(64, 64, &(CNM_RECT){ .x = 256, .y = 0, .w = 32, .h = 32 }, 0, RENDERER_LIGHT);
 		Renderer_DrawBitmap(64, 64+40, &(CNM_RECT){ .x = 256, .y = 0, .w = 31, .h = 32 }, 0, RENDERER_LIGHT);
 		Renderer_DrawBitmap(64+41, 64, &(CNM_RECT){ .x = 256, .y = 0, .w = 32, .h = 32 }, 0, RENDERER_LIGHT);
