@@ -1062,7 +1062,7 @@ void Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int li
 		return;
 	}
 
-	if (light == RENDERER_LIGHT && trans == 0 && src.x % 8 == 0 && src.w >= 16) {
+	if (light == RENDERER_LIGHT && trans == 0 && src.x % 8 == 0 && src.w >= 32) {
 		const uint64_t *restrict src_pixel = (uint64_t *)(((uint8_t *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x));
 		const int grid_x = _x / 8;
 		const int grid_srcw = (src.w - 1) / 8 + 1;

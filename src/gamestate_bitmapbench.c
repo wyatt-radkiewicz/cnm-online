@@ -62,6 +62,7 @@ void GameState_BitmapBench_Draw(void)
 	{
 		Renderer_Clear(RCOL_LIGHT_BLUE);
 		float score = (float)bench_time / 10.0f;
+		Renderer_DrawBitmap(2, 64, &(CNM_RECT){ .x = 416+8, .y = 1264, .w = 16, .h = 5 }, 0, RENDERER_LIGHT);
 		Renderer_DrawBitmap(64, 64, &(CNM_RECT){ .x = 256, .y = 0, .w = 32, .h = 32 }, 0, RENDERER_LIGHT);
 		Renderer_DrawBitmap(64, 64+40, &(CNM_RECT){ .x = 256, .y = 0, .w = 31, .h = 32 }, 0, RENDERER_LIGHT);
 		Renderer_DrawBitmap(64+41, 64, &(CNM_RECT){ .x = 256, .y = 0, .w = 32, .h = 32 }, 0, RENDERER_LIGHT);
