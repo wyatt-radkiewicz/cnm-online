@@ -1063,7 +1063,7 @@ void Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int li
 	}
 
 	// Only go for 32 and above because otherwise its not worth it for speed
-#if 1
+#if 0
 	if (light == RENDERER_LIGHT && trans == 0 && src.x % 8 == 0 && src.w >= 32) {
  		const uint64_t *restrict src_pixel = (uint64_t *)(((uint8_t *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x));
  		const int grid_x = _x / 8;
