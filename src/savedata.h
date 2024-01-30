@@ -1,6 +1,36 @@
 #ifndef _savedata_h_
 #define _savedata_h_
 
+	//
+	//Here we go again, motherfucker
+	//Yeah
+	//Come on down and see the idiot right here
+	//Too fucked to beg and not afraid to care
+	//What's the matter with calamity anyway?
+	//Right? Get the fuck outta my face
+	//Understand I can't feel anything
+	//It isn't like I wanna sift through the decay
+	//I feel like a wound like I got a fucking gun against my head
+	//You live when I'm dead
+	//One more time, motherfucker
+	//Everybody hates me now, so fuck it
+	//Blood's on my face and my hands
+	//And I don't know why I'm not afraid to cry
+	//But that's none of your business
+	//Whose life is it? Get it? See it? Feel it? Eat it?
+	//Spin it around so I can spit in its face
+	//I wanna leave without a trace
+	//'Cause I don't wanna die in this place
+	//People equal shit
+	//People equal shit
+	//People equal shit
+	//People equal shit
+	//What you gonna do?
+	//(PEOPLE EQUAL SHIT) 'Cause I'm not afraid of you
+	//(PEOPLE EQUAL SHIT) I'm everything you'll never be
+	//(PEOPLE EQUAL SHIT) Yeah
+	//
+
 typedef struct savedata {
 	//int started;
 	int lives, hp, strength;
