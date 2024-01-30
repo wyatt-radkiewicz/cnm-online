@@ -22,6 +22,9 @@
 #include "background.h"
 //#_include "gamelua.h"
 #include "savedata.h"
+#include "petdefs.h"
+#include "player.h"
+#include "ending_text.h"
 #include "mem.h"
 
 #define GAME_MAX_STATES 8
@@ -269,9 +272,11 @@ void GameState_Base_Init(void)
 	}
 
 	Game_InitGameVars();
+	savedata_sys_init();
 	FileSystem_Init();
 	//Blocks_SetWorldSize(512, 256);
 	//Blocks_GenBlockProps(1024);
+	EndingText_Init();
 	TeleportInfos_Init();
 	Spawners_Init();
 	Wobj_Init();
@@ -282,6 +287,8 @@ void GameState_Base_Init(void)
 	//Console_Print("WELCOME TO CNM ONLINE!");
 	Console_Print("WELCOME TO CNM ONLINE "CNM_VERSION_STRING"!");
 	Serial_LoadConfig();
+	petdef_sys_init();
+	player_sys_init();
 	if (!dgame_info.dedicated && !dgame_info.master_server)
 	{
 		Renderer_Init(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,

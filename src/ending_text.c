@@ -6,8 +6,9 @@
 #include "utility.h"
 #include "input.h"
 #include "audio.h"
+#include "mem.h"
 
-char ending_lines[ENDING_TEXT_MAX_LINES][ENDING_TEXT_MAX_WIDTH + 1];
+char (*ending_lines)[ENDING_TEXT_MAX_WIDTH + 1];
 static int ending_y = 1000000;
 static int ending_line_start = 0;
 static int ending_line_end = 0;
@@ -26,6 +27,10 @@ static int done_drawing = CNM_FALSE;
 static int dialoge_push_cooldown = 0;
 static int dialoge_automatic_end_timer = 0;
 
+void EndingText_Init(void) {
+	ending_lines = arena_global_alloc(sizeof(*ending_lines) * ENDING_TEXT_MAX_LINES);
+	memset(ending_lines, 0, sizeof(*ending_lines) * ENDING_TEXT_MAX_LINES);
+}
 void EndingText_ResetYValue(void)
 {
 	dialoge_cooldown = 0;
@@ -80,7 +85,7 @@ void EndingText_Draw(void)
 }
 void EndingText_ClearAllLines(void)
 {
-	memset(ending_lines, 0, sizeof(ending_lines));
+	memset(ending_lines, 0, sizeof(*ending_lines) * ENDING_TEXT_MAX_LINES);
 }
 
 void Dialoge_Start(int start_line, int end_line)

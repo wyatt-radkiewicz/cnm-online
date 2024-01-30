@@ -6,6 +6,7 @@
 #define ENDING_TEXT_MAX_WIDTH (UTIL_MAX_TEXT_WIDTH - 8)
 #define DIALOGE_PAGE_LINES 3
 
+void EndingText_Init(void);
 void EndingText_ResetYValue(void);
 void EndingText_SetLine(int index, const char *line);
 const char *EndingText_GetLine(int index);

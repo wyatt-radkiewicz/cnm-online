@@ -8,7 +8,7 @@
 #include "mem.h"
 
 static int net_initialized = CNM_FALSE;
-#define NET_MAX_POLLING_FUNCS 8
+#define NET_MAX_POLLING_FUNCS 4
 #ifdef DEBUG
 #define NET_MAX_FAKEDPINGERS 2048
 #else
@@ -27,7 +27,7 @@ typedef struct fakedpinger {
 } fakedpinger_t;
 static NET_SAFE *net_head;
 static int net_fake_loss;
-static fakedpinger_t _pingers[NET_MAX_FAKEDPINGERS];
+static fakedpinger_t *_pingers;
 static int _pingframes, _total_pingframes, _num_pingers;
 static uint32_t net_avg_incoming[30];
 static uint32_t net_avg_outgoing[30];
@@ -92,6 +92,9 @@ void Net_Init(void)
 	_pingframes = 0;
 	_total_pingframes = 0;
 	_num_pingers = 0;
+
+	_pingers = arena_global_alloc(sizeof(*_pingers) * NET_MAX_FAKEDPINGERS);
+
 	memset(net_avg_incoming, 0, sizeof(net_avg_incoming));
 	memset(net_avg_outgoing, 0, sizeof(net_avg_outgoing));
 	//net_pool = Pool_Create(sizeof(NET_SAFE));
@@ -298,7 +301,7 @@ void Net_Update(void)
 		s->times_sent++;
 		if (s->times_sent % 10 == 0)
 			Net_Send2(&s->packet, CNM_FALSE, CNM_TRUE, CNM_TRUE);
-		if (s->times_sent >= 600)
+		if (s->times_sent >= 600) // 20 seconds
 			Net_DestroySafe(s);
 		s = n;
 	}

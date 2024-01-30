@@ -25,8 +25,10 @@ struct globalsave {
 #define SAVE_DIR "saves/"
 
 extern int g_current_save;
-extern savedata_t g_saves[SAVE_SLOTS+1];
+extern savedata_t *g_saves;
 extern struct globalsave g_globalsave;
+
+void savedata_sys_init(void);
 
 void new_save(savedata_t *data);
 void save_game(int slot, const savedata_t *data);

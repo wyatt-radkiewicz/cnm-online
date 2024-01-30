@@ -279,7 +279,7 @@ void Wobj_Quit(void);
 void Wobj_SetNodeId(int node);
 int Wobj_GetNodeId(void);
 WOBJ *Wobj_CreateOwned(int type, float x, float y, int ci, float cf);
-WOBJ *Wobj_CreateUnowned(int type, float x, float y, int frame, int flags, int ci, float cf, int node_id, int uuid);
+WOBJ *Wobj_CreateUnowned(int type, float x, float y, int frame, int flags, int ci, float cf, int node_id, int uuid, int run_create);
 void Wobj_RecreateUnwoned(WOBJ *wobj, float tx, float ty);
 void Wobj_DestroyWobj(WOBJ *wobj);
 void Wobj_DestroyUnownedWobjs(void);

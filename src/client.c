@@ -128,7 +128,7 @@ void Client_Update(NET_PACKET *packet)
 
 	if (packet->hdr.type == NET_SERVER_OWNED_OBJECTS)
 	{
-		Wobj_CreateUnowned(WOBJ_SLIME, 0, 0, 0, 0, 0, 0, 0, 0);
+		//Wobj_CreateUnowned(WOBJ_SLIME, 0, 0, 0, 0, 0, 0, 0, 0);
 		WOBJ wobj_data;
 		NET_OWNED_OBJECTS header;
 		memcpy(&header, packet->data, sizeof(NET_OWNED_OBJECTS));
@@ -168,7 +168,7 @@ void Client_Update(NET_PACKET *packet)
 			NetGame_SetHistoryWobjFromNode(0, header.frame, (struct wobjdata *)&wobj_data);
 			//memcpy(&wobj_data, packet->data + ptr, WOBJ_NET_SIZE);
 			if (netgame_should_create_unowned(wobj_data.node_id, wobj_data.uuid)) {
-				WOBJ *new_wobj = Wobj_CreateUnowned(wobj_data.type, wobj_data.x, wobj_data.y, wobj_data.anim_frame, wobj_data.flags, 0, 0.0f, wobj_data.node_id, wobj_data.uuid);
+				WOBJ *new_wobj = Wobj_CreateUnowned(wobj_data.type, wobj_data.x, wobj_data.y, wobj_data.anim_frame, wobj_data.flags, 0, 0.0f, wobj_data.node_id, wobj_data.uuid, CNM_FALSE);
 				memcpy(new_wobj, &wobj_data, WOBJ_NET_SIZE);
 				new_wobj->interpolate = CNM_FALSE;
 				NetGame_TryToApplyInterpToUnownedWobj(0, new_wobj);

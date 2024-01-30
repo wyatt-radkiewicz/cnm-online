@@ -16,6 +16,9 @@ dynpool_t dynpool_init(size_t initial_chunks, size_t elemsz, alloc_pfn allocer) 
 		.head = &self->first,
 		.free = &self->first,
 		.first = (dynpool_block_t){
+#ifdef DEBUG
+			.dbg_parent = self,
+#endif
 			.elemsz = elemsz,
 			.nchunks = initial_chunks,
 			.next = NULL,
@@ -48,6 +51,9 @@ void *dynpool_alloc(dynpool_t self) {
 	if (!self->free) {
 		dynpool_block_t *blk = self->allocer(sizeof(*blk) + self->head->nchunks * self->elemsz);
 		*blk = (dynpool_block_t){
+#ifdef DEBUG
+			.dbg_parent = self,
+#endif
 			.elemsz = self->elemsz,
 			.nchunks = self->head->nchunks,
 			.next = self->head,
@@ -82,6 +88,9 @@ void dynpool_free(dynpool_t self, void *ptr) {
 	}
 	dynpool_chunk_t *chunk = (dynpool_chunk_t *)((uintptr_t)ptr - offsetof(dynpool_chunk_t, data));
 	dynpool_block_t *blk = chunk->parent;
+#ifdef DEBUG
+	assert(self == blk->dbg_parent);
+#endif
 	if (blk->nalloced-- == blk->nchunks) {
 		blk->lastfree = NULL;
 		blk->nextfree = self->free;
@@ -127,7 +136,16 @@ void dynpool_fast_clear(dynpool_t self) {
 	}
 
 	// DEBUG: remove this
-	//assert(dynpool_empty(self));
+	assert(dynpool_empty(self));
+}
+size_t dynpool_num_chunks(const dynpool_t self) {
+	size_t nchunks = 0;
+	dynpool_block_t *blk = self->head;
+	while (blk) {
+		nchunks += blk->nalloced;
+		blk = blk->next;
+	}
+	return nchunks;
 }
 
 void fixedpool_init(fixedpool_t *self, size_t elemsz, size_t buflen) {

@@ -38,8 +38,9 @@ typedef struct PetDef {
 } PetDef;
 
 extern int g_num_petdefs;
-extern PetDef g_petdefs[MAX_PETDEFS];
+extern PetDef *g_petdefs;
 
+void petdef_sys_init(void);
 PetDef petdef_from_line(const char *line);
 
 #endif

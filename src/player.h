@@ -138,6 +138,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	//float stored_yvel;
 } PLAYER_LOCAL_DATA;
 
+void player_sys_init(void);
 void WobjPlayer_Create(WOBJ *wobj);
 void WobjPlayer_Update(WOBJ *wobj);
 void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy);

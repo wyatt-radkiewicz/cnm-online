@@ -2,11 +2,13 @@
 #include "console.h"
 #include "wobj.h"
 #include "logic_links.h"
+#include "mem.h"
 
-static WOBJ *links[LOGIC_LINKS_MAX];
+static WOBJ **links;
 
 void LogicLinks_ResetLinks(void) {
-	memset(links, 0, sizeof(links));
+	links = arena_alloc(sizeof(*links) * LOGIC_LINKS_MAX);
+	memset(links, 0, sizeof(*links) * LOGIC_LINKS_MAX);
 }
 WOBJ *LogicLinks_GetWobjFromLink(int link) {
 	if (link >= LOGIC_LINKS_MAX) {

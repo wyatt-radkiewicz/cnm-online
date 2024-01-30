@@ -229,9 +229,14 @@ static int pet_unlock_y = 0, pet_unlock_timer = 0;
 static int titlepopup_y = 0, titlepopup_timer = 0;
 
 #define MAX_USED_DIALOGS 16
-static unsigned char _used_dialogs_node[MAX_USED_DIALOGS];
-static int _used_dialogs_uuid[MAX_USED_DIALOGS];
+static unsigned char *_used_dialogs_node;
+static int *_used_dialogs_uuid;
 static int _ud_idx;
+
+void player_sys_init(void) {
+	_used_dialogs_node = arena_global_alloc(sizeof(*_used_dialogs_node) * MAX_USED_DIALOGS);
+	_used_dialogs_uuid = arena_global_alloc(sizeof(*_used_dialogs_uuid) * MAX_USED_DIALOGS);
+}
 
 static void clear_used_dialogs(void) {
 	for (int i = 0; i < MAX_USED_DIALOGS; i++) {
@@ -1149,6 +1154,13 @@ void WobjPlayer_Update(WOBJ *wobj)
 					//wobj->vel_x += plat->vel_x;
 					// Look further down for vel_x change
 					//apply_plat_velx = CNM_TRUE;
+				}
+				if (local_data->in_water) {
+					if (wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) {
+						Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x - 16.0f, wobj->y, 0, 0.0f);
+						Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x + 16.0f, wobj->y, 1, 0.0f);
+					}
+					wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
 				}
 				const float ang = Wobj_GetGroundAngle(wobj);
 				//wobj->vel_y = -jmp_speed * cosf(ang);

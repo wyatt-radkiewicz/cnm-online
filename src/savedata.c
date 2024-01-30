@@ -8,9 +8,10 @@
 #include "lparse.h"
 #include "savedata.h"
 #include "game.h"
+#include "mem.h"
 
 int g_current_save;
-savedata_t g_saves[SAVE_SLOTS+1];
+savedata_t *g_saves;
 struct globalsave g_globalsave;
 
 void new_save(savedata_t *data) {
@@ -24,6 +25,10 @@ void new_save(savedata_t *data) {
 	data->offhandhp = 100.0f;
 	data->upgrade_state = 0;
 	data->upgradehp = 100.0f;
+}
+
+void savedata_sys_init(void) {
+	g_saves = arena_global_alloc(sizeof(*g_saves) * (SAVE_SLOTS+1));
 }
 
 static void save_data(LParse *lp, const savedata_t *data);

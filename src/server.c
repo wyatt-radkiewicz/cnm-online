@@ -10,14 +10,17 @@
 #include "fadeout.h"
 #include "world.h"
 #include "audio.h"
+#include "mem.h"
 
-static int _players_finished[NETGAME_MAX_NODES];
+static int *_players_finished;
 static int _num_finished, _level_transition_timer;
 
 static void Server_ResetFinishedPlayers(void);
 
 void Server_Create(void)
 {
+	arena_push_zone("SERVERCODE");
+	_players_finished = arena_alloc(sizeof(*_players_finished) * NETGAME_MAX_NODES);
 	Server_ResetFinishedPlayers();
 	Net_AddPollingFunc(Server_Update);
 	NetGame_GetNode(0)->active = CNM_TRUE;
@@ -29,6 +32,7 @@ void Server_Create(void)
 void Server_Destroy(void)
 {
 	Net_RemovePollingFunc(Server_Update);
+	arena_pop_zone("SERVERCODE");
 }
 void Server_Update(NET_PACKET *packet)
 {
@@ -303,7 +307,7 @@ void Server_Update(NET_PACKET *packet)
 	}
 }
 static void Server_ResetFinishedPlayers(void) {
-	memset(_players_finished, 0xff, sizeof(_players_finished));
+	memset(_players_finished, 0xff, sizeof(*_players_finished) * NETGAME_MAX_NODES);
 	_num_finished = 0;
 	_level_transition_timer = -1;
 }

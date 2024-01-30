@@ -435,8 +435,9 @@ void WobjBozoPin_Draw(WOBJ *wobj, int camx, int camy)
 }
 
 #define BOZO_WAYPOINTS_MAX 32
-static float bzx[BOZO_WAYPOINTS_MAX], bzy[BOZO_WAYPOINTS_MAX];
+static float *bzx, *bzy;
 static int bznum;
+
 void WobjBozoWaypoint_Create(WOBJ *wobj) {
 	if (bznum >= BOZO_WAYPOINTS_MAX) return;
 	bzx[bznum] = wobj->x;
@@ -1178,8 +1179,8 @@ void WobjLavaDragonBody_Create(WOBJ *wobj)
 #define TTBOSS_MAX_WAYPOINTS 128
 #define TTBOSS_STATE_SEARCHING 0
 #define TTBOSS_STATE_ATTACKING 1
-static float ttboss_x[TTBOSS_MAX_WAYPOINTS];
-static float ttboss_y[TTBOSS_MAX_WAYPOINTS];
+static float *ttboss_x;
+static float *ttboss_y;
 static int ttboss_num_waypoints = 0;
 static int ttboss_state = TTBOSS_STATE_SEARCHING;
 
@@ -1187,8 +1188,8 @@ static int ttboss_state = TTBOSS_STATE_SEARCHING;
 
 void TTBoss_ResetOnLevelLoad(void)
 {
-	memset(ttboss_x, 0, sizeof(ttboss_x));
-	memset(ttboss_y, 0, sizeof(ttboss_y));
+	memset(ttboss_x, 0, sizeof(*ttboss_x) * TTBOSS_MAX_WAYPOINTS);
+	memset(ttboss_y, 0, sizeof(*ttboss_y) * TTBOSS_MAX_WAYPOINTS);
 	ttboss_num_waypoints = 0;
 	ttboss_state = TTBOSS_STATE_SEARCHING;
 }
@@ -1688,7 +1689,7 @@ typedef struct _SUPER_DRAGON_DATA
 	float angle;
 } SUPER_DRAGON_DATA;
 
-SUPER_DRAGON_DATA super_dragons[MAX_SUPER_DRAGONS];
+SUPER_DRAGON_DATA *super_dragons;
 
 #define SUPER_DRAGON_STATE_IDLE 4
 #define SUPER_DRAGON_STATE_FLYING 0
@@ -2789,5 +2790,12 @@ void Enemies_ZoneAllocLocalDataPools(void) {
 		arena_alloc
 	);
 	_ldpool_lavadragon = dynpool_init(4, sizeof(LAVADRAGON_DATA), arena_alloc);
+
+
+	bzx = arena_alloc(sizeof(*bzx) * BOZO_WAYPOINTS_MAX);
+	bzy = arena_alloc(sizeof(*bzy) * BOZO_WAYPOINTS_MAX);
+	ttboss_x = arena_alloc(sizeof(*ttboss_x) * TTBOSS_MAX_WAYPOINTS);
+	ttboss_y = arena_alloc(sizeof(*ttboss_y) * TTBOSS_MAX_WAYPOINTS);
+	super_dragons = arena_alloc(sizeof(*super_dragons) * MAX_SUPER_DRAGONS);
 }
 

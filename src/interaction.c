@@ -13,6 +13,7 @@
 #include "renderer.h"
 #include "ending_text.h"
 #include "fadeout.h"
+#include "mem.h"
 
 #define NETGAME_MAX_WOBJ_UPDATES 32
 
@@ -27,8 +28,8 @@ typedef struct _WOBJ_HURT_ENTRY
 
 static int interaction_mode = INTERACTION_MODE_SINGLEPLAYER;
 static WOBJ *interaction_player = NULL;
-static WOBJ *destroyed_wobjs[NETGAME_MAX_WOBJ_UPDATES];
-static WOBJ_HURT_ENTRY hurt_wobjs[NETGAME_MAX_WOBJ_UPDATES];
+static WOBJ **destroyed_wobjs;
+static WOBJ_HURT_ENTRY *hurt_wobjs;
 static int destroyed_wobjs_allocater = 0;
 static int audio_uuid = -1;
 static int _next_level_timer = -1;
@@ -40,9 +41,12 @@ static int Interaction_GetHurtIndex(WOBJ *wobj);
 
 void Interaction_Init(void)
 {
+	destroyed_wobjs = arena_global_alloc(sizeof(*destroyed_wobjs) * NETGAME_MAX_WOBJ_UPDATES);
+	hurt_wobjs = arena_global_alloc(sizeof(*hurt_wobjs) * NETGAME_MAX_WOBJ_UPDATES);
+
 	//_next_level_timer = -1;
-	memset(destroyed_wobjs, 0, sizeof(destroyed_wobjs));
-	memset(hurt_wobjs, 0, sizeof(hurt_wobjs));
+	memset(destroyed_wobjs, 0, sizeof(*destroyed_wobjs) * NETGAME_MAX_WOBJ_UPDATES);
+	memset(hurt_wobjs, 0, sizeof(*hurt_wobjs) * NETGAME_MAX_WOBJ_UPDATES);
 	audio_uuid = 0;
 }
 void Interaction_SetMode(int mode)

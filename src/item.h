@@ -81,7 +81,7 @@ typedef struct _ITEM
 
 #define ITEM_HIDE_TIMER 20
 
-extern ITEM_TYPE item_types[];
+extern const ITEM_TYPE item_types[];
 
 void Item_Init(void);
 void Item_Reset(void);

@@ -147,7 +147,7 @@ WOBJ *Wobj_CreateOwned(int type, float x, float y, int ci, float cf)
 		wobj_types[type].create(wobj);
 	return wobj;
 }
-WOBJ *Wobj_CreateUnowned(int type, float x, float y, int frame, int flags, int ci, float cf, int node_id, int uuid)
+WOBJ *Wobj_CreateUnowned(int type, float x, float y, int frame, int flags, int ci, float cf, int node_id, int uuid, int run_create)
 {
 	WOBJ *wobj = NULL;
 	int i;
@@ -198,7 +198,7 @@ WOBJ *Wobj_CreateUnowned(int type, float x, float y, int frame, int flags, int c
 	}
 
 	ObjGrid_AddObject(unowned_grid, &wobj->internal.obj);
-	if (wobj_types[type].create != NULL)
+	if (wobj_types[type].create != NULL && run_create)
 		wobj_types[type].create(wobj);
 	return wobj;
 }

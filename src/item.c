@@ -57,7 +57,7 @@ static void ItemLightningWand_OnUse(ITEM *item, WOBJ *player);
 
 static void ItemKeyGeneric_Update(ITEM *key, WOBJ *player);
 
-ITEM_TYPE item_types[] =
+const ITEM_TYPE item_types[] =
 {
 	{ // No item
 		{0, 0, 0, 0},

@@ -16,6 +16,9 @@ typedef struct dynpool_chunk {
 } dynpool_chunk_t;
 
 struct dynpool_block {
+#ifdef DEBUG
+	dynpool_t dbg_parent;
+#endif
 	dynpool_block_t *next, *nextfree, *lastfree;
 	size_t nchunks, freeid, elemsz, nalloced;
 	dynpool_chunk_t *free;
@@ -35,6 +38,7 @@ void *dynpool_alloc(dynpool_t self);
 void dynpool_free(dynpool_t self, void *ptr);
 int dynpool_empty(const dynpool_t self);
 void dynpool_fast_clear(dynpool_t self);
+size_t dynpool_num_chunks(const dynpool_t self);
 
 typedef struct fixedpool_chunk {
 	struct fixedpool_chunk *next;
@@ -52,7 +56,8 @@ void *fixedpool_alloc(fixedpool_t *self);
 void fixedpool_free(fixedpool_t *self, void *blk);
 int fixedpool_empty(const fixedpool_t *self);
 
-#define ARENA_SIZE (1024*1024*10)
+#define ARENA_SIZE (1024*1024*12)
+//#define ARENA_SIZE (1024*1024*8)
 
 void arena_init(const char *base_zone_name);
 void arena_deinit(void);

@@ -19,9 +19,12 @@
 #define GAMECONSOLE_STATE_TYPING 0x0001
 #define GAMECONSOLE_STATE_ROLLBACK 0x1002
 
-static char gameconsole_lines[GAMECONSOLE_HISTORY][UTIL_MAX_TEXT_WIDTH + 1];
-static char gameconsole_back_buffer[UTIL_MAX_TEXT_WIDTH + 1];
-static char gameconsole_buffer[GAMECONSOLE_HISTORY * UTIL_MAX_TEXT_WIDTH];
+#define BACKBUF_SZ (UTIL_MAX_TEXT_WIDTH + 1)
+#define BUFSZ (GAMECONSOLE_HISTORY * UTIL_MAX_TEXT_WIDTH)
+
+static char (*gameconsole_lines)[UTIL_MAX_TEXT_WIDTH + 1];
+static char *gameconsole_back_buffer;
+static char *gameconsole_buffer;
 static int gameconsole_y = 0;
 static int gameconsole_state = GAMECONSOLE_STATE_BACK;
 static int gameconsole_fadetime = 0;
@@ -32,9 +35,13 @@ static char *GameConsole_GetNextLine(void);
 
 void GameConsole_Init(void)
 {
-	memset(gameconsole_lines, 0, sizeof(gameconsole_lines));
-	memset(gameconsole_buffer, 0, sizeof(gameconsole_buffer));
-	memset(gameconsole_back_buffer, 0, sizeof(gameconsole_back_buffer));
+	gameconsole_lines = arena_global_alloc(sizeof(*gameconsole_lines) * GAMECONSOLE_HISTORY);
+	gameconsole_back_buffer = arena_global_alloc(BACKBUF_SZ);
+	gameconsole_buffer = arena_global_alloc(BUFSZ);
+
+	memset(gameconsole_lines, 0, sizeof(*gameconsole_lines) * GAMECONSOLE_HISTORY);
+	memset(gameconsole_buffer, 0, BUFSZ);
+	memset(gameconsole_back_buffer, 0, BACKBUF_SZ);
 	Console_SetCallback(GameConsole_PrintCallback);
 	gameconsole_initialized = CNM_TRUE;
 }
@@ -45,15 +52,15 @@ void GameConsole_PrintCallback(const char *str)//const char *format, va_list arg
 		return;
 
 	n = strlen(str);//Util_StringPrintF(gameconsole_buffer, sizeof(gameconsole_buffer), format, args);
-	memset(gameconsole_buffer, 0, sizeof(gameconsole_buffer));
-	strncpy(gameconsole_buffer, str, sizeof(gameconsole_buffer) - 1);
+	memset(gameconsole_buffer, 0, BUFSZ);
+	strncpy(gameconsole_buffer, str, BUFSZ - 1);
 	num_lines = (n % UTIL_MAX_TEXT_WIDTH == 0) ? (n / UTIL_MAX_TEXT_WIDTH) : (n / UTIL_MAX_TEXT_WIDTH + 1);
 	for (i = 0; i < num_lines; i++)
 		memcpy(GameConsole_GetNextLine(), gameconsole_buffer + (i * UTIL_MAX_TEXT_WIDTH), UTIL_MAX_TEXT_WIDTH);
 
 	if (gameconsole_state == GAMECONSOLE_STATE_BACK && num_lines >= 1)
 	{
-		memset(gameconsole_back_buffer, 0, sizeof(gameconsole_back_buffer));
+		memset(gameconsole_back_buffer, 0, BACKBUF_SZ);
 		memcpy(gameconsole_back_buffer, gameconsole_buffer + ((num_lines - 1) * UTIL_MAX_TEXT_WIDTH), UTIL_MAX_TEXT_WIDTH);
 		gameconsole_fadetime = 90;
 	}
@@ -71,7 +78,7 @@ void GameConsole_HandleInput(int input, char c)
 			gameconsole_state == GAMECONSOLE_STATE_ROLLBACK)
 		{
 			gameconsole_state = GAMECONSOLE_STATE_ROLLUP;
-			memset(gameconsole_back_buffer, 0, sizeof(gameconsole_back_buffer));
+			memset(gameconsole_back_buffer, 0, BACKBUF_SZ);
 			Input_PushState(INPUT_STATE_CONSOLE);
 			return;
 		}
@@ -88,11 +95,11 @@ void GameConsole_HandleInput(int input, char c)
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			gameconsole_state = GAMECONSOLE_STATE_TYPING;
 			Input_PushState(INPUT_STATE_CONSOLE);
-			memset(gameconsole_back_buffer, 0, sizeof(gameconsole_back_buffer));
+			memset(gameconsole_back_buffer, 0, BACKBUF_SZ);
 		}
 		break;
 		case GAMECONSOLE_INPUT_ESC:
-		memset(gameconsole_back_buffer, 0, sizeof(gameconsole_back_buffer));
+		memset(gameconsole_back_buffer, 0, BACKBUF_SZ);
 		if (gameconsole_state == GAMECONSOLE_STATE_TYPING)
 		{
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
@@ -104,7 +111,7 @@ void GameConsole_HandleInput(int input, char c)
 		{
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			Input_PopState();
-			memset(gameconsole_back_buffer, 0, sizeof(gameconsole_back_buffer));
+			memset(gameconsole_back_buffer, 0, BACKBUF_SZ);
 			gameconsole_state = GAMECONSOLE_STATE_ROLLBACK;
 		}
 		break;
@@ -139,7 +146,7 @@ void GameConsole_HandleInput(int input, char c)
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			Command_Execute(gameconsole_back_buffer, CNM_TRUE);
 			gameconsole_didtype = CNM_TRUE;
-			memset(gameconsole_back_buffer, 0, sizeof(gameconsole_back_buffer));
+			memset(gameconsole_back_buffer, 0, BACKBUF_SZ);
 		}
 		break;
 		case GAMECONSOLE_INPUT_CHAR:
@@ -211,7 +218,7 @@ void GameConsole_Update(void)
 		if (gameconsole_y <= 0)
 		{
 			gameconsole_state = GAMECONSOLE_STATE_BACK;
-			memcpy(gameconsole_back_buffer, gameconsole_lines[0], sizeof(gameconsole_back_buffer));
+			memcpy(gameconsole_back_buffer, gameconsole_lines[0], BACKBUF_SZ);
 			if (!gameconsole_didtype)
 				gameconsole_fadetime = 15;
 			gameconsole_didtype = CNM_FALSE;
@@ -224,12 +231,12 @@ void GameConsole_Draw(void)
 	if (!gameconsole_initialized)
 		return;
 
-	if (Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer) {
+	if (Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer || Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer) {
 		if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_CLIENT_CONNECTING) Renderer_SetFont(288, 416, 8, 8);
 		else Renderer_SetFont(256, 192, 8, 8);
 
-		Renderer_DrawText(0, 50, 0, RENDERER_LIGHT, "arena %dK/%dK", arena_used_mem() / 1024, ARENA_SIZE / 1024);
-		Renderer_DrawText(0, 58, 0, RENDERER_LIGHT, "data seg todo");
+		Renderer_DrawText(0, 50, 0, RENDERER_LIGHT, "mainmem %dK/%dK", arena_used_mem() / 1024, ARENA_SIZE / 1024);
+		//Renderer_DrawText(0, 58, 0, RENDERER_LIGHT, "data seg todo");
 	}
 
 	if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_CLIENT_CONNECTING) Renderer_SetFont(288, 480, 8, 8);

@@ -2,16 +2,19 @@
 #include <math.h>
 #include "player_spawns.h"
 #include "utility.h"
+#include "mem.h"
 
 static int spawning_mode = PLAYER_SPAWN_TYPE_NORMAL_MODES;
-static float spawns_x[PLAYER_SPAWN_TYPE_MAX][PLAYER_SPAWNS_MAX];
-static float spawns_y[PLAYER_SPAWN_TYPE_MAX][PLAYER_SPAWNS_MAX];
+static float (*spawns_x)[PLAYER_SPAWNS_MAX];
+static float (*spawns_y)[PLAYER_SPAWNS_MAX];
 
 void PlayerSpawns_Init(void)
 {
 	spawning_mode = PLAYER_SPAWN_TYPE_NORMAL_MODES;
-	memset(spawns_x, 0, sizeof(spawns_x));
-	memset(spawns_y, 0, sizeof(spawns_y));
+	spawns_x = arena_global_alloc(sizeof(*spawns_x) * PLAYER_SPAWN_TYPE_MAX);
+	memset(spawns_x, 0, sizeof(*spawns_x) * PLAYER_SPAWN_TYPE_MAX);
+	spawns_y = arena_global_alloc(sizeof(*spawns_y) * PLAYER_SPAWN_TYPE_MAX);
+	memset(spawns_y, 0, sizeof(*spawns_y) * PLAYER_SPAWN_TYPE_MAX);
 	for (int i = 0; i < PLAYER_SPAWN_TYPE_MAX * PLAYER_SPAWNS_MAX; i++)
 	{
 		spawns_x[i / PLAYER_SPAWNS_MAX][i % PLAYER_SPAWNS_MAX] = INFINITY;

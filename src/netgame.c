@@ -15,29 +15,36 @@
 #include "item.h"
 #include "mem.h"
 
-static NETGAME_NODE nodes[NETGAME_MAX_NODES];
-static NETGAME_DAMAGE_ENTRY *damages[NETGAME_MAX_OBJECTS];
+static NETGAME_NODE *nodes;
+static NETGAME_DAMAGE_ENTRY **damages;
 static dynpool_t _damagepool;
 static int damages_packet_num = 0;
 
 static int num_forced_changes = 0;
-static CLIENT_WOBJ_UPDATE_REQUEST forced_changes[NETGAME_MAX_MISCUPDATES];
+static CLIENT_WOBJ_UPDATE_REQUEST *forced_changes;
 
-static WOBJ server_history[NETGAME_MAX_HISTORY][NETGAME_MAX_OBJECTS];
+static WOBJ (*server_history)[NETGAME_MAX_OBJECTS];
 static unsigned int sendframe;
 
 static int numwobj_bytes, numwobj_bytes2;
 static int numwobjs_for_bytes, numwobjs_for_bytes2;
 
 #define DRBUF_SZ 16
-static int _drbuf_node[DRBUF_SZ];
-static int _drbuf_uuid[DRBUF_SZ];
+static int *_drbuf_node;
+static int *_drbuf_uuid;
 static int _drbuf_idx;
 
 void NetGame_Init(void)
 {
 	int i;
-	memset(nodes, 0, sizeof(nodes));
+	nodes = arena_global_alloc(sizeof(*nodes) * NETGAME_MAX_NODES);
+	damages = arena_global_alloc(sizeof(*damages)  * NETGAME_MAX_OBJECTS);
+	forced_changes = arena_global_alloc(sizeof(*forced_changes) * NETGAME_MAX_MISCUPDATES);
+	server_history = arena_global_alloc(sizeof(*server_history) * NETGAME_MAX_HISTORY);
+	_drbuf_node = arena_global_alloc(sizeof(*_drbuf_node) * DRBUF_SZ);
+	_drbuf_uuid = arena_global_alloc(sizeof(*_drbuf_uuid) * DRBUF_SZ);
+
+	memset(nodes, 0, sizeof(*nodes) * NETGAME_MAX_NODES);
 	_damagepool = dynpool_init(32, sizeof(NETGAME_DAMAGE_ENTRY), arena_global_alloc);
 	for (i = 0; i < NETGAME_MAX_OBJECTS; i++)
 	{
@@ -60,7 +67,7 @@ void NetGame_Init(void)
 		_drbuf_uuid[i] = -1;
 	}
 	_drbuf_idx = 0;
-	memset(forced_changes, 0, sizeof(forced_changes));
+	memset(forced_changes, 0, sizeof(*forced_changes) * NETGAME_MAX_MISCUPDATES);
 }
 void NetGame_Quit(void)
 {
@@ -260,7 +267,7 @@ float NetGame_GetClientWobjHealth(WOBJ *w)
 	return w->health - (e ? e->damage_dealt : 0.0f);
 }
 static void clear_all_damages(void) {
-	memset(damages, 0, sizeof(damages));
+	memset(damages, 0, sizeof(*damages) * NETGAME_MAX_OBJECTS);
 	dynpool_fast_clear(_damagepool);
 	//int i;
 	//for (i = 0; i < NETGAME_MAX_OBJECTS; i++)
@@ -309,6 +316,8 @@ static void send_damages(int n, int m) //	Yes this was made by ShadowRealm9, I j
 		}
 		p->hdr.size = packet_bytecount(head);
 		Net_Send(p);
+	} else {
+		Net_DestroyPacket(p);
 	}
 }
 void NetGame_ClientSendDamages(void)
@@ -449,7 +458,7 @@ void NetGame_SendMiscWobjForcedChanges(int node)
 		p->hdr.size = serialize_wobj_update_packet((uint8_t *)p->data, forced_changes + i);
 		Net_Send(p);
 	}
-	memset(forced_changes, 0, sizeof(forced_changes));
+	memset(forced_changes, 0, sizeof(*forced_changes) * NETGAME_MAX_MISCUPDATES);
 	num_forced_changes = 0;
 }
 
@@ -560,7 +569,7 @@ void NetGame_RemoveAndAddNewUnownedServerWobjs(int _node) {
 		if (node->client_wobjs[node->num_client_wobjs] == NULL) {
 			node->client_wobjs[node->num_client_wobjs] =
 				Wobj_CreateUnowned(rbuf->wobjs[j].type, rbuf->wobjs[j].x, rbuf->wobjs[j].y, rbuf->wobjs[j].anim_frame,
-								   rbuf->wobjs[j].flags, 0, 0.0f, _node, rbuf->wobjs[j].uuid);
+								   rbuf->wobjs[j].flags, 0, 0.0f, _node, rbuf->wobjs[j].uuid, CNM_FALSE);
 		}
 		else {
 			Wobj_RecreateUnwoned(node->client_wobjs[node->num_client_wobjs], rbuf->wobjs[j].x, rbuf->wobjs[j].y);

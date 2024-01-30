@@ -4,9 +4,10 @@
 #include "console.h"
 #include "petdefs.h"
 #include "game.h"
+#include "mem.h"
 
 int g_num_petdefs;
-PetDef g_petdefs[MAX_PETDEFS];
+PetDef *g_petdefs;
 
 static int getint(const char **str) {
 	char intbuf[32] = { '\0' };
@@ -28,6 +29,9 @@ static float getfloat(const char **str) {
 	return atof(floatbuf);
 }
 
+void petdef_sys_init(void) {
+	g_petdefs = arena_global_alloc(sizeof(*g_petdefs) * MAX_PETDEFS);
+}
 PetDef petdef_from_line(const char *line) {
 	PetDef pet = (PetDef) {
 		.name = { '\0' },
