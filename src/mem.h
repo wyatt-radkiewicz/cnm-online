@@ -56,7 +56,7 @@ void *fixedpool_alloc(fixedpool_t *self);
 void fixedpool_free(fixedpool_t *self, void *blk);
 int fixedpool_empty(const fixedpool_t *self);
 
-#define ARENA_SIZE (1024*1024*12)
+#define ARENA_SIZE (1024*1024*13)
 //#define ARENA_SIZE (1024*1024*8)
 
 void arena_init(const char *base_zone_name);
