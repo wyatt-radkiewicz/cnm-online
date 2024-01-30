@@ -3,7 +3,8 @@ TARGET_NAME := cnmonline
 BUILD_DIR := ./build
 SOURCE_DIR := ./src
 SRCS := $(wildcard $(SOURCE_DIR)/*.c)
-OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(SRCS)))
+OBJS := $(addprefix $(BUILD_DIR)/,$(patsubst %.c,%.o,$(SRCS)))
+#OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(SRCS)))
 
 # Flags
 CFLAGS := $(CFLAGS) $(shell sdl2-config --cflags) -I$(SOURCE_DIR)
@@ -36,12 +37,15 @@ tools:
 	$(CC) $(SOURCE_DIR)/ibapply/ibapply.c -o $(BUILD_DIR)/ibapply
 
 define BUILD_SRC
-$(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(1))): $(1) $(addprefix $(SOURCE_DIR)/,$(2))
+#$(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(1))): $(1) $(addprefix $(SOURCE_DIR)/,$(2))
+#$$(warning $(BUILD_DIR)/$(dir $(1))$(2))
+$$(BUILD_DIR)/$(dir $(1))$(2)
 	mkdir -p $$(dir $$@)
-	$$(CC) $$(CFLAGS) $$(CPPFLAGS) -c $$< -o $$@
+	$$(CC) $$(CFLAGS) $$(CPPFLAGS) -c $(1) -o $$@
 endef
 
-$(foreach src,$(SRCS),$(eval $(call BUILD_SRC,$(src),$(shell grep "#include \"[:alnum:|.|\"]*" $(src) | awk -F ' ' '{print $$2 }' | awk -F '\"' '{print $$2 }'))))
+#$(foreach src,$(SRCS),$(eval $(call BUILD_SRC,$(shell $(CC) -$(src),$(shell grep "#include \"[:alnum:|.|\"]*" $(src) | awk -F ' ' '{print $$2 }' | awk -F '\"' '{print $$2 }'))))
+$(foreach src,$(SRCS),$(eval $(call BUILD_SRC,$(src),$(shell $(CC) $(CFLAGS) -M $(src) | tr -d '\n' | tr '\\' ' '))))
 
 .PHONY: clean
 clean:

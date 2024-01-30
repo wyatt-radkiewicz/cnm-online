@@ -31,13 +31,14 @@
 
 static WOBJ *player;
 
-static char title_card_strings[TITLE_CARD_MAX_LINES][ENDING_TEXT_MAX_WIDTH + 1];
+static char (*title_card_strings)[ENDING_TEXT_MAX_WIDTH + 1];
 static int title_card_timer;
 static int title_card_num_lines;
 
 void World_Start(int mode)
 {
 	arena_push_zone("WORLD");
+	title_card_strings = arena_alloc(sizeof(*title_card_strings) * TITLE_CARD_MAX_LINES);
 	char buffer[UTIL_MAX_TEXT_WIDTH * 2];
 
 	// Initialize the interaction modes first

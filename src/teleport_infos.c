@@ -2,12 +2,15 @@
 #include <stdlib.h>
 #include "teleport_infos.h"
 #include "console.h"
+#include "mem.h"
 
 static TELEPORT_INFO *infos;
-static TELEPORT_INFO infosbuf[TELEPORT_INFOS_MAX_TELEPORTS];
+static TELEPORT_INFO *infosbuf;
 
 void TeleportInfos_Init(void)
 {
+	infosbuf = arena_global_alloc(sizeof(*infosbuf) * TELEPORT_INFOS_MAX_TELEPORTS);
+
 	int i;
 	infos = infosbuf;
 	for (i = 0; i < TELEPORT_INFOS_MAX_TELEPORTS; i++)

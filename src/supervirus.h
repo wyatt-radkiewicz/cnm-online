@@ -3,6 +3,7 @@
 
 extern unsigned char _supervirus_bitmap[];
 
+void supervirus_sys_init(void);
 void supervirus_render(int x, int y);
 void supervirus_render_all(void);
 

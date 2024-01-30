@@ -25,6 +25,7 @@
 #include "petdefs.h"
 #include "player.h"
 #include "ending_text.h"
+#include "supervirus.h"
 #include "mem.h"
 
 #define GAME_MAX_STATES 8
@@ -289,6 +290,7 @@ void GameState_Base_Init(void)
 	Serial_LoadConfig();
 	petdef_sys_init();
 	player_sys_init();
+	supervirus_sys_init();
 	if (!dgame_info.dedicated && !dgame_info.master_server)
 	{
 		Renderer_Init(Game_GetVar(GAME_VAR_FULLSCREEN)->data.integer,

@@ -18,6 +18,7 @@
 #define GET_WOBJ(iter) ((WOBJ *)((unsigned char *)(iter) - offsetof(WOBJ, internal.obj)))
 //#define WOBJ_SEARCH_MAP_SIZE (1 << 11)
 #define SMAPSZ 64
+#define DELOWNSZ 128
 
 // Debug prints
 #define DBGLRU 0
@@ -27,13 +28,13 @@ static OBJGRID *owned_grid;
 static OBJGRID *unowned_grid;
 static int owned_uuid;
 static int wobj_node_id;
-static WOBJ *deleted_owned[64];
+static WOBJ **deleted_owned;
 static int deleted_size;
 static int major_reset;
 
 static dynpool_t _wobjpool;
 static WOBJ *owned;
-static WOBJ unowned[WOBJ_MAX_UNOWNED_WOBJS];
+static WOBJ *unowned;
 static int unowned_size;
 
 //static WOBJ *search_map[WOBJ_SEARCH_MAP_SIZE];
@@ -45,15 +46,13 @@ typedef struct smapent {
 	int psl;
 	smaplru_t *lru;
 } smapent_t;
-static smapent_t _smap_owned[SMAPSZ], _smap_unowned[SMAPSZ];
+static smapent_t *_smap_owned, *_smap_unowned;
 static int _smap_owned_sz, _smap_unowned_sz;
 
 static smaplru_t *_lru_owned_head, *_lru_owned_tail;
 static smaplru_t *_lru_unowned_head, *_lru_unowned_tail;
-static byte_t _lru_owned_pool_buf[sizeof(fixedpool_t) + (SMAPSZ + 1) * sizeof(smaplru_t)];
-static fixedpool_t *_lru_owned_pool = (fixedpool_t *)_lru_owned_pool_buf;
-static byte_t _lru_unowned_pool_buf[sizeof(fixedpool_t) + (SMAPSZ + 1) * sizeof(smaplru_t)];
-static fixedpool_t *_lru_unowned_pool = (fixedpool_t *)_lru_unowned_pool_buf;
+static fixedpool_t *_lru_owned_pool;
+static fixedpool_t *_lru_unowned_pool;
 
 static void Wobj_FreeOwnedWobjAndRemove(WOBJ *wobj);
 
@@ -62,10 +61,18 @@ static void WobjSearch_DestoryEntry(int node, int uuid);
 static void WobjSearch_Reset(void);
 static void WobjSearch_DestroyUnownedEntries(void);
 
+#define LRU_POOL_SZ (sizeof(fixedpool_t) + (SMAPSZ + 1) * sizeof(smaplru_t))
+
 void Wobj_Init(void)
 {
-	memset(unowned, 0, sizeof(unowned));
-	memset(deleted_owned, 0, sizeof(deleted_owned));
+	_lru_owned_pool = arena_global_alloc(LRU_POOL_SZ);
+	_lru_unowned_pool = arena_global_alloc(LRU_POOL_SZ);
+	_smap_owned = arena_global_alloc(sizeof(*_smap_owned) * SMAPSZ);
+	_smap_unowned = arena_global_alloc(sizeof(*_smap_unowned) * SMAPSZ);
+	unowned = arena_global_alloc(sizeof(*unowned) * WOBJ_MAX_UNOWNED_WOBJS);
+	memset(unowned, 0, sizeof(*unowned) * WOBJ_MAX_UNOWNED_WOBJS);
+	deleted_owned = arena_global_alloc(sizeof(*deleted_owned) * DELOWNSZ);
+	memset(deleted_owned, 0, sizeof(*deleted_owned) * DELOWNSZ);
 	deleted_size = 0;
 	owned = NULL;
 	owned_uuid = 0;
@@ -75,9 +82,9 @@ void Wobj_Init(void)
 	owned_grid = ObjGrid_Create(256, 256);
 	unowned_grid = ObjGrid_Create(256, 256);
 	
+	fixedpool_init(_lru_owned_pool, sizeof(smaplru_t), LRU_POOL_SZ);
+	fixedpool_init(_lru_unowned_pool, sizeof(smaplru_t), LRU_POOL_SZ);
 	WobjSearch_Reset();
-	fixedpool_init(_lru_owned_pool, sizeof(smaplru_t), sizeof(_lru_owned_pool_buf));
-	fixedpool_init(_lru_unowned_pool, sizeof(smaplru_t), sizeof(_lru_unowned_pool_buf));
 	_wobjpool = dynpool_init(512, sizeof(WOBJ), arena_global_alloc);
 	//wobj_pool = Pool_Create(sizeof(WOBJ));
 }
@@ -217,7 +224,7 @@ void Wobj_DestroyWobj(WOBJ *wobj)
 
 	if (wobj->internal.owned)
 	{
-		if (deleted_size >= sizeof(deleted_owned)/sizeof(deleted_owned[0])) return;
+		if (deleted_size >= DELOWNSZ) return;
 		for (int i = 0; i < deleted_size; i++)
 		{
 			if (deleted_owned[i] == wobj)
@@ -1476,7 +1483,7 @@ found:
 static void WobjSearch_Reset(void)
 {
 	//memset(search_map, 0, sizeof(search_map));
-	memset(_smap_owned, 0, sizeof(_smap_owned));
+	memset(_smap_owned, 0, sizeof(*_smap_owned) * SMAPSZ);
 	_smap_owned_sz = 0;
 	_lru_owned_head = NULL;
 	_lru_owned_tail = NULL;
@@ -1492,7 +1499,7 @@ static void WobjSearch_Reset(void)
 }
 static void WobjSearch_DestroyUnownedEntries(void)
 {
-	memset(_smap_unowned, 0, sizeof(_smap_unowned));
+	memset(_smap_unowned, 0, sizeof(*_smap_unowned) * SMAPSZ);
 	_smap_unowned_sz = 0;
 	_lru_unowned_head = NULL;
 	_lru_unowned_tail = NULL;

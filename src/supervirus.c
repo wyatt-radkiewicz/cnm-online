@@ -1,11 +1,12 @@
 #include "renderer.h"
 #include "supervirus.h"
+#include "mem.h"
 
 #define T 0x00
 #define B 0xf7
 #define W 0x04
 
-#define MAX_SUPERVIRUSES 8
+#define MAX_SUPERVIRUSES 32
 
 unsigned char _supervirus_bitmap[] = {
 	T, T, B, W, W, W, W, W, W, W, W, W, B, T,
@@ -39,8 +40,12 @@ unsigned char _supervirus_bitmap[] = {
 };
 
 static int num = 0;
-static int _x[MAX_SUPERVIRUSES], _y[MAX_SUPERVIRUSES];
+static int *_x, *_y;
 
+void supervirus_sys_init(void) {
+	_x = arena_global_alloc(sizeof(*_x) * MAX_SUPERVIRUSES);
+	_y = arena_global_alloc(sizeof(*_y) * MAX_SUPERVIRUSES);
+}
 void supervirus_render(int x, int y) {
 	if (num < MAX_SUPERVIRUSES) {
 		_x[num] = x;

@@ -214,6 +214,10 @@ void *arena_alloc(size_t size) {
 	_arena_head += size;
 	*(size_t *)_arena_head = size;
 	_arena_head += sizeof(size_t);
+	if (_arena_head > _arena_tail) {
+		Console_Print("OUT OF MEM!!!!");
+		Console_Print("Found in zone %s", _stack_dbgnames[_stack_top]);
+	}
 	assert(_arena_head <= _arena_tail);
 	return ptr;
 }
@@ -248,6 +252,10 @@ void *arena_global_alloc(size_t size) {
 	size = ((size - 1) / sizeof(size_t) + 2) * sizeof(size_t);
 	_arena_tail -= size;
 	*(size_t *)_arena_tail = size;
+	if (_arena_head > _arena_tail) {
+		Console_Print("OUT OF MEM!!!!");
+		Console_Print("Found in zone %s", _stack_dbgnames[_stack_top]);
+	}
 	assert(_arena_head <= _arena_tail);
 	return _arena_tail + sizeof(size_t);
 }

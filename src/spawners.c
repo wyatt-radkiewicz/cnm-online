@@ -14,7 +14,7 @@
 
 static OBJGRID *spawners_grid;
 static SPAWNER *spawners_head;
-static SPAWNER *spawner_groups[MAX_SPAWNER_GROUPS][MAX_SPAWNERS_PER_GROUP];
+static SPAWNER *(*spawner_groups)[MAX_SPAWNERS_PER_GROUP];
 //static POOL *spawners_pool;
 static dynpool_t _pool;
 static int spawners_mode;
@@ -27,7 +27,8 @@ void Spawners_Init(void)
 	spawners_head = NULL;
 	spawners_grid = ObjGrid_Create(256, 256);
 	spawners_mode = SPAWNER_SINGLEPLAYER;
-	memset(spawner_groups, 0, sizeof(spawner_groups));
+	spawner_groups = arena_global_alloc(sizeof(*spawner_groups) * MAX_SPAWNER_GROUPS);
+	memset(spawner_groups, 0, sizeof(*spawner_groups) * MAX_SPAWNER_GROUPS);
 
 	spawners_last_num_players = 0;
 	spawners_num_players = 0;
@@ -53,7 +54,7 @@ void Spawners_UnloadSpawners(void)
 		spawner = next;
 	}
 	spawners_head = NULL;
-	memset(spawner_groups, 0, sizeof(spawner_groups));
+	memset(spawner_groups, 0, sizeof(*spawner_groups) * MAX_SPAWNER_GROUPS);
 
 	dynpool_fast_clear(_pool);
 	assert(dynpool_empty(_pool));
