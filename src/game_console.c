@@ -236,7 +236,9 @@ void GameConsole_Draw(void)
 		else Renderer_SetFont(256, 192, 8, 8);
 
 		Renderer_DrawText(0, 50, 0, RENDERER_LIGHT, "mainmem %dK/%dK", arena_used_mem() / 1024, ARENA_SIZE / 1024);
-		//Renderer_DrawText(0, 58, 0, RENDERER_LIGHT, "data seg todo");
+#ifndef CNM_LOW_MEM
+		Renderer_DrawText(0, 58, 0, RENDERER_LIGHT, "%dK on lowmem", ARENA_SIZE_LOW_MEM / 1024);
+#endif
 	}
 
 	if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_CLIENT_CONNECTING) Renderer_SetFont(288, 480, 8, 8);

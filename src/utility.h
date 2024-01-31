@@ -9,8 +9,15 @@
 #define CNM_NO_X86ASSEMBLY
 #endif
 
-#define NETGAME_MAX_NODES 8
+//#define CNM_LOW_MEM
+
+#ifdef CNM_LOW_MEM
+#define NETGAME_MAX_NODES 4
 #define NETGAME_MAX_HISTORY 10
+#else
+#define NETGAME_MAX_NODES 64
+#define NETGAME_MAX_HISTORY 12
+#endif
 
 #define XSTRINGIZE(s) STRINGIZE(s)
 #define STRINGIZE(s) #s

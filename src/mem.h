@@ -2,6 +2,8 @@
 #define _mem_h_
 #include <stddef.h>
 
+#include "utility.h"
+
 typedef unsigned char byte_t;
 typedef void *(*alloc_pfn)(size_t);
 
@@ -56,8 +58,12 @@ void *fixedpool_alloc(fixedpool_t *self);
 void fixedpool_free(fixedpool_t *self, void *blk);
 int fixedpool_empty(const fixedpool_t *self);
 
-#define ARENA_SIZE (1024*1024*13)
-//#define ARENA_SIZE (1024*1024*8)
+#define ARENA_SIZE_LOW_MEM (1024*1024*12)
+#ifndef CNM_LOW_MEM
+#define ARENA_SIZE (1024*1024*48)
+#else
+#define ARENA_SIZE ARENA_SIZE_LOW_MEM 
+#endif
 
 void arena_init(const char *base_zone_name);
 void arena_deinit(void);
