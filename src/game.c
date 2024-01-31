@@ -227,7 +227,7 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_CL_INTERP].data.integer = CNM_TRUE;
 	game_vars[GAME_VAR_PLAYER_SKIN].data.integer = 0;
 	game_vars[GAME_VAR_SHOWPOS].data.integer = CNM_FALSE;
-	game_vars[GAME_VAR_CL_SMOOTHING].data.decimal = 0.75f;
+	game_vars[GAME_VAR_CL_SMOOTHING].data.decimal = 1.0f;
 	game_vars[GAME_VAR_CL_TIME_BETWEEN_UPDATES].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_CL_SHOW_NODEUUIDS].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_NOCLIP].data.integer = CNM_FALSE;

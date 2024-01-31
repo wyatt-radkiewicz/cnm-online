@@ -521,8 +521,8 @@ void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py) {
 	}
 
 	int interp_node = (Interaction_GetMode() == INTERACTION_MODE_CLIENT) ? 0 : wobj->node_id;
-	*px = wobj->interp_x + ((wobj->x - wobj->interp_x) * (wobj->interp_frame / (float)NetGame_GetNode(interp_node)->avgframes_between_updates));
-	*py = wobj->interp_y + ((wobj->y - wobj->interp_y) * (wobj->interp_frame / (float)NetGame_GetNode(interp_node)->avgframes_between_updates));
+	*px = wobj->interp_x + ((wobj->x - wobj->interp_x) * ((float)wobj->interp_frame / NetGame_GetNode(interp_node)->avgframes_between_updates));
+	*py = wobj->interp_y + ((wobj->y - wobj->interp_y) * ((float)wobj->interp_frame / NetGame_GetNode(interp_node)->avgframes_between_updates));
 }
 void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS])
 {
@@ -592,7 +592,7 @@ void Wobj_DrawWobjs(int camx, int camy)
 					if (!other->internal.owned && other->interpolate && Game_GetVar(GAME_VAR_CL_INTERP)->data.integer)
 					{
 						int interp_node = (Interaction_GetMode() == INTERACTION_MODE_CLIENT) ? 0 : other->node_id;
-						int interp_frame = other->interp_frame++;
+						int interp_frame = other->interp_frame;
 						float interp_percent = (float)interp_frame / (float)(NetGame_GetNode(interp_node)->avgframes_between_updates);
 						if (NetGame_GetNode(interp_node)->avgframes_between_updates == 0.0f)
 							interp_percent = 1.0f;
@@ -615,6 +615,7 @@ void Wobj_DrawWobjs(int camx, int camy)
 
 						if (wobj_types[other->type].draw != NULL && ~other->flags & WOBJ_DONT_DRAW)
 							wobj_types[other->type].draw(other, camx, camy);
+						other->interp_frame++;
 
 						other->x = oldx;
 						other->y = oldy;
@@ -703,9 +704,18 @@ void wobj_move_and_hit_blocks(WOBJ *wobj) {
 	const int ang_type = roundf((ground_ang > CNM_PI ? CNM_PI - (ground_ang - CNM_PI) : ground_ang) / CNM_PI * 6.0f);
 	const int doslow = (ground_ang < CNM_PI) == (wobj->vel_x > 0.0f);
 	switch (ang_type) {
-	case 1: wobj->vel_x *= doslow ? (2.0f / 3.0f) : (6.0f / 5.0f); break;
-	case 2: wobj->vel_x *= doslow ? (1.0f / 2.0f) : (1.0f); break;
-	case 3: wobj->vel_x *= doslow ? (1.0f / 3.0f) : (3.0f / 4.0f); break;
+	case 1:
+		wobj->vel_x *= doslow ? (2.0f / 3.0f) : (6.0f / 5.0f);
+		if (!doslow && wobj->vel_y >= 0.0f && wobj->vel_y < fabsf(wobj->vel_x)) wobj->vel_y = fabsf(wobj->vel_x) / 2.0f;
+		break;
+	case 2:
+		wobj->vel_x *= doslow ? (1.0f / 2.0f) : (1.0f);
+		if (!doslow && wobj->vel_y >= 0.0f && wobj->vel_y < fabsf(wobj->vel_x)) wobj->vel_y = fabsf(wobj->vel_x);
+		break;
+	case 3:
+		wobj->vel_x *= doslow ? (1.0f / 3.0f) : (3.0f / 4.0f);
+		if (!doslow && wobj->vel_y >= 0.0f && wobj->vel_y < fabsf(wobj->vel_x)) wobj->vel_y = fabsf(wobj->vel_x) * 2.0f;
+		break;
 	default: break;
 	}
 	if (wobj->type == WOBJ_PLAYER) {
@@ -894,10 +904,15 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely)
 			Util_ResolveAABBCollision(&h, &other_h, &x, &y);
 			obj->x = h.x - obj->hitbox.x;
 			obj->y = h.y - obj->hitbox.y;
-			if (x && set_velx)
-				obj->vel_x = collider->vel_x;
+			if (x && set_velx) {
+				if ((obj->x + obj->hitbox.x + obj->hitbox.w / 2.0f < other_h.x + other_h.w / 2.0f && obj->vel_x >= collider->vel_x)
+					|| (obj->x + obj->hitbox.x + obj->hitbox.w / 2.0f > other_h.x + other_h.w / 2.0f && obj->vel_x <= collider->vel_x))
+					obj->vel_x = collider->vel_x;
+			}
 			if (y && set_vely) {
-				obj->vel_y = collider->vel_y;
+				if ((obj->y + obj->hitbox.y + obj->hitbox.h / 2.0f < other_h.y + other_h.h / 2.0f && obj->vel_y >= collider->vel_y)
+					|| (obj->y + obj->hitbox.y + obj->hitbox.h / 2.0f > other_h.y + other_h.h / 2.0f && obj->vel_y <= collider->vel_y))
+					obj->vel_y = collider->vel_y;
 			}
 		}
 		if ((collider->flags & WOBJ_IS_JUMPTHROUGH) && !(obj->flags & WOBJ_SKIP_JUMPTHROUGH))

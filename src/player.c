@@ -977,8 +977,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 					w->speed = 9.0f;
 					w->strength = wobj->strength + 0.1f;
 
+					local_data->been_jumping_timer = 10;
 					wobj->vel_y = 15.0f;
 					wobj->custom_ints[1] |= PLAYER_FLAG_USED_DOUBLE_JUMP;
+					wobj->flags |= WOBJ_IS_GROUNDED; // Set grounded flag because we're on the ground lol
 					Interaction_PlaySound(wobj, 25);
 				}
 			}
@@ -1099,10 +1101,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (local_data->been_jumping_timer > 5 && wobj->vel_y > 0.0f && Wobj_IsCollidingWithBlocks(wobj, 0.0f, wobj->vel_y)) {
 			// get vel x once landed
 			//Console_Print("asdf %d", Game_GetFrame());
+			
+			const float oldy = wobj->y;
+			for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 1.0f) && !player_is_on_spring(wobj); i++)
+				wobj->y += 1.0f;
+			
 			const float ang = Wobj_GetGroundAngle(wobj);
 			wobj->vel_x += (wobj->vel_y * -sinf(ang));
 			wobj->vel_y = (wobj->vel_y * cosf(ang));
 			local_data->been_jumping_timer = 0;
+			wobj->y = oldy;
 		}
 		if (Wobj_IsGrouneded(wobj)) {
 			local_data->is_grounded_buffer = 6;
@@ -1776,10 +1784,15 @@ search_platinfos:
 		if (!plat) goto plat_velx_application;
 		if (wobj->vel_y < plat->vel_y) goto plat_velx_application;
 
+		if (local_data->platinfo.active && local_data->platinfo.node == plat->node_id && local_data->platinfo.uuid == plat->uuid) {
+			goto plat_velx_application;
+		}
 		local_data->platinfo.active = true;
 		local_data->platinfo.node = plat->node_id;
 		local_data->platinfo.uuid = plat->uuid;
-		local_data->platinfo.relx = wobj->x - plat->x;
+		float px, py;
+		WobjCalculate_InterpolatedPos(plat, &px, &py);
+		local_data->platinfo.relx = wobj->x - px;
 	}
 plat_velx_application:
 	//if (local_data->platinfo.active) {

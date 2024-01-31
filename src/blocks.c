@@ -480,7 +480,7 @@ void Blocks_StickBoxToGround(CNM_BOX *b)
 	memcpy(&c, b, sizeof(CNM_BOX));
 
 	c.y = floorf(c.y);
-	c.y += 16.0f;
+	c.y += 32.0f;
 	if (Blocks_IsCollidingWithSolid(&c, 0))
 	{
 		c.y = b->y;
