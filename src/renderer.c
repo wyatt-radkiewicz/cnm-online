@@ -12,15 +12,14 @@
 #include "game.h"
 #include "mem.h"
 
-#define RENDERER_LEVELS 8
-
+#define RENDERER_LEVELS_LIGHT (RENDERER_LEVELS + 2)
 static SDL_Window *renderer_win;
 static SDL_Surface *renderer_scr;
 static SDL_Surface *renderer_gfx;
 static SDL_Surface *renderer_hires_temp;
 static SDL_Surface *renderer_effects_buf;
 static unsigned char (*renderer_trans)[256][RENDERER_LEVELS]; /* Source color, Destination Color, Transparency level */
-static unsigned char (*renderer_light)[RENDERER_LEVELS]; /* Color, Light level */
+static unsigned char (*renderer_light)[RENDERER_LEVELS_LIGHT]; /* Color, Light level */
 static CNM_RECT renderer_font;
 static int renderer_fullscreen;
 static int renderer_initialized = CNM_FALSE;
@@ -533,6 +532,12 @@ static int rgb_dist(int r1, int g1, int b1, int r2, int g2, int b2) {
 	int dist_b = b2 - b1;
 	return (dist_r * dist_r) + (dist_g * dist_g) + (dist_b * dist_b);
 }
+static int rgb_dist_naive(int r1, int g1, int b1, int r2, int g2, int b2) {
+	int dist_r = abs(r2 - r1);
+	int dist_g = abs(g2 - g1);
+	int dist_b = abs(b2 - b1);
+	return dist_r + dist_g + dist_b;
+}
 
 static int get_nearest_color(int r, int g, int b) {
 	int closest_index = 1, closest_dist = INT_MAX;
@@ -569,9 +574,9 @@ void Renderer_BuildTables(void)
 			sc = renderer_scr->format->palette->colors[s];
 			dc = renderer_scr->format->palette->colors[d];
 			r = (float)sc.r / 255.0f; g = (float)sc.g / 255.0f; b = (float)sc.b / 255.0f;
-			rs = (((float)dc.r / 255.0f) - r) / (float)(RENDERER_LEVELS + 1);
-			gs = (((float)dc.g / 255.0f) - g) / (float)(RENDERER_LEVELS + 1);
-			bs = (((float)dc.b / 255.0f) - b) / (float)(RENDERER_LEVELS + 1);
+			rs = (((float)dc.r / 255.0f) - r) / (float)(RENDERER_LEVELS);
+			gs = (((float)dc.g / 255.0f) - g) / (float)(RENDERER_LEVELS);
+			bs = (((float)dc.b / 255.0f) - b) / (float)(RENDERER_LEVELS);
 			renderer_trans[s][d][0] = s;
 			if (!s)
 				renderer_trans[s][d][0] = d;
@@ -592,10 +597,10 @@ void Renderer_BuildTables(void)
 	for (s = 1; s < 256; s++)
 	{
 		sc = renderer_scr->format->palette->colors[s];
-		renderer_light[s][0] = get_nearest_color(255, 255, 255);
+		//renderer_light[s][0] = get_nearest_color(255, 255, 255);
 		//const int lightadd[] = {50, 130, 0};
-		const int lightadd[] = {60, 150, 0};
-		for (l = RENDERER_LIGHT - 1; l > 0; l--)
+		const int lightadd[] = {30, 60, 120};
+		for (l = RENDERER_LIGHT - 1; l > -1; l--)
 		{
 			int _r = sc.r + lightadd[RENDERER_LIGHT - l - 1];
 			int _g = sc.g + lightadd[RENDERER_LIGHT - l - 1];
@@ -609,8 +614,8 @@ void Renderer_BuildTables(void)
 			renderer_light[s][l] = get_nearest_color(_r, _g, _b);
 		}
 		renderer_light[s][RENDERER_LIGHT] = s;
-		const int darksub[] = {35, 85, 150, 0};
-		for (l = RENDERER_LIGHT + 1; l < RENDERER_LEVELS - 1; l++)
+		const int darksub[] = {10, 20, 40, 80};
+		for (l = RENDERER_LIGHT + 1; l < RENDERER_LEVELS_LIGHT; l++)
 		{
 			int _r = sc.r - darksub[l - RENDERER_LIGHT - 1];
 			int _g = sc.g - darksub[l - RENDERER_LIGHT - 1];
@@ -623,7 +628,9 @@ void Renderer_BuildTables(void)
 			if (_b < 0) _b = 0;
 			renderer_light[s][l] = get_nearest_color(_r, _g, _b);
 		}
-		renderer_light[s][RENDERER_LEVELS - 1] = get_nearest_color(0, 0, 0);
+		renderer_light[s][RENDERER_BLACK] = get_nearest_color(0, 0, 0);
+		renderer_light[s][RENDERER_WHITE] = get_nearest_color(255, 255, 255);
+		//renderer_light[s][RENDERER_LEVELS_LIGHT - 1] = get_nearest_color(0, 0, 0);
 	}
 }
 //static void Renderer_BuildConvTable(void)

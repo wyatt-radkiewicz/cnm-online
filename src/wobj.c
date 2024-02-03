@@ -1167,8 +1167,8 @@ static void Wobj_CalculateLightForGridChunkAdd(int gx, int gy)
 	{
 		while (iters[g].wobj != NULL)
 		{
-			ox = (int)iters[g].wobj->x / BLOCK_SIZE;
-			oy = (int)iters[g].wobj->y / BLOCK_SIZE;
+			ox = (int)(iters[g].wobj->x + iters[g].wobj->hitbox.x + iters[g].wobj->hitbox.w / 2.0f) / BLOCK_SIZE;
+			oy = (int)(iters[g].wobj->y + iters[g].wobj->hitbox.y + iters[g].wobj->hitbox.h / 2.0f) / BLOCK_SIZE;
 			int light_type = (((int)iters[g].wobj->flags & WOBJ_LIGHT_SMALL) ? 1 : 0) +
 				(((int)iters[g].wobj->flags & WOBJ_LIGHT_BIG) ? 2 : 0);
 

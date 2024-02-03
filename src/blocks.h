@@ -72,7 +72,7 @@ void Blocks_StickBoxToGround(CNM_BOX *b);
 float Blocks_GetAngle(float x, float y);
 
 void Blocks_GetBlockDrawRect(BLOCK block, CNM_RECT *src);
-void Blocks_DrawBlock(int x, int y, BLOCK block, int light);
+void Blocks_DrawBlock(int x, int y, BLOCK block, int light, int layer_hint);
 void Blocks_DrawBlocks(int layer, int camx, int camy);
 
 #endif

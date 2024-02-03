@@ -200,7 +200,7 @@ typedef enum _WOBJ_TYPES
 
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
 #define Wobj_IsGrounded(w) Wobj_IsGrouneded(w)
-#define Wobj_DamageLighting(w, l) (((w)->flags & WOBJ_DAMAGE_INDICATE) ? 0 : (l))
+#define Wobj_DamageLighting(w, l) (((w)->flags & WOBJ_DAMAGE_INDICATE) ? RENDERER_WHITE : (l))
 
 #define WOBJDATA_STRUCT_DEF(name) struct name \
 	{ \

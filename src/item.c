@@ -737,7 +737,7 @@ void Item_Use(WOBJ *player)
 }*/
 static void ItemGeneric_MusleFlash(ITEM *item, WOBJ *player)
 {
-	if (item->custom_timer >= 0)
+	if (item->custom_timer > 0)
 		player->flags |= WOBJ_LIGHT_SMALL;
 	else
 		player->flags &= ~WOBJ_LIGHT_SMALL;
@@ -771,7 +771,7 @@ static void ItemShotgun_OnUse(ITEM *shotgun, WOBJ *player)
 	}
 	Player_PlayShootAnim(player);
 	Interaction_PlaySound(player, 0);
-	shotgun->custom_timer = 20+10;
+	shotgun->custom_timer = 5+1;
 	shotgun->use_timer = 10;
 
 	shotgun->durability -= 1.0f;

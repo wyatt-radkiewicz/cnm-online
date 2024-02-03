@@ -533,11 +533,12 @@ void Blocks_GetBlockDrawRect(BLOCK block, CNM_RECT *src)
 		memset(src, 0, sizeof(CNM_RECT));
 	}
 }
-void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
+void Blocks_DrawBlock(int x, int y, BLOCK block, int light, int layer_hint)
 {
 	CNM_RECT src;
-	if (block < 1 || block > 4095)
+	if (block < 0 || block > 4095)
 		return;
+	if (block == 0) goto light_only;
 	Blocks_GetBlockDrawRect(block, &src);
 #ifdef DEBUG
 	if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer) {
@@ -582,6 +583,16 @@ void Blocks_DrawBlock(int x, int y, BLOCK block, int light)
 		Blocks_GetBlockProp(block)->transparency,
 		light
 	);
+	return;
+light_only:
+	// looks shitty
+	//if (layer_hint == BLOCKS_BG && light != RENDERER_LIGHT) {
+	//	if (light < RENDERER_LIGHT) {
+	//		Renderer_DrawRect(&(CNM_RECT){.x = x, .y = y, .w = 32, .h = 32}, RCOL_WHITE, RENDERER_LEVELS - 1 - (RENDERER_LIGHT - light), RENDERER_LIGHT);
+	//	} else {
+	//		Renderer_DrawRect(&(CNM_RECT){.x = x, .y = y, .w = 32, .h = 32}, RCOL_BLACK, RENDERER_LEVELS - 1 - (light - RENDERER_LIGHT), RENDERER_LIGHT);
+	//	}
+	//}
 #ifdef DEBUG
 	}
 #endif
@@ -605,7 +616,7 @@ void Blocks_DrawBlocks(int layer, int camx, int camy)
 			sx = x * BLOCK_SIZE - camx;
 			sy = y * BLOCK_SIZE - camy;
 			if (!is_effects) {
-				Blocks_DrawBlock(sx, sy, block, light);
+				Blocks_DrawBlock(sx, sy, block, light, layer);
 			} else if (blocks_props[block].dmg_type == BLOCK_DMG_TYPE_LAVA) {
 				if (effects_layer == BLOCKS_DUMMY_EFFECTS_EX) {
 					Renderer_DrawHorzRippleEffect(&(CNM_RECT){ .x = sx, .y = sy, .w = 32, .h = 32}, 35.f, 3.5f, -0.8f);
