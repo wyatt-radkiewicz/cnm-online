@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include "pausemenu.h"
 #include "interaction.h"
 #include "renderer.h"
@@ -217,13 +218,20 @@ void pause_menu_draw(void) {
 			if (idx != options_num) Renderer_SetFont(384, 576, 8, 8);
 			else Renderer_SetFont(256, 192, 8, 8);
 			if (!(g_saves[g_current_save].lives <= 1 && idx == 0) || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx][text_mode]);
+			int w = r.w;
 			if (idx == options_num) {
-				int w = r.w;
 				Util_SetRect(&r, 376-24, 576 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
 				Renderer_DrawBitmap(-w + side_xstart + i*32 + left_disp + (w / 2 - center) - 12, RENDERER_HEIGHT - start + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT);
 				Util_SetRect(&r, 376-24, 576 + 8*((Game_GetFrame() / 2 + 2) % 6), 8, 8);
 				Renderer_DrawBitmap2(-w + side_xstart + i*32 + left_disp + (w / 2 + center) , RENDERER_HEIGHT - start + i*32 + left_disp + 8, &r, 0, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
 			}
+			Util_SetRect(&r, 360, 576 + 8*((Game_GetFrame() / 2 + 4) % 6), 16, 8);
+			int down_arrow_y = RENDERER_HEIGHT - start + i*32 + left_disp + 16;
+			int down_arrow_trans = ((RENDERER_HEIGHT - 16 - 8) - down_arrow_y) / 2;
+			if (down_arrow_trans < 4) down_arrow_trans = 4;
+			if (down_arrow_trans > 7) down_arrow_trans = 7;
+			if (idx == sizeof(option_names)/sizeof(*option_names) - 1) down_arrow_trans = 7;
+			Renderer_DrawBitmap2(-w + side_xstart + i*32 + left_disp + (w / 2) - 8, down_arrow_y+3+(int)sinf((float)Game_GetFrame() / 4.0f)*3, &r, down_arrow_trans, RENDERER_LIGHT, 0, 0);
 		}
 		idx++;
 	}

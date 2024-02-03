@@ -518,25 +518,29 @@ void Renderer_BuildTables(void)
 	for (s = 1; s < 256; s++)
 	{
 		sc = renderer_scr->format->palette->colors[s];
-		r = (float)sc.r / 255.0f; g = (float)sc.g / 255.0f; b = (float)sc.b / 255.0f;
-		rs = (1.0f - r) / (float)(RENDERER_LIGHT);
-		gs = (1.0f - g) / (float)(RENDERER_LIGHT);
-		bs = (1.0f - b) / (float)(RENDERER_LIGHT);
 		renderer_light[s][0] = get_nearest_color(255, 255, 255);
+		const int lightadd[] = {50, 130, 0};
 		for (l = RENDERER_LIGHT - 1; l > 0; l--)
 		{
-			r += rs; g += gs; b += bs;
-			renderer_light[s][l] = get_nearest_color((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
+			int _r = sc.r + lightadd[RENDERER_LIGHT - l - 1];
+			if (_r < 0) _r = 0;
+			int _g = sc.g + lightadd[RENDERER_LIGHT - l - 1];
+			if (_g < 0) _g = 0;
+			int _b = sc.b + lightadd[RENDERER_LIGHT - l - 1];
+			if (_b < 0) _b = 0;
+			renderer_light[s][l] = get_nearest_color(_r, _g, _b);
 		}
 		renderer_light[s][RENDERER_LIGHT] = s;
-		r = (float)sc.r / 255.0f; g = (float)sc.g / 255.0f; b = (float)sc.b / 255.0f;
-		rs = (0.0f - r) / (float)(RENDERER_LEVELS - RENDERER_LIGHT - 1);
-		gs = (0.0f - g) / (float)(RENDERER_LEVELS - RENDERER_LIGHT - 1);
-		bs = (0.0f - b) / (float)(RENDERER_LEVELS - RENDERER_LIGHT - 1);
+		const int darksub[] = {35, 85, 150, 0};
 		for (l = RENDERER_LIGHT + 1; l < RENDERER_LEVELS - 1; l++)
 		{
-			r += rs; g += gs; b += bs;
-			renderer_light[s][l] = get_nearest_color((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
+			int _r = sc.r - darksub[l - RENDERER_LIGHT - 1];
+			if (_r < 0) _r = 0;
+			int _g = sc.g - darksub[l - RENDERER_LIGHT - 1];
+			if (_g < 0) _g = 0;
+			int _b = sc.b - darksub[l - RENDERER_LIGHT - 1];
+			if (_b < 0) _b = 0;
+			renderer_light[s][l] = get_nearest_color(_r, _g, _b);
 		}
 		renderer_light[s][RENDERER_LEVELS - 1] = get_nearest_color(0, 0, 0);
 	}
