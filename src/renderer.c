@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <float.h>
 #include <SDL.h>
 #include <SDL_surface.h>
 #include <SDL_video.h>
@@ -35,6 +36,7 @@ int RENDERER_HEIGHT;
 static int Abs(int i);
 //static void Renderer_BuildConvTable(void);
 static void Renderer_UpdateWindowFromSettings(void);
+static void rgb_to_hsv(int ri, int gi, int bi, float *h, float *s, float *v);
 static int get_nearest_color(int r, int g, int b);
 
 static void Renderer_SetPixel(int x, int y, int color, int trans, int light);
@@ -460,6 +462,78 @@ void Renderer_DrawStetchedSpan(int x, int y, int w, int srcx, int srcy, int srcw
 	}
 }
 
+static void rgb_to_hsv(int ri, int gi, int bi, float *h, float *s, float *v) {
+	float r = (float)ri / 255.0f, g = (float)gi / 255.0f, b = (float)bi / 255.0f;
+	int valuei = CNM_MAX(ri, CNM_MAX(gi, bi));
+	float value = CNM_MAX(r, CNM_MAX(g, b));
+	float xmin = CNM_MIN(r, CNM_MIN(g, b));
+	float chroma = value - xmin;
+	float light = (value + xmin) / 2.0f;
+	float hue = 0.0f;
+	if (chroma <= 0.001f) {
+		hue = 0.0f;
+	} else if (valuei == ri) {
+		hue = 60.0f * (fmodf((g-b)/chroma, 6.0f));
+	} else if (valuei == gi) {
+		hue = 60.0f * ((b - r)/chroma + 2.0f);
+	} else if (valuei == bi) {
+		hue = 60.0f * ((r - g)/chroma + 4.0f);
+	}
+	float sat = 0.0f;
+	//value
+	if (value != 0.0f) sat = chroma / value;
+	//lightness
+	if (light != 0.0f && light != 1.0f) sat = (value - light)/CNM_MIN(light, 1.0f - light);
+
+	*h = hue;
+	*s = sat * 100.0f;
+	*v = value * 100.0f;
+}
+
+static float hsv_dist(float h1, float s1, float v1, float h2, float s2, float v2) {
+	float sv_dist = fabsf(s1 - s2) + fabsf(v1 - v2);
+	float h_dist = fabsf(h1 - h2);
+	if (h1 < h2) {
+		float new_dist = fabsf((h1 + 360.0f) - h2);
+		if (new_dist < h_dist) h_dist = new_dist;
+	}
+	if (h2 < h1) {
+		float new_dist = fabsf(h1 - (h2 + 360.0f));
+		if (new_dist < h_dist) h_dist = new_dist;
+	}
+	return h_dist * 0.8f + sv_dist * 1.2f;
+}
+
+static int get_nearest_color_hsv(int r, int g, int b) {
+	int closest_index = 1;
+	float closest_dist = FLT_MAX;
+	float h, s, v;
+	rgb_to_hsv(r, g, b, &h, &s, &v);
+	for (int i = 1; i < 0x100; i++)
+	{
+		if (i >= renderer_scr->format->palette->ncolors)
+			continue;
+
+		SDL_Color cur_color = renderer_scr->format->palette->colors[i];
+		float curh, curs, curv;
+		rgb_to_hsv(cur_color.r, cur_color.g, cur_color.b, &curh, &curs, &curv);
+		float dist = hsv_dist(h, s, v, curh, curs, curv);
+		if (dist < closest_dist)
+		{
+			closest_dist = dist;
+			closest_index = i;
+		}
+	}
+	return closest_index;
+}
+
+static int rgb_dist(int r1, int g1, int b1, int r2, int g2, int b2) {
+	int dist_r = r2 - r1;
+	int dist_g = g2 - g1;
+	int dist_b = b2 - b1;
+	return (dist_r * dist_r) + (dist_g * dist_g) + (dist_b * dist_b);
+}
+
 static int get_nearest_color(int r, int g, int b) {
 	int closest_index = 1, closest_dist = INT_MAX;
 	for (int i = 1; i < 0x100; i++)
@@ -468,7 +542,7 @@ static int get_nearest_color(int r, int g, int b) {
 			continue;
 
 		SDL_Color cur_color = renderer_scr->format->palette->colors[i];
-		int dist = abs(r - cur_color.r) + abs(g - cur_color.g) + abs(b - cur_color.b);
+		int dist = rgb_dist(r, g, b, cur_color.r, cur_color.g, cur_color.b);
 		if (dist < closest_dist)
 		{
 			closest_dist = dist;
@@ -519,15 +593,19 @@ void Renderer_BuildTables(void)
 	{
 		sc = renderer_scr->format->palette->colors[s];
 		renderer_light[s][0] = get_nearest_color(255, 255, 255);
-		const int lightadd[] = {50, 130, 0};
+		//const int lightadd[] = {50, 130, 0};
+		const int lightadd[] = {60, 150, 0};
 		for (l = RENDERER_LIGHT - 1; l > 0; l--)
 		{
 			int _r = sc.r + lightadd[RENDERER_LIGHT - l - 1];
-			if (_r < 0) _r = 0;
 			int _g = sc.g + lightadd[RENDERER_LIGHT - l - 1];
-			if (_g < 0) _g = 0;
 			int _b = sc.b + lightadd[RENDERER_LIGHT - l - 1];
-			if (_b < 0) _b = 0;
+			if (_r < _g && _r < _b) _r += 16;
+			else if (_g < _r && _g < _b) _g += 16;
+			else if (_b < _g && _b < _r) _b += 16;
+			if (_r > 255) _r = 255;
+			if (_g > 255) _g = 255;
+			if (_b > 255) _b = 255;
 			renderer_light[s][l] = get_nearest_color(_r, _g, _b);
 		}
 		renderer_light[s][RENDERER_LIGHT] = s;
@@ -535,10 +613,13 @@ void Renderer_BuildTables(void)
 		for (l = RENDERER_LIGHT + 1; l < RENDERER_LEVELS - 1; l++)
 		{
 			int _r = sc.r - darksub[l - RENDERER_LIGHT - 1];
-			if (_r < 0) _r = 0;
 			int _g = sc.g - darksub[l - RENDERER_LIGHT - 1];
-			if (_g < 0) _g = 0;
 			int _b = sc.b - darksub[l - RENDERER_LIGHT - 1];
+			if (_r > _g && _r > _b) _r -= 16;
+			else if (_g > _r && _g > _b) _g -= 16;
+			else if (_b > _g && _b > _r) _b -= 16;
+			if (_r < 0) _r = 0;
+			if (_g < 0) _g = 0;
 			if (_b < 0) _b = 0;
 			renderer_light[s][l] = get_nearest_color(_r, _g, _b);
 		}
