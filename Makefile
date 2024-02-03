@@ -9,7 +9,7 @@ OBJS := $(addprefix $(BUILD_DIR)/,$(patsubst %.c,%.o,$(SRCS)))
 # Flags
 CFLAGS := $(CFLAGS) $(shell sdl2-config --cflags) -I$(SOURCE_DIR)
 SDL_LDFLAGS := $(shell sdl2-config --libs) -lSDL2_mixer -lSDL2_net
-LDFLAGS := $(LDFLAGS) $(SDL_LDFLAGS)
+LDFLAGS := $(LDFLAGS) $(SDL_LDFLAGS) -lm
 
 # Build modes
 debug: CFLAGS += -DDEBUG -g -O0
