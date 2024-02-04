@@ -1211,9 +1211,9 @@ void Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int li
 #endif
 
 #ifdef DEBUG
-	if (_src->x % 8 != 0 && _src->w > RENDERER_MAX_WIDTH / 2) {
-		Console_Print("warning: slow normal draw because of unaligned source x");
-	}
+	//if (_src->x % 8 != 0 && _src->w > RENDERER_MAX_WIDTH / 2) {
+		//Console_Print("warning: slow normal draw because of unaligned source x");
+	//}
 #endif
 
 	const uint8_t *restrict src_pixel = ((unsigned char *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x);

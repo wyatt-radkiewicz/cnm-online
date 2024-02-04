@@ -21,6 +21,7 @@
 #include "petdefs.h"
 #include "player_spawns.h"
 #include "mem.h"
+#include "camera.h"
 
 static void WobjGeneric_Hurt(WOBJ *victim, WOBJ *inflictor)
 {
@@ -111,6 +112,7 @@ static void Wobj_ShotgunPel_Create(WOBJ *wobj) {
 	wobj->custom_floats[1] = 1.0f;
 }
 static void Wobj_ShotgunPel_Update(WOBJ *wobj) {
+	Wobj_DoSplashes(wobj);
 	wobj->custom_ints[0]++;
 	wobj->x += wobj->vel_x;
 	wobj->y += wobj->vel_y;
@@ -164,9 +166,11 @@ static void WobjVelPlayerPellet_Create(WOBJ *wobj)
 	wobj->hitbox.y = 8.0f;
 	wobj->hitbox.w = 16.0f;
 	wobj->hitbox.h = 16.0f;
+	wobj->custom_ints[1] = 0;
 }
 static void WobjVelPlayerPellet_Update(WOBJ *wobj)
 {
+	Wobj_DoSplashes(wobj);
 	wobj->x += wobj->vel_x;
 	wobj->y += wobj->vel_y;
 	wobj->custom_ints[0]++;
@@ -746,6 +750,25 @@ static void WobjPlayerMinigunPellet_Create(WOBJ *wobj)
 static void WobjPlayerMinigunPellet_Update(WOBJ *wobj)
 {
 	WobjGenericAttack_Update(wobj);
+
+	// do splashes
+	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
+		for (int i = 0; (Game_GetFrame() % 5 == 0) && i < 16; i++) {
+			wobj->hitbox.x += 4.0f;
+			if (Wobj_InWater(wobj)) {
+				Create_Splash_Particles(
+					wobj->x + wobj->hitbox.x,
+					wobj->y + 8.0f + Util_RandFloat() * 16.0f,
+					Wobj_GetWaterBlockID(wobj),
+					(wobj->flags & WOBJ_HFLIP) ? 0.0f : CNM_PI,
+					6.0f,
+					2,
+					2
+				);
+			}
+		}
+	}
+	wobj->hitbox = (CNM_BOX){.x = 0.0f, .y = 0.0f, .w = 64.0f, .h = 32.0f};
 }
 static void WobjPlayerMinigunPellet_Draw(WOBJ *wobj, int camx, int camy) {
 	wobj->anim_frame = Game_GetFrame() % 3;
@@ -1910,6 +1933,7 @@ static void WobjPet_Update(WOBJ *wobj) {
 			//wobj->y += wobj->vel_y;
 		}
 	}
+	Wobj_DoSplashes(wobj);
 
 	if (wobj->x > plr->x) wobj->flags |= WOBJ_HFLIP;
 	else wobj->flags &= ~WOBJ_HFLIP;
@@ -1974,6 +1998,102 @@ static void WobjPet_Draw(WOBJ *wobj, int camx, int camy) {
 }
 static void Wobj_KeyRemover_Create(WOBJ *wobj) {
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 64.0f, 96.0f);
+}
+
+#define PFLAG_COLLIDE 1
+#define PFLAG_SPLASH 2
+#define PFLAG_WATERED 4
+#define PFLAG_FADE 8
+static void Wobj_Particle_Create(WOBJ *wobj) {
+}
+static void Wobj_Particle_Update(WOBJ *wobj) {
+	
+	wobj->vel_y += wobj->speed;
+	wobj->x += wobj->vel_x;
+	wobj->y += wobj->vel_y;
+	if (wobj->custom_ints[1]-- <= 0)
+		Interaction_DestroyWobj(wobj);
+	int watered = wobj->item & PFLAG_WATERED;
+	if (~wobj->item & PFLAG_COLLIDE) return;
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->vel_x, 0.0f))
+	{
+		wobj->vel_x *= -1.0f * wobj->jump * (watered ? 0.9f : 1.0f);
+		if (wobj->jump <= 0.02f) wobj->vel_y = 0.0f;
+		if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
+	}
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, wobj->vel_y))
+	{
+		wobj->vel_y *= -1.0f * wobj->jump * (watered ? 0.5f : 1.0f);
+		if (wobj->jump <= 0.02f) wobj->vel_x = 0.0f;
+		if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
+	}
+	if (Wobj_InWater(wobj) && (wobj->item & PFLAG_SPLASH) && !watered) {
+		Create_Splash_Particles(
+			wobj->x,
+			wobj->y,
+			Wobj_GetWaterBlockID(wobj),
+			atan2f(-wobj->vel_y, -wobj->vel_x),
+			sqrtf(wobj->vel_x*wobj->vel_x + wobj->vel_y*wobj->vel_y),
+			5,
+			2
+		);
+		wobj->item |= PFLAG_WATERED;
+	}
+}
+static void Wobj_Particle_Draw(WOBJ *wobj, int camx, int camy) {
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)ceilf(wobj->y) - camy,
+		&(CNM_RECT){
+			.x = (wobj->anim_frame & 0xffff),
+			.y = ((unsigned int)wobj->anim_frame >> 16),
+			.w = (int)wobj->hitbox.w,
+			.h = (int)wobj->hitbox.h,
+		},
+		7 - (int)((float)wobj->custom_ints[1] / (float)wobj->custom_ints[0] * 7.0f),
+		Blocks_GetCalculatedBlockLight((int)wobj->x / BLOCK_SIZE, (int)wobj->y / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
+	);
+}
+void Wobj_Particle_Spawn(float x, float y, CNM_RECT src, float vx, float vy, float grav, float bounce, int collide, int make_splash, int lifetime, int bounce_snd, int slowly_fade) {
+	WOBJ *p = Interaction_CreateWobj(WOBJ_PARTICLE, x, y, lifetime, 0.0f);
+	p->anim_frame = src.x | (src.y << 16);
+	p->hitbox = (CNM_BOX){ .x = 0.0f, .y = 0.0f, .w = (float)src.w, .h = (float)src.h };
+	p->jump = bounce;
+	p->item = 0;
+	if (collide) p->item |= PFLAG_COLLIDE;
+	if (make_splash) p->item |= PFLAG_SPLASH;
+	if (slowly_fade) p->item |= PFLAG_FADE;
+	p->money = bounce_snd;
+	p->speed = grav;
+	p->custom_ints[1] = lifetime;
+	p->vel_x = vx;
+	p->vel_y = vy;
+	p->link_uuid = 0;
+}
+void Wobj_Particle_Splash_Spawn(float x, float y, int block, float vx, float vy) {
+	if (x > Camera_GetXPos() + RENDERER_WIDTH || x < Camera_GetXPos() ||
+		y > Camera_GetYPos() + RENDERER_HEIGHT || y < Camera_GetYPos()) return;
+	BLOCK_PROPS *props = Blocks_GetBlockProp(block);
+	if (props == NULL) return;
+	Wobj_Particle_Spawn(x, y, (CNM_RECT){
+		.x = props->dmg ? (props->frames_x[0] * BLOCK_SIZE + Util_RandInt(5, 27)) : (256),
+		.y = props->dmg ? (props->frames_y[0] * BLOCK_SIZE + Util_RandInt(5, 27)) : (480),
+		.w = 3,
+		.h = 3,
+	}, vx, vy, 0.25f, 0.0f, 1, 0, 35, 65, 1);
+}
+void Create_Splash_Particles(float x, float y, int block, float ang, float spd, int n, int nmulti) {
+	const float spd_percent = 1.5f - CNM_MIN(spd / 5.0f, 1.0f);
+	for (int i = 0; i < (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER ? n : nmulti); i++) {
+		float a = ang + (Util_RandFloat() * 2.0f - 1.0f) * spd_percent;
+		float s = spd * (Util_RandFloat() * 0.5f + 1.0f);
+		Wobj_Particle_Splash_Spawn(
+			x, y, block, cosf(a) * s, sinf(a) * s
+		);
+	}
 }
 
 void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void) {
@@ -4048,6 +4168,20 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0, // Money reward
 		CNM_FALSE, // Does network interpolation?
 		CNM_TRUE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 157: Particle Object
+		Wobj_Particle_Create, // Create
+		Wobj_Particle_Update, // Update
+		Wobj_Particle_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{ 0, 0, 32, 32, },
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
 		0, // Score reward
 	},
 };

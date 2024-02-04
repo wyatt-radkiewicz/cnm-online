@@ -399,6 +399,8 @@ void WobjPlayer_Create(WOBJ *wobj)
 	//local_data->stored_plat_velx = 0.0f;
 	local_data->been_jumping_timer = 0;
 	local_data->skip_jumpthrough_timer = 0;
+	local_data->last_water_x = 0;
+	local_data->last_water_y = 0;
 	//local_data->slope_jumped = CNM_FALSE;
 
 	local_data->platinfo.active = false;
@@ -675,13 +677,17 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		}
 		local_data->last_in_water = local_data->in_water;
-		BLOCK_PROPS *water_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE));
-		local_data->in_water = water_props->dmg_type == BLOCK_DMG_TYPE_LAVA;
-		if (!local_data->in_water)
-		{
-			water_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE));
-			local_data->in_water = water_props->dmg_type == BLOCK_DMG_TYPE_LAVA;
+		local_data->in_water = Wobj_InWater(wobj);
+		if (local_data->in_water) {
+			local_data->last_water_block = Wobj_GetWaterBlockID(wobj);
 		}
+		//BLOCK_PROPS *water_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE));
+		//local_data->in_water = water_props->dmg_type == BLOCK_DMG_TYPE_LAVA;
+		//if (!local_data->in_water)
+		//{
+		//	water_props = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, (int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE));
+		//	local_data->in_water = water_props->dmg_type == BLOCK_DMG_TYPE_LAVA;
+		//}
 
 		if (local_data->in_water)
 		{
@@ -715,8 +721,60 @@ void WobjPlayer_Update(WOBJ *wobj)
 				}
 			}
 		}
-		if (local_data->in_water != local_data->last_in_water)
-			Interaction_CreateWobj(WOBJ_WATER_SPLASH_EFFECT, wobj->x, wobj->y - 16.0f, 0, 0.0f);
+		if (local_data->in_water != local_data->last_in_water) {
+			float ang = CNM_PI / -2.0f;
+			int newx = (int)(wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f) / BLOCK_SIZE;
+			int newy = (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h / 2.0f) / BLOCK_SIZE;
+			if (!local_data->in_water) {
+				if (Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, local_data->last_water_x + 1, local_data->last_water_y))->dmg_type != BLOCK_DMG_TYPE_LAVA
+					|| Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, local_data->last_water_x - 1, local_data->last_water_y))->dmg_type != BLOCK_DMG_TYPE_LAVA) {
+					if (newx >= local_data->last_water_x) ang = 0.0f;
+					if (newx < local_data->last_water_x) ang = CNM_PI;
+				}
+				if (newy > local_data->last_water_y) ang = CNM_PI / 2.0f;
+				if (newy < local_data->last_water_y) ang = CNM_PI / -2.0f;
+			} else {
+				if (Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, newx + 1, newy))->dmg_type != BLOCK_DMG_TYPE_LAVA
+					|| Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, newx - 1, newy))->dmg_type != BLOCK_DMG_TYPE_LAVA) {
+					if (newx >= local_data->last_water_x) ang = CNM_PI;
+					if (newx < local_data->last_water_x) ang = 0.0f;
+				}
+				if (newy > local_data->last_water_y) ang = CNM_PI / -2.0f;
+				if (newy < local_data->last_water_y) ang = CNM_PI / 2.0f;
+			}
+
+			float pspd = sqrtf(wobj->vel_x*wobj->vel_x + wobj->vel_y*wobj->vel_y) * 0.5f;
+			Create_Splash_Particles(
+				wobj->x + 16.0f,
+				wobj->y + 20.0f,
+				local_data->last_water_block, 
+				ang,
+				pspd,
+				20,
+				5
+			);
+			Create_Splash_Particles(
+				wobj->x + 16.0f + sinf(ang) * 5.0f,
+				wobj->y + 20.0f + cosf(ang) * 5.0f,
+				local_data->last_water_block, 
+				ang,
+				pspd,
+				20,
+				5
+			);
+			Create_Splash_Particles(
+				wobj->x + 16.0f - sinf(ang) * 5.0f,
+				wobj->y + 20.0f - cosf(ang) * 5.0f,
+				local_data->last_water_block, 
+				ang,
+				pspd,
+				20,
+				5
+			);
+		}
+
+		local_data->last_water_x = (int)(wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f) / BLOCK_SIZE;
+		local_data->last_water_y = (int)(wobj->y + wobj->hitbox.y + wobj->hitbox.h / 2.0f) / BLOCK_SIZE;
 		float cmul = local_data->control_mul;
 		if (local_data->been_jumping_timer < 9999) local_data->been_jumping_timer++;
 		if (cmul < 0.0f) cmul = 0.0f;

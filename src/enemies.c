@@ -37,6 +37,7 @@ void WobjSlime_Create(WOBJ *wobj)
 void WobjSlime_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 
 	wobj->custom_ints[0]--;
@@ -110,6 +111,7 @@ void WobjFlyingSlime_Update(WOBJ *wobj)
 	FlyingSlimeAI *ai = wobj->local_data;
 	if (!player) return;
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 
 	if (Game_GetFrame() % 5 == 0) wobj->anim_frame = (wobj->anim_frame + 1) & 1;
@@ -205,6 +207,7 @@ void WobjHeavy_Update(WOBJ *wobj)
 	//memcpy(&tempbox, &wobj->hitbox, sizeof(tempbox));
 	//Util_SetBox(&wobj->hitbox, 16.0f, 0.0f, 16.0f, 64.0f);
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
 	WobjPhysics_BeginUpdate(wobj);
 	//memcpy(&wobj->hitbox, &tempbox, sizeof(tempbox));
@@ -330,6 +333,7 @@ void WobjDragon_Update(WOBJ *wobj)
 	float cy = wobj->y + 64.0f;
 
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	wobj->anim_frame = (Game_GetFrame() / 15) % 2;
 	if (wobj->custom_ints[0]) wobj->anim_frame += 2;
 
@@ -394,6 +398,7 @@ void WobjBozoPin_Create(WOBJ *wobj)
 void WobjBozoPin_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 	wobj->vel_x = 0.0f;
 	wobj->vel_y = 0.0f;
@@ -460,6 +465,7 @@ void WobjBozo_Create(WOBJ *wobj)
 void WobjBozo_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	wobj->anim_frame = (wobj->health < 50.0f) ? 1 : 0;
 	if (bznum != 0) {
 		float tx = bzx[wobj->custom_ints[0]];
@@ -584,6 +590,7 @@ void WobjLavaMonster_Create(WOBJ *wobj)
 void WobjLavaMonster_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 	if (Wobj_IsGrouneded(wobj))
 		wobj->vel_y = 0.0f;
@@ -630,6 +637,7 @@ void WobjTTMinionSmall_Create(WOBJ *wobj)
 void WobjTTMinionSmall_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	if (Game_GetFrame() % 29 == 0)
 	{
 		WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
@@ -693,6 +701,7 @@ void WobjTTMinionBig_Create(WOBJ *wobj)
 void WobjTTMinionBig_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	if (Game_GetFrame() % 28 == 0 && wobj->local_data == NULL)
 	{
 		WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
@@ -778,6 +787,7 @@ void WobjSlimeWalker_Update(WOBJ *wobj)
 	}
 
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 	if (wobj->custom_ints[1] == 0)
 	{
@@ -864,6 +874,7 @@ void WobjMegaFish_Create(WOBJ *wobj)
 void WobjMegaFish_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 	wobj->vel_x = cosf(CNM_2RAD(wobj->custom_floats[1])) * wobj->speed;
 	wobj->vel_y = sinf(CNM_2RAD(wobj->custom_floats[1])) * wobj->speed;
@@ -965,6 +976,7 @@ void WobjLavaDragonHead_Create(WOBJ *wobj)
 void WobjLavaDragonHead_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 
 	LAVADRAGON_DATA *data = wobj->local_data;
 	WOBJ *target = NULL;
@@ -1236,6 +1248,7 @@ void WobjTTBoss_Create(WOBJ *wobj)
 void WobjTTBoss_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 
 	if (!wobj->TTBOSS_PROVOKED)
 	{
@@ -1341,6 +1354,7 @@ void WobjEaterBug_Create(WOBJ *wobj)
 void WobjEaterBug_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 
 	if (wobj->custom_ints[0] == 0)
 	{
@@ -1388,6 +1402,7 @@ void WobjSpiderWalker_Create(WOBJ *wobj)
 void WobjSpiderWalker_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	if (Game_GetFrame() % 5 == 0 && wobj->custom_ints[0] < 0)
 	{
 		WOBJ *np = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
@@ -1716,6 +1731,7 @@ void WobjSuperDragonBoss_Create(WOBJ *wobj)
 void WobjSuperDragonBoss_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 
 	SUPER_DRAGON_DATA *data = wobj->local_data;
 
@@ -1869,6 +1885,7 @@ void WobjBozoLaserMinion_Create(WOBJ *wobj)
 void WobjBozoLaserMinion_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 
 	// Finding Closest Player
 	if (wobj->custom_ints[0] == 0 && Game_GetFrame() % 31 == 0)
@@ -1996,6 +2013,7 @@ void WobjBozoMk2_Create(WOBJ *wobj)
 void WobjBozoMk2_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WOBJ *np = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
 	if (np->x > wobj->x + 24.0f) wobj->flags &= ~WOBJ_HFLIP;
 	else wobj->flags |= WOBJ_HFLIP;
@@ -2103,6 +2121,7 @@ void WobjSpikeGuy_Create(WOBJ *wobj)
 void WobjSpikeGuy_Update(WOBJ *wobj)
 {
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 
 	// Finding Closest Player
 	if (wobj->custom_ints[0] == 0 && Game_GetFrame() % 31 == 0)
@@ -2282,6 +2301,7 @@ void WobjKamakaziSlime_Update(WOBJ *wobj)
 {
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	wobj->custom_ints[0]--;
 
 	if ((Game_GetFrame() + 1) % 4 == 0 && wobj->custom_ints[0] < 0)
@@ -2414,6 +2434,7 @@ void WobjRockGuyMedium_Update(WOBJ *wobj)
 {
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 
 	WOBJ *player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
@@ -2462,6 +2483,7 @@ static void WobjRockGuySmall_AI(WOBJ *wobj, float spd, float jmp)
 {
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 
 	WOBJ *player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
@@ -2572,12 +2594,16 @@ void WobjRockGuySlider_Update(WOBJ *wobj)
 {
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 
-	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 5.0f, 0.0f))
+	const CNM_BOX setbox = wobj->hitbox;
+	Util_SetBox(&wobj->hitbox, 31.5f, 11.5f, 1.0f, 1.0f);
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 64.0f, 0.0f))
 		wobj->custom_floats[0] = -1.0f;
-	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, -5.0f, 0.0f))
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, -64.0f, 0.0f))
 		wobj->custom_floats[0] = 1.0f;
+	wobj->hitbox = setbox;
 
 	if (fabsf(wobj->vel_x) < 15.0f)
 		wobj->vel_x += wobj->custom_floats[0] * 0.1f;
@@ -2619,6 +2645,7 @@ void WobjRockGuySmasher_Update(WOBJ *wobj)
 {
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 	Wobj_DoEnemyCry(wobj, 45);
+	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
 
 	WOBJ *player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
@@ -2662,8 +2689,10 @@ void WobjRockGuySmasher_Update(WOBJ *wobj)
 		if (wobj->custom_floats[1] < 0.0f && wobj->x > player->x)
    			on_wrong_side = CNM_TRUE;
 
+		CNM_BOX setbox = wobj->hitbox;
+		Util_SetBox(&wobj->hitbox, 7.5f, 40.0f, 1.0f, 1.0f);
 		if ((Interaction_GetDistanceToWobj(player, wobj) < 128.0f && wobj->custom_ints[1] > 120) ||
-			Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[1] * 4.0f, -1.0f) ||
+			Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[1] * 96.0f, -1.0f) ||
 			(wobj->custom_ints[1] > 30*10) ||
 			(on_wrong_side && wobj->custom_ints[1] > 30*2))
 		{
@@ -2672,9 +2701,11 @@ void WobjRockGuySmasher_Update(WOBJ *wobj)
 			wobj->anim_frame = 2;
 			wobj->y += 32.0f;
 			if (~wobj->flags & WOBJ_HFLIP) wobj->x -= 64.0f;
-			Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 96.0f, 64.0f);
+			else wobj->x += 8.0f;
+			Util_SetBox(&setbox, 0.0f, 0.0f, 96.0f, 64.0f);
 			return;
 		}
+		wobj->hitbox = setbox;
 		wobj->custom_ints[1]++;
 		wobj->anim_frame = 1;
 	}

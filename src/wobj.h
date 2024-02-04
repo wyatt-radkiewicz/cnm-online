@@ -169,6 +169,7 @@ typedef enum _WOBJ_TYPES
 	WOBJ_PET_UNLOCK,
 	WOBJ_PLAYER_PET,
 	WOBJ_KEY_REMOVER,
+	WOBJ_PARTICLE,
 	WOBJ_MAX
 } WOBJ_TYPES;
 
@@ -197,6 +198,7 @@ typedef enum _WOBJ_TYPES
 #define WOBJ_HAS_PLAYER_FINISHED (1 << 21)
 #define WOBJ_SKIP_JUMPTHROUGH (1 << 22)
 #define WOBJ_BEING_ICED (1 << 23)
+#define WOBJ_WAS_WATER (1 << 24)
 
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
 #define Wobj_IsGrounded(w) Wobj_IsGrouneded(w)
@@ -325,12 +327,18 @@ void Wobj_UpdateGridPos(WOBJ *wobj);
 void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound);
 float Wobj_GetGroundAngle(const WOBJ *wobj);
 void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py);
+int Wobj_InWater(WOBJ *wobj);
+int Wobj_GetWaterBlockID(WOBJ *wobj);
 //void Wobj_OnDestroyLocalData(WOBJ *wobj);
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);
 void WobjGenericAttack_Update(WOBJ *wobj);
 
 void BreakPart_CreateParts(float x, float y, float yspd_start, int srcx, int srcy, int w, int h);
+void Wobj_Particle_Spawn(float x, float y, CNM_RECT src, float vx, float vy, float grav, float bounce, int collide, int make_splash, int lifetime, int bounce_snd, int slowly_fade);
+void Wobj_Particle_Splash_Spawn(float x, float y, int block, float vx, float vy);
+void Create_Splash_Particles(float x, float y, int block, float ang, float spd, int n, int nmultiplayer);
+void Wobj_DoSplashes(WOBJ *wobj);
 
 void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void);
 

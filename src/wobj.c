@@ -1289,6 +1289,33 @@ void WobjGenericAttack_Update(WOBJ *wobj)
 	Interaction_DamageFoundWobjs(wobj);
 	Interaction_DamageOtherPlayers(wobj);
 }
+int Wobj_InWater(WOBJ *wobj) {
+	return Wobj_GetWaterBlockID(wobj) != -1;
+}
+int Wobj_GetWaterBlockID(WOBJ *wobj) {
+	float cx = wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f;
+	float cy = wobj->y + wobj->hitbox.y + wobj->hitbox.h / 2.0f;
+	int in_water = CNM_FALSE;
+	int bid = Blocks_GetBlock(BLOCKS_BG, (int)(cx) / BLOCK_SIZE, (int)(cy) / BLOCK_SIZE);
+	BLOCK_PROPS *water_props = Blocks_GetBlockProp(bid);
+	in_water = water_props->dmg_type == BLOCK_DMG_TYPE_LAVA;
+	if (!in_water)
+	{
+		bid = Blocks_GetBlock(BLOCKS_FG, (int)(cx) / BLOCK_SIZE, (int)(cy) / BLOCK_SIZE);
+		water_props = Blocks_GetBlockProp(bid);
+		in_water = water_props->dmg_type == BLOCK_DMG_TYPE_LAVA;
+	}
+	return in_water ? bid : -1;
+}
+void Wobj_DoSplashes(WOBJ *wobj) {
+	if (Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) return;
+	int inwater = !!Wobj_InWater(wobj);
+	if (!!(wobj->flags & WOBJ_WAS_WATER) != inwater) {
+		Create_Splash_Particles(wobj->x, wobj->y, Wobj_GetWaterBlockID(wobj), atan2f(-wobj->vel_y, -wobj->vel_x), sqrtf(wobj->vel_x*wobj->vel_x +wobj->vel_y * wobj->vel_y)*0.25f, 10, 5);
+	}
+	if (inwater) wobj->flags |= WOBJ_WAS_WATER;
+	else wobj->flags &= ~WOBJ_WAS_WATER;
+}
 
 static uint32_t WobjSearch_GetCalculatedHash(int node, int uuid)
 {
