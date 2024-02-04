@@ -614,7 +614,7 @@ void Renderer_BuildTables(void)
 			renderer_light[s][l] = get_nearest_color(_r, _g, _b);
 		}
 		renderer_light[s][RENDERER_LIGHT] = s;
-		const int darksub[] = {10, 20, 40, 80};
+		const int darksub[] = {10, 30, 60, 120};
 		for (l = RENDERER_LIGHT + 1; l < RENDERER_LEVELS_LIGHT; l++)
 		{
 			int _r = sc.r - darksub[l - RENDERER_LIGHT - 1];

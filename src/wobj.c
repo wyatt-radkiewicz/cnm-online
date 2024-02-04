@@ -701,7 +701,7 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 }
 void wobj_move_and_hit_blocks(WOBJ *wobj) {
 	const float ground_ang = Wobj_IsGrounded(wobj) ? Wobj_GetGroundAngle(wobj) : 0.0f;
-	const int ang_type = roundf((ground_ang > CNM_PI ? CNM_PI - (ground_ang - CNM_PI) : ground_ang) / CNM_PI * 6.0f);
+	const int ang_type = ceilf((ground_ang > CNM_PI ? CNM_PI - (ground_ang - CNM_PI) : ground_ang) / CNM_PI * 6.0f);
 	const int doslow = (ground_ang < CNM_PI) == (wobj->vel_x > 0.0f);
 	switch (ang_type) {
 	case 1:
@@ -713,7 +713,7 @@ void wobj_move_and_hit_blocks(WOBJ *wobj) {
 		if (!doslow && wobj->vel_y >= 0.0f && wobj->vel_y < fabsf(wobj->vel_x)) wobj->vel_y = fabsf(wobj->vel_x);
 		break;
 	case 3:
-		wobj->vel_x *= doslow ? (1.0f / 3.0f) : (3.0f / 4.0f);
+		wobj->vel_x *= doslow ? (1.0f / 10.0f) : (3.0f / 4.0f);
 		if (!doslow && wobj->vel_y >= 0.0f && wobj->vel_y < fabsf(wobj->vel_x)) wobj->vel_y = fabsf(wobj->vel_x) * 2.0f;
 		break;
 	default: break;
@@ -727,7 +727,7 @@ void wobj_move_and_hit_blocks(WOBJ *wobj) {
 	switch (ang_type) {
 	case 1: result.vx *= doslow ? (3.0f / 2.0f) : (5.0f / 6.0f); break;
 	case 2: result.vx *= doslow ? (2.0f) : (1.0f); break;
-	case 3: result.vx *= doslow ? (3.0f) : (4.0f / 3.0f); break;
+	case 3: result.vx *= doslow ? (10.0f) : (4.0f / 3.0f); break;
 	default: break;
 	}
 	wobj->vel_x = result.vx;

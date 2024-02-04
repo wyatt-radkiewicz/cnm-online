@@ -399,6 +399,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	//local_data->stored_plat_velx = 0.0f;
 	local_data->been_jumping_timer = 0;
 	local_data->skip_jumpthrough_timer = 0;
+	//local_data->slope_jumped = CNM_FALSE;
 
 	local_data->platinfo.active = false;
 
@@ -704,10 +705,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 			if (wobj->vel_y >= -1.0f) {
 				if (!touching_ice) local_data->control_mul = 1.0f;
 				if (local_data->sliding_cap_landing_speed && local_data->been_jumping_timer < 45) {
-					if (wobj->vel_x > final_speed) wobj->vel_x = final_speed;
-					if (wobj->vel_x < -final_speed) wobj->vel_x = -final_speed;
+					if (wobj->vel_x > final_speed) wobj->vel_x -= dec / 6.0f;
+					if (wobj->vel_x < -final_speed) wobj->vel_x += dec / 6.0f;
+					if (wobj->vel_x <= final_speed && wobj->vel_x >= -final_speed) {
+						local_data->sliding_cap_landing_speed = CNM_FALSE;
+					}
+				} else if (local_data->been_jumping_timer >= 45) {
+					local_data->sliding_cap_landing_speed = CNM_FALSE;
 				}
-				local_data->sliding_cap_landing_speed = CNM_FALSE;
 			}
 		}
 		if (local_data->in_water != local_data->last_in_water)
@@ -1107,10 +1112,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 				wobj->y += 1.0f;
 			
 			const float ang = Wobj_GetGroundAngle(wobj);
-			wobj->vel_x += (wobj->vel_y * -sinf(ang));
+			wobj->vel_x += (wobj->vel_y * -sinf(ang)) * 0.85f;
 			wobj->vel_y = (wobj->vel_y * cosf(ang));
 			local_data->been_jumping_timer = 0;
 			wobj->y = oldy;
+			wobj->flags |= WOBJ_IS_GROUNDED;
+			if (fabsf(wobj->vel_x) >= final_speed + 1.0f) {
+				local_data->sliding_cap_landing_speed = CNM_TRUE;
+			}
 		}
 		if (Wobj_IsGrouneded(wobj)) {
 			local_data->is_grounded_buffer = 6;
@@ -1175,6 +1184,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 				//wobj->vel_x += -jmp_speed * sinf(ang);
 				wobj->vel_y = (-jmp_speed * cosf(ang)) + (-wobj->vel_x * sinf(ang));
 				wobj->vel_x = (-jmp_speed * sinf(ang)) + (wobj->vel_x * cosf(ang));
+				if (fabsf(wobj->vel_x) > final_speed && !(ang <= 0.1f || ang >= 359.9f)) {
+					local_data->sliding_cap_landing_speed = CNM_TRUE;
+				}
 				local_data->jumped = JUMP_TIMER;
 				local_data->animtimer = 0;
 				Interaction_PlaySound(wobj, 58);

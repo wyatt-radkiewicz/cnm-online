@@ -129,6 +129,7 @@ typedef struct _PLAYER_LOCAL_DATA
 
 	int been_jumping_timer;
 	int skip_jumpthrough_timer;
+	//int slope_jumped;
 
 	WOBJ *pet;
 

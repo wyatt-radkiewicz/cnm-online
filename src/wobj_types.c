@@ -937,11 +937,17 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 		{
 			if (Wobj_IsGrouneded(player) && wobj->custom_ints[1])
 			{
+				float vx = player->vel_x, vy = -10.0f;
 				if (player->flags & WOBJ_HFLIP)
-					player->vel_x += 10.0f;
+					vx += 10.0f;
 				else
-					player->vel_x -= 10.0f;
-				player->vel_y = -10.0f;
+					vx -= 10.0f;
+				const float ang = Wobj_GetGroundAngle(player);
+				//if (ang > 0.1f && ang < 359.9f) vx = player->vel_x;
+				vy -= fabsf(vx) * 0.25f * fabsf(sinf(ang));
+				vx *= fabsf(cosf(ang));
+				player->vel_y = (vy * cosf(ang)) + (-vx * sinf(ang));
+				player->vel_x = (vy * sinf(ang)) + (vx * cosf(ang));
 				player->y -= 1.0f;
 				player_launch_from_platinfo(player);
 			}
