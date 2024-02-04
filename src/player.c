@@ -725,11 +725,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		if (local_data->in_water != local_data->last_in_water ||
 			local_data->in_splash != local_data->last_in_splash) {
-			float ang = atan2f(-wobj->vel_y, -wobj->vel_x);
+			float vx = wobj->vel_x, vy = wobj->vel_y;
+			if (local_data->platinfo.active) {
+				vx += local_data->platinfo.last_velx * 2.0f;
+				vy += local_data->platinfo.last_vely * 2.0f;
+			}
+			float ang = atan2f(-vy, -vx);
 			if ((local_data->in_water != local_data->last_in_water && !local_data->in_water)
 				|| (local_data->in_splash != local_data->last_in_splash && !local_data->in_splash)) ang += CNM_PI;
 			if (local_data->in_water && local_data->last_in_splash && !local_data->in_splash) ang -= CNM_PI;
-			float pspd = sqrtf(wobj->vel_x*wobj->vel_x + wobj->vel_y*wobj->vel_y) * 0.5f;
+			float pspd = sqrtf(vx*vx + vy*vy) * 0.5f;
 			Create_Splash_Particles(
 				wobj->x + 16.0f,
 				wobj->y + 20.0f,
@@ -1722,6 +1727,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->health = 100.0f;
 		wobj->speed = 5.0f;
 		wobj->jump = 10.0f;
+		local_data->platinfo.active = CNM_FALSE;
 		clear_used_dialogs();
 		for (int k = 0; k < 5; k++)
 		{

@@ -243,6 +243,7 @@ static void WobjScMovingPlatform_Create(WOBJ *wobj)
 }
 static void WobjScMovingPlatform_Update(WOBJ *wobj)
 {
+	Wobj_DoSplashes(wobj);
 	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	if (wobj->custom_ints[1] > wobj->custom_ints[0] - 10) {
 		wobj->vel_x += wobj->custom_floats[1];
@@ -334,6 +335,7 @@ static void WobjMovingPlatformVertical_Create(WOBJ *wobj)
 }
 static void WobjMovingPlatformVertical_Update(WOBJ *wobj)
 {
+	Wobj_DoSplashes(wobj);
 	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	if (wobj->custom_ints[1] > wobj->custom_ints[0] - 10) {
 		wobj->vel_y += wobj->custom_floats[1];
@@ -1384,6 +1386,7 @@ static void WobjCustomizableMovingPlatform_Create(WOBJ *wobj)
 }
 static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 {
+	Wobj_DoSplashes(wobj);
 	Wobj_TryTeleportWobj(wobj, CNM_TRUE);
 	if (wobj->item > 0)
 	{

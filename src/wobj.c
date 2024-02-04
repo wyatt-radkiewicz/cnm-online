@@ -1327,6 +1327,13 @@ void Wobj_DoSplashes(WOBJ *wobj) {
 			wobj->x = ox;
 			wobj->y = oy;
 		}
+		float bullet_vel = 1.0f;
+		if (wobj->flags & (WOBJ_IS_PLAYER_WEAPON | WOBJ_IS_PLAYER_BULLET)) {
+			bullet_vel = 0.25f;
+		}
+		if (wobj->flags & (WOBJ_IS_MOVESTAND)) {
+			bullet_vel = 1.7f;
+		}
 		float ang = atan2f(-wobj->vel_y, -wobj->vel_x);
 		if (!inwater && !insplash) ang += CNM_PI;
 		if (bid != -1) {
@@ -1335,7 +1342,7 @@ void Wobj_DoSplashes(WOBJ *wobj) {
 				wobj->y,
 				bid,
 				ang,
-				sqrtf(wobj->vel_x*wobj->vel_x +wobj->vel_y * wobj->vel_y)*0.25f,
+				sqrtf(wobj->vel_x*wobj->vel_x +wobj->vel_y * wobj->vel_y)*bullet_vel,
 				10,
 				5
 			);
