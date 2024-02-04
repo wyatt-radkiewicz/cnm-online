@@ -198,7 +198,8 @@ typedef enum _WOBJ_TYPES
 #define WOBJ_HAS_PLAYER_FINISHED (1 << 21)
 #define WOBJ_SKIP_JUMPTHROUGH (1 << 22)
 #define WOBJ_BEING_ICED (1 << 23)
-#define WOBJ_WAS_WATER (1 << 24)
+#define WOBJ_WAS_SPLASH (1 << 24)
+#define WOBJ_WAS_WATER (1 << 25)
 
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
 #define Wobj_IsGrounded(w) Wobj_IsGrouneded(w)
@@ -327,8 +328,8 @@ void Wobj_UpdateGridPos(WOBJ *wobj);
 void Wobj_DoEnemyCry(WOBJ *wobj, int cry_sound);
 float Wobj_GetGroundAngle(const WOBJ *wobj);
 void WobjCalculate_InterpolatedPos(WOBJ *wobj, float *px, float *py);
-int Wobj_InWater(WOBJ *wobj);
-int Wobj_GetWaterBlockID(WOBJ *wobj);
+int Wobj_InWater(WOBJ *wobj, int with_splash, int with_water);
+int Wobj_GetWaterBlockID(WOBJ *wobj, int with_splash, int with_water);
 //void Wobj_OnDestroyLocalData(WOBJ *wobj);
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);

@@ -1564,7 +1564,9 @@
     {
       "solid": false,
       "transparency": 2,
-      "damage_type": "None",
+      "damage_type": {
+        "Splashes": 0
+      },
       "anim_speed": 4,
       "angle": 0,
       "frames": [
@@ -1613,7 +1615,9 @@
     {
       "solid": false,
       "transparency": 2,
-      "damage_type": "None",
+      "damage_type": {
+        "Splashes": 0
+      },
       "anim_speed": 4,
       "angle": 0,
       "frames": [

@@ -129,8 +129,8 @@ typedef struct _PLAYER_LOCAL_DATA
 
 	int been_jumping_timer;
 	int skip_jumpthrough_timer;
-	int last_water_x, last_water_y;
 	int last_water_block;
+	int in_splash, last_in_splash;
 	//int slope_jumped;
 
 	WOBJ *pet;

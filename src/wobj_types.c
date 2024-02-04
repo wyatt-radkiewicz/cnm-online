@@ -755,11 +755,11 @@ static void WobjPlayerMinigunPellet_Update(WOBJ *wobj)
 	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
 		for (int i = 0; (Game_GetFrame() % 5 == 0) && i < 16; i++) {
 			wobj->hitbox.x += 4.0f;
-			if (Wobj_InWater(wobj)) {
+			if (Wobj_InWater(wobj, 1, 1)) {
 				Create_Splash_Particles(
 					wobj->x + wobj->hitbox.x,
 					wobj->y + 8.0f + Util_RandFloat() * 16.0f,
-					Wobj_GetWaterBlockID(wobj),
+					Wobj_GetWaterBlockID(wobj, 1, 1),
 					(wobj->flags & WOBJ_HFLIP) ? 0.0f : CNM_PI,
 					6.0f,
 					2,
@@ -2027,11 +2027,11 @@ static void Wobj_Particle_Update(WOBJ *wobj) {
 		if (wobj->jump <= 0.02f) wobj->vel_x = 0.0f;
 		if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
 	}
-	if (Wobj_InWater(wobj) && (wobj->item & PFLAG_SPLASH) && !watered) {
+	if (Wobj_InWater(wobj, 0, 1) && (wobj->item & PFLAG_SPLASH) && !watered) {
 		Create_Splash_Particles(
 			wobj->x,
 			wobj->y,
-			Wobj_GetWaterBlockID(wobj),
+			Wobj_GetWaterBlockID(wobj, 1, 1),
 			atan2f(-wobj->vel_y, -wobj->vel_x),
 			sqrtf(wobj->vel_x*wobj->vel_x + wobj->vel_y*wobj->vel_y),
 			5,
@@ -2051,7 +2051,7 @@ static void Wobj_Particle_Draw(WOBJ *wobj, int camx, int camy) {
 			.w = (int)wobj->hitbox.w,
 			.h = (int)wobj->hitbox.h,
 		},
-		7 - (int)((float)wobj->custom_ints[1] / (float)wobj->custom_ints[0] * 7.0f),
+		(wobj->item & PFLAG_FADE) ? (7 - (int)((float)wobj->custom_ints[1] / (float)wobj->custom_ints[0] * 7.0f)) : 0,
 		Blocks_GetCalculatedBlockLight((int)wobj->x / BLOCK_SIZE, (int)wobj->y / BLOCK_SIZE),
 		wobj->flags & WOBJ_HFLIP,
 		wobj->flags & WOBJ_VFLIP
