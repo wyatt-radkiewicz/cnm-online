@@ -368,7 +368,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_TRUE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		55.0f, // Item durability
+		100.0f, // Item durability
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 26: Mega Potion
