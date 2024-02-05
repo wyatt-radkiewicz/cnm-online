@@ -1243,7 +1243,7 @@ static void WobjLockedBlockGeneric_Create(WOBJ *wobj)
 
 static void WobjWaterSplashEffect_Create(WOBJ *wobj)
 {
-	Interaction_PlaySound(wobj, 41);
+	//Interaction_PlaySound(wobj, 41);
 	wobj->custom_ints[0] = 0;
 	wobj->anim_frame = 0;
 }
@@ -2022,13 +2022,13 @@ static void Wobj_Particle_Update(WOBJ *wobj) {
 	{
 		wobj->vel_x *= -1.0f * wobj->jump * (watered ? 0.9f : 1.0f);
 		if (wobj->jump <= 0.02f) wobj->vel_y = 0.0f;
-		if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
+		//if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
 	}
 	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, wobj->vel_y))
 	{
 		wobj->vel_y *= -1.0f * wobj->jump * (watered ? 0.5f : 1.0f);
 		if (wobj->jump <= 0.02f) wobj->vel_x = 0.0f;
-		if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
+		//if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
 	}
 	if (Wobj_InWater(wobj, 0, 1) && (wobj->item & PFLAG_SPLASH) && !watered) {
 		Create_Splash_Particles(

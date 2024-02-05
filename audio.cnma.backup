@@ -100,10 +100,10 @@ arena 100
 rrn 0
 bzds 0
 ocean 300
-train 200
+train 27000
 ei 400
 deephaus 500
-AC 600
+AC 55000
 ttf 700
 ll 800
 rr 0
@@ -111,7 +111,7 @@ ice 900
 cm 1000
 lc 1100
 mall 0
-tut 1301
+tut 24000
 hq 0
 MODE MAXPOWER0
 spd 2
@@ -282,6 +282,13 @@ function LUA_UPDATE1(w)
 end
 __ENDLUA__
 MODE PETDEFS
-"SLMWALK" 7 58 10 19 8 w 1 3 1
-"SPIKER" 8 56 11 19 -1 w 1 2 1
+"BMPER" 0 64 10 19 8 f 10
+"LIFE_ORB" 10 64 11 19 -1 f 6
+"GOLDEN_BROTHER" 0 65 12 19 -1 w 1 3 2
+"CHOG" 0 66 10 20 -1 w 8 6 2
+"SMALL_ROCK_GUY" 6 65 11 20 -1 b 4 1 0 7
+"THE_BRAINCHILD" 11 65 12 20 -1 b 1 1 0 2
+"CLASSIC" 0 67 10 21 -1 w 1 1 2
+"GREAT_TYPIST" 13 65 11 21 -1 w 1 1 1
+"AMOGUS" 4 67 12 21 -1 w 1 5 1
 ENDPETS

@@ -735,6 +735,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				|| (local_data->in_splash != local_data->last_in_splash && !local_data->in_splash)) ang += CNM_PI;
 			if (local_data->in_water && local_data->last_in_splash && !local_data->in_splash) ang -= CNM_PI;
 			float pspd = sqrtf(vx*vx + vy*vy) * 0.5f;
+			Interaction_PlaySound(wobj, 41);
 			Create_Splash_Particles(
 				wobj->x + 16.0f,
 				wobj->y + 20.0f,

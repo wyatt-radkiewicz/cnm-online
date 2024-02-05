@@ -1346,6 +1346,7 @@ void Wobj_DoSplashes(WOBJ *wobj) {
 				10,
 				5
 			);
+			//if (bullet_vel > 0.5f && bullet_vel < 1.5f) Interaction_PlaySound(wobj, 65);
 		}
 	}
 	if (inwater) wobj->flags |= WOBJ_WAS_WATER;
