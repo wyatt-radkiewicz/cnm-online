@@ -560,30 +560,38 @@ void WobjSliverSlime_Create(WOBJ *wobj)
 }
 
 // TODO: Update lava monster
-enum LAVAMONSTER_STATES {
-	LMS_IDLE,
-	LMS_CHASING,
-	LMS_DROP,
-	LMS_FLYING,
-	LMS_SHOOTING,
-	LMS_SWOOP,
-};
-typedef struct _LAVAMONSTER_LOCAL_DATA {
+typedef enum lmstates {
+	lm_idle,
+	lm_chase,
+	lm_fly,
+	lm_drop,
+	lm_grow,
+} lmstates_t;
+typedef struct lmdata {
 	int state;
-	int state_timer;
-} LAVAMONSTER_LOCAL_DATA;
+	int timer;
+} lmdata_t;
+static dynpool_t lmdata_pool;
+void WobjLavaMonster_OnDestroy(WOBJ *wobj) {
+	dynpool_free(lmdata_pool, wobj->local_data);
+}
 void WobjLavaMonster_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE;
-	wobj->health = 16.0f;
-	wobj->strength = 6.0f;
+	wobj->on_destroy = WobjLavaMonster_OnDestroy;
+	wobj->health = 20.0f;
+	wobj->strength = 10.0f;
 	wobj->jump = 10.0f;
-	wobj->hitbox.x = 0.0f;
-	wobj->hitbox.y = 0.0f;
-	wobj->hitbox.w = 48.0f;
-	wobj->hitbox.h = 48.0f;
+	wobj->hitbox.x = 4.0f;
+	wobj->hitbox.y = 4.0f;
+	wobj->hitbox.w = 24.0f;
+	wobj->hitbox.h = 12.0f;
 	wobj->vel_x = 0.0f;
 	wobj->vel_y = 0.0f;
+	wobj->local_data = dynpool_alloc(lmdata_pool);
+	lmdata_t *ld = wobj->local_data;
+	ld->state = lm_idle;
+	ld->timer = 0;
 	if (wobj->custom_ints[0])
 		wobj->flags |= WOBJ_HFLIP;
 }
@@ -592,32 +600,111 @@ void WobjLavaMonster_Update(WOBJ *wobj)
 	Wobj_DoEnemyCry(wobj, 45);
 	Wobj_DoSplashes(wobj);
 	WobjPhysics_BeginUpdate(wobj);
-	if (Wobj_IsGrouneded(wobj))
+	lmdata_t *ld = wobj->local_data;
+
+	WOBJ *player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
+	switch (ld->state) {
+	case lm_idle:
+		if (Interaction_GetDistanceToWobj(wobj, player)) {
+			ld->state = lm_chase;
+			ld->timer = 30*3;
+		}
+		wobj->vel_y += 0.5f;
+		wobj->anim_frame = 0;
+		break;
+	case lm_chase:
+		wobj->anim_frame = (abs(ld->timer) / 3) % 2 + 0;
+		if (player->x > wobj->x && wobj->vel_x < 6.0f) {
+			wobj->vel_x += 0.5f;
+			wobj->flags &= ~WOBJ_HFLIP;
+		}
+		if (player->x < wobj->x && wobj->vel_x > -6.0f) {
+			wobj->vel_x -= 0.5f;
+			wobj->flags |= WOBJ_HFLIP;
+		}
+		if (!Wobj_IsGrouneded(wobj))
+			wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
+		else
+			wobj->vel_y = 0.0f;
+		if (player->y < wobj->y - 64.0f && Wobj_IsGrouneded(wobj))
+			wobj->vel_y = -10.0f;
+		if (((Wobj_IsCollidingWithBlocksOrObjects(wobj, 10.0f, 0.0f) && wobj->vel_x > 0.0f) ||
+			 (Wobj_IsCollidingWithBlocksOrObjects(wobj, -10.0f, 0.0f) && wobj->vel_x < 0.0f)) &&
+			player->y <= wobj->y) {
+			wobj->vel_y = -10.0f;
+		}
+		if (ld->timer-- <= 0) {
+			ld->state = lm_fly;
+			ld->timer = 30*4;
+		}
+		wobj->vel_y += 0.5f;
+		break;
+	case lm_fly:
+		wobj->anim_frame = (abs(ld->timer) / 3) % 2 + 2;
+		if (wobj->y < player->y - 32.0f && wobj->vel_y < 8.0f) {
+			wobj->vel_y += 0.8f;
+		} else if (wobj->y > player->y - 32.0f && wobj->vel_y > -5.0f) {
+			wobj->vel_y -= 0.5f;
+		}
+		if (wobj->x < player->x && wobj->vel_x < 6.0f) {
+			wobj->vel_x += 0.3f;
+			wobj->flags &= ~WOBJ_HFLIP;
+		} else if (wobj->x > player->x && wobj->vel_x > -6.0f) {
+			wobj->vel_x -= 0.3f;
+			wobj->flags |= WOBJ_HFLIP;
+		}
+		if (ld->timer-- <= 0) {
+			ld->state = lm_drop;
+			ld->timer = 30*1;
+
+			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, 0.0f);
+			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI);
+			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI/2.0f);
+			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI/-2.0f);
+		}
+		break;
+	case lm_drop:
+		wobj->anim_frame = (abs(ld->timer) / 3) % 2 + 2;
+		if (ld->timer-- > 0) {
+			wobj->vel_y -= 0.4f;
+			wobj->vel_x *= 0.8f;
+		} else {
+			wobj->vel_y += 0.9f;
+			if (ld->timer < -30*10 || Wobj_IsGrounded(wobj)) {
+				ld->state = lm_grow;
+				ld->timer = 30*2;
+			}
+		}
+		break;
+	case lm_grow:
+		wobj->anim_frame = ((30 - (ld->timer / 2)) / 6) + 4;
+		if (wobj->anim_frame >= 9) wobj->anim_frame = 8;
 		wobj->vel_y = 0.0f;
-	if (Game_GetFrame() % 30 * 3 == 0 && Wobj_IsGrouneded(wobj))
-		wobj->vel_y -= wobj->jump;
-	wobj->vel_y += 0.5f;
+		wobj->vel_x = 0.0f;
+		if (ld->timer-- < 0) {
+			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, 0.0f);
+			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI);
+			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI/2.0f);
+			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI/-2.0f);
+			Interaction_CreateWobj(
+				WOBJ_FIREBALL,
+				wobj->x,
+				wobj->y - 24.0f,
+				0,
+				atan2f(player->y - wobj->y, player->x - wobj->x)
+			);
+
+			ld->state = lm_chase;
+			ld->timer = 30*3;
+		}
+		break;
+	}
+
 	WobjPhysics_EndUpdate(wobj);
 
 	if (Game_GetFrame() % 29 == 0)
 		Interaction_PlaySound(wobj, 20);
 
-	if (Game_GetFrame() % 30 * 2 == 0)
-	{
-		WOBJ *fireball = Interaction_CreateWobj
-		(
-			WOBJ_FIREBALL, wobj->x, wobj->y, 0,
-			(wobj->custom_ints[0]) ? CNM_2RAD(180.0f) : 0.0f
-		);
-		fireball->speed = 7.0f;
-
-		fireball = Interaction_CreateWobj
-		(
-			WOBJ_FIREBALL, wobj->x, wobj->y, 0,
-			(wobj->custom_ints[0]) ? CNM_2RAD(172.0f) : CNM_2RAD(8.0f)
-		);
-		fireball->speed = 7.0f;
-	}
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
@@ -2821,7 +2908,7 @@ void Enemies_ZoneAllocLocalDataPools(void) {
 		arena_alloc
 	);
 	_ldpool_lavadragon = dynpool_init(4, sizeof(LAVADRAGON_DATA), arena_alloc);
-
+	lmdata_pool = dynpool_init(16, sizeof(lmdata_t), arena_alloc);
 
 	bzx = arena_alloc(sizeof(*bzx) * BOZO_WAYPOINTS_MAX);
 	bzy = arena_alloc(sizeof(*bzy) * BOZO_WAYPOINTS_MAX);
