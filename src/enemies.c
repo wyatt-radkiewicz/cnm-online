@@ -580,7 +580,7 @@ void WobjLavaMonster_Create(WOBJ *wobj)
 	wobj->flags = WOBJ_IS_HOSTILE;
 	wobj->on_destroy = WobjLavaMonster_OnDestroy;
 	wobj->health = 20.0f;
-	wobj->strength = 10.0f;
+	wobj->strength = 6.0f;
 	wobj->jump = 10.0f;
 	wobj->hitbox.x = 4.0f;
 	wobj->hitbox.y = 4.0f;
@@ -605,7 +605,7 @@ void WobjLavaMonster_Update(WOBJ *wobj)
 	WOBJ *player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
 	switch (ld->state) {
 	case lm_idle:
-		if (Interaction_GetDistanceToWobj(wobj, player)) {
+		if (Interaction_GetDistanceToWobj(wobj, player) <= (float)RENDERER_MAX_WIDTH) {
 			ld->state = lm_chase;
 			ld->timer = 30*3;
 		}
@@ -681,21 +681,22 @@ void WobjLavaMonster_Update(WOBJ *wobj)
 		if (wobj->anim_frame >= 9) wobj->anim_frame = 8;
 		wobj->vel_y = 0.0f;
 		wobj->vel_x = 0.0f;
-		if (ld->timer-- < 0) {
+		if (--ld->timer % 30 == 0) {
 			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, 0.0f);
 			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI);
 			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI/2.0f);
 			Interaction_CreateWobj(WOBJ_FIREBALL, wobj->x, wobj->y - 24.0f, 0, CNM_PI/-2.0f);
-			Interaction_CreateWobj(
-				WOBJ_FIREBALL,
-				wobj->x,
-				wobj->y - 24.0f,
-				0,
-				atan2f(player->y - wobj->y, player->x - wobj->x)
-			);
-
-			ld->state = lm_chase;
-			ld->timer = 30*3;
+			if (ld->timer <= 0) {
+				Interaction_CreateWobj(
+					WOBJ_FIREBALL,
+					wobj->x,
+					wobj->y - 24.0f,
+					0,
+					atan2f(player->y - wobj->y, player->x - wobj->x)
+				);
+				ld->state = lm_chase;
+				ld->timer = 30*3;
+			}
 		}
 		break;
 	}
