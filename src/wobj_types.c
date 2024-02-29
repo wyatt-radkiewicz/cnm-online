@@ -268,7 +268,7 @@ static void WobjScMovingPlatform_Update(WOBJ *wobj)
 static void WobjMovingPlatform_Draw(WOBJ *wobj, int camx, int camy) {
 	Renderer_DrawBitmap2
 	(
-		(int)floorf(wobj->x) - camx,
+		(int)wobj->x - camx,
 		(int)ceilf(wobj->y) - camy,
 		&(CNM_RECT){
 			.x = (wobj->item >> 12) * 32,
@@ -2105,6 +2105,7 @@ void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void) {
 
 static void Wobj_HitMarker_Create(WOBJ *wobj) {
 	wobj->vel_y = -2.5f;
+	wobj->flags |= WOBJ_OVERLAYER;
 	wobj->custom_ints[1] = 7;
 	wobj->custom_floats[0] = wobj->x - Camera_GetXPos();
 	wobj->custom_floats[1] = wobj->y - Camera_GetYPos();

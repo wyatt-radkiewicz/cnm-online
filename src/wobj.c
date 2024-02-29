@@ -19,6 +19,7 @@
 //#define WOBJ_SEARCH_MAP_SIZE (1 << 11)
 #define SMAPSZ 64
 #define DELOWNSZ 128
+#define NOVERLAYERS 64
 
 // Debug prints
 #define DBGLRU 0
@@ -36,6 +37,9 @@ static dynpool_t _wobjpool;
 static WOBJ *owned;
 static WOBJ *unowned;
 static int unowned_size;
+
+static WOBJ **overlayer_draws;
+static int noverlayer_draws;
 
 //static WOBJ *search_map[WOBJ_SEARCH_MAP_SIZE];
 typedef struct smaplru {
@@ -65,6 +69,8 @@ static void WobjSearch_DestroyUnownedEntries(void);
 
 void Wobj_Init(void)
 {
+	overlayer_draws = arena_global_alloc(sizeof(*overlayer_draws) * NOVERLAYERS);
+	noverlayer_draws = 0;
 	_lru_owned_pool = arena_global_alloc(LRU_POOL_SZ);
 	_lru_unowned_pool = arena_global_alloc(LRU_POOL_SZ);
 	_smap_owned = arena_global_alloc(sizeof(*_smap_owned) * SMAPSZ);
@@ -572,6 +578,65 @@ void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS])
 		}
 	}
 }
+static void Wobj_DrawWobj(WOBJ *other, int camx, int camy) {
+	if (!other->internal.owned && other->interpolate && Game_GetVar(GAME_VAR_CL_INTERP)->data.integer)
+	{
+		int interp_node = (Interaction_GetMode() == INTERACTION_MODE_CLIENT) ? 0 : other->node_id;
+		int interp_frame = other->interp_frame;
+		float interp_percent = (float)interp_frame / (float)(NetGame_GetNode(interp_node)->avgframes_between_updates);
+		if (NetGame_GetNode(interp_node)->avgframes_between_updates == 0.0f)
+			interp_percent = 1.0f;
+		float oldx = other->x, oldy = other->y;
+		float smoothing = Game_GetVar(GAME_VAR_CL_SMOOTHING)->data.decimal;
+
+		float neededx = other->interp_x + ((oldx - other->interp_x) * interp_percent);
+		float neededy = other->interp_y + ((oldy - other->interp_y) * interp_percent);
+
+		other->smooth_x += (neededx - other->smooth_x) * smoothing;
+		other->smooth_y += (neededy - other->smooth_y) * smoothing;
+
+		if (Game_GetFrame() % (30*5) == 0)
+		{
+			other->smooth_x = neededx;
+			other->smooth_y = neededy;
+		}
+		other->x = other->smooth_x;
+		other->y = other->smooth_y;
+
+		if (wobj_types[other->type].draw != NULL && ~other->flags & WOBJ_DONT_DRAW)
+			wobj_types[other->type].draw(other, camx, camy);
+		other->interp_frame++;
+
+		other->x = oldx;
+		other->y = oldy;
+	}
+	else
+	{
+		if (wobj_types[other->type].draw != NULL && ~other->flags & WOBJ_DONT_DRAW)
+			wobj_types[other->type].draw(other, camx, camy);
+	}
+
+	// Debug helpers with non-drawer things
+	if (wobj_types[other->type].draw == NULL) {
+		CNM_RECT r;
+		if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
+		{
+			Util_SetRect(&r, (int)(other->x + other->hitbox.x) - camx, (int)(other->y + other->hitbox.y) - camy,
+						 (int)other->hitbox.w, (int)other->hitbox.h);
+			Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
+		}
+
+		if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer)
+		{
+			Renderer_DrawText
+			(
+				(int)other->x - camx, (int)other->y - camy + 8, 0, RENDERER_LIGHT,
+				"(%d, %d)",
+				(int)(other->x), (int)(other->y)
+			);
+		}
+	}
+}
 void Wobj_DrawWobjs(int camx, int camy)
 {
 	OBJGRID_ITER iter;
@@ -588,63 +653,13 @@ void Wobj_DrawWobjs(int camx, int camy)
 				while (iter != NULL)
 				{
 					other = GET_WOBJ(iter);
-
-					if (!other->internal.owned && other->interpolate && Game_GetVar(GAME_VAR_CL_INTERP)->data.integer)
-					{
-						int interp_node = (Interaction_GetMode() == INTERACTION_MODE_CLIENT) ? 0 : other->node_id;
-						int interp_frame = other->interp_frame;
-						float interp_percent = (float)interp_frame / (float)(NetGame_GetNode(interp_node)->avgframes_between_updates);
-						if (NetGame_GetNode(interp_node)->avgframes_between_updates == 0.0f)
-							interp_percent = 1.0f;
-						float oldx = other->x, oldy = other->y;
-						float smoothing = Game_GetVar(GAME_VAR_CL_SMOOTHING)->data.decimal;
-
-						float neededx = other->interp_x + ((oldx - other->interp_x) * interp_percent);
-						float neededy = other->interp_y + ((oldy - other->interp_y) * interp_percent);
-
-						other->smooth_x += (neededx - other->smooth_x) * smoothing;
-						other->smooth_y += (neededy - other->smooth_y) * smoothing;
-
-						if (Game_GetFrame() % (30*5) == 0)
-						{
-							other->smooth_x = neededx;
-							other->smooth_y = neededy;
+					
+					if (other->flags & WOBJ_OVERLAYER) {
+						if (noverlayer_draws < NOVERLAYERS) {
+							overlayer_draws[noverlayer_draws++] = other;
 						}
-						other->x = other->smooth_x;
-						other->y = other->smooth_y;
-
-						if (wobj_types[other->type].draw != NULL && ~other->flags & WOBJ_DONT_DRAW)
-							wobj_types[other->type].draw(other, camx, camy);
-						other->interp_frame++;
-
-						other->x = oldx;
-						other->y = oldy;
-					}
-					else
-					{
-						if (wobj_types[other->type].draw != NULL && ~other->flags & WOBJ_DONT_DRAW)
-							wobj_types[other->type].draw(other, camx, camy);
-					}
-
-					// Debug helpers with non-drawer things
-					if (wobj_types[other->type].draw == NULL) {
-						CNM_RECT r;
-						if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
-						{
-							Util_SetRect(&r, (int)(other->x + other->hitbox.x) - camx, (int)(other->y + other->hitbox.y) - camy,
-										 (int)other->hitbox.w, (int)other->hitbox.h);
-							Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
-						}
-
-						if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer)
-						{
-							Renderer_DrawText
-							(
-								(int)other->x - camx, (int)other->y - camy + 8, 0, RENDERER_LIGHT,
-								"(%d, %d)",
-								(int)(other->x), (int)(other->y)
-							);
-						}
+					} else {
+						Wobj_DrawWobj(other, camx, camy);
 					}
 
 					ObjGrid_AdvanceIter(&iter);
@@ -652,6 +667,12 @@ void Wobj_DrawWobjs(int camx, int camy)
 			}
 		}
 	}
+}
+void Wobj_DrawWobjsOverlayer(int camx, int camy) {
+	for (int i = 0; i < noverlayer_draws; i++) {
+		Wobj_DrawWobj(overlayer_draws[i], camx, camy);
+	}
+	noverlayer_draws = 0;
 }
 void Wobj_ResolveBlocksCollision(WOBJ *obj)
 {

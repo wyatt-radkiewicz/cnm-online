@@ -201,6 +201,7 @@ typedef enum _WOBJ_TYPES
 #define WOBJ_BEING_ICED (1 << 23)
 #define WOBJ_WAS_SPLASH (1 << 24)
 #define WOBJ_WAS_WATER (1 << 25)
+#define WOBJ_OVERLAYER (1 << 26)
 
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
 #define Wobj_IsGrounded(w) Wobj_IsGrouneded(w)
@@ -304,6 +305,7 @@ void Wobj_GetCollisionsWithFlags(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLIS
 void Wobj_GetCollisionsWithType(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS], int type);
 void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS]);
 void Wobj_DrawWobjs(int camx, int camy);
+void Wobj_DrawWobjsOverlayer(int camx, int camy);
 void Wobj_ResolveBlocksCollision(WOBJ *obj);
 void wobj_move_and_hit_blocks(WOBJ *obj);
 void WobjPhysics_BeginUpdate(WOBJ *wobj);

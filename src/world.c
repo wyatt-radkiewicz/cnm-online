@@ -268,6 +268,9 @@ void World_Draw(int mode)
 	Renderer_SaveToEffectsBuffer();
 	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS_EX, camx, camy);
 
+	// Draw overlayer things
+	Wobj_DrawWobjsOverlayer(camx, camy);
+
 	// High priority background
 	Background_Draw(1, camx, camy);
 
