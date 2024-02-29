@@ -2103,6 +2103,63 @@ void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void) {
 	_ldpool_pet = dynpool_init(4, sizeof(PetLocalData), arena_alloc);
 }
 
+static void Wobj_HitMarker_Create(WOBJ *wobj) {
+	wobj->vel_y = -2.5f;
+	wobj->custom_ints[1] = 7;
+	wobj->custom_floats[0] = wobj->x - Camera_GetXPos();
+	wobj->custom_floats[1] = wobj->y - Camera_GetYPos();
+}
+static void Wobj_HitMarker_Update(WOBJ *wobj) {
+	wobj->y += wobj->vel_y;
+	wobj->custom_floats[1] += wobj->vel_y;
+	if (fabsf(wobj->vel_y) > 0.2f) wobj->vel_y += 0.2f;
+	else wobj->vel_y += 0.05f;
+	if (wobj->custom_ints[1] >= 7 && wobj->vel_y > 0.2f) Interaction_DestroyWobj(wobj);
+}
+static void Wobj_HitMarker_Draw(WOBJ *wobj, int camx, int camy) {
+	if (wobj->vel_y > 0.2f && wobj->custom_ints[1] < 7) {
+		wobj->custom_ints[1]++;
+	} else if (wobj->vel_y < 0.0f && wobj->custom_ints[1] > 0) {
+		wobj->custom_ints[1]--;
+	}
+
+	int digits[10] = {0};
+	int ndigits = -1;
+	int dmg = abs(wobj->custom_ints[0]);
+	while (dmg != 0) {
+		digits[++ndigits] = dmg % 10;
+		dmg /= 10;
+	}
+	if (ndigits == -1) ndigits = 0;
+
+	int basex = wobj->internal.owned ? wobj->custom_floats[0] : wobj->x - camx;
+	int basey = wobj->internal.owned ? wobj->custom_floats[1] : wobj->y - camy;
+	int startx = (ndigits + 1) * -5;
+	int srcx = 288;
+	int srcy = 1536 + (wobj->custom_ints[0] >= 0 ? 0 : 9);
+	if (wobj->vel_y > 0.2f) {
+		srcx -= ((wobj->custom_ints[1] / 2) & 0x2) ? 96 : 0;
+		srcy += ((wobj->custom_ints[1] / 2) & 0x1) ? 24 : 0;
+	}
+	for (;ndigits > -1; ndigits--) {
+		Renderer_DrawBitmap2 (
+			basex + startx,
+			basey,
+			&(CNM_RECT){
+				.x = srcx + digits[ndigits] * 9,
+				.y = srcy,
+				.w = 9,
+				.h = 9,
+			},
+			wobj->custom_ints[1],
+			RENDERER_LIGHT,
+			wobj->flags & WOBJ_HFLIP,
+			wobj->flags & WOBJ_VFLIP
+		);
+		startx += 9;
+	}
+}
+
 #define LUAOBJ_DEF {\
 	NULL,\
 	NULL,\
@@ -4177,6 +4234,20 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		Wobj_Particle_Create, // Create
 		Wobj_Particle_Update, // Update
 		Wobj_Particle_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{ 0, 0, 32, 32, },
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 158: Hit Marker Object
+		Wobj_HitMarker_Create, // Create
+		Wobj_HitMarker_Update, // Update
+		Wobj_HitMarker_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{ 0, 0, 32, 32, },

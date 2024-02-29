@@ -1897,6 +1897,12 @@ plat_velx_application:
 		//if (local_data->currskin != 9)
 			//local_data->curranim = PLAYER_ANIM_SHOOT;
 	}
+	if (Game_GetFrame() % 10 == 0) {
+		if (fabsf(wobj->health - local_data->last_hp) >= 1.0f) {
+			Interaction_CreateWobj(WOBJ_HIT_MARKER, wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f, wobj->y - 4.0f, local_data->last_hp - wobj->health, 0.0f);
+		}
+		local_data->last_hp = wobj->health;
+	}
 	if (wobj->health < old_hp)
 	{
 		wobj->flags |= WOBJ_DAMAGE_INDICATE;

@@ -133,6 +133,8 @@ typedef struct _PLAYER_LOCAL_DATA
 	int in_splash, last_in_splash;
 	//int slope_jumped;
 
+	float last_hp;
+
 	WOBJ *pet;
 
 	player_platform_info_t platinfo;

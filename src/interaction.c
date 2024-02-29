@@ -35,6 +35,17 @@ static int audio_uuid = -1;
 static int _next_level_timer = -1;
 static WOBJ *victims[WOBJ_MAX_COLLISIONS];
 
+#define HURT_MAP_SZ 32
+
+typedef struct hurt {
+	int node, uuid;
+	float damage, x, y;
+	int psl;
+} hurt_t;
+
+static hurt_t *hurt_map;
+static int hurt_map_len;
+
 static int Interaction_IsUnownedWobjInDestoryed(WOBJ *wobj);
 static void Interaction_AddDestroyedWobjToList(WOBJ *wobj);
 static int Interaction_GetHurtIndex(WOBJ *wobj);
@@ -43,6 +54,7 @@ void Interaction_Init(void)
 {
 	destroyed_wobjs = arena_global_alloc(sizeof(*destroyed_wobjs) * NETGAME_MAX_WOBJ_UPDATES);
 	hurt_wobjs = arena_global_alloc(sizeof(*hurt_wobjs) * NETGAME_MAX_WOBJ_UPDATES);
+	hurt_map = arena_global_alloc(sizeof(*hurt_map) * HURT_MAP_SZ);
 
 	//_next_level_timer = -1;
 	memset(destroyed_wobjs, 0, sizeof(*destroyed_wobjs) * NETGAME_MAX_WOBJ_UPDATES);
@@ -51,6 +63,11 @@ void Interaction_Init(void)
 }
 void Interaction_SetMode(int mode)
 {
+	for (int i = 0; i < HURT_MAP_SZ; i++) {
+		hurt_map[i].psl = 0;
+		hurt_map[i].node = -1;
+	}
+	hurt_map_len = 0;
 	interaction_mode = mode;
 }
 void Interaction_SetClientPlayerWObj(WOBJ *player)
@@ -82,6 +99,25 @@ void Interaction_FinishLevel(int ending_text_line) {
 	}
 }
 void Interaction_Tick(void) {
+	if ((Game_GetFrame() + 5) % 10 == 0) {
+		int x = -1000, y = -1000;
+		for (int i = 0; i < HURT_MAP_SZ; i++) {
+			hurt_t *hurt = &hurt_map[i];
+			if (hurt->node < 0) continue;
+			int lastx = x, lasty = y;
+			x = hurt->x / 9;
+			y = hurt->y / 9;
+			if (abs(x - lastx) <= 3) {
+				y = lasty - 1;
+				x = lastx;
+			}
+			Interaction_CreateWobj(WOBJ_HIT_MARKER, x * 9, y * 9, ceilf(hurt->damage), 0.0f);
+			hurt->node = -1;
+			hurt->psl = 0;
+		}
+		hurt_map_len = 0;
+	}
+
 	if (_next_level_timer > -1) _next_level_timer--;
 	if (_next_level_timer == 0 && interaction_mode == INTERACTION_MODE_SINGLEPLAYER) {
 		if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
@@ -120,6 +156,39 @@ WOBJ *Interaction_GetVictim(WOBJ *inflictor, int flags)
 
 	return NULL;
 }
+static void hurt_map_inflict(WOBJ *victim, float dmg) {
+	// Add to the hurt map
+	if (hurt_map_len >= HURT_MAP_SZ) return;
+	int hurt_id = victim->uuid % HURT_MAP_SZ;
+	if (victim->type != WOBJ_PLAYER) dmg *= 10.0f;
+	hurt_t hurt = (hurt_t){
+		.psl = 0,
+		.node = victim->node_id,
+		.uuid = victim->uuid,
+		.damage = dmg,
+		.x = victim->x + victim->hitbox.x + victim->hitbox.w / 2.0f,
+		.y = victim->y + victim->hitbox.y - 4.0f,
+	};
+	while (hurt_map[hurt_id].node >= 0) {
+		if (hurt_map[hurt_id].uuid == hurt.uuid && hurt_map[hurt_id].node == hurt.node) {
+			hurt_map[hurt_id].damage += dmg;
+			hurt_map[hurt_id].x = hurt.x;
+			hurt_map[hurt_id].y = hurt.y;
+			return;
+		}
+
+		if (hurt.psl > hurt_map[hurt_id].psl) {
+			const hurt_t tmp = hurt_map[hurt_id];
+			hurt_map[hurt_id] = hurt;
+			hurt = tmp;
+		}
+
+		hurt_id = (hurt_id + 1) % HURT_MAP_SZ;
+		hurt.psl++;
+	}
+	hurt_map_len++;
+	hurt_map[hurt_id] = hurt;
+}
 void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 {
 	int is_player;
@@ -137,6 +206,7 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 			//if (is_player)
 			//	interaction_player->strength += wobj_types[victim->type].strength_reward;
 			wobj_types[victim->type].hurt(victim, inflictor);
+			hurt_map_inflict(victim, inflictor->strength);
 			if (victim->health < 0.0f)
 			{
 				if (is_player)
@@ -165,6 +235,7 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 			}*/
 
 			victim->flags |= WOBJ_DAMAGE_INDICATE;
+			hurt_map_inflict(victim, inflictor->strength);
 			if (!victim->internal.owned)
 				NetGame_DamageUnownedWobj(victim, inflictor->strength);
 			else
@@ -188,11 +259,13 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 		}
 		if (victim->type == WOBJ_PLAYER) {
 			victim->flags |= WOBJ_DAMAGE_INDICATE;
-			if (!victim->internal.owned)
+			if (!victim->internal.owned) {
+				hurt_map_inflict(victim, inflictor->strength * 5.0f);
 				NetGame_DamageUnownedWobj(victim, inflictor->strength * 5.0f);
 				// This damage multiplication is done because players have the highest health in the game...
 				// For instance, most bosses have 80 HP...
 				// Laser minion has 15 hp and lava monster has 16 hp (but wider)
+			}
 		}
 		break;
 	}
