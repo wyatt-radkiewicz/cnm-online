@@ -139,6 +139,9 @@ static void WobjPlayerPellet_Create(WOBJ *wobj)
 	wobj->anim_frame = 0;
 	wobj->custom_ints[0] = 0;
 	wobj->flags = WOBJ_IS_PLAYER_WEAPON | WOBJ_IS_PLAYER_BULLET;
+	if (wobj->type == DEEPHOUSE_BOOT_BLAST) {
+		wobj->flags |= WOBJ_FIRE_TYPE;
+	}
 	wobj->hitbox.x = 8.0f;
 	wobj->hitbox.y = 8.0f;
 	wobj->hitbox.w = 16.0f;
@@ -488,7 +491,7 @@ static void WobjFire_Create(WOBJ *wobj)
 	wobj->link_uuid = 0;
 	wobj->custom_ints[1] = 0;
 	wobj->strength = 5.0f;
-	wobj->flags = WOBJ_LIGHT_BIG;
+	wobj->flags = WOBJ_LIGHT_BIG | WOBJ_FIRE_TYPE;
 }
 static void WobjFire_Update(WOBJ *wobj)
 {
@@ -545,6 +548,7 @@ static void WobjIceAttack_Create(WOBJ *wobj)
 	wobj->custom_ints[0] = 0;
 	wobj->custom_ints[1] = 0;
 	wobj->strength = 10.0f;
+	wobj->flags |= WOBJ_WATER_TYPE;
 }
 static void WobjIceAttack_Update(WOBJ *wobj)
 {
@@ -601,8 +605,12 @@ static void WobjIceAttack_Update(WOBJ *wobj)
 		}
 	}
 
-	if (wobj->custom_ints[1] >= 30*10) {
-		WOBJ *other = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
+	int timer = 30*10;
+	WOBJ *other = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
+	if (other && (other->flags & WOBJ_FIRE_TYPE)) {
+		timer /= 3.0f;
+	}
+	if (wobj->custom_ints[1] >= timer) {
 		if (other) {
 			Interaction_ClearWobjFlag(other, WOBJ_BEING_ICED);
 		}
@@ -624,7 +632,7 @@ static void WobjCloudPlatform_Update(WOBJ *wobj)
 
 static void WobjLightningAttackParticle_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_LIGHT_SMALL | WOBJ_LIGHT_BIG;
+	wobj->flags = WOBJ_LIGHT_SMALL | WOBJ_LIGHT_BIG | WOBJ_VOID_TYPE;
 	wobj->custom_ints[0] = 10;
 	wobj->strength = 10000.0f;
 	wobj->hitbox.x = 0.0f;
@@ -653,6 +661,7 @@ static void WobjPlayerLaser_Create(WOBJ *wobj)
 	wobj->hitbox.w = 128.0f;
 	wobj->hitbox.h = 96.0f;
 	wobj->custom_ints[1] = 0;
+	wobj->flags |= WOBJ_VOID_TYPE;
 	Interaction_PlaySound(wobj, 8);
 }
 static void WobjPlayerLaser_Update(WOBJ *wobj)
@@ -673,7 +682,7 @@ static void WobjPlayerLaser_Draw(WOBJ *wobj, int camx, int camy)
 
 	for (int i = 0; i < size; i++)
 	{
-		Util_SetRect(&r, 320, 128, 32, 32);
+		Util_SetRect(&r, 32, 64, 32, 32);
 		Renderer_DrawBitmap
 		(
 			(int)wobj->x + ((i * (128 / size)) * wobj->custom_ints[0]) - camx,
@@ -790,7 +799,7 @@ static void WobjFlameThrowerFlame_Create(WOBJ *wobj)
 	Util_SetBox(&wobj->hitbox, 4.0f, 4.0f, 24.0f, 24.0f);
 	wobj->custom_ints[0] = 30*3 + 15;
 	wobj->vel_y = 0.15f;
-	wobj->flags = WOBJ_LIGHT_BIG; 
+	wobj->flags = WOBJ_LIGHT_BIG | WOBJ_FIRE_TYPE; 
 	wobj->speed = 3.0f;
 }
 static void WobjFlameThrowerFlame_Update(WOBJ *wobj)
@@ -812,6 +821,9 @@ static void WobjFlameThrowerFlame_Update(WOBJ *wobj)
 	if (wobj->custom_ints[0] < 30)
 		wobj->speed *= 0.92f;
 
+	if (Wobj_GetWaterBlockID(wobj, 0, 1) != -1) {
+		wobj->custom_ints[0] -= 2;
+	}
 	if (wobj->custom_ints[0]-- <= 0)
 		Interaction_DestroyWobj(wobj);
 }
@@ -830,6 +842,7 @@ static void WobjUltraSwordBoomerang_Create(WOBJ *wobj)
 	wobj->anim_frame = wobj->custom_ints[0];
 	wobj->custom_ints[0] = 0;
 	wobj->custom_ints[1] = 0;
+	wobj->flags |= WOBJ_VOID_TYPE;
 	wobj->vel_x  = 0.0f; wobj->vel_y = 0.0f;
 	wobj->money = 0; // Used as timer
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
@@ -900,7 +913,7 @@ static void WobjHeavyHammerSwing_Create(WOBJ *wobj)
 	wobj->custom_ints[0] = 0; // timer
 	wobj->custom_ints[1] = CNM_TRUE; // Apply ground jump?
 	wobj->custom_floats[0] = wobj->custom_ints[0] ? -1.0f : 1.0f;
-	wobj->flags = WOBJ_IS_PLAYER_WEAPON;
+	wobj->flags = WOBJ_IS_PLAYER_WEAPON | WOBJ_EARTH_TYPE;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 0.0f, 0.0f);
 }
 static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
@@ -1021,7 +1034,7 @@ static void WobjFissionEnergyBolt_Create(WOBJ *wobj)
 	case 3: wobj->vel_x = 0.0f; wobj->vel_y = spd; break;
 	}
 	wobj->custom_ints[0] = 0;
-	wobj->flags = WOBJ_IS_PLAYER_WEAPON;
+	wobj->flags = WOBJ_IS_PLAYER_WEAPON | WOBJ_VOID_TYPE;
 	wobj->money = 0; // Has hit enemy flag
 	Util_SetBox(&wobj->hitbox, 2.0f, 2.0f, 28.0f, 28.0f);
 	Interaction_PlaySound(wobj, 14);
@@ -2161,6 +2174,43 @@ static void Wobj_HitMarker_Draw(WOBJ *wobj, int camx, int camy) {
 	}
 }
 
+static void Wobj_Goop_Create(WOBJ *wobj) {
+	wobj->anim_frame = 0;
+	wobj->flags = WOBJ_IS_PLAYER_WEAPON | WOBJ_GOOP_TYPE;
+	Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 24.0f, 16.0f);
+	wobj->custom_ints[0] = 0;
+	wobj->custom_ints[1] = 0;
+	wobj->money = 2;
+}
+static void Wobj_Goop_Update(WOBJ *wobj) {
+	WobjGenericAttack_Update(wobj);
+	wobj->vel_y += 0.5f;
+	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 2.0f)) {
+		wobj->vel_y = 0.0f;
+		wobj->vel_x *= 0.3f;
+		wobj->custom_ints[1]++;
+		wobj->anim_frame = 1;
+	}
+	wobj->x += wobj->vel_x;
+	wobj->y += wobj->vel_y;
+	if (wobj->custom_ints[0]++ > 10*30 || wobj->custom_ints[1] > 30*3) {
+		wobj->money += Game_GetFrame() & 1;
+	}
+	if (wobj->money > 7) {
+		Interaction_DestroyWobj(wobj);
+	}
+}
+static void Wobj_Goop_Draw(WOBJ *wobj, int camx, int camy) {
+	Renderer_DrawBitmap
+	(
+		(int)wobj->x - camx + (wobj->anim_frame ? 0 : 8),
+		(int)wobj->y - camy,
+		&wobj_types[WOBJ_GOOP].frames[wobj->anim_frame],
+		wobj->money >= 7 ? 7 : wobj->money,
+		RENDERER_LIGHT
+	);
+}
+
 #define LUAOBJ_DEF {\
 	NULL,\
 	NULL,\
@@ -2411,6 +2461,7 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 			{224, 480-256, 32, 32},	// Unused
 			{256, 96, 32, 32}, // 1-Up box
 			{288, 96, 32, 32}, // Wrench
+			{384, 32, 32, 32}, // Goop Bottle
 		},
 		0.0f,				  // Strength Reward
 		0,					  // Money Reward
@@ -4259,6 +4310,21 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		NULL, // Hurt callback
 		{ // Animation Frames
 			{ 0, 0, 32, 32, },
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 159: Goop Pellet Object
+		Wobj_Goop_Create, // Create
+		Wobj_Goop_Update, // Update
+		Wobj_Goop_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{432, 0, 16, 16},
+			{416, 48, 32, 16},
 		},
 		0.0f, // Strength reward
 		0, // Money reward

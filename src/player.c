@@ -987,7 +987,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
-		if (local_data->upgrade_state == PLAYER_UPGRADE_NONE) {
+		if (local_data->upgrade_state != PLAYER_UPGRADE_SHOES &&
+			local_data->upgrade_state != PLAYER_UPGRADE_WINGS &&
+			local_data->upgrade_state != PLAYER_UPGRADE_CRYSTAL_WINGS) {
 			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
 				wobj->custom_ints[1] |= PLAYER_FLAG_STOMPING;
 				if (local_data->slide_jump_cooldown < 5) local_data->slide_jump_cooldown = 5;
@@ -1886,9 +1888,13 @@ plat_velx_application:
 	if (!local_data->ability3_hasjumped) {
 		local_data->ability3_timer--;
 	}
+	wobj->flags &= ~(WOBJ_FIRE_TYPE | WOBJ_WATER_TYPE | WOBJ_VOID_TYPE | WOBJ_EARTH_TYPE);
+	if (local_data->fire_resistance-- > 0) wobj->flags |= WOBJ_FIRE_TYPE;
+	if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES) wobj->flags |= WOBJ_EARTH_TYPE;
+	if (local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) wobj->flags |= WOBJ_WATER_TYPE;
+	if (local_data->upgrade_state == PLAYER_UPGRADE_VORTEX) wobj->flags |= WOBJ_VOID_TYPE;
 	if (local_data->ability3_timer <= 0 && local_data->finish_timer <= 0 && !Game_GetVar(GAME_VAR_GOD)->data.integer) {
-		if (local_data->fire_resistance-- <= 0)
-			recved_lava_damage = Interaction_WobjReceiveBlockDamage(wobj);
+		recved_lava_damage = Interaction_WobjReceiveBlockDamage(wobj);
 		if (wobj->health >= old_hp)
 			recved_lava_damage = CNM_FALSE;
 		recved_normal_damage = Interaction_PlayerRecieveDamage();

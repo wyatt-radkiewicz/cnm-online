@@ -21,7 +21,7 @@
 
 void WobjSlime_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_GOOP_TYPE;
 	wobj->health = 2.0f;
 	wobj->strength = 0.8333333f;
 	wobj->speed = 3.0f;
@@ -94,7 +94,7 @@ void WobjFlyingSlime_Create(WOBJ *wobj)
 	wobj->hitbox.h = 32.0f;
 	wobj->custom_ints[0] = 0;
 	wobj->custom_ints[1] = 0;
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_GOOP_TYPE;
 	wobj->strength = 1.6666667f;
 	wobj->anim_frame = 0;
 	wobj->health = 6.0f;
@@ -186,7 +186,7 @@ void WobjHeavy_Destroy(WOBJ *wobj) {
 void WobjHeavy_Create(WOBJ *wobj)
 {
 	Util_SetBox(&wobj->hitbox, 8.0f, 0.0f, 48.0f, 64.0f);
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_EARTH_TYPE;
 	WOBJ *s = Interaction_CreateWobj(WOBJ_HEAVY_SHEILD_BOX, wobj->x, wobj->y, 0, 0.0f);
 	wobj->link_node = s->node_id;
 	wobj->link_uuid = s->uuid;
@@ -304,7 +304,7 @@ void WobjHeavyBlast_Create(WOBJ *wobj)
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 7.0f;
 	wobj->anim_frame = 0;
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_FIRE_TYPE;
 	wobj->custom_ints[0] = 0;
 	wobj->strength = 2.6666667f;
 	wobj->health = 1000000.0f;
@@ -320,6 +320,8 @@ void WobjDragon_Create(WOBJ *wobj)
 {
 	wobj->anim_frame = 0;
 	wobj->flags = WOBJ_IS_HOSTILE;
+	if (!wobj->custom_ints[0]) wobj->flags |= WOBJ_FIRE_TYPE;
+	else wobj->flags |= WOBJ_VOID_TYPE;
 	wobj->hitbox.x = 0.0f;
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 128.0f;
@@ -360,11 +362,11 @@ void WobjFireball_Create(WOBJ *wobj)
 	wobj->speed = 6.5f;
 	wobj->strength = 3.333333333f;
 	wobj->health = 10000.0f;
-	wobj->flags = WOBJ_IS_HOSTILE;
-	wobj->hitbox.x = 0.0f;
-	wobj->hitbox.y = 0.0f;
-	wobj->hitbox.w = 32.0f;
-	wobj->hitbox.h = 32.0f;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_FIRE_TYPE;
+	wobj->hitbox.x = 4.0f;
+	wobj->hitbox.y = 4.0f;
+	wobj->hitbox.w = 24.0f;
+	wobj->hitbox.h = 24.0f;
 	Interaction_PlaySound(wobj, 16);
 }
 void WobjFireball_Update(WOBJ *wobj)
@@ -386,7 +388,7 @@ void WobjBozoPin_Create(WOBJ *wobj)
 	wobj->hitbox.y = 8.0f;
 	wobj->hitbox.w = 32.0f;
 	wobj->hitbox.h = 48.0f;
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->health = 12.0f;
 	wobj->strength = 3.0f;
 	wobj->custom_ints[0] = 0;
@@ -457,7 +459,7 @@ void WobjBozo_Create(WOBJ *wobj)
 	wobj->custom_ints[1] = CNM_FALSE;
 	wobj->custom_ints[0] = 0;
 	wobj->anim_frame = 0;
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->health = 100.0f;
 	if (wobj->custom_floats[0] > 0.001f) wobj->health = wobj->custom_floats[0];
 	wobj->strength = 16.66667f;
@@ -530,7 +532,7 @@ void WobjBozoFireball_Create(WOBJ *wobj) {
 	wobj->speed = 6.5f;
 	wobj->strength = 3.333333333f;
 	wobj->health = 10000.0f;
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_FIRE_TYPE;
 	wobj->hitbox.x = 0.0f;
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
@@ -546,7 +548,7 @@ void WobjBozoFireball_Update(WOBJ *wobj) {
 
 void WobjSliverSlime_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->health = 4.0f;
 	wobj->strength = 1.5f;
 	wobj->speed = 5.0f;
@@ -577,7 +579,7 @@ void WobjLavaMonster_OnDestroy(WOBJ *wobj) {
 }
 void WobjLavaMonster_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_FIRE_TYPE;
 	wobj->on_destroy = WobjLavaMonster_OnDestroy;
 	wobj->health = 20.0f;
 	wobj->strength = 6.0f;
@@ -711,7 +713,7 @@ void WobjLavaMonster_Update(WOBJ *wobj)
 
 void WobjTTMinionSmall_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->hitbox.x = 0.0f;
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
@@ -774,7 +776,7 @@ void WobjTTMinionSmall_Update(WOBJ *wobj)
 
 void WobjTTMinionBig_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->hitbox.x = 0.0f;
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
@@ -845,7 +847,7 @@ void WobjWolf_Create(WOBJ *wobj) {
 }
 void WobjSlimeWalker_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_GOOP_TYPE;
 	wobj->health = 18.0f;
 	wobj->strength = 1.5f;
 	wobj->speed = 3.0f;
@@ -949,7 +951,7 @@ void WobjSlimeWalker_Draw(WOBJ *wobj, int camx, int camy)
 
 void WobjMegaFish_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_WATER_TYPE;
 	wobj->health = 3.0f;
 	wobj->strength = 1.33333333f;
 	wobj->speed = wobj->custom_floats[0];
@@ -1321,7 +1323,7 @@ void WobjTTBossWaypoint_Create(WOBJ *wobj)
 }
 void WobjTTBoss_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->strength = 16.67f;
 	wobj->health = 75.0f;
 	wobj->speed = wobj->custom_floats[0];
@@ -1802,7 +1804,7 @@ SUPER_DRAGON_DATA *super_dragons;
 
 void WobjSuperDragonBoss_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->anim_frame = 0;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 128.0f, 128.0f);
 	wobj->strength = 1.666666667f;
@@ -1964,7 +1966,7 @@ void WobjSuperDragonLandingZone_Create(WOBJ *wobj)
 
 void WobjBozoLaserMinion_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->health = 15.0f;
 	wobj->strength = 0.8333333333f;
 	wobj->custom_ints[0] = 0;
@@ -2092,7 +2094,7 @@ void WobjBozoMk2_Create(WOBJ *wobj)
 {
 	Util_SetBox(&wobj->hitbox, 8.0f, 8.0f, 32.0f, 56.0f);
 	wobj->anim_frame = 0;
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
 	wobj->health = 20.0f;
 	wobj->strength = 1.666667f;
 	wobj->custom_ints[0] = 0; // State
@@ -2377,7 +2379,7 @@ void WobjBanditGuy_Update(WOBJ *wobj)
 
 void WobjKamakaziSlime_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_GOOP_TYPE;
 	wobj->custom_floats[0] = (float)(Util_RandInt(0, 1) * 2 - 1);
 	wobj->custom_ints[0] = 0;
 	wobj->health = 5.0f;
@@ -2509,7 +2511,7 @@ void WobjRockGuySpear_Update(WOBJ *wobj)
 #define ROCK_GUY_MEDIUM_TRACKING_PLAYER (1 << 15)
 void WobjRockGuyMedium_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_EARTH_TYPE;
 	wobj->strength = 1.333333333f;
 	wobj->health = ROCK_GUY_MEDIUM_MAXHP;
 	wobj->custom_ints[0] = ROCK_GUY_MEDIUM_SLEEPING;
@@ -2603,7 +2605,7 @@ void WobjRockGuySmall1_Death(WOBJ *wobj)
 }
 void WobjRockGuySmall1_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_EARTH_TYPE;
 	wobj->strength = 0.4f;
 	wobj->health = 2.0f;
 	wobj->anim_frame = 0;
@@ -2630,7 +2632,7 @@ void WobjRockGuySmall1_Update(WOBJ *wobj)
 void WobjRockGuySmall2_Create(WOBJ *wobj)
 {
 	wobj->custom_ints[1] = 0;
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_EARTH_TYPE;
 	wobj->strength = 0.3333333f;
 	wobj->health = 0.7f;
 	wobj->anim_frame = 0;
@@ -2669,7 +2671,7 @@ void WobjRockGuySlider_Death(WOBJ *wobj)
 }
 void WobjRockGuySlider_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_EARTH_TYPE;
 	wobj->health = RGSLIDER_MAXHP;
 	wobj->strength = 2.833333333f;
 	wobj->custom_floats[0] = (float)(Util_RandInt(0, 100) / 60) * 2.0f + 1.0f;
@@ -2719,7 +2721,7 @@ break_apart:
 #define RGSMASHER_SMASHING 2
 void WobjRockGuySmasher_Create(WOBJ *wobj)
 {
-	wobj->flags = WOBJ_IS_HOSTILE;
+	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_EARTH_TYPE;
 	wobj->health = 40.0f;
 	wobj->strength = 3.33333333f;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 96.0f);

@@ -189,6 +189,53 @@ static void hurt_map_inflict(WOBJ *victim, float dmg) {
 	hurt_map_len++;
 	hurt_map[hurt_id] = hurt;
 }
+float get_dmg_mul(int inflictor, int victim) {
+	if ((inflictor & WOBJ_WATER_TYPE) && (victim & WOBJ_FIRE_TYPE)) {
+		return 3.0f;
+	}
+	if ((inflictor & WOBJ_FIRE_TYPE) && (victim & WOBJ_VOID_TYPE)) {
+		return 2.0f;
+	}
+	if ((inflictor & WOBJ_VOID_TYPE) && (victim & WOBJ_EARTH_TYPE)) {
+		return 3.0f;
+	}
+	if ((inflictor & WOBJ_EARTH_TYPE) && (victim & WOBJ_GOOP_TYPE)) {
+		return 2.0f;
+	}
+	if ((inflictor & WOBJ_GOOP_TYPE) && (victim & WOBJ_WATER_TYPE)) {
+		return 2.0f;
+	}
+	if ((inflictor & WOBJ_GOOP_TYPE) && (victim & WOBJ_FIRE_TYPE)) {
+		return 2.0f;
+	}
+
+	if ((victim & WOBJ_WATER_TYPE) && (inflictor & WOBJ_FIRE_TYPE)) {
+		return 0.1f;
+	}
+	if ((victim & WOBJ_FIRE_TYPE) && (inflictor & WOBJ_VOID_TYPE)) {
+		return 0.5f;
+	}
+	if ((victim & WOBJ_FIRE_TYPE) && (inflictor & WOBJ_FIRE_TYPE)) {
+		return 0.1f;
+	}
+	if ((victim & WOBJ_VOID_TYPE) && (inflictor & WOBJ_EARTH_TYPE)) {
+		return 0.25f;
+	}
+	if ((victim & WOBJ_EARTH_TYPE) && (inflictor & WOBJ_GOOP_TYPE)) {
+		return 0.5f;
+	}
+	if ((victim & WOBJ_GOOP_TYPE) && (inflictor & WOBJ_WATER_TYPE)) {
+		return 0.5f;
+	}
+	if ((victim & WOBJ_GOOP_TYPE) && (inflictor & WOBJ_FIRE_TYPE)) {
+		return 0.5f;
+	}
+	if ((inflictor & WOBJ_GOOP_TYPE) && (victim & WOBJ_GOOP_TYPE)) {
+		return 0.1f;
+	}
+
+	return 1.0f;
+}
 void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 {
 	int is_player;
@@ -196,17 +243,19 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 		return;
 	is_player = inflictor->flags & WOBJ_IS_PLAYER_WEAPON || inflictor->flags & WOBJ_IS_PLAYER;
 
+	float dmg = inflictor->strength * get_dmg_mul(inflictor->flags, victim->flags);
+
 	switch (interaction_mode)
 	{
 	case INTERACTION_MODE_SINGLEPLAYER:
 		if (wobj_types[victim->type].hurt != NULL && !(victim->flags & WOBJ_INVULN))
 		{
 			victim->flags |= WOBJ_DAMAGE_INDICATE;
-			victim->health -= inflictor->strength;
+			victim->health -= dmg;
 			//if (is_player)
 			//	interaction_player->strength += wobj_types[victim->type].strength_reward;
 			wobj_types[victim->type].hurt(victim, inflictor);
-			hurt_map_inflict(victim, inflictor->strength);
+			hurt_map_inflict(victim, dmg);
 			if (victim->health < 0.0f)
 			{
 				if (is_player)
@@ -235,11 +284,11 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 			}*/
 
 			victim->flags |= WOBJ_DAMAGE_INDICATE;
-			hurt_map_inflict(victim, inflictor->strength);
+			hurt_map_inflict(victim, dmg);
 			if (!victim->internal.owned)
-				NetGame_DamageUnownedWobj(victim, inflictor->strength);
+				NetGame_DamageUnownedWobj(victim, dmg);
 			else
-				victim->health -= inflictor->strength;
+				victim->health -= dmg;
 
 			//if (is_player && !Interaction_IsUnownedWobjInDestoryed(victim))
 			//	interaction_player->strength += wobj_types[victim->type].strength_reward;
@@ -260,8 +309,8 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 		if (victim->type == WOBJ_PLAYER) {
 			victim->flags |= WOBJ_DAMAGE_INDICATE;
 			if (!victim->internal.owned) {
-				hurt_map_inflict(victim, inflictor->strength * 5.0f);
-				NetGame_DamageUnownedWobj(victim, inflictor->strength * 5.0f);
+				hurt_map_inflict(victim, dmg * 5.0f);
+				NetGame_DamageUnownedWobj(victim, dmg * 5.0f);
 				// This damage multiplication is done because players have the highest health in the game...
 				// For instance, most bosses have 80 HP...
 				// Laser minion has 15 hp and lava monster has 16 hp (but wider)
@@ -344,11 +393,10 @@ int Interaction_PlayerRecieveDamage(void)
 		Wobj_GetCollisionsWithFlags(interaction_player, collisions, WOBJ_IS_HOSTILE);
 		for (i = 0; i < WOBJ_MAX_COLLISIONS && collisions[i] != NULL; i++)
 		{
-			//if (collisions[i]->flags & WOBJ_IS_HOSTILE)
-			//{
-				Player_RecieveDamage(interaction_player, collisions[i], collisions[i]->strength);
-				taken_damage = CNM_TRUE;
-			//}
+			WOBJ *inflictor = collisions[i];
+			float dmg = inflictor->strength * get_dmg_mul(inflictor->flags, interaction_player->flags);
+			Player_RecieveDamage(interaction_player, inflictor, dmg);
+			taken_damage = CNM_TRUE;
 		}
 	}
 
@@ -359,7 +407,7 @@ int Interaction_WobjReceiveBlockDamage(WOBJ *wobj)
 	CNM_BOX b;
 	BLOCK_PROPS *props;
 
-	if (wobj == NULL)
+	if (wobj == NULL || wobj->flags & WOBJ_FIRE_TYPE)
 		return CNM_FALSE;
 
 	if (wobj->internal.owned)

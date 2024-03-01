@@ -611,7 +611,12 @@ static void Command_SetUpgrade(const char *args, int from_player)
 	if (!can_run_cheat1(from_player))
 		return;
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
-	((PLAYER_LOCAL_DATA *)player->local_data)->upgrade_state = atoi(Command_ExtractArg(args, 0));
+	PLAYER_LOCAL_DATA *ld = player->local_data;
+	ld->upgrade_state = atoi(Command_ExtractArg(args, 0));
+	ld->upgradehp = 100.0f;
+	if (ld->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) {
+		ld->upgradehp = 75.0f;
+	}
 }
 static void Command_StartDialoge(const char *args, int from_player)
 {

@@ -171,6 +171,7 @@ typedef enum _WOBJ_TYPES
 	WOBJ_KEY_REMOVER,
 	WOBJ_PARTICLE,
 	WOBJ_HIT_MARKER,
+	WOBJ_GOOP,
 	WOBJ_MAX
 } WOBJ_TYPES;
 
@@ -202,6 +203,11 @@ typedef enum _WOBJ_TYPES
 #define WOBJ_WAS_SPLASH (1 << 24)
 #define WOBJ_WAS_WATER (1 << 25)
 #define WOBJ_OVERLAYER (1 << 26)
+#define WOBJ_FIRE_TYPE (1 << 27)
+#define WOBJ_WATER_TYPE (1 << 28)
+#define WOBJ_EARTH_TYPE (1 << 29)
+#define WOBJ_VOID_TYPE (1 << 30)
+#define WOBJ_GOOP_TYPE (1 << 31)
 
 #define Wobj_IsGrouneded(w) ((w)->flags & WOBJ_IS_GROUNDED)
 #define Wobj_IsGrounded(w) Wobj_IsGrouneded(w)

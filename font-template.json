@@ -1,0 +1,12 @@
+{
+    "alphabet": " !|#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[{]^_`{|}~",
+    "sprite_path": "font-template.png",
+    "atlas": {
+        "rows": 16,
+        "cols": 6,
+        "grid_width": 8,
+        "grid_height": 8,
+        "common_width": 8,
+    },
+    "default_spacing": 0,
+}

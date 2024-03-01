@@ -13,6 +13,7 @@
 
 //static void NULL(ITEM *item, WOBJ *player, int camx, int camy);
 static void ItemGeneric_MusleFlash(ITEM *item, WOBJ* player);
+static void ItemGoopBottle_OnUse(ITEM *item, WOBJ *player);
 
 static void ItemShotgun_OnUse(ITEM *shotgun, WOBJ *player);
 static void ItemShotgun_OnDrop(ITEM *shotgun, WOBJ *player);
@@ -332,7 +333,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		0.0f, // Item durability
+		75.0f, // Item durability
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 23: Rocket Launcher Item
@@ -562,6 +563,18 @@ const ITEM_TYPE item_types[] =
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
 		250.0f, // Item durability
 		CNM_TRUE, // Draw Infront
+	},
+	{ // 40: Goop Bottle 
+		{384, 32, 32, 32},
+		NULL, // Update
+		NULL, // On Pickup
+		NULL, // On Drop
+		ItemGoopBottle_OnUse, // On Use
+		NULL, // Draw
+		CNM_FALSE, // Can be used when "use" is held
+		WOBJ_DROPPED_ITEM, // What object it is when dropped
+		60.0f, // Item durability
+		CNM_FALSE, // Draw Infront
 	}
 };
 
@@ -1054,6 +1067,7 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 		break;
 	case ITEM_TYPE_FIRE_POTION:
 		((PLAYER_LOCAL_DATA *)player->local_data)->fire_resistance = 30 * 15;
+		player->flags |= WOBJ_FIRE_TYPE;
 		break;
 	case ITEM_TYPE_MEGA_POTION: player->health += 1000.0f; break;
 	case ITEM_TYPE_ULTRA_MEGA_POTION: player->health += 10000.0f; break;
@@ -1190,6 +1204,25 @@ static void ItemGoldenShotgun_OnUse(ITEM *shotgun, WOBJ *player)
 	Player_PlayShootAnim(player);
 	shotgun->hide_timer = ITEM_HIDE_TIMER;
 }
+static void ItemGoopBottle_OnUse(ITEM *item, WOBJ *player) {
+	const float x[5] = {-1.8f, -0.8f, 0.0f, 0.8f, 1.8f};
+
+	for (int i = 0; i < 5; i++)
+	{
+		WOBJ *w = Interaction_CreateWobj(WOBJ_GOOP, player->x, player->y, 0, 0);
+		w->flags |= WOBJ_IS_PLAYER_WEAPON;
+		w->strength = (player->strength);
+		w->vel_x = player->vel_x + ((player->flags & WOBJ_HFLIP) ? -2.0f : 2.0f) + x[i];
+		w->vel_y = -5.0f;
+	}
+	item->durability -= 1.0f;
+	
+	Interaction_PlaySound(player, 22);
+	item->use_timer = 35;
+	item->custom_timer = 10;
+	Player_PlayShootAnim(player);
+	item->hide_timer = ITEM_HIDE_TIMER;
+}
 
 static void ItemLaserRifle_Update(ITEM *laser, WOBJ *player)
 {
@@ -1207,8 +1240,9 @@ static void ItemLaserRifle_Update(ITEM *laser, WOBJ *player)
 static void ItemLaserRifle_OnUse(ITEM *laser, WOBJ *player)
 {
 	WOBJ *l = Interaction_CreateWobj(WOBJ_PLAYER_LASER, player->x, player->y, ((player->flags & WOBJ_HFLIP) ? -1 : 1), 0.0f);
-	l->strength = player->strength + 100.0f;
+	l->strength = player->strength + 0.1f;
 	l->flags |= WOBJ_IS_PLAYER_WEAPON;
+	laser->durability -= 1.0f;
 	laser->use_timer = 30;
 	laser->melee_obj = l;
 	laser->hide_timer = ITEM_HIDE_TIMER;
