@@ -452,10 +452,11 @@ void Wobj_UncompressDelta(struct wobjdata *output, struct wobjdata *delta, struc
 
 void Wobj_UpdateGridPos(WOBJ *wobj)
 {
-	if (wobj->internal.owned)
+	if (wobj->internal.owned) {
 		ObjGrid_MoveObject(owned_grid, &wobj->internal.obj, wobj->x, wobj->y);
-	else
+	} else {
 		ObjGrid_MoveObject(unowned_grid, &wobj->internal.obj, wobj->x, wobj->y);
+	}
 }
 
 static int WobjCollisionFlagCriteria(WOBJ *other, int flags) {
@@ -1378,7 +1379,7 @@ void Wobj_DoSplashes(WOBJ *wobj) {
 
 static uint32_t WobjSearch_GetCalculatedHash(int node, int uuid)
 {
-	return ((node * 120340) + (uuid ^ 134)) % SMAPSZ;
+	return (uint32_t)((node * 120340) + (uuid ^ 134)) % SMAPSZ;
 }
 static WOBJ *_find_wobj(int node, int uuid) {
 #if DBGLRU >= 1
@@ -1470,6 +1471,7 @@ static int _hit_limits = 0;
 static WOBJ *WobjSearch_FindEntry(const int node, const int uuid)
 {
 	smapent_t *const map = node == wobj_node_id ? _smap_owned : _smap_unowned;
+	if (node == -1) return NULL;
 
 	uint32_t i;
 	smaplru_t *v = NULL;

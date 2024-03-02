@@ -1905,7 +1905,11 @@ plat_velx_application:
 	}
 	if (Game_GetFrame() % 10 == 0) {
 		if (fabsf(wobj->health - local_data->last_hp) >= 1.0f) {
-			Interaction_CreateWobj(WOBJ_HIT_MARKER, wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f, wobj->y - 4.0f, local_data->last_hp - wobj->health, 0.0f);
+			add_hitmarker(
+				local_data->last_hp - wobj->health,
+				wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f,
+				wobj->y - 4.0f
+			);
 		}
 		local_data->last_hp = wobj->health;
 	}
@@ -2549,6 +2553,34 @@ void Player_TryTitlePopup(void) {
 	titlepopup_timer = 30*5;
 }
 
+#define MAX_HITMS 128
+static hitmarker_t *hitms;
+static int hitm_idx;
+
+void add_hitmarker(int dmg, float x, float y) {
+	hitmarker_t hm = (hitmarker_t){
+		.active = true,
+		.vy = -3.0f,
+		.timer = 7,
+		.state = 0,
+		.green = dmg < 0,
+		.x = x - Camera_GetXPos(),
+		.y = y - Camera_GetYPos(),
+		.ndigits = 0,
+		.digits = {0},
+	};
+
+	if (dmg < 0) dmg = -dmg;
+	while (dmg != 0 && hm.ndigits < 5) {
+		hm.digits[hm.ndigits++] = dmg % 10;
+		dmg /= 10;
+	}
+	if (hm.ndigits == 0) hm.ndigits = 1;
+
+	hitms[hitm_idx] = hm;
+	hitm_idx = (hitm_idx + 1) % MAX_HITMS;
+}
+
 void Player_ResetHUD(void) {
 	hp_curr = 0.0f;
 	last_hpbreak = 0;
@@ -2558,6 +2590,67 @@ void Player_ResetHUD(void) {
 	hp_break_anim = 0.0f;
 	memset(hp, 0, sizeof(hp));
 	next_hp = 0;
+
+	hitms = arena_alloc(sizeof(*hitms) * MAX_HITMS);
+	memset(hitms, 0, sizeof(*hitms) * MAX_HITMS);
+	hitm_idx = 0;
+}
+
+static void drawhm(hitmarker_t *hm) {
+	hm->y += hm->vy;
+	hm->vy += 0.2f;
+	if (hm->vy > 0.0f) {
+		hm->vy = 0.0f;
+		if (hm->state == 0) {
+			hm->state = 1;
+			hm->timer = 0;
+		}
+	}
+
+	int srcx = 192;
+	int srcy = 1536 + (hm->green ? 11 : 0);
+	const int startx = hm->ndigits * -5;
+	int trans = 0;
+	int light = RENDERER_LIGHT;
+	float per = 1.0f;
+	switch (hm->state) {
+	case 0:
+		if (hm->timer > 0) hm->timer--;
+		trans = hm->timer;
+		break;
+	case 1:
+		if (hm->timer++ >= 19) hm->active = false;
+		srcx += ((hm->timer / 5) & 0x1) ? 90 : 0;
+		srcy += ((hm->timer / 5) & 0x2) ? 22 : 0;
+		trans = 1 + hm->timer / 3;
+		if (hm->timer > 8) {
+			per = 1.0f - (float)(hm->timer - 8) / 12.0f;
+		}
+		if (hm->green) light = RENDERER_LIGHT - 2 - hm->timer / 4;
+		else light = RENDERER_LIGHT + 3 + hm->timer / 4;
+		if (light > 7) light = 7;
+		if (light < 0) light = 0;
+		break;
+	}
+
+	int currx = 0;
+	for (int i = hm->ndigits - 1; i > -1; i--) {
+		Renderer_DrawBitmap2(
+			hm->x + startx + (int)((float)currx * per),
+			hm->y,
+			&(CNM_RECT){
+				.x = srcx + hm->digits[i] * 9,
+				.y = srcy,
+				.w = 9,
+				.h = 11,
+			},
+			trans,
+			light,
+			0,
+			0
+		);
+		currx += 9;
+	}
 }
 
 void Player_DrawHUD(WOBJ *player) {
@@ -2565,6 +2658,10 @@ void Player_DrawHUD(WOBJ *player) {
 	PLAYER_LOCAL_DATA *local_data = (PLAYER_LOCAL_DATA *)player->local_data;
 
 	Renderer_SetFont(256, 192, 8, 8);
+
+	for (int i = 0; i < MAX_HITMS; i++) {
+		if (hitms[i].active) drawhm(hitms + i);
+	}
 
 	char temp_hud[64];
 	Util_SetRect(&r, 320, 1232, 96, 6);

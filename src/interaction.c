@@ -106,12 +106,12 @@ void Interaction_Tick(void) {
 			if (hurt->node < 0) continue;
 			int lastx = x, lasty = y;
 			x = hurt->x / 9;
-			y = hurt->y / 9;
+			y = hurt->y / 11;
 			if (abs(x - lastx) <= 3) {
 				y = lasty - 1;
 				x = lastx;
 			}
-			Interaction_CreateWobj(WOBJ_HIT_MARKER, x * 9, y * 9, ceilf(hurt->damage), 0.0f);
+			add_hitmarker(ceilf(hurt->damage), x * 9, y * 11);
 			hurt->node = -1;
 			hurt->psl = 0;
 		}

@@ -57,6 +57,14 @@ typedef struct player_platform_info {
 	float relx;
 } player_platform_info_t;
 
+typedef struct hitmarker {
+	bool active, green;
+	float x, y, vy;
+	int digits[5], ndigits;
+	int state;
+	int timer;
+} hitmarker_t;
+
 typedef struct _PLAYER_LOCAL_DATA
 {
 	int death_limbo_counter;
@@ -160,5 +168,6 @@ void Player_SwapOffhand(WOBJ *player);
 void Player_TryTitlePopup(void);
 void Player_ChangePet(WOBJ *player, int petid);
 void player_launch_from_platinfo(WOBJ *wobj);
+void add_hitmarker(int dmg, float x, float y);
 
 #endif

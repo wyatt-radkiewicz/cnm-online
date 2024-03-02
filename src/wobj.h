@@ -2,6 +2,7 @@
 #define _wobj_h_
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "utility.h"
 #include "obj_grid.h"
 #include "interaction.h"
@@ -170,7 +171,6 @@ typedef enum _WOBJ_TYPES
 	WOBJ_PLAYER_PET,
 	WOBJ_KEY_REMOVER,
 	WOBJ_PARTICLE,
-	WOBJ_HIT_MARKER,
 	WOBJ_GOOP,
 	WOBJ_MAX
 } WOBJ_TYPES;
