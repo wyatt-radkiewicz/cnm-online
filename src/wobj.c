@@ -640,6 +640,8 @@ static void Wobj_DrawWobj(WOBJ *other, int camx, int camy) {
 }
 void Wobj_DrawWobjs(int camx, int camy)
 {
+	clear_lens_flare();
+
 	OBJGRID_ITER iter;
 	WOBJ *other;
 	OBJGRID *grids[2] = {unowned_grid, owned_grid};

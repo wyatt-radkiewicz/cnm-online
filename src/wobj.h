@@ -172,6 +172,7 @@ typedef enum _WOBJ_TYPES
 	WOBJ_KEY_REMOVER,
 	WOBJ_PARTICLE,
 	WOBJ_GOOP,
+	WOBJ_LENS_FLARE,
 	WOBJ_MAX
 } WOBJ_TYPES;
 
@@ -342,6 +343,8 @@ int Wobj_GetWaterBlockID(WOBJ *wobj, int with_splash, int with_water);
 //void Wobj_OnDestroyLocalData(WOBJ *wobj);
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);
+void draw_lens_flare(int camx, int camy);
+void clear_lens_flare(void);
 void WobjGenericAttack_Update(WOBJ *wobj);
 
 void BreakPart_CreateParts(float x, float y, float yspd_start, int srcx, int srcy, int w, int h);

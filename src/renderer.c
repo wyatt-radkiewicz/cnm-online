@@ -20,6 +20,7 @@ static SDL_Surface *renderer_hires_temp;
 static SDL_Surface *renderer_effects_buf;
 static unsigned char (*renderer_trans)[256][RENDERER_LEVELS]; /* Source color, Destination Color, Transparency level */
 static unsigned char (*renderer_light)[RENDERER_LEVELS_LIGHT]; /* Color, Light level */
+static unsigned char *renderer_additive;
 static CNM_RECT renderer_font;
 static int renderer_fullscreen;
 static int renderer_initialized = CNM_FALSE;
@@ -50,6 +51,7 @@ void Renderer_Init(int start_fullscreen, int hi_res, int widescreen)
 
 	renderer_trans = arena_global_alloc(sizeof(*renderer_trans) * 256);
 	renderer_light = arena_global_alloc(sizeof(*renderer_light) * 256);
+	renderer_additive = arena_global_alloc(sizeof(*renderer_additive) * 256);
 	
 	renderer_fullscreen = start_fullscreen;
 	renderer_hires_mode = hi_res;
@@ -173,69 +175,6 @@ void Renderer_Update(void)
 			}
 		}
 		SDL_BlitScaled(renderer_hires_temp, NULL, winsurf, &r);
-		//SDL_Surface *temp_scr = SDL_CreateRGBSurface(0, RENDERER_WIDTH * 2, RENDERER_HEIGHT * 2, 32, 0, 0, 0, 0);
-		//SDL_Surface *wsurf = SDL_GetWindowSurface(renderer_win);
-		//Uint32 colors[256];
-		//{
-		//	SDL_Color *unconvcols = renderer_scr->format->palette->colors;
-		//	for (int i = 0; i < 256; i++)
-		//	{
-		//		colors[i] = SDL_MapRGBA(
-		//			wsurf->format,
-		//			unconvcols[i].r,
-		//			unconvcols[i].g,
-		//			unconvcols[i].b,
-		//			0xff
-		//		);
-		//	}
-		//}
-		//Uint32 *dst = (Uint32 *)wsurf->pixels;
-		//Uint8 *src = (Uint8 *)renderer_scr->pixels;
-		//int x = 0, y = 0;
-
-//#define REPEAT8(X) X X X X X X X X
-//#define REPEAT16(X) REPEAT8(X) REPEAT8(X)
-//#define REPEAT32(X) REPEAT16(X) REPEAT16(X)
-//#define REPEAT64(X) REPEAT32(X) REPEAT32(X)
-//#define REPEATWIDTH(X) REPEAT64(X) REPEAT64(X) REPEAT64(X) REPEAT64(X) REPEAT64(X)
-		//for (; y < RENDERER_HEIGHT;)
-		//{
-		//	REPEATWIDTH(
-		//		*dst = colors[*src];
-		//		dst++;
-		//		*dst = colors[*src];
-		//		src++; dst++;
-		//	)
-		//	src -= RENDERER_WIDTH;
-		//	REPEATWIDTH(
-		//		*dst = colors[*src];
-		//		dst++;
-		//		*dst = colors[*src];
-		//		src++; dst++;
-		//	)
-		//	y++;
-		//}
-		//SDL_BlitSurface(renderer_hires_temp, NULL, SDL_GetWindowSurface(renderer_win), NULL);
-		/*SDL_PixelFormat *screen_format = renderer_scr->format;
-		Uint32 *pixels = (Uint32 *)(renderer_hires_temp->pixels);
-		int x, y;
-		for (y = 0; y < RENDERER_HEIGHT * 2; y++)
-		{
-			for (x = 0; x < RENDERER_WIDTH * 2; x++)
-			{
-				Uint32 *color_bytes = pixels + (y * RENDERER_WIDTH * 2 + x);
-				unsigned char index = ((unsigned char *)renderer_scr->pixels)[(y / 2) * RENDERER_WIDTH + (x / 2)];
-				*color_bytes = SDL_MapRGBA(
-					renderer_hires_temp->format,
-					screen_format->palette->colors[index].r,
-					screen_format->palette->colors[index].g,
-					screen_format->palette->colors[index].b,
-					0xff
-				);
-			}
-		}
-		SDL_BlitSurface(renderer_hires_temp, NULL, SDL_GetWindowSurface(renderer_win), NULL);*/
-		//SDL_FreeSurface(temp_scr);
 	}
 	//SDL_UnlockSurface(SDL_GetWindowSurface(renderer_win));
 	//SDL_UnlockSurface(renderer_scr);
@@ -591,6 +530,18 @@ void Renderer_BuildTables(void)
 		}
 	}
 
+	renderer_additive[0] = RENDERER_LIGHT;
+	for (s = 1; s < 256; s++) {
+		sc = renderer_scr->format->palette->colors[s];
+		int max = CNM_MAX(CNM_MAX(sc.r, sc.g), sc.b);
+		int light = RENDERER_LIGHT - (max / 64);
+		//int trans = 8 - (max / 32);
+		//if (trans > 7) trans = 7;
+		if (light < 0) light = RENDERER_WHITE;
+		renderer_additive[s] = light;
+		//renderer_additive[s] = trans;
+	}
+
 	/* Build the light tables */
 	renderer_light[0][0] = 0; renderer_light[0][1] = 0; renderer_light[0][2] = 0; renderer_light[0][3] = 0;
 	renderer_light[0][4] = 0; renderer_light[0][5] = 0; renderer_light[0][6] = 0; renderer_light[0][7] = 0;
@@ -630,53 +581,8 @@ void Renderer_BuildTables(void)
 		}
 		renderer_light[s][RENDERER_BLACK] = get_nearest_color(0, 0, 0);
 		renderer_light[s][RENDERER_WHITE] = get_nearest_color(255, 255, 255);
-		//renderer_light[s][RENDERER_LEVELS_LIGHT - 1] = get_nearest_color(0, 0, 0);
 	}
 }
-//static void Renderer_BuildConvTable(void)
-//{
-//	int r, g, b;
-//	int closest_index, closest_match, i, cur_match;
-//	SDL_Color cur_color;
-//	if (!renderer_initialized)
-//		return;
-//
-//	for (r = 0; r < (1 << RENDERER_DEPTH); r++)
-//	{
-//		for (g = 0; g < (1 << RENDERER_DEPTH); g++)
-//		{
-//			for (b = 0; b < (1 << RENDERER_DEPTH); b++)
-//			{
-//				closest_index = 1;
-//				closest_match = 0x100*3;
-//				for (i = 1; i < 0x100; i++)
-//				{
-//					if (i >= renderer_scr->format->palette->ncolors)
-//						continue;
-//
-//					cur_color = renderer_scr->format->palette->colors[i];
-//					cur_match =
-//						Abs((r << (8 - RENDERER_DEPTH)) - cur_color.r) +
-//						Abs((g << (8 - RENDERER_DEPTH)) - cur_color.g) +
-//						Abs((b << (8 - RENDERER_DEPTH)) - cur_color.b);
-//					if (cur_match < closest_match)
-//					{
-//						closest_match = cur_match;
-//						closest_index = i;
-//					}
-//				}
-//				renderer_conv[r][g][b] = closest_index;
-//			}
-//		}
-//	}
-//}
-//int Renderer_MakeColor(int r, int g, int b)
-//{
-//	if (!renderer_initialized)
-//		return 0;
-//
-//	return renderer_conv[r >> (8 - RENDERER_DEPTH)][g >> (8 - RENDERER_DEPTH)][b >> (8 - RENDERER_DEPTH)];
-//}
 int Renderer_GetBitmapHeight(void)
 {
 	if (renderer_initialized && renderer_gfx != NULL)
@@ -701,118 +607,58 @@ void Renderer_Clear(int color)
 	rect.h = RENDERER_HEIGHT;
 	Renderer_DrawRect(&rect, color, 0, RENDERER_LIGHT);
 }
-//#ifndef CNM_NO_X86ASSEMBLY
-//void __declspec(naked) __cdecl Renderer_DrawRect(const CNM_RECT *rect, int color, int trans, int light)
-//{
-//	__asm
-//	{
-//		push ebp // Create stack frame
-//		mov ebp,esp
-//		push ebx
-//		push edi
-//		push esi
-//
-//		mov eax, DWORD PTR[renderer_initialized]
-//		cmp eax,0
-//		je drawrect_return
-//		cmp DWORD PTR [ebp+12],0 // Make sure we dont render transparent rectangles
-//		je drawrect_return
-//
-//		mov edx,DWORD PTR [ebp+8] // Get the rectangle pointer
-//		mov ecx,[edx]
-//		add ecx,[edx+8] // ECX now has the right bound of the rectangle
-//		cmp ecx,RENDERER_WIDTH
-//		jle dont_clip_right
-//		mov ecx,RENDERER_WIDTH
-//dont_clip_right:
-//		mov eax,[edx]
-//		cmp ecx,eax
-//		jle drawrect_return // Return if the rect is not on screen
-//		cmp eax,0
-//		jge dont_clip_left
-//		mov eax,0
-//dont_clip_left:
-//		sub ecx,eax
-//		jle drawrect_return // Return if the rect is not on screen
-//// By this point ECX has the width and EAX has the x position
-//
-//		mov ebx,[edx+4]
-//		add ebx,[edx+12] // EAX now has the right bound of the rectangle
-//		cmp ebx,RENDERER_HEIGHT
-//		jle dont_clip_bottom
-//		mov ebx,RENDERER_HEIGHT
-//dont_clip_bottom:
-//		mov esi,[edx+4]
-//		cmp ebx,esi
-//		jle drawrect_return // Return if the rect is not on screen
-//		cmp esi,0
-//		jge dont_clip_top
-//		mov esi,0
-//dont_clip_top:
-//		sub ebx,esi
-//		jle drawrect_return // Return if the rect is not on screen
-//// By this point EBX has the height and ESI has the y position
-//
-//		mov [esp-4],ecx // Width
-//		mov [esp-8],ebx // Height
-//		mov edi,ecx
-//		sub edi,RENDERER_WIDTH
-//		neg edi
-//		mov [esp-12], edi // Counter width
-//
-//// Now we calculate the destination pointer
-//		mov edi,renderer_scr
-//		mov edi,[edi]renderer_scr.pixels
-//		mov ebx,esi
-//		imul ebx,ebx,RENDERER_WIDTH
-//		add edi,eax
-//		add edi,ebx // EDI now has the desination
-//
-//		mov eax, DWORD PTR[ebp + 12] // Get color byte
-//		lea esi, [renderer_light + eax*8]
-//		add esi, DWORD PTR[ebp + 20]
-//		movzx eax, BYTE PTR[esi] // Now we have the lighted color
-//		shl eax, 8+3
-//		or al, BYTE PTR[ebp + 16] // EBX has pre-shifted index for the transparency
-//drawrect_loop:
-//		movzx ebx, BYTE PTR[edi]
-//		shl ebx, 3
-//		or ebx, eax
-//		movzx ebx, BYTE PTR[renderer_trans + ebx]
-//		mov BYTE PTR[edi],bl
-//
-//		inc edi
-//		loop drawrect_loop
-//		mov ecx,[esp-8]
-//		dec ecx
-//		je drawrect_return
-//		mov [esp-8],ecx // Go down the veritcal loop counter
-//		mov ecx,[esp-4] // Reset horizontal loop counter
-//		add edi,[esp-12]
-//		jmp drawrect_loop
-//
-//drawrect_return: // Return from the function
-//		pop esi
-//		pop edi
-//		pop ebx
-//		pop ebp
-//		ret
-//	}
-//
-//	/*int x, y;
-//	if (!renderer_initialized)
-//		return;
-//
-//	for (y = rect->y; y < rect->y + rect->h; y++)
-//	{
-//		for (x = rect->x; x < rect->x + rect->w; x++)
-//		{
-//			if (x > -1 && x < RENDERER_WIDTH && y > -1 && y < RENDERER_HEIGHT)
-//				Renderer_SetPixel(x, y, color, trans, light);
-//		}
-//	}*/
-//}
-//#else
+void render_draw_additive_light(int _x, int _y, CNM_RECT src) {
+	if (!renderer_initialized)
+		return;
+
+	if (_y < 0) {
+		if (_y + src.h < 0) {
+			return;
+		} else {
+			src.y -= _y;
+			src.h += _y;
+			_y = 0;
+		}
+	}
+	if (_y + src.h > RENDERER_HEIGHT) {
+		if (_y >= RENDERER_HEIGHT) {
+			return;
+		} else {
+			src.h = RENDERER_HEIGHT - _y;
+		}
+	}
+	if (_x < 0) {
+		if (_x + src.w < 0) {
+			return;
+		} else {
+			src.x -= _x;
+			src.w += _x;
+			_x = 0;
+		}
+	}
+	if (_x + src.w > RENDERER_WIDTH) {
+		if (_x >= RENDERER_WIDTH) {
+			return;
+		} else {
+			src.w = RENDERER_WIDTH - _x;
+		}
+	}
+	
+	const uint8_t *restrict src_pixel = ((unsigned char *)renderer_gfx->pixels) + (src.y * renderer_gfx->w + src.x);
+	uint8_t *restrict dest_pixel = ((unsigned char *)renderer_scr->pixels) + (_y * RENDERER_WIDTH + _x);
+	const int src_width = renderer_gfx->w - src.w;
+	const int gfx_width = RENDERER_WIDTH - src.w;
+
+	for (int y = 0; y < src.h; y++) {
+		for (int x = 0; x < src.w; x++) {
+			*dest_pixel = renderer_light[*dest_pixel][renderer_additive[*src_pixel]];
+			dest_pixel++;
+			src_pixel++;
+		}
+		src_pixel += src_width;
+		dest_pixel += gfx_width;
+	}
+}
 void Renderer_DrawRect(const CNM_RECT *_rect, int color, int trans, int light) {
 	int x, y, last_color;
 	CNM_RECT rect;
@@ -866,230 +712,6 @@ void Renderer_DrawEmptyRect(const CNM_RECT *rect, int color, int trans, int ligh
 	Util_SetRect(&r, rect->x + rect->w, rect->y, 1, rect->h);
 	Renderer_DrawRect(&r, color, trans, light);
 }
-
-
-//#ifndef CNM_NO_X86ASSEMBLY
-//#define FAST_DRAWBITMAP
-//#ifdef FAST_DRAWBITMAP
-//typedef long long mm0_int64;
-//mm0_int64 __declspec(align(16)) xmm_zero_register[2] = {0, 0};
-//void __declspec(naked) __stdcall Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int light)
-//#else
-//void __stdcall Renderer_DrawBitmap(int _x, int _y, const CNM_RECT *_src, int trans, int light)
-//#endif
-//{
-//#ifdef FAST_DRAWBITMAP
-//#define ARG_X 8
-//#define ARG_Y 12
-//#define ARG_SRC 16
-//#define ARG_TRANS 20
-//#define ARG_LIGHT 24
-//
-//#define LOCAL_DX 4
-//#define LOCAL_SX 8
-//#define LOCAL_W 12
-//#define LOCAL_CW 16
-//
-////#define LOCAL_DY 20
-////#define LOCAL_SY 24
-//#define LOCAL_H 20
-//	__asm
-//	{
-//		push ebp
-//		mov ebp,esp
-//		push ebx
-//		push esi
-//		push edi
-//		
-//// If there is no renderer, then don't render
-//		mov eax, DWORD PTR[renderer_initialized]
-//		cmp eax, 0
-//		je drawbitmap_return1
-//
-//// EAX = dest x, EBX = src x, ECX = width
-//		mov eax, [ebp + ARG_X]
-//		mov ecx,[ebp+ARG_SRC]
-//		mov ebx,[ecx]_src.x
-//		mov ecx,[ecx]_src.w
-//		add ecx,eax
-//		cmp ecx,RENDERER_WIDTH
-//		jle dont_clip_right
-//		mov ecx,RENDERER_WIDTH
-//dont_clip_right:
-//		cmp ecx,eax
-//		jle end
-//		cmp eax,0
-//		jge dont_clip_left
-//		sub ebx,eax
-//		mov eax,0
-//dont_clip_left:
-//		sub ecx,eax
-//		jle end
-//		mov [esp-LOCAL_DX],eax
-//		mov [esp-LOCAL_SX],ebx
-//		mov [esp-LOCAL_W],ecx
-//		sub ecx,RENDERER_WIDTH
-//		neg ecx
-//		mov [esp-LOCAL_CW],ecx
-//
-//// EAX = dest y, EBX = src y, ECX = height
-//		mov eax, [ebp + ARG_Y]
-//		mov ecx, [ebp + ARG_SRC]
-//		mov ebx, [ecx]_src.y
-//		mov ecx, [ecx]_src.h
-//		add ecx, eax
-//		cmp ecx, RENDERER_HEIGHT
-//		jle dont_clip_bottom
-//		mov ecx, RENDERER_HEIGHT
-//dont_clip_bottom:
-//		cmp ecx, eax
-//		jle end
-//		cmp eax, 0
-//		jge dont_clip_top
-//		sub ebx, eax
-//		mov eax, 0
-//dont_clip_top:
-//		sub ecx, eax
-//		jle end
-//		mov[esp - LOCAL_H], ecx
-//
-//// Set up the source bitmap pointer and the screen destination pointer
-//		mov esi,renderer_gfx
-//		mov esi,[esi]renderer_gfx.pixels
-//		imul ebx,ebx,512
-//		add esi,ebx
-//		add esi,[esp - LOCAL_SX]
-//
-//		mov edi,renderer_scr
-//		mov edi,[edi]renderer_scr.pixels
-//		imul eax,eax,RENDERER_WIDTH
-//		add edi,eax
-//		add edi,[esp - LOCAL_DX]
-//
-//		movzx ebx, BYTE PTR[ebp + ARG_TRANS]
-//		movzx ebp, BYTE PTR[ebp + ARG_LIGHT]
-//		mov ecx, [esp - LOCAL_W]
-//		cmp ebp,RENDERER_LIGHT
-//		jne slow_path
-//		cmp ebx,0
-//		je fast_path
-//slow_path:
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor edx, edx
-//drawing_loop:
-//		movzx eax, BYTE PTR[esi]
-//		inc esi
-//		movzx eax, BYTE PTR[renderer_light + eax*8 + ebp]
-//		shl eax,8
-//		movzx edx, BYTE PTR[edi]
-//		or eax,edx
-//		movzx edx, BYTE PTR[renderer_trans + eax*8 + ebx]
-//		mov BYTE PTR[edi],dl
-//
-//		inc edi
-//		dec ecx
-//		jne drawing_loop
-//		add esi, [esp - LOCAL_CW]
-//		add esi, 512 - RENDERER_WIDTH
-//		add edi, [esp - LOCAL_CW]
-//		mov ecx,[esp -  LOCAL_H]
-//		dec ecx
-//		mov[esp - LOCAL_H], ecx
-//		mov ecx, [esp - LOCAL_W]
-//		jne drawing_loop
-//
-//end:
-//		pop edi
-//		pop esi
-//		pop ebx
-//		pop ebp
-//		ret 20
-//
-//// This is the special case where the graphics are normal brightness and transparency
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//		xor eax, eax
-//fast_path:
-//		mov ebp,0xff
-//		xor eax, eax
-//		xor ebx, ebx
-//		xor edx, edx
-//
-//loop_start:
-//		cmp ecx, 16
-//		jl drawing_loop3
-//drawing_loop2:
-//		movups xmm0, XMMWORD PTR[esi]
-//		movups xmm3, XMMWORD PTR[edi]
-//		movups xmm2,xmm0
-//		movups xmm1, xmm_zero_register
-//		pcmpeqb xmm0, xmm1
-//		pand xmm0, xmm3
-//		por xmm0, xmm2
-//		movups XMMWORD PTR[edi], xmm0
-//		add edi,16
-//		add esi,16
-//
-//		sub ecx,16
-//		cmp ecx, 16
-//		jge drawing_loop2
-//		cmp ecx, 0
-//drawing_loop3:
-//		je loop_complete
-//		movzx eax, BYTE PTR[esi]
-//		cmp eax,0
-//		cmove eax, DWORD PTR[edi]
-//		inc esi
-//		mov BYTE PTR[edi], al
-//		inc edi
-//		dec ecx
-//		jmp drawing_loop3
-//loop_complete:
-//
-//		add esi, [esp - LOCAL_CW]
-//		add esi, 512 - RENDERER_WIDTH
-//		add edi, [esp - LOCAL_CW]
-//		mov ecx, [esp - LOCAL_H]
-//		dec ecx
-//		mov[esp - LOCAL_H], ecx
-//		mov ecx, [esp - LOCAL_W]
-//		jne loop_start
-//
-//drawbitmap_return1:
-//		pop edi
-//		pop esi
-//		pop ebx
-//		pop ebp
-//		ret 20
-//
-//	}
-//#undef ARG_X
-//#undef ARG_Y
-//#undef ARG_SRC
-//#undef ARG_TRANS
-//#undef ARG_LIGHT
-//
-//#else
-//	return; // This macro option has been now moved to CNM_NO_X86ASSEMBLY look below...
-//#endif
-//}
-//#else
 
 inline static uint64_t passthru(uint64_t src, uint64_t dst) {
     union bytes {

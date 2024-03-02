@@ -5,6 +5,7 @@
 #include "wobj.h"
 #include "player.h"
 
+static int lastx, lasty;
 static int *camx, *camy;
 static int cam_in_ybounds, camy_scroll_back, cam_forced, cam_top;
 static int cam_ext_target, cam_ext_offset;
@@ -26,12 +27,16 @@ void Camera_Setup(int x, int y)
 	cam_ext_offset = 0;
 	cam_ext_targety = 0;
 	cam_ext_offsety = 0;
+	lastx = *camx;
+	lasty = *camy;
 }
 void Camera_Update(int target_x, int target_y)
 {
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	PLAYER_LOCAL_DATA *plr_local = player->local_data;
 
+	lastx = *camx;
+	lasty = *camy;
 	if (cam_forced)
 		return;
 	// Update the camera position
@@ -100,6 +105,14 @@ int Camera_GetXPos(void)
 int Camera_GetYPos(void)
 {
 	return *camy;
+}
+int Camera_GetXVel(void)
+{
+	return *camx - lastx;
+}
+int Camera_GetYVel(void)
+{
+	return *camy - lasty;
 }
 void Camera_SetForced(int forced)
 {

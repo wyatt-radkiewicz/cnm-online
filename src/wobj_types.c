@@ -2149,6 +2149,124 @@ static void Wobj_Goop_Draw(WOBJ *wobj, int camx, int camy) {
 	);
 }
 
+static void Wobj_LensFlare_Draw(WOBJ *wobj, int camx, int camy) {
+	wobj->flags |= WOBJ_OVERLAYER;
+	draw_lens_flare(camx, camy);
+}
+static bool is_lens_obstructed(int x, int y) {
+	BLOCK_PROPS *prop = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x / BLOCK_SIZE, y / BLOCK_SIZE));	
+	if (prop->transparency == 0 && Renderer_GetBitmapPixel(
+		prop->frames_x[0] * 32 + (x - (x / 32 * 32)),
+		prop->frames_y[0] * 32 + (y - (y / 32 * 32))
+	) != 0) return true;
+	prop = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, x / BLOCK_SIZE, y / BLOCK_SIZE));	
+	if (prop->transparency == 0 && Renderer_GetBitmapPixel(
+		prop->frames_x[0] * 32 + (x - (x / 32 * 32)),
+		prop->frames_y[0] * 32 + (y - (y / 32 * 32))
+	) != 0) return true;
+
+	return false;
+}
+static bool drawn_flare = false;
+void clear_lens_flare(void){ 
+	drawn_flare = false;
+}
+void draw_lens_flare(int camx, int camy) {
+	if (!drawn_flare) drawn_flare = true;
+	else return;
+
+	int xv = Camera_GetXVel() / 3;
+	int yv = Camera_GetYVel() / 3;
+
+	int x = RENDERER_WIDTH / 5 * 4+xv;
+	int y = 16+yv;
+	int wx = x + camx, wy = y + camy;
+
+	int obs = 13;
+	obs -= is_lens_obstructed(wx + 40, wy + 40);
+	obs -= is_lens_obstructed(wx + 20, wy + 40);
+	obs -= is_lens_obstructed(wx + 60, wy + 40);
+	obs -= is_lens_obstructed(wx + 40, wy + 20);
+	obs -= is_lens_obstructed(wx + 40, wy + 60);
+
+	obs -= is_lens_obstructed(wx + 10, wy + 40);
+	obs -= is_lens_obstructed(wx + 70, wy + 40);
+	obs -= is_lens_obstructed(wx + 40, wy + 10);
+	obs -= is_lens_obstructed(wx + 40, wy + 70);
+
+	obs -= is_lens_obstructed(wx + 10, wy + 10);
+	obs -= is_lens_obstructed(wx + 70, wy + 70);
+	obs -= is_lens_obstructed(wx + 10, wy + 70);
+	obs -= is_lens_obstructed(wx + 70, wy + 10);
+
+	if (obs >= 6) {
+		render_draw_additive_light(
+			x, y,
+			(CNM_RECT){
+				.x = 144,
+				.y = 1792,
+				.w = 80,
+				.h = 80,
+		});
+	}
+	x -= 10-xv;
+	y += 8+yv;
+	if (obs >= 5) {
+		render_draw_additive_light(
+			x, y,
+			(CNM_RECT){
+				.x = 144+80,
+				.y = 1792,
+				.w = 80,
+				.h = 80,
+		});
+	}
+	x -= 40-xv;
+	y += 10+yv;
+	if (obs >= 4) {
+		render_draw_additive_light(
+			x+16, y+16,
+			(CNM_RECT){
+				.x = 144+160,
+				.y = 1792,
+				.w = 48,
+				.h = 48,
+		});
+	}
+	x -= 30-xv;
+	y += 8+yv;
+	if (obs >= 3) {
+		render_draw_additive_light(
+			x+24, y+24,
+			(CNM_RECT){
+				.x = 144+160+48,
+				.y = 1792,
+				.w = 32,
+				.h = 32,
+		});
+		x -= 10-xv;
+		y += 8+yv;
+		render_draw_additive_light(
+			x+16, y+16,
+			(CNM_RECT){
+				.x = 144+160,
+				.y = 1792,
+				.w = 48,
+				.h = 48,
+		});
+		x -= 10-xv;
+		y += 8+yv;
+		render_draw_additive_light(
+			x+24, y+32,
+			(CNM_RECT){
+				.x = 144+160+48,
+				.y = 1792+32,
+				.w = 16,
+				.h = 16,
+		});
+	}
+}
+
 void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void) {
 	_ldpool_pet = dynpool_init(4, sizeof(PetLocalData), arena_alloc);
 }
@@ -4257,6 +4375,21 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		0.0f, // Strength reward
 		0, // Money reward
 		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE, // Can respawn?
+		0, // Score reward
+	},
+	{ // 159: Lens Flare Object
+		NULL, // Create
+		NULL, // Update
+		Wobj_LensFlare_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{432, 0, 16, 16},
+			{416, 48, 32, 16},
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_FALSE, // Does network interpolation?
 		CNM_FALSE, // Can respawn?
 		0, // Score reward
 	},

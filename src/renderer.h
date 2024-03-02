@@ -53,6 +53,7 @@ void Renderer_DrawEmptyRect(const CNM_RECT *rect, int color, int trans, int ligh
 //void __cdecl Renderer_DrawRect(const CNM_RECT *rect, int color, int trans, int light);
 //void __stdcall Renderer_DrawBitmap(int x, int y, const CNM_RECT *src, int trans, int light);
 //#else
+void render_draw_additive_light(int x, int y, CNM_RECT src);
 void Renderer_DrawRect(const CNM_RECT *rect, int color, int trans, int light);
 void Renderer_DrawBitmap(int x, int y, const CNM_RECT *src, int trans, int light);
 //#endif
