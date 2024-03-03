@@ -2151,16 +2151,20 @@ static void Wobj_Goop_Draw(WOBJ *wobj, int camx, int camy) {
 
 static void Wobj_LensFlare_Draw(WOBJ *wobj, int camx, int camy) {
 	wobj->flags |= WOBJ_OVERLAYER;
-	draw_lens_flare(camx, camy);
+	int xv = Camera_GetXVel() / 3;
+	int yv = Camera_GetYVel() / 3;
+	draw_lens_flare(camx, camy, xv, yv);
 }
 static bool is_lens_obstructed(int x, int y) {
-	BLOCK_PROPS *prop = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_FG, x / BLOCK_SIZE, y / BLOCK_SIZE));	
-	if (prop->transparency == 0 && Renderer_GetBitmapPixel(
+	int id = Blocks_GetBlock(BLOCKS_FG, x / 32, y / 32);
+	BLOCK_PROPS *prop = Blocks_GetBlockProp(id);
+	if (id > 0 && prop->transparency == 0 && Renderer_GetBitmapPixel(
 		prop->frames_x[0] * 32 + (x - (x / 32 * 32)),
 		prop->frames_y[0] * 32 + (y - (y / 32 * 32))
 	) != 0) return true;
-	prop = Blocks_GetBlockProp(Blocks_GetBlock(BLOCKS_BG, x / BLOCK_SIZE, y / BLOCK_SIZE));	
-	if (prop->transparency == 0 && Renderer_GetBitmapPixel(
+	id = Blocks_GetBlock(BLOCKS_BG, x / 32, y / 32);
+	prop = Blocks_GetBlockProp(id);	
+	if (id > 0  && prop->transparency == 0 && Renderer_GetBitmapPixel(
 		prop->frames_x[0] * 32 + (x - (x / 32 * 32)),
 		prop->frames_y[0] * 32 + (y - (y / 32 * 32))
 	) != 0) return true;
@@ -2171,12 +2175,9 @@ static bool drawn_flare = false;
 void clear_lens_flare(void){ 
 	drawn_flare = false;
 }
-void draw_lens_flare(int camx, int camy) {
+void draw_lens_flare(int camx, int camy, int xv, int yv) {
 	if (!drawn_flare) drawn_flare = true;
 	else return;
-
-	int xv = Camera_GetXVel() / 3;
-	int yv = Camera_GetYVel() / 3;
 
 	int x = RENDERER_WIDTH / 5 * 4+xv;
 	int y = 16+yv;
@@ -2199,12 +2200,19 @@ void draw_lens_flare(int camx, int camy) {
 	obs -= is_lens_obstructed(wx + 10, wy + 70);
 	obs -= is_lens_obstructed(wx + 70, wy + 10);
 
+	int sx = 144, sy = 1792;
+	if (Game_TopState() == GAME_STATE_MAINMENU ||
+		Game_TopState() == GAME_STATE_CLIENT_CONNECTING) {
+		sx = 0,
+		sy = 944;
+	}
+
 	if (obs >= 6) {
 		render_draw_additive_light(
 			x, y,
 			(CNM_RECT){
-				.x = 144,
-				.y = 1792,
+				.x = sx,
+				.y = sy,
 				.w = 80,
 				.h = 80,
 		});
@@ -2215,8 +2223,8 @@ void draw_lens_flare(int camx, int camy) {
 		render_draw_additive_light(
 			x, y,
 			(CNM_RECT){
-				.x = 144+80,
-				.y = 1792,
+				.x = sx+80,
+				.y = sy,
 				.w = 80,
 				.h = 80,
 		});
@@ -2227,8 +2235,8 @@ void draw_lens_flare(int camx, int camy) {
 		render_draw_additive_light(
 			x+16, y+16,
 			(CNM_RECT){
-				.x = 144+160,
-				.y = 1792,
+				.x = sx+160,
+				.y = sy,
 				.w = 48,
 				.h = 48,
 		});
@@ -2239,8 +2247,8 @@ void draw_lens_flare(int camx, int camy) {
 		render_draw_additive_light(
 			x+24, y+24,
 			(CNM_RECT){
-				.x = 144+160+48,
-				.y = 1792,
+				.x = sx+160+48,
+				.y = sy,
 				.w = 32,
 				.h = 32,
 		});
@@ -2249,8 +2257,8 @@ void draw_lens_flare(int camx, int camy) {
 		render_draw_additive_light(
 			x+16, y+16,
 			(CNM_RECT){
-				.x = 144+160,
-				.y = 1792,
+				.x = sx+160,
+				.y = sy,
 				.w = 48,
 				.h = 48,
 		});
@@ -2259,8 +2267,8 @@ void draw_lens_flare(int camx, int camy) {
 		render_draw_additive_light(
 			x+24, y+32,
 			(CNM_RECT){
-				.x = 144+160+48,
-				.y = 1792+32,
+				.x = sx+160+48,
+				.y = sy+32,
 				.w = 16,
 				.h = 16,
 		});

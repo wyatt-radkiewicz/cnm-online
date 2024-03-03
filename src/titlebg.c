@@ -24,13 +24,16 @@ static CNM_RECT wings[4];
 static float pos[2];
 static float vel[2];
 
-static float _camx = 0.0f, _camy = 0.0f, _camx_coarse = 0.0f, _camy_coarse = 0.0f, _camx_spd = 0.0f, _camy_spd = 0.0f;
+static float _camx = 0.0f, _camy = 0.0f,
+			 _camx_coarse = 0.0f, _camy_coarse = 0.0f,
+			 _camx_spd = 0.0f, _camy_spd = 0.0f;
 static float *_camx_list, *_camy_list;
 static int _cam_list_len, _next_cam_target;
 #define MAX_TITLE_CARDS 4
 static int _title_card_ticker, _title_card_y[MAX_TITLE_CARDS];
 static int title_target_y, title_card_stagger;
 static int _inited = CNM_FALSE;
+static bool lensflare;
 
 void titlebg_init(void) {
 	_inited = CNM_TRUE;
@@ -61,8 +64,10 @@ void titlebg_init(void) {
 	if (!_cam_list_len) _cam_list_len = 2;
 	_camx_list = arena_alloc(sizeof(*_camx_list) * _cam_list_len);
 	_camy_list = arena_alloc(sizeof(*_camy_list) * _cam_list_len);
+	lensflare = false;
 	spawner = Spawners_Iterate(NULL);
 	while (spawner) {
+		if (spawner->wobj_type == WOBJ_LENS_FLARE) lensflare = true;
 		if (spawner->wobj_type == TT_BOSS_WAYPOINT)	{
 			//Console_Print("asdf");
 			_camx_list[spawner->custom_int] = spawner->x;
@@ -231,6 +236,9 @@ void titlebg_draw(void(*mid_callback)(void)) {
 	Renderer_DrawBitmap2((int)pos[0], (int)pos[1], &player, 0, RENDERER_LIGHT, hflip, 0.0f);
 	
 	Background_Draw(1, (int)_camx, (int)_camy);
+
+	clear_lens_flare();
+	if (lensflare) draw_lens_flare(_camx, _camy, floorf(_camx_spd), floorf(_camy_spd));
 
 	if (mid_callback) mid_callback();
 

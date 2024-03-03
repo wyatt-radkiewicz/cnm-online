@@ -343,7 +343,7 @@ int Wobj_GetWaterBlockID(WOBJ *wobj, int with_splash, int with_water);
 //void Wobj_OnDestroyLocalData(WOBJ *wobj);
 
 void WobjGeneric_Draw(WOBJ *obj, int camx, int camy);
-void draw_lens_flare(int camx, int camy);
+void draw_lens_flare(int camx, int camy, int xv, int yv);
 void clear_lens_flare(void);
 void WobjGenericAttack_Update(WOBJ *wobj);
 
