@@ -1789,8 +1789,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 
 	if (isnan(wobj->health)) wobj->health = 100.0f;
 
-	if (!local_data->vortexed_mode)
+	if (!local_data->vortexed_mode) {
 		WobjPhysics_EndUpdate(wobj);
+
+		float oy = wobj->y;
+		wobj->y += 5.0f;
+		WOBJ *ground = Wobj_GetWobjColliding(wobj, WOBJ_IS_JUMPTHROUGH);
+		wobj->y = oy;
+		local_data->touching_non_cloud_ground = 
+			Wobj_IsGrounded(wobj) && (!ground || ground->type != WOBJ_CLOUD_PLATFORM);
+	}
 
 	// Search for player platforms (platinfo)
 	{

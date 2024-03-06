@@ -54,6 +54,7 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player);
 static void ItemFireWand_OnUse(ITEM *item, WOBJ *player);
 static void ItemIceWand_OnUse(ITEM *item, WOBJ *player);
 static void ItemAirWand_OnUse(ITEM *item, WOBJ *player);
+static void ItemAirWand_OnUpdate(ITEM *item, WOBJ *player);
 static void ItemLightningWand_OnUse(ITEM *item, WOBJ *player);
 
 static void ItemKeyGeneric_Update(ITEM *key, WOBJ *player);
@@ -290,14 +291,14 @@ const ITEM_TYPE item_types[] =
 	},
 	{ // 19: Air Wand Item
 		{96, 416-256, 32, 32},
-		NULL,
+		ItemAirWand_OnUpdate,
 		NULL,
 		NULL,
 		ItemAirWand_OnUse, // On Use
 		NULL, // Draw
-		CNM_TRUE, // Activate on "use" held
+		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		0.0f, // Item durability
+		400.0f, // Item durability
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 20: Lightning Wand Item
@@ -1139,18 +1140,45 @@ static void ItemIceWand_OnUse(ITEM *item, WOBJ *player)
 	item->durability -= 1.0f;
 	item->hide_timer = ITEM_HIDE_TIMER;
 }
+static void ItemAirWand_OnUpdate(ITEM *item, WOBJ *player) {
+	PLAYER_LOCAL_DATA *ld = player->local_data;
+	if (ld->touching_non_cloud_ground) {
+		item->custom_ints[0] = 0;
+	}
+}
 static void ItemAirWand_OnUse(ITEM *item, WOBJ *player)
 {
-	//player->y -= 3.0f;
-	WOBJ *cloud = Interaction_CreateWobj
-	(
-		WOBJ_CLOUD_PLATFORM,
-		player->x - 8.0f,
-		player->y + player->hitbox.x + player->hitbox.h - 16.0f - 4.0f,
-		0,
-		0.0f
-	);
+	if (item->custom_ints[0] < 7 && !Wobj_IsGrounded(player)) {
+		WOBJ *platform = Interaction_CreateWobj(
+			WOBJ_CLOUD_PLATFORM,
+			player->x + player->hitbox.x + player->hitbox.w / 2.0f - 32.0f,
+			player->y + player->hitbox.y + player->hitbox.h + 1.0f,
+			0,
+			0.0f
+		);
+		if (player->vel_y < 0.0f) player->vel_y /= 2.0f;
+		else {
+			player->vel_y = 0.0f;
+			player->y += 1.0f;
+			player->flags |= WOBJ_IS_GROUNDED;
+		}
+		item->custom_ints[0]++;
+	}
+	int dir = player->flags & WOBJ_HFLIP ? -1 : 1;
+	WOBJ *f;
+	f = Interaction_CreateWobj(WOBJ_CLOUD_FIRE, player->x+8.0f, player->y+8.0f, dir, -2.0f);
+	f->strength = player->strength + 0.02f;
+	Interaction_CreateWobj(WOBJ_CLOUD_FIRE, player->x+8.0f, player->y+8.0f, dir, -1.0f);
+	f->strength = player->strength + 0.02f;
+	Interaction_CreateWobj(WOBJ_CLOUD_FIRE, player->x+8.0f, player->y+8.0f, dir, 0.0f);
+	f->strength = player->strength + 0.04f;
+	Interaction_CreateWobj(WOBJ_CLOUD_FIRE, player->x+8.0f, player->y+8.0f, dir, 1.0f);
+	f->strength = player->strength + 0.02f;
+	Interaction_CreateWobj(WOBJ_CLOUD_FIRE, player->x+8.0f, player->y+8.0f, dir, 2.0f);
+	f->strength = player->strength + 0.02f;
+	item->use_timer = 20;
 	item->hide_timer = ITEM_HIDE_TIMER;
+	item->durability -= 1.0f;
 	if (!item->last_in_use)
 		Interaction_PlaySound(player, 9);
 	//item->use_timer = 1;

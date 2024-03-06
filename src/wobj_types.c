@@ -620,14 +620,91 @@ static void WobjIceAttack_Update(WOBJ *wobj)
 
 static void WobjCloudPlatform_Create(WOBJ *wobj)
 {
-	Util_SetBox(&wobj->hitbox, 8.0f, 16.0f, 48.0f, 8.0f);
-	wobj->flags = WOBJ_IS_SOLID;
-	wobj->custom_ints[0] = 7;
+	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 64.0f, 16.0f);
+	wobj->flags = WOBJ_IS_JUMPTHROUGH;
+	wobj->custom_ints[0] = 30;
 }
 static void WobjCloudPlatform_Update(WOBJ *wobj)
 {
-	if (wobj->custom_ints[0]-- <= 0)
+	if (--wobj->custom_ints[0] <= 0)
 		Interaction_DestroyWobj(wobj);
+}
+static void WobjCloudPlatform_Draw(WOBJ *wobj, int camx, int camy) {
+	int trans = 0;
+	if (wobj->custom_ints[0] > 30-7) {
+		trans = wobj->custom_ints[0] - (30-7);
+	}
+	if (wobj->custom_ints[0] < 7) {
+		trans = 7 - wobj->custom_ints[0];
+	}
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y - camy + trans / 2,
+		&wobj_types[WOBJ_CLOUD_PLATFORM].frames[0],
+		trans,
+		Blocks_GetCalculatedBlockLight((int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
+	);
+}
+
+static void WobjCloudFire_Create(WOBJ *wobj) {
+	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
+	wobj->vel_x = 4.0f * wobj->custom_ints[0];
+	wobj->vel_y = wobj->custom_floats[0];
+	wobj->custom_ints[0] = 30*2;
+	wobj->flags = WOBJ_IS_PLAYER_WEAPON; 
+	wobj->link_node = -1;
+}
+static void WobjCloudFire_Update(WOBJ *wobj) {
+	WobjGenericAttack_Update(wobj);
+	wobj->x += wobj->vel_x;
+	wobj->y += wobj->vel_y / 2.0f;
+	if (--wobj->custom_ints[0] <= 0) {
+		Interaction_DestroyWobj(wobj);
+	}
+
+	WOBJ *enemy = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
+	if (wobj->custom_ints[1]++ > 20) {
+		wobj->link_node = -1;
+	}
+	if (!enemy) {
+		enemy = Wobj_GetWobjColliding(wobj, WOBJ_IS_HOSTILE);
+		if (enemy) {
+			wobj->link_node = enemy->node_id;
+			wobj->link_uuid = enemy->uuid;
+			wobj->custom_ints[1] = 0;
+			wobj->custom_floats[0] = enemy->x;
+			wobj->custom_floats[1] = enemy->y;
+		}
+	}
+	if (enemy) {
+		Interaction_ForceWobjPosition(
+			enemy,
+			wobj->custom_floats[0],
+			wobj->custom_floats[1]
+		);
+	}
+}
+static void WobjCloudFire_Draw(WOBJ *wobj, int camx, int camy) {
+	int trans = 0;
+	if (wobj->custom_ints[0] > 60-7) {
+		trans = wobj->custom_ints[0] - (60-7);
+	}
+	if (wobj->custom_ints[0] < 7) {
+		trans = 7 - wobj->custom_ints[0];
+	}
+	Renderer_DrawBitmap2
+	(
+		(int)wobj->x - camx,
+		(int)wobj->y - camy,
+		&wobj_types[WOBJ_CLOUD_FIRE].frames[0],
+		trans,
+		Blocks_GetCalculatedBlockLight((int)(wobj->x + 16.0f) / BLOCK_SIZE, (int)(wobj->y + 16.0f) / BLOCK_SIZE),
+		wobj->flags & WOBJ_HFLIP,
+		wobj->flags & WOBJ_VFLIP
+	);
 }
 
 static void WobjLightningAttackParticle_Create(WOBJ *wobj)
@@ -2646,10 +2723,10 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 	{ // 25: Cloud Platform Object
 		WobjCloudPlatform_Create, // Create
 		WobjCloudPlatform_Update, // Update
-		WobjGeneric_Draw, // Draw
+		WobjCloudPlatform_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{128, 0, 64, 32}
+			{128, 0, 64, 16}
 		},
 		0.0f, // Strength reward
 		0, // Money reward
@@ -4400,5 +4477,18 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		CNM_FALSE, // Does network interpolation?
 		CNM_FALSE, // Can respawn?
 		0, // Score reward
+	},
+	{ // 160: Cloud Fire Object
+		WobjCloudFire_Create, // Create
+		WobjCloudFire_Update, // Update
+		WobjCloudFire_Draw, // Draw
+		NULL, // Hurt callback
+		{ // Animation Frames
+			{160, 16, 16, 16}
+		},
+		0.0f, // Strength reward
+		0, // Money reward
+		CNM_TRUE, // Does network interpolation?
+		CNM_FALSE // Can respawn?
 	},
 };

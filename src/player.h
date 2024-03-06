@@ -139,6 +139,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int skip_jumpthrough_timer;
 	int last_water_block;
 	int in_splash, last_in_splash;
+	int touching_non_cloud_ground;
 	//int slope_jumped;
 
 	float last_hp;
