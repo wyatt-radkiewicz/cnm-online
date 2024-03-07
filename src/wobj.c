@@ -836,6 +836,7 @@ void WobjPhysics_BeginUpdate(WOBJ *wobj)
 wphys_flags_t WobjPhysics_EndUpdate(WOBJ *wobj)
 {
 	wphys_flags_t flags = 0;
+	flags |= wobj_move_and_hit_blocks(wobj);
 	int set_velx = CNM_TRUE, set_vely = CNM_TRUE;
 	if (wobj->type == WOBJ_PLAYER) {
 		PLAYER_LOCAL_DATA *lc = wobj->local_data;
@@ -847,8 +848,6 @@ wphys_flags_t WobjPhysics_EndUpdate(WOBJ *wobj)
 	flags |= Wobj_ResolveObjectsCollision(wobj, set_velx, set_vely);
 	if (flags & wphys_obj && Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f)) {
 		flags |= Wobj_ResolveBlocksCollision(wobj);
-	} else {
-		flags |= wobj_move_and_hit_blocks(wobj);
 	}
 
 	// Stick to ground with slopes

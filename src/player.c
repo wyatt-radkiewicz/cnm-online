@@ -1809,7 +1809,6 @@ void WobjPlayer_Update(WOBJ *wobj)
 
 		if (obj) goto plat_velx_application;
 	}
-	if (local_data->platinfo.active) Console_Print("%d", Game_GetFrame());
 
 	// Search for player platforms (platinfo)
 	{
