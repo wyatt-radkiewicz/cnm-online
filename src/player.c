@@ -1790,6 +1790,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (isnan(wobj->health)) wobj->health = 100.0f;
 
 	if (!local_data->vortexed_mode) {
+		// Get pushed off by platforms
+		const CNM_BOX oldhb = wobj->hitbox;
+		wobj->hitbox.y = 10.0f;
+		wobj->hitbox.h = 3.0f;
+		const bool obj = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
+		wobj->hitbox = oldhb;
+		if (obj) local_data->platinfo.active = false;
+
 		WobjPhysics_EndUpdate(wobj);
 
 		float oy = wobj->y;
@@ -1798,7 +1806,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->y = oy;
 		local_data->touching_non_cloud_ground = 
 			Wobj_IsGrounded(wobj) && (!ground || ground->type != WOBJ_CLOUD_PLATFORM);
+
+		if (obj) goto plat_velx_application;
 	}
+	if (local_data->platinfo.active) Console_Print("%d", Game_GetFrame());
 
 	// Search for player platforms (platinfo)
 	{
@@ -1821,14 +1832,24 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->flags |= WOBJ_IS_GROUNDED;
 
 		if (Blocks_IsCollidingWithSolid(&(CNM_BOX){
-			.x = wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f,
-			.y = wobj->y + wobj->hitbox.y + wobj->hitbox.h + 1.5f,
-			.w = 1.0f,
-			.h = 1.0f,
+			.x = wobj->x + wobj->hitbox.x + 2.0f,
+			.y = wobj->y + wobj->hitbox.y + 3.0f,
+			.w = wobj->hitbox.w - 4.0f,
+			.h = wobj->hitbox.h - 6.0f,
 		}, CNM_TRUE)) {
 			local_data->platinfo.active = CNM_FALSE;
 			goto search_platinfos;
 		}
+		const CNM_BOX ob = wobj->hitbox;
+		wobj->hitbox.x += wobj->hitbox.w / 2.0f;
+		wobj->hitbox.w = 1.0f;
+		wobj->hitbox.h += 3.0f;
+		if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 3.0f)) {
+			wobj->hitbox = ob;
+			local_data->platinfo.active = false;
+			goto plat_velx_application;
+		}
+		wobj->hitbox = ob;
 
 		float plry = wobj->y;
 		wobj->y += 2.0f;
@@ -1840,7 +1861,6 @@ void WobjPlayer_Update(WOBJ *wobj)
 			goto search_platinfos;
 		}
 
-		//Wobj_ResolveObjectsCollision(wobj, 0, 0);
 		Wobj_ResolveBlocksCollision(wobj);
 	}
 search_platinfos:
@@ -1853,9 +1873,17 @@ search_platinfos:
 		WOBJ *plat = Wobj_GetWobjColliding(wobj, WOBJ_IS_MOVESTAND);
 		wobj->y = plry;
 		if (!plat) goto plat_velx_application;
+		//if (wobj->y + wobj->hitbox.y + wobj->hitbox.h / 2.0f > plat->y + plat->hitbox.y) {
+		//	goto plat_velx_application;
+		//}
+		if (wobj->y + wobj->hitbox.y + wobj->hitbox.h / 2.0f > plat->y + plat->hitbox.y) {
+			goto plat_velx_application;
+		}
 		if (wobj->vel_y < plat->vel_y) goto plat_velx_application;
 
-		if (local_data->platinfo.active && local_data->platinfo.node == plat->node_id && local_data->platinfo.uuid == plat->uuid) {
+		if (local_data->platinfo.active
+			&& local_data->platinfo.node == plat->node_id
+			&& local_data->platinfo.uuid == plat->uuid) {
 			goto plat_velx_application;
 		}
 		local_data->platinfo.active = true;

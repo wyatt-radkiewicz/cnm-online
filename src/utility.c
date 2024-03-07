@@ -164,7 +164,7 @@ int Util_AABBCollision(const CNM_BOX *a, const CNM_BOX *b)
 int Util_ResolveAABBCollision(CNM_BOX *a, const CNM_BOX *b, int *resolved_in_x, int *resolved_in_y)
 {
 	int dummy[2];
-	float sides[4];
+	int sides[4];
 	
 	if (resolved_in_x == NULL)
 		resolved_in_x = dummy + 0;
@@ -173,12 +173,13 @@ int Util_ResolveAABBCollision(CNM_BOX *a, const CNM_BOX *b, int *resolved_in_x, 
 
 	if (Util_AABBCollision(a, b))
 	{
-		sides[0] = (b->x + b->w) - (a->x);		// If smallest: Move "b" right
-		sides[1] = (a->y + a->h) - (b->y);		// If smallest: Move "b" up
-		sides[2] = (a->x + a->w) - (b->x);		// If smallest: Move "b" left
-		sides[3] = (b->y + b->h) - (a->y);		// If smallest: Move "b" down
+		sides[0] = (int)((b->x + b->w) - (a->x));		// If smallest: Move "b" right
+		sides[1] = (int)((a->y + a->h) - (b->y));		// If smallest: Move "b" up
+		sides[2] = (int)((a->x + a->w) - (b->x));		// If smallest: Move "b" left
+		sides[3] = (int)((b->y + b->h) - (a->y));		// If smallest: Move "b" down
+		int min = CNM_MIN(sides[0], CNM_MIN(sides[1], CNM_MIN(sides[2], sides[3])));
 
-		if (sides[0] < sides[1] && sides[0] < sides[2] && sides[0] < sides[3])
+		if (sides[0] == min)
 		{
 			*resolved_in_x = CNM_TRUE;
 			*resolved_in_y = CNM_FALSE;
@@ -186,7 +187,7 @@ int Util_ResolveAABBCollision(CNM_BOX *a, const CNM_BOX *b, int *resolved_in_x, 
 			//while (Util_AABBCollision(b, a))
 			//	a->x += 1.0f;
 		}
-		if (sides[1] <= sides[0] && sides[1] <= sides[2] && sides[1] <= sides[3])
+		if (sides[1] == min)
 		{
 			*resolved_in_y = CNM_TRUE;
 			*resolved_in_x = CNM_FALSE;
@@ -194,7 +195,7 @@ int Util_ResolveAABBCollision(CNM_BOX *a, const CNM_BOX *b, int *resolved_in_x, 
 			//while (Util_AABBCollision(b, a))
 			//	a->y -= 1.0f;
 		}
-		if (sides[2] < sides[1] && sides[2] < sides[0] && sides[2] < sides[3])
+		if (sides[2] == min)
 		{
 			*resolved_in_x = CNM_TRUE;
 			*resolved_in_y = CNM_FALSE;
@@ -202,7 +203,7 @@ int Util_ResolveAABBCollision(CNM_BOX *a, const CNM_BOX *b, int *resolved_in_x, 
 			//while (Util_AABBCollision(b, a))
 			//	a->x -= 1.0f;
 		}
-		if (sides[3] <= sides[1] && sides[3] <= sides[2] && sides[3] <= sides[0])
+		if (sides[3] == min)
 		{
 			*resolved_in_y = CNM_TRUE;
 			*resolved_in_x = CNM_FALSE;

@@ -433,6 +433,7 @@ struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, 
 	const int test_jt = vy > 0.0f && !skip_jumpthrough;
 	const float oy = y + b.y + b.h - 4.0f;
 	int process_x = CNM_TRUE;
+	bool rx = false, ry = false;
 	if (Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x, .y = y + b.y + 1.0f, .w = b.w, .h = b.h }, 1, 1, 0, 0.0f) ||
 		(Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 1, 0, 0, 0.0f) &&
 		 !Blocks_IsCollidingWithSolidFlags(&(CNM_BOX){ .x = x + b.x + vx, .y = y + b.y, .w = b.w, .h = b.h }, 0, 1, 0, 0.0f)) ||
@@ -454,6 +455,7 @@ struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, 
 			x += move;
 		}
 		vx = 0.0f;
+		rx = true;
 	} else {
 		x += vx;
 	}
@@ -464,6 +466,7 @@ struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, 
 			y += move;
 		}
 		vy = 0.0f;
+		ry = true;
 	} else {
 		y += vy;
 	}
@@ -472,7 +475,7 @@ struct bresolve_result bresolve_collision(float x, float y, float vx, float vy, 
 		y -= 1.0f;
 	}
 
-	return (struct bresolve_result){ .x = x, .y = y, .vx = vx, .vy = vy };
+	return (struct bresolve_result){ .x = x, .y = y, .vx = vx, .vy = vy, .resolved_x = rx, .resolved_y = ry, };
 }
 void Blocks_StickBoxToGround(CNM_BOX *b)
 {

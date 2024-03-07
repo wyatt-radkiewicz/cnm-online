@@ -1,5 +1,7 @@
 #ifndef _blocks_h_
 #define _blocks_h_
+#include <stdbool.h>
+
 #include "utility.h"
 
 #define BLOCK_SIZE 32
@@ -68,6 +70,7 @@ BLOCK_PROPS *Blocks_IsCollidingWithDamage(const CNM_BOX *b);
 void Blocks_ResolveCollisionInstant(CNM_BOX *b, int *resolved_in_x, int *resolved_in_y);
 struct bresolve_result {
 	float x, y, vx, vy;
+	bool resolved_x, resolved_y;
 } bresolve_collision(float x, float y, float vx, float vy, CNM_BOX b, int skip_jumpthrough);
 void Blocks_StickBoxToGround(CNM_BOX *b);
 float Blocks_GetAngle(float x, float y);

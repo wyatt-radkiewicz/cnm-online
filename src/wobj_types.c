@@ -2284,7 +2284,7 @@ void draw_lens_flare(int camx, int camy, int xv, int yv) {
 		sy = 944;
 	}
 
-	if (obs >= 6) {
+	if (obs >= 10) {
 		render_draw_additive_light(
 			x, y,
 			(CNM_RECT){
@@ -2296,7 +2296,7 @@ void draw_lens_flare(int camx, int camy, int xv, int yv) {
 	}
 	x -= 10-xv;
 	y += 8+yv;
-	if (obs >= 5) {
+	if (obs >= 6) {
 		render_draw_additive_light(
 			x, y,
 			(CNM_RECT){
@@ -2308,7 +2308,7 @@ void draw_lens_flare(int camx, int camy, int xv, int yv) {
 	}
 	x -= 40-xv;
 	y += 10+yv;
-	if (obs >= 4) {
+	if (obs >= 5) {
 		render_draw_additive_light(
 			x+16, y+16,
 			(CNM_RECT){

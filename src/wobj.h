@@ -314,12 +314,20 @@ void Wobj_GetCollisionsWithType(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISI
 void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS]);
 void Wobj_DrawWobjs(int camx, int camy);
 void Wobj_DrawWobjsOverlayer(int camx, int camy);
-void Wobj_ResolveBlocksCollision(WOBJ *obj);
-void wobj_move_and_hit_blocks(WOBJ *obj);
+
+typedef enum wphys_flags {
+	wphys_resolved_x,	// resolved in x axis
+	wphys_resolved_y,	// same but in y
+	wphys_wall,			// hit wall
+	wphys_obj,			// hit object
+} wphys_flags_t;
+
+wphys_flags_t WobjPhysics_EndUpdate(WOBJ *wobj);
+wphys_flags_t Wobj_ResolveBlocksCollision(WOBJ *obj);
+wphys_flags_t wobj_move_and_hit_blocks(WOBJ *obj);
 void WobjPhysics_BeginUpdate(WOBJ *wobj);
-void WobjPhysics_EndUpdate(WOBJ *wobj);
 void WobjPhysics_ApplyWindForces(WOBJ *wobj);
-void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely);
+wphys_flags_t Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely);
 WOBJ *Wobj_GetOwnedWobjFromUUID(int uuid);
 WOBJ *Wobj_GetAnyWOBJFromUUIDAndNode(int node, int uuid);
 int Wobj_TryTeleportWobj(WOBJ *wobj, int only_telearea2);

@@ -546,9 +546,9 @@ void Wobj_GetCollision(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_COLLISIONS])
 	a.w = subject->hitbox.w;
 	a.h = subject->hitbox.h;
 	/* First start with unowned objects (because usually unowned objects are enemy objects) then the owned ones */
-	for (x = (int)(a.x / OBJGRID_SIZE) - 1; x < (int)ceilf((a.x + a.w) / OBJGRID_SIZE) + 1; x++)
+	for (x = (int)(a.x / OBJGRID_SIZE) - 1; x <= (int)ceilf((a.x + a.w) / OBJGRID_SIZE) + 1; x++)
 	{
-		for (y = (int)(a.y / OBJGRID_SIZE) - 1; y < (int)ceilf((a.y + a.h) / OBJGRID_SIZE) + 1; y++)
+		for (y = (int)(a.y / OBJGRID_SIZE) - 1; y <= (int)ceilf((a.y + a.h) / OBJGRID_SIZE) + 1; y++)
 		{
 			for (i = 0; i < 2; i++)
 			{
@@ -618,24 +618,59 @@ static void Wobj_DrawWobj(WOBJ *other, int camx, int camy) {
 	}
 
 	// Debug helpers with non-drawer things
-	if (wobj_types[other->type].draw == NULL) {
-		CNM_RECT r;
-		if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
-		{
-			Util_SetRect(&r, (int)(other->x + other->hitbox.x) - camx, (int)(other->y + other->hitbox.y) - camy,
-						 (int)other->hitbox.w, (int)other->hitbox.h);
-			Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
-		}
+	CNM_RECT r;
+	if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
+	{
+		Util_SetRect(&r, (int)(other->x + other->hitbox.x) - camx, (int)(other->y + other->hitbox.y) - camy,
+					 (int)other->hitbox.w, (int)other->hitbox.h);
+		Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
+	}
 
-		if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer)
-		{
-			Renderer_DrawText
-			(
-				(int)other->x - camx, (int)other->y - camy + 8, 0, RENDERER_LIGHT,
-				"(%d, %d)",
-				(int)(other->x), (int)(other->y)
-			);
-		}
+	if (Game_GetVar(GAME_VAR_SHOW_GRIDPOS)->data.integer)
+	{
+		Renderer_DrawText
+		(
+			(int)other->x - camx, (int)other->y - camy, 0, RENDERER_LIGHT,
+			"(%d, %d)",
+			(int)(other->x / OBJGRID_SIZE), (int)(other->y / OBJGRID_SIZE)
+		);
+	}
+
+	if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer)
+	{
+		Renderer_DrawText
+		(
+			(int)other->x - camx, (int)other->y - camy + 8, 0, RENDERER_LIGHT,
+			"(%d, %d)",
+			(int)(other->x), (int)(other->y)
+		);
+	}
+
+	if (Game_GetVar(GAME_VAR_CL_SHOW_NODEUUIDS)->data.integer)
+	{
+		Renderer_DrawText
+		(
+			(int)other->x - camx, (int)other->y - camy + 16, 0, RENDERER_LIGHT,
+			"NODE: %d, UUID: %d",
+			other->node_id, other->uuid
+		);
+	}
+
+	if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
+	{
+		Util_SetRect(&r, (int)(other->x + other->hitbox.x) - camx, (int)(other->y + other->hitbox.y) - camy,
+					 (int)other->hitbox.w, (int)other->hitbox.h);
+		Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
+	}
+
+	if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer)
+	{
+		Renderer_DrawText
+		(
+			(int)other->x - camx, (int)other->y - camy + 8, 0, RENDERER_LIGHT,
+			"(%d, %d)",
+			(int)(other->x), (int)(other->y)
+		);
 	}
 }
 void Wobj_DrawWobjs(int camx, int camy)
@@ -677,9 +712,10 @@ void Wobj_DrawWobjsOverlayer(int camx, int camy) {
 	}
 	noverlayer_draws = 0;
 }
-void Wobj_ResolveBlocksCollision(WOBJ *obj)
+wphys_flags_t Wobj_ResolveBlocksCollision(WOBJ *obj)
 {
 	int x, y;
+	wphys_flags_t flags = 0;
 	CNM_BOX h;
 	h.x = obj->x + obj->hitbox.x;
 	h.y = obj->y + obj->hitbox.y;
@@ -688,10 +724,18 @@ void Wobj_ResolveBlocksCollision(WOBJ *obj)
 	Blocks_ResolveCollisionInstant(&h, &x, &y);
 	obj->x = h.x - obj->hitbox.x;
 	obj->y = h.y - obj->hitbox.y;
-	if (x)
-		obj->vel_x = 0.0f;
-	if (y)
-		obj->vel_y = 0.0f;
+	if (x || y) {
+		flags |= wphys_wall;
+		if (x) {
+			flags |= wphys_resolved_x;
+			obj->vel_x = 0.0f;
+		}
+		if (y) {
+			flags |= wphys_resolved_y;
+			obj->vel_y = 0.0f;
+		}
+	}
+	return flags;
 }
 
 static int WobjPhysics_IsGrounded(WOBJ *wobj)
@@ -723,7 +767,7 @@ static int WobjPhysics_IsGrounded(WOBJ *wobj)
 	else
 		return CNM_FALSE;
 }
-void wobj_move_and_hit_blocks(WOBJ *wobj) {
+wphys_flags_t wobj_move_and_hit_blocks(WOBJ *wobj) {
 	const float ground_ang = Wobj_IsGrounded(wobj) ? Wobj_GetGroundAngle(wobj) : 0.0f;
 	const int ang_type = ceilf((ground_ang > CNM_PI ? CNM_PI - (ground_ang - CNM_PI) : ground_ang) / CNM_PI * 6.0f);
 	const int doslow = (ground_ang < CNM_PI) == (wobj->vel_x > 0.0f);
@@ -748,6 +792,14 @@ void wobj_move_and_hit_blocks(WOBJ *wobj) {
 	struct bresolve_result result = bresolve_collision(wobj->x, wobj->y, wobj->vel_x, wobj->vel_y, wobj->hitbox, wobj->flags & WOBJ_SKIP_JUMPTHROUGH);
 	wobj->x = result.x;
 	wobj->y = result.y;
+
+	wphys_flags_t flags = 0;
+	if (result.resolved_x || result.resolved_y) {
+		flags |= wphys_wall;
+		if (result.resolved_x) flags |= wphys_resolved_x;
+		if (result.resolved_y) flags |= wphys_resolved_y;
+	}
+
 	switch (ang_type) {
 	case 1: result.vx *= doslow ? (3.0f / 2.0f) : (5.0f / 6.0f); break;
 	case 2: result.vx *= doslow ? (2.0f) : (1.0f); break;
@@ -756,6 +808,7 @@ void wobj_move_and_hit_blocks(WOBJ *wobj) {
 	}
 	wobj->vel_x = result.vx;
 	wobj->vel_y = result.vy;
+	return flags;
 }
 static void stick_to_moving_platforms(WOBJ *wobj) {
 	WOBJ *other;
@@ -780,9 +833,9 @@ void WobjPhysics_BeginUpdate(WOBJ *wobj)
 	(void)wobj;
 }
 
-void WobjPhysics_EndUpdate(WOBJ *wobj)
+wphys_flags_t WobjPhysics_EndUpdate(WOBJ *wobj)
 {
-	wobj_move_and_hit_blocks(wobj);
+	wphys_flags_t flags = 0;
 	int set_velx = CNM_TRUE, set_vely = CNM_TRUE;
 	if (wobj->type == WOBJ_PLAYER) {
 		PLAYER_LOCAL_DATA *lc = wobj->local_data;
@@ -791,7 +844,12 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 			set_vely = CNM_FALSE;
 		}
 	}
-	Wobj_ResolveObjectsCollision(wobj, set_velx, set_vely);
+	flags |= Wobj_ResolveObjectsCollision(wobj, set_velx, set_vely);
+	if (flags & wphys_obj && Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f)) {
+		flags |= Wobj_ResolveBlocksCollision(wobj);
+	} else {
+		flags |= wobj_move_and_hit_blocks(wobj);
+	}
 
 	// Stick to ground with slopes
 	if ((Wobj_IsGrounded(wobj) || WobjPhysics_IsGrounded(wobj)) && wobj->vel_y >= 0.0f)
@@ -829,6 +887,7 @@ void WobjPhysics_EndUpdate(WOBJ *wobj)
 
 	wobj->flags &= ~WOBJ_IS_GROUNDED;
 	wobj->flags |= WobjPhysics_IsGrounded(wobj) ? WOBJ_IS_GROUNDED : 0;
+	return flags;
 }
 void WobjPhysics_ApplyWindForces(WOBJ *wobj)
 {
@@ -880,8 +939,9 @@ int Wobj_ResolveObjectsCollisionSortFunc(const void *a, const void *b)
 	if (da > db) return 1;
 	return 0;
 }
-void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely)
+wphys_flags_t Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely)
 {
+	wphys_flags_t flags = 0;
 	int i, num_indexes = 0;
 	WOBJ_COLINFO_HELPER infos[WOBJ_MAX_COLLISIONS];
 	WOBJ *collisions[WOBJ_MAX_COLLISIONS];
@@ -889,7 +949,7 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely)
 	int x, y;
 	CNM_BOX h, other_h;
 	float interp_x, interp_y;
-	Wobj_GetCollision(obj, collisions);
+	Wobj_GetCollisionsWithFlags(obj, collisions, WOBJ_IS_SOLID | WOBJ_IS_JUMPTHROUGH);
 	for (i = 0; i < WOBJ_MAX_COLLISIONS; i++)
 	{
 		if (collisions[i] != NULL)
@@ -928,11 +988,13 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely)
 			Util_ResolveAABBCollision(&h, &other_h, &x, &y);
 			obj->x = h.x - obj->hitbox.x;
 			obj->y = h.y - obj->hitbox.y;
+			if (x) flags |= wphys_obj | wphys_resolved_x;
 			if (x && set_velx) {
 				if ((obj->x + obj->hitbox.x + obj->hitbox.w / 2.0f < other_h.x + other_h.w / 2.0f && obj->vel_x >= collider->vel_x)
 					|| (obj->x + obj->hitbox.x + obj->hitbox.w / 2.0f > other_h.x + other_h.w / 2.0f && obj->vel_x <= collider->vel_x))
 					obj->vel_x = collider->vel_x;
 			}
+			if (y) flags |= wphys_obj | wphys_resolved_y;
 			if (y && set_vely) {
 				if ((obj->y + obj->hitbox.y + obj->hitbox.h / 2.0f < other_h.y + other_h.h / 2.0f && obj->vel_y >= collider->vel_y)
 					|| (obj->y + obj->hitbox.y + obj->hitbox.h / 2.0f > other_h.y + other_h.h / 2.0f && obj->vel_y <= collider->vel_y))
@@ -949,6 +1011,7 @@ void Wobj_ResolveObjectsCollision(WOBJ *obj, int set_velx, int set_vely)
 			}
 		}
 	}
+	return flags;
 }
 static void print_smap_data(void) {
 	//Console_Print("smap print frame: %d", Game_GetFrame());
@@ -1034,7 +1097,7 @@ WOBJ *Wobj_GetWobjColliding(WOBJ *wobj, int flags)
 {
 	int i;
 	WOBJ *collisions[WOBJ_MAX_COLLISIONS];
-	Wobj_GetCollision(wobj, collisions);
+	Wobj_GetCollisionsWithFlags(wobj, collisions, flags);
 	for (i = 0; i < WOBJ_MAX_COLLISIONS && collisions[i] != NULL; i++)
 	{
 		if (collisions[i]->flags & flags)
@@ -1046,7 +1109,7 @@ WOBJ *Wobj_GetWobjCollidingWithType(WOBJ *wobj, int type)
 {
 	int i;
 	WOBJ *collisions[WOBJ_MAX_COLLISIONS];
-	Wobj_GetCollision(wobj, collisions);
+	Wobj_GetCollisionsWithType(wobj, collisions, type);
 	for (i = 0; i < WOBJ_MAX_COLLISIONS && collisions[i] != NULL; i++)
 	{
 		if (collisions[i]->type == type)
@@ -1267,43 +1330,6 @@ void WobjGeneric_Draw(WOBJ *obj, int camx, int camy)
 	//obj->flags &= WOBJ_DAMAGE_INDICATE;
 	if (Game_GetFrame() % 3 == 0)
 		obj->flags &= ~WOBJ_DAMAGE_INDICATE;
-
-	if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
-	{
-		Util_SetRect(&r, (int)(obj->x + obj->hitbox.x) - camx, (int)(obj->y + obj->hitbox.y) - camy,
-					 (int)obj->hitbox.w, (int)obj->hitbox.h);
-		Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
-	}
-
-	if (Game_GetVar(GAME_VAR_SHOW_GRIDPOS)->data.integer)
-	{
-		Renderer_DrawText
-		(
-			(int)obj->x - camx, (int)obj->y - camy, 0, RENDERER_LIGHT,
-			"(%d, %d)",
-			(int)(obj->x / OBJGRID_SIZE), (int)(obj->y / OBJGRID_SIZE)
-		);
-	}
-
-	if (Game_GetVar(GAME_VAR_SHOWPOS)->data.integer)
-	{
-		Renderer_DrawText
-		(
-			(int)obj->x - camx, (int)obj->y - camy + 8, 0, RENDERER_LIGHT,
-			"(%d, %d)",
-			(int)(obj->x), (int)(obj->y)
-		);
-	}
-
-	if (Game_GetVar(GAME_VAR_CL_SHOW_NODEUUIDS)->data.integer)
-	{
-		Renderer_DrawText
-		(
-			(int)obj->x - camx, (int)obj->y - camy + 16, 0, RENDERER_LIGHT,
-			"NODE: %d, UUID: %d",
-			obj->node_id, obj->uuid
-		);
-	}
 }
 void WobjGenericAttack_Update(WOBJ *wobj)
 {
