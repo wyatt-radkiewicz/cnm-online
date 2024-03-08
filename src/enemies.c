@@ -720,15 +720,17 @@ void WobjTTMinionSmall_Create(WOBJ *wobj)
 	wobj->hitbox.h = 32.0f;
 	wobj->anim_frame = 0;
 	wobj->health = 1.0f;
-	wobj->strength = 15.0f;
+	wobj->strength = 25.0f;
 	wobj->local_data = NULL;
 	wobj->custom_ints[1] = 0;
+	wobj->money = Util_RandInt(0, 120);
 }
 void WobjTTMinionSmall_Update(WOBJ *wobj)
 {
+	wobj->money++;
 	Wobj_DoEnemyCry(wobj, 45);
 	Wobj_DoSplashes(wobj);
-	if (Game_GetFrame() % 29 == 0)
+	if (wobj->money % 29 == 0)
 	{
 		WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
 		if (Interaction_GetDistanceToWobj(wobj, closest_player) <= 140.0f)
@@ -756,7 +758,7 @@ void WobjTTMinionSmall_Update(WOBJ *wobj)
 
 		WOBJ *cp = wobj->local_data;
 		wobj->y = cp->y;
-		if ((Game_GetFrame() / 60) % 2 == 0)
+		if ((wobj->money / 60) % 2 == 0)
 		{
 			if (wobj->x > cp->x - 64.0f)
 				wobj->x -= 3.0f;
@@ -774,6 +776,13 @@ void WobjTTMinionSmall_Update(WOBJ *wobj)
 	Wobj_TryTeleportWobj(wobj, CNM_FALSE);
 }
 
+typedef struct ttminbig {
+	float home_x, home_y;
+	WOBJ *target;
+	int physco; // Dont leave player after dieing
+	int chance; // deaths of the player we are currently targeting
+} ttminbig_t;
+dynpool_t dp_ttminbig;
 void WobjTTMinionBig_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
@@ -787,29 +796,52 @@ void WobjTTMinionBig_Create(WOBJ *wobj)
 	wobj->local_data = NULL;
 	wobj->custom_floats[0] = CNM_2RAD(1.0f);
 	wobj->custom_floats[1] = 0.0f;
+	
+	ttminbig_t *ld = dynpool_alloc(dp_ttminbig);
+	wobj->local_data = ld;
+	ld->home_x = wobj->x;
+	ld->home_y = wobj->y;
+	ld->chance = 30*10;
+	ld->physco = Util_RandInt(0, 10) <= 0; // 1 in 10 chance
+	ld->target = NULL;
 }
 void WobjTTMinionBig_Update(WOBJ *wobj)
 {
+	ttminbig_t *ld = wobj->local_data;
+
 	Wobj_DoEnemyCry(wobj, 45);
 	Wobj_DoSplashes(wobj);
-	if (Game_GetFrame() % 28 == 0 && wobj->local_data == NULL)
+	if (Game_GetFrame() % 28 == 0 && ld->target == NULL)
 	{
 		WOBJ *closest_player = Interaction_GetNearestPlayerToPoint(wobj->x, wobj->y);
-		if (Interaction_GetDistanceToWobj(wobj, closest_player) <= 140.0f)
-			wobj->local_data = closest_player;
-		else
-			wobj->local_data = NULL;
+		if (Interaction_GetDistanceToWobj(wobj, closest_player) <= 140.0f) {
+			ld->target = closest_player;
+		} else {
+			ld->target = NULL;
+		}
 	}
 
-	if (wobj->local_data != NULL)
+	if (ld->target != NULL)
 	{
-		WOBJ *cp = wobj->local_data;
-		if ((Game_GetFrame() / 60) % 2 == 0)
+		if ((ld->target->flags & WOBJ_HAS_TELEPORTED
+			|| ld->target->flags & WOBJ_PLAYER_IS_RESPAWNING) && !ld->physco) {
+			if (ld->chance > 1) ld->chance--;
+			if (Util_RandInt(0, ld->chance) <= 0) {
+				ld->target = NULL;
+				ld->chance = 30*10;
+				wobj->x = ld->home_x;
+				wobj->y = ld->home_y;
+				return;
+			}
+		}
+
+		WOBJ *cp = ld->target;
+		if ((Game_GetFrame() / 60) % 2 == 0 || Wobj_IsCollidingWithBlocks(wobj, 0.0f, 0.0f))
 		{
 			if (~wobj->flags & WOBJ_BEING_ICED) wobj->x = cp->x + cosf(wobj->custom_floats[0]) * 96.0f;
 			if (~wobj->flags & WOBJ_BEING_ICED) wobj->y = cp->y + sinf(wobj->custom_floats[0]) * 96.0f;
 			wobj->custom_floats[0] += wobj->custom_floats[1];
-			wobj->custom_floats[1] += CNM_2RAD(0.5f);
+			wobj->custom_floats[1] += CNM_2RAD(0.25f);
 
 			int scream_speed = 15;
 			scream_speed -= (int)(wobj->custom_floats[1] * 10.0f);
@@ -2912,6 +2944,7 @@ void Enemies_ZoneAllocLocalDataPools(void) {
 	);
 	_ldpool_lavadragon = dynpool_init(4, sizeof(LAVADRAGON_DATA), arena_alloc);
 	lmdata_pool = dynpool_init(16, sizeof(lmdata_t), arena_alloc);
+	dp_ttminbig = dynpool_init(16, sizeof(ttminbig_t), arena_alloc);
 
 	bzx = arena_alloc(sizeof(*bzx) * BOZO_WAYPOINTS_MAX);
 	bzy = arena_alloc(sizeof(*bzy) * BOZO_WAYPOINTS_MAX);

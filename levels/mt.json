@@ -4508,30 +4508,7 @@
     {
       "pos": [
         3136.0,
-        2064.0
-      ],
-      "type_data": {
-        "MovingPlatform": {
-          "vertical": false,
-          "dist": 350.0,
-          "speed": -5.0,
-          "bitmapx": 10,
-          "bitmapy": 92,
-          "jumpthrough": false
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        3136.0,
-        2128.3745
+        2128.0
       ],
       "type_data": {
         "MovingPlatform": {
@@ -4576,14 +4553,14 @@
     },
     {
       "pos": [
-        2976.0,
-        1904.7921
+        2975.814,
+        1904.0
       ],
       "type_data": {
         "MovingPlatform": {
           "vertical": false,
           "dist": 565.0,
-          "speed": -10.0,
+          "speed": -6.0,
           "bitmapx": 10,
           "bitmapy": 92,
           "jumpthrough": false
@@ -4606,7 +4583,7 @@
         "MovingPlatform": {
           "vertical": false,
           "dist": 565.0,
-          "speed": 10.0,
+          "speed": 5.0,
           "bitmapx": 10,
           "bitmapy": 92,
           "jumpthrough": false
@@ -4629,7 +4606,7 @@
         "MovingPlatform": {
           "vertical": false,
           "dist": 565.0,
-          "speed": 11.0,
+          "speed": 4.0,
           "bitmapx": 10,
           "bitmapy": 92,
           "jumpthrough": false
@@ -4830,6 +4807,60 @@
           "bitmapx": 9,
           "bitmapy": 94,
           "jumpthrough": false
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2624.0,
+        1152.0
+      ],
+      "type_data": {
+        "TtMinion": {
+          "small": true
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2560.0,
+        1152.0
+      ],
+      "type_data": {
+        "TtMinion": {
+          "small": true
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        2496.0,
+        1152.0
+      ],
+      "type_data": {
+        "TtMinion": {
+          "small": true
         }
       },
       "spawning_criteria": {

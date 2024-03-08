@@ -495,8 +495,10 @@ static void Wobj_GetCollisionsGeneral(WOBJ *subject, WOBJ *collisions[WOBJ_MAX_C
 						ObjGrid_AdvanceIter(&iter);
 						continue;
 					}
-					b.x = other->x + other->hitbox.x;
-					b.y = other->y + other->hitbox.y;
+					float ix, iy;
+					WobjCalculate_InterpolatedPos(other, &ix, &iy);
+					b.x = ix + other->hitbox.x;
+					b.y = iy + other->hitbox.y;
 					b.w = other->hitbox.w;
 					b.h = other->hitbox.h;
 					if (Util_AABBCollision(&a, &b))
@@ -658,7 +660,9 @@ static void Wobj_DrawWobj(WOBJ *other, int camx, int camy) {
 
 	if (Game_GetVar(GAME_VAR_SHOW_COLLISION_BOXES)->data.integer)
 	{
-		Util_SetRect(&r, (int)(other->x + other->hitbox.x) - camx, (int)(other->y + other->hitbox.y) - camy,
+		float ix, iy;
+		WobjCalculate_InterpolatedPos(other, &ix, &iy);
+		Util_SetRect(&r, (int)(ix + other->hitbox.x) - camx, (int)(iy + other->hitbox.y) - camy,
 					 (int)other->hitbox.w, (int)other->hitbox.h);
 		Renderer_DrawRect(&r, RCOL_PINK, 2, RENDERER_LIGHT);
 	}
