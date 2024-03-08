@@ -1181,8 +1181,8 @@
     },
     {
       "pos": [
-        2656.0,
-        960.0
+        2639.8079,
+        959.8079
       ],
       "type_data": {
         "MovingPlatform": {
@@ -4807,60 +4807,6 @@
           "bitmapx": 9,
           "bitmapy": 94,
           "jumpthrough": false
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2624.0,
-        1152.0
-      ],
-      "type_data": {
-        "TtMinion": {
-          "small": true
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2560.0,
-        1152.0
-      ],
-      "type_data": {
-        "TtMinion": {
-          "small": true
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2496.0,
-        1152.0
-      ],
-      "type_data": {
-        "TtMinion": {
-          "small": true
         }
       },
       "spawning_criteria": {

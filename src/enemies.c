@@ -533,10 +533,10 @@ void WobjBozoFireball_Create(WOBJ *wobj) {
 	wobj->strength = 3.333333333f;
 	wobj->health = 10000.0f;
 	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_FIRE_TYPE;
-	wobj->hitbox.x = 0.0f;
-	wobj->hitbox.y = 0.0f;
-	wobj->hitbox.w = 32.0f;
-	wobj->hitbox.h = 32.0f;
+	wobj->hitbox.x = 4.0f;
+	wobj->hitbox.y = 4.0f;
+	wobj->hitbox.w = 24.0f;
+	wobj->hitbox.h = 24.0f;
 	Interaction_PlaySound(wobj, 16);
 }
 void WobjBozoFireball_Update(WOBJ *wobj) {
@@ -1626,7 +1626,7 @@ void WobjRotatingFireColunmPiece_Create(WOBJ *wobj)
 	wobj->custom_ints[1] = (int)wobj->y;
 	wobj->vel_x = wobj->x - (float)wobj->custom_ints[0]; // This is how far away it is from the center
 	//if (wobj->x < wobj->custom_ints[0]) wobj->speed = CNM_PI;
-	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
+	Util_SetBox(&wobj->hitbox, 4.0f, 4.0f, 24.0f, 24.0f);
 }
 void WobjRotatingFireColunmPiece_Update(WOBJ *wobj)
 {
@@ -1669,7 +1669,7 @@ void init_moving_firev(WOBJ *wobj) {
 		wobj->health *= -1.0f;
 	}
 	wobj->vel_y = 0.0f;
-	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
+	Util_SetBox(&wobj->hitbox, 4.0f, 4.0f, 24.0f, 24.0f);
 }
 void WobjMovingFireVertical_Create(WOBJ *wobj)
 {
