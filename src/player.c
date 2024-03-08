@@ -743,7 +743,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 				ang,
 				pspd,
 				20,
-				5
+				5,
+				true
 			);
 			Create_Splash_Particles(
 				wobj->x + 16.0f + sinf(ang) * 5.0f,
@@ -752,7 +753,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 				ang,
 				pspd,
 				20,
-				5
+				5,
+				true
 			);
 			Create_Splash_Particles(
 				wobj->x + 16.0f - sinf(ang) * 5.0f,
@@ -761,7 +763,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 				ang,
 				pspd,
 				20,
-				5
+				5,
+				true
 			);
 		}
 

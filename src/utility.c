@@ -179,37 +179,25 @@ int Util_ResolveAABBCollision(CNM_BOX *a, const CNM_BOX *b, int *resolved_in_x, 
 		sides[3] = (int)((b->y + b->h) - (a->y));		// If smallest: Move "b" down
 		int min = CNM_MIN(sides[0], CNM_MIN(sides[1], CNM_MIN(sides[2], sides[3])));
 
-		if (sides[2] == min)
-		{
-			*resolved_in_x = CNM_TRUE;
-			*resolved_in_y = CNM_FALSE;
-			a->x = b->x - a->w;
-			//while (Util_AABBCollision(b, a))
-			//	a->x -= 1.0f;
-		}
-		if (sides[3] == min)
-		{
-			*resolved_in_y = CNM_TRUE;
-			*resolved_in_x = CNM_FALSE;
-			a->y = b->y + b->h;
-			//while (Util_AABBCollision(b, a))
-			//	a->y += 1.0f;
-		}
-		if (sides[0] == min)
-		{
-			*resolved_in_x = CNM_TRUE;
-			*resolved_in_y = CNM_FALSE;
-			a->x = b->x + b->w;
-			//while (Util_AABBCollision(b, a))
-			//	a->x += 1.0f;
-		}
-		if (sides[1] == min)
-		{
+		if (sides[1] <= min + 2) {
 			*resolved_in_y = CNM_TRUE;
 			*resolved_in_x = CNM_FALSE;
 			a->y = b->y - a->h;
-			//while (Util_AABBCollision(b, a))
-			//	a->y -= 1.0f;
+		}
+		if (sides[0] == min) {
+			*resolved_in_x = CNM_TRUE;
+			*resolved_in_y = CNM_FALSE;
+			a->x = b->x + b->w;
+		}
+		if (sides[2] == min) {
+			*resolved_in_x = CNM_TRUE;
+			*resolved_in_y = CNM_FALSE;
+			a->x = b->x - a->w;
+		}
+		if (sides[3] == min) {
+			*resolved_in_y = CNM_TRUE;
+			*resolved_in_x = CNM_FALSE;
+			a->y = b->y + b->h;
 		}
 
 		return CNM_TRUE;

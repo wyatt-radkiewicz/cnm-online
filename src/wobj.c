@@ -1385,19 +1385,20 @@ void Wobj_DoSplashes(WOBJ *wobj) {
 			bullet_vel = 0.25f;
 		}
 		if (wobj->flags & (WOBJ_IS_MOVESTAND)) {
-			bullet_vel = 1.7f;
+			bullet_vel = 1.25f;
 		}
 		float ang = atan2f(-wobj->vel_y, -wobj->vel_x);
 		if (!inwater && !insplash) ang += CNM_PI;
 		if (bid != -1) {
 			Create_Splash_Particles(
-				wobj->x,
-				wobj->y,
+				wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f,
+				wobj->y + wobj->hitbox.y + wobj->hitbox.h / 2.0f,
 				bid,
 				ang,
 				sqrtf(wobj->vel_x*wobj->vel_x +wobj->vel_y * wobj->vel_y)*bullet_vel,
 				10,
-				5
+				5,
+				~wobj->flags & WOBJ_IS_SOLID
 			);
 			//if (bullet_vel > 0.5f && bullet_vel < 1.5f) Interaction_PlaySound(wobj, 65);
 		}

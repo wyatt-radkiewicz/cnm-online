@@ -357,9 +357,9 @@ void clear_lens_flare(void);
 void WobjGenericAttack_Update(WOBJ *wobj);
 
 void BreakPart_CreateParts(float x, float y, float yspd_start, int srcx, int srcy, int w, int h);
-void Wobj_Particle_Spawn(float x, float y, CNM_RECT src, float vx, float vy, float grav, float bounce, int collide, int make_splash, int lifetime, int bounce_snd, int slowly_fade);
-void Wobj_Particle_Splash_Spawn(float x, float y, int block, float vx, float vy);
-void Create_Splash_Particles(float x, float y, int block, float ang, float spd, int n, int nmultiplayer);
+void Wobj_Particle_Spawn(float x, float y, CNM_RECT src, float vx, float vy, float grav, float bounce, int collide, int make_splash, int lifetime, int bounce_snd, int slowly_fade, int objs);
+void Wobj_Particle_Splash_Spawn(float x, float y, int block, float vx, float vy, int objs);
+void Create_Splash_Particles(float x, float y, int block, float ang, float spd, int n, int nmulti, int objs);
 void Wobj_DoSplashes(WOBJ *wobj);
 
 void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void);

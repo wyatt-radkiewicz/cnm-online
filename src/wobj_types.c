@@ -851,7 +851,8 @@ static void WobjPlayerMinigunPellet_Update(WOBJ *wobj)
 					(wobj->flags & WOBJ_HFLIP) ? 0.0f : CNM_PI,
 					6.0f,
 					2,
-					2
+					2,
+					true
 				);
 			}
 		}
@@ -2097,6 +2098,7 @@ static void Wobj_KeyRemover_Create(WOBJ *wobj) {
 #define PFLAG_SPLASH 2
 #define PFLAG_WATERED 4
 #define PFLAG_FADE 8
+#define PFLAG_OBJS 16
 static void Wobj_Particle_Create(WOBJ *wobj) {
 }
 static void Wobj_Particle_Update(WOBJ *wobj) {
@@ -2108,17 +2110,24 @@ static void Wobj_Particle_Update(WOBJ *wobj) {
 		Interaction_DestroyWobj(wobj);
 	int watered = wobj->item & PFLAG_WATERED;
 	if (~wobj->item & PFLAG_COLLIDE) return;
-	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->vel_x, 0.0f))
-	{
-		wobj->vel_x *= -1.0f * wobj->jump * (watered ? 0.9f : 1.0f);
-		if (wobj->jump <= 0.02f) wobj->vel_y = 0.0f;
-		//if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
-	}
-	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, wobj->vel_y))
-	{
-		wobj->vel_y *= -1.0f * wobj->jump * (watered ? 0.5f : 1.0f);
-		if (wobj->jump <= 0.02f) wobj->vel_x = 0.0f;
-		//if (wobj->money >= 0) Interaction_PlaySound(wobj, wobj->money);
+	if (wobj->item & PFLAG_OBJS) {
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->vel_x, 0.0f)) {
+			wobj->vel_x *= -1.0f * wobj->jump * (watered ? 0.9f : 1.0f);
+			if (wobj->jump <= 0.02f) wobj->vel_y = 0.0f;
+		}
+		if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, wobj->vel_y)) {
+			wobj->vel_y *= -1.0f * wobj->jump * (watered ? 0.5f : 1.0f);
+			if (wobj->jump <= 0.02f) wobj->vel_x = 0.0f;
+		}
+	} else {
+		if (Wobj_IsCollidingWithBlocks(wobj, wobj->vel_x, 0.0f)) {
+			wobj->vel_x *= -1.0f * wobj->jump * (watered ? 0.9f : 1.0f);
+			if (wobj->jump <= 0.02f) wobj->vel_y = 0.0f;
+		}
+		if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, wobj->vel_y)) {
+			wobj->vel_y *= -1.0f * wobj->jump * (watered ? 0.5f : 1.0f);
+			if (wobj->jump <= 0.02f) wobj->vel_x = 0.0f;
+		}
 	}
 	if (Wobj_InWater(wobj, 0, 1) && (wobj->item & PFLAG_SPLASH) && !watered) {
 		Create_Splash_Particles(
@@ -2128,7 +2137,8 @@ static void Wobj_Particle_Update(WOBJ *wobj) {
 			atan2f(-wobj->vel_y, -wobj->vel_x),
 			sqrtf(wobj->vel_x*wobj->vel_x + wobj->vel_y*wobj->vel_y),
 			5,
-			2
+			2,
+			true
 		);
 		wobj->item |= PFLAG_WATERED;
 	}
@@ -2150,7 +2160,7 @@ static void Wobj_Particle_Draw(WOBJ *wobj, int camx, int camy) {
 		wobj->flags & WOBJ_VFLIP
 	);
 }
-void Wobj_Particle_Spawn(float x, float y, CNM_RECT src, float vx, float vy, float grav, float bounce, int collide, int make_splash, int lifetime, int bounce_snd, int slowly_fade) {
+void Wobj_Particle_Spawn(float x, float y, CNM_RECT src, float vx, float vy, float grav, float bounce, int collide, int make_splash, int lifetime, int bounce_snd, int slowly_fade, int objs) {
 	WOBJ *p = Interaction_CreateWobj(WOBJ_PARTICLE, x, y, lifetime, 0.0f);
 	p->anim_frame = src.x | (src.y << 16);
 	p->hitbox = (CNM_BOX){ .x = 0.0f, .y = 0.0f, .w = (float)src.w, .h = (float)src.h };
@@ -2159,6 +2169,7 @@ void Wobj_Particle_Spawn(float x, float y, CNM_RECT src, float vx, float vy, flo
 	if (collide) p->item |= PFLAG_COLLIDE;
 	if (make_splash) p->item |= PFLAG_SPLASH;
 	if (slowly_fade) p->item |= PFLAG_FADE;
+	if (objs) p->item |= PFLAG_OBJS;
 	p->money = bounce_snd;
 	p->speed = grav;
 	p->custom_ints[1] = lifetime;
@@ -2166,7 +2177,7 @@ void Wobj_Particle_Spawn(float x, float y, CNM_RECT src, float vx, float vy, flo
 	p->vel_y = vy;
 	p->link_uuid = 0;
 }
-void Wobj_Particle_Splash_Spawn(float x, float y, int block, float vx, float vy) {
+void Wobj_Particle_Splash_Spawn(float x, float y, int block, float vx, float vy, int objs) {
 	if (x > Camera_GetXPos() + RENDERER_WIDTH || x < Camera_GetXPos() ||
 		y > Camera_GetYPos() + RENDERER_HEIGHT || y < Camera_GetYPos()) return;
 	BLOCK_PROPS *props = Blocks_GetBlockProp(block);
@@ -2176,15 +2187,15 @@ void Wobj_Particle_Splash_Spawn(float x, float y, int block, float vx, float vy)
 		.y = props->dmg ? (props->frames_y[0] * BLOCK_SIZE + Util_RandInt(5, 27)) : (480),
 		.w = 3,
 		.h = 3,
-	}, vx, vy, 0.25f, 0.0f, 1, 0, 35, 65, 1);
+	}, vx, vy, 0.25f, 0.0f, 1, 0, 35, 65, 1, objs);
 }
-void Create_Splash_Particles(float x, float y, int block, float ang, float spd, int n, int nmulti) {
+void Create_Splash_Particles(float x, float y, int block, float ang, float spd, int n, int nmulti, int objs) {
 	const float spd_percent = 1.5f - CNM_MIN(spd / 5.0f, 1.0f);
 	for (int i = 0; i < (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER ? n : nmulti); i++) {
 		float a = ang + (Util_RandFloat() * 2.0f - 1.0f) * spd_percent;
 		float s = spd * (Util_RandFloat() * 0.5f + 1.0f);
 		Wobj_Particle_Splash_Spawn(
-			x, y, block, cosf(a) * s, sinf(a) * s
+			x, y, block, cosf(a) * s, sinf(a) * s, objs
 		);
 	}
 }
