@@ -41,6 +41,7 @@ void Console_Print(const char *format, ...)
 	int bufsz = vsnprintf(NULL, 0, format, args) + 1;
 	assert(bufsz > 0);
 	char *buf = arena_alloc(bufsz);
+	va_start(args, format);
 	vsnprintf(buf, bufsz, format, args);
 
 	va_end(args);
