@@ -134,6 +134,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int slide_input_buffer;
 	float stored_slide_speed;
 	int slide_super_jump_timer;
+	int isjumping;
 
 	int been_jumping_timer;
 	int skip_jumpthrough_timer;

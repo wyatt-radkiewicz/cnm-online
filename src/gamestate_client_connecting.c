@@ -46,7 +46,7 @@ void GameState_ClientConnecting_Draw(void)
 	//Util_SetRect(&r, 320, 832, 192, 32);
 	//Renderer_DrawBitmap(160 - 96, 30, &r, 0, RENDERER_LIGHT);
 	titlebg_draw(NULL);
-	Util_SetRect(&r, 400, 7136, 112, 48);
+	Util_SetRect(&r, 400, 32, 112, 48);
 	int x = RENDERER_WIDTH / 2 - r.w + 12, y = RENDERER_HEIGHT / 2 + 16 + 12+(12*2);
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + 16, &r, 2, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
 	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, RENDERER_HEIGHT / 2 + 16, &r, 2, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);

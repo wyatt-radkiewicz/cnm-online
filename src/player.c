@@ -399,6 +399,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	//local_data->stored_plat_velx = 0.0f;
 	local_data->been_jumping_timer = 0;
 	local_data->skip_jumpthrough_timer = 0;
+	local_data->isjumping = CNM_FALSE;
 	local_data->in_splash = 0;
 	local_data->last_in_splash = 0;
 	//local_data->slope_jumped = CNM_FALSE;
@@ -1177,6 +1178,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Wobj_IsGrouneded(wobj)) {
 			local_data->is_grounded_buffer = 6;
 			local_data->been_jumping_timer = 0;
+			local_data->isjumping = CNM_FALSE;
 		}
 		//Console_Print("%d", local_data->been_jumping_timer);
 		//
@@ -1241,6 +1243,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 					local_data->sliding_cap_landing_speed = CNM_TRUE;
 				}
 				local_data->jumped = JUMP_TIMER;
+				local_data->isjumping = CNM_TRUE;
 				local_data->animtimer = 0;
 				Interaction_PlaySound(wobj, 58);
 				if (local_data->slide_super_jump_timer > 0 ||
@@ -1328,6 +1331,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				//local_data->ability3_timer = 30;
 			}
 		}
+		
 		if (local_data->jumped > 0 && !local_data->has_cut_jump && !Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && wobj->vel_y < (final_jmp / -2.0f && !local_data->lock_controls))
 		{
 			//wobj->vel_y = (final_jmp - local_data->jump_init_yspd) / -2.0f;

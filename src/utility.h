@@ -30,7 +30,7 @@
 #define CNM_2DEG(r) ((r) / CNM_PI * 180.0f)
 #define CNM_VERSION_PREFIX "Beta"
 #define CNM_MAJOR_VERSION 1
-#define CNM_MINOR_VERSION 5
+#define CNM_MINOR_VERSION 8
 #define CNM_VERSION_STRING CNM_VERSION_PREFIX " " XSTRINGIZE(CNM_MAJOR_VERSION)"."XSTRINGIZE(CNM_MINOR_VERSION)
 
 inline static uint16_t ror16(uint16_t x, uint16_t n) {

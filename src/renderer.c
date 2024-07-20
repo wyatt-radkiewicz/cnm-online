@@ -907,6 +907,13 @@ void Renderer_DrawBitmap2(int _x, int _y, const CNM_RECT *_src, int trans, int l
 	tx_step = hflip ? -1 : 1;
 	ty_step = vflip ? -1 : 1;
 
+	if (ty_start + ty_step * src.h > renderer_gfx->h) {
+#ifdef DEBUG
+		Console_Print("Don't use out of bounds gfx DUMBASS!");
+#endif
+		return;
+	}
+
 	for (y = _y, ty = ty_start; y < _y + src.h; y++, ty += ty_step)
 	{
 		uint8_t *dst_color = &((unsigned char *)renderer_scr->pixels)[_x + y * RENDERER_WIDTH];

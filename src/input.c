@@ -154,11 +154,12 @@ void Input_Update(void)
 
 	if (input_pad != NULL)
 	{
-		int activation = 8000;
+		int activation = INT16_MAX / 3 * 2;
 		int left_x = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_LEFTX);
 		int left_y = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_LEFTY);
 		int right_x = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_RIGHTX);
 		int right_y = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_RIGHTY);
+		int right_trig = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
 
 		if (Input_TopState() == INPUT_STATE_PLAYING)
 		{
@@ -172,6 +173,7 @@ void Input_Update(void)
 			input_buttons[INPUT_ENTER] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_A);
 			input_buttons[INPUT_ESCAPE] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_B);
 		}
+		input_buttons[INPUT_FIRE] |= (right_trig > activation) || SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
 		input_buttons[INPUT_LEFT] |= (left_x < -activation) || SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
 		input_buttons[INPUT_RIGHT] |= (left_x > activation) || SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
 		input_buttons[INPUT_W] |= (right_y < -activation);
