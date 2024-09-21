@@ -574,7 +574,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		60.0f, // Item durability
+		50.0f, // Item durability
 		CNM_FALSE, // Draw Infront
 	}
 };

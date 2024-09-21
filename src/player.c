@@ -403,6 +403,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->last_in_splash = 0;
 	//local_data->slope_jumped = CNM_FALSE;
 
+	local_data->plat_velx_add = 0.0f;
 	local_data->platinfo.active = false;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
@@ -416,13 +417,15 @@ void WobjPlayer_Create(WOBJ *wobj)
 	}
 }
 
-void player_launch_from_platinfo(WOBJ *wobj) {
+void player_launch_from_platinfo(WOBJ *wobj, int dovelx) {
 	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
 	if (!local_data->platinfo.active) return;
 	if (Wobj_IsCollidingWithBlocks(wobj, 0.0f, 1.0f)) return;
-	wobj->vel_x += local_data->platinfo.last_velx;
+	//wobj->vel_x += local_data->platinfo.last_velx;
 	wobj->vel_y += local_data->platinfo.last_vely;
 	local_data->platinfo.active = false;
+	if (dovelx) local_data->plat_velx_add = local_data->platinfo.last_velx;
+	else wobj->vel_x += local_data->platinfo.last_velx;
 }
 
 void WobjPlayer_Update(WOBJ *wobj)
@@ -1177,6 +1180,15 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Wobj_IsGrouneded(wobj)) {
 			local_data->is_grounded_buffer = 6;
 			local_data->been_jumping_timer = 0;
+			local_data->plat_velx_add = 0.0f;
+		} else {
+			if (local_data->plat_velx_add) {
+				if (local_data->plat_velx_add > 0.1f) {
+					local_data->plat_velx_add -= 0.05f;
+				} else if (local_data->plat_velx_add < -0.1f) {
+					local_data->plat_velx_add += 0.05f;
+				}
+			}
 		}
 		//Console_Print("%d", local_data->been_jumping_timer);
 		//
@@ -1219,7 +1231,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 					jmp_speed -= local_data->platinfo.last_vely;
 					local_data->jump_init_yspd = local_data->platinfo.last_vely;
 					float vy = wobj->vel_y;
-					player_launch_from_platinfo(wobj);
+					player_launch_from_platinfo(wobj, 1);
 					wobj->vel_y = vy;
 					//wobj->vel_x += plat->vel_x;
 					// Look further down for vel_x change
@@ -1801,7 +1813,14 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->hitbox = oldhb;
 		if (obj) local_data->platinfo.active = false;
 
-		WobjPhysics_EndUpdate(wobj);
+		wobj->vel_x += local_data->plat_velx_add;
+		wphys_flags_t wflags = WobjPhysics_EndUpdate(wobj);
+		//if (wflags) Console_Print("%d", wflags);
+		if (~wflags & wphys_resolved_x) {
+			wobj->vel_x -= local_data->plat_velx_add;
+		} else {
+			local_data->plat_velx_add = 0.0f;
+		}
 
 		float oy = wobj->y;
 		wobj->y += 5.0f;
@@ -1818,7 +1837,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (!local_data->platinfo.active) goto search_platinfos;
 		WOBJ *plat = Wobj_GetAnyWOBJFromUUIDAndNode(local_data->platinfo.node, local_data->platinfo.uuid);
 		if (!plat) {
-			player_launch_from_platinfo(wobj);
+			player_launch_from_platinfo(wobj, 1);
 			goto search_platinfos;
 		}
 		float px, py;
@@ -1859,7 +1878,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->y = plry;
 		if ((wobj->x + wobj->hitbox.x > px + plat->hitbox.x + plat->hitbox.w ||
 			wobj->x + wobj->hitbox.x + wobj->hitbox.w < px + plat->hitbox.x) && not_on_platform) {
-			player_launch_from_platinfo(wobj);
+			player_launch_from_platinfo(wobj, 1);
 			goto search_platinfos;
 		}
 
@@ -2047,8 +2066,8 @@ plat_velx_application:
 	}
 
 	// Cap player health, money, and strength
-	if (wobj->health > PLAYER_HP_MAX)
-		wobj->health = PLAYER_HP_MAX;
+	//if (wobj->health > PLAYER_HP_MAX)
+		//wobj->health = PLAYER_HP_MAX;
 	if (wobj->strength > 9.99f)
 		wobj->strength = 9.99f;
 	// if (wobj->money > 99999)
@@ -2717,6 +2736,7 @@ void Player_DrawHUD(WOBJ *player) {
 
 	float target_hp = player->health, tween = 0.5f;
 	if (target_hp < 0.0f) target_hp = 0.0f;
+	if (target_hp > 1000.0f) target_hp = 1000.0f;
 	if (player->flags & WOBJ_PLAYER_IS_RESPAWNING) {
 		target_hp = 0.0f;
 		tween = 0.2f;

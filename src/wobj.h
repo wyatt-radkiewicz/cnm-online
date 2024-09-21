@@ -316,10 +316,10 @@ void Wobj_DrawWobjs(int camx, int camy);
 void Wobj_DrawWobjsOverlayer(int camx, int camy);
 
 typedef enum wphys_flags {
-	wphys_resolved_x,	// resolved in x axis
-	wphys_resolved_y,	// same but in y
-	wphys_wall,			// hit wall
-	wphys_obj,			// hit object
+	wphys_resolved_x = 1,	// resolved in x axis
+	wphys_resolved_y = 2,	// same but in y
+	wphys_wall = 4,			// hit wall
+	wphys_obj = 8,			// hit object
 } wphys_flags_t;
 
 wphys_flags_t WobjPhysics_EndUpdate(WOBJ *wobj);

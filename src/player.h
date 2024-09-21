@@ -143,6 +143,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	//int slope_jumped;
 
 	float last_hp;
+	float plat_velx_add;
 
 	WOBJ *pet;
 
@@ -168,7 +169,7 @@ void Player_SetSkinInstant(WOBJ *player, int skinid);
 void Player_SwapOffhand(WOBJ *player);
 void Player_TryTitlePopup(void);
 void Player_ChangePet(WOBJ *player, int petid);
-void player_launch_from_platinfo(WOBJ *wobj);
+void player_launch_from_platinfo(WOBJ *wobj, int dovelx);
 void add_hitmarker(int dmg, float x, float y);
 
 #endif

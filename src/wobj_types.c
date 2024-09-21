@@ -1065,7 +1065,7 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 				player->vel_y = (vy * cosf(ang)) + (-vx * sinf(ang));
 				player->vel_x = (vy * sinf(ang)) + (vx * cosf(ang));
 				player->y -= 1.0f;
-				player_launch_from_platinfo(player);
+				player_launch_from_platinfo(player, true);
 			}
 		}
 		Interaction_DestroyWobj(wobj);
@@ -1489,8 +1489,10 @@ static void WobjCustomizableMovingPlatform_Update(WOBJ *wobj)
 	}
 	else
 	{
-		if ((wobj->money & CMPF_DESPAWN) && (~wobj->money & CMPF_FIRST_GO))
+		if ((wobj->money & CMPF_DESPAWN) && (~wobj->money & CMPF_FIRST_GO)) {
 			Interaction_DestroyWobj(wobj);
+			return;
+		}
 		if (~wobj->money & CMPF_FIRST_GO) {
 			if (wobj->vel_x != 0.0f) {
 				wobj->custom_floats[0] = -wobj->vel_x;
@@ -2207,11 +2209,14 @@ static void Wobj_Goop_Create(WOBJ *wobj) {
 	wobj->custom_ints[0] = 0;
 	wobj->custom_ints[1] = 0;
 	wobj->money = 2;
+	wobj->link_node = -1;
 }
 static void Wobj_Goop_Update(WOBJ *wobj) {
 	WobjGenericAttack_Update(wobj);
 	wobj->vel_y += 0.5f;
+	bool blks = false;
 	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 2.0f)) {
+		blks = true;
 		wobj->vel_y = 0.0f;
 		wobj->vel_x *= 0.3f;
 		wobj->custom_ints[1]++;
@@ -2224,6 +2229,25 @@ static void Wobj_Goop_Update(WOBJ *wobj) {
 	}
 	if (wobj->money > 7) {
 		Interaction_DestroyWobj(wobj);
+	}
+
+	WOBJ *enemy = Wobj_GetAnyWOBJFromUUIDAndNode(wobj->link_node, wobj->link_uuid);
+	if (!enemy && blks) {
+		enemy = Wobj_GetWobjColliding(wobj, WOBJ_IS_HOSTILE | WOBJ_IS_PLAYER);
+		if (enemy) {
+			wobj->link_node = enemy->node_id;
+			wobj->link_uuid = enemy->uuid;
+			wobj->custom_ints[1] = 0;
+			wobj->custom_floats[0] = enemy->x;
+			wobj->custom_floats[1] = enemy->y;
+		}
+	}
+	if (enemy) {
+		Interaction_ForceWobjPosition(
+			enemy,
+			wobj->custom_floats[0],
+			wobj->custom_floats[1]
+		);
 	}
 }
 static void Wobj_Goop_Draw(WOBJ *wobj, int camx, int camy) {

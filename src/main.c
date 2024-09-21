@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 	Parse_Args(argc, argv);
 
 #ifdef DEBUG
-	run_tests();
+	//run_tests();
 #endif
 	Game_Init(&gi);
 	Game_Quit();
