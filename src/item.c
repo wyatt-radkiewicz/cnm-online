@@ -59,7 +59,7 @@ static void ItemLightningWand_OnUse(ITEM *item, WOBJ *player);
 
 static void ItemKeyGeneric_Update(ITEM *key, WOBJ *player);
 
-const ITEM_TYPE item_types[] =
+ITEM_TYPE item_types[] =
 {
 	{ // No item
 		{0, 0, 0, 0},
@@ -70,7 +70,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_NULL, // What object it is when dropped
-		0.0f, // Item durability
+		0, // Special count 
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Shotgun Item
@@ -82,7 +82,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		75.0f, // Item durability
+		5, // Special count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Knife Item
@@ -94,7 +94,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_TRUE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		50.0f, // Item durability
+		10, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Apple Item
@@ -106,7 +106,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		10, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Cake Item
@@ -118,7 +118,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		10, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Strength Item
@@ -130,7 +130,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		50, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Speed Item
@@ -142,7 +142,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		20, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Jump Item
@@ -154,7 +154,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		20, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Sword Item
@@ -166,7 +166,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_TRUE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		50.0f, // Item durability
+		20, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Healh Potion Item
@@ -178,7 +178,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		15, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Sniper Rifle Item
@@ -190,7 +190,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		80.0f, // Item durability
+		10, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 50 Money Item
@@ -202,7 +202,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		30, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 100 Money Item
@@ -214,7 +214,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		40, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 500 Money Item
@@ -226,7 +226,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		50, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Cheeseburger Item
@@ -238,7 +238,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		20, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // Golden Axe Item
@@ -250,7 +250,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_TRUE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		50.0f, // Item durability
+		80, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // Unbound Wand Item
@@ -262,7 +262,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		50.0f, // Item durability
+		25, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 17: Fire Wand Item
@@ -274,7 +274,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		100.0f, // Item durability
+		25, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 18: Ice Wand Item
@@ -286,7 +286,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		100.0f, // Item durability
+		25, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 19: Air Wand Item
@@ -298,7 +298,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		400.0f, // Item durability
+		25, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 20: Lightning Wand Item
@@ -310,7 +310,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		100.0f, // Item durability
+		25, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 21: Golden Shotgun Item
@@ -322,7 +322,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		75.0f, // Item durability
+		50, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 22: Laser Rifle Item
@@ -334,7 +334,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		75.0f, // Item durability
+		100, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 23: Rocket Launcher Item
@@ -346,7 +346,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Activate on "use" held
 		WOBJ_DROPPED_ITEM, // Generic dropped item object
-		15.0f, // Item durability
+		100, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 24: Fire Potion
@@ -358,7 +358,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		50, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 25: Minigun Item
@@ -370,7 +370,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_TRUE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		100.0f, // Item durability
+		80, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 26: Mega Potion
@@ -382,7 +382,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		80, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 27: Ultra Mega Potion
@@ -394,7 +394,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		100, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 28: AWP
@@ -406,7 +406,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		50.0f, // Item durability
+		80, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 29: Flamethrower
@@ -418,7 +418,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_TRUE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		100.0f, // Item durability
+		50, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 30: Poisonious Strength Potion
@@ -430,7 +430,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		80, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 31: Poisonious Speed Potion
@@ -442,7 +442,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		80, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 32: Poisonious Jump Potion
@@ -454,7 +454,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		80, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 33: Beastchurger Consumable
@@ -466,7 +466,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		50, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 34: Ultra Sword
@@ -478,7 +478,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		50.0f, // Item durability
+		40, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 34: Heavy Hammer
@@ -490,7 +490,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		75.0f, // Item durability
+		30, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 34: Fission Gun
@@ -502,7 +502,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		30.0f, // Item durability
+		80, // Special Count
 		CNM_FALSE, // Draw Infront
 	},
 	{ // 35: Red Key
@@ -514,7 +514,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		25, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 36: Green Key
@@ -526,7 +526,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		25, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 37: Blue Key
@@ -538,7 +538,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		25, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 38: 1-Up Orange Juice Box 
@@ -550,7 +550,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		0.0f, // Item durability
+		100, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 39: Fix it up Wrench 
@@ -562,7 +562,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		250.0f, // Item durability
+		100, // Special Count
 		CNM_TRUE, // Draw Infront
 	},
 	{ // 40: Goop Bottle 
@@ -574,7 +574,7 @@ const ITEM_TYPE item_types[] =
 		NULL, // Draw
 		CNM_FALSE, // Can be used when "use" is held
 		WOBJ_DROPPED_ITEM, // What object it is when dropped
-		50.0f, // Item durability
+		20, // Special Count
 		CNM_FALSE, // Draw Infront
 	}
 };
@@ -591,6 +591,11 @@ void Item_Init(void)
 }
 void Item_Reset(void) {
 	memset(&item_current, 0, sizeof(item_current));
+}
+void Item_ResetPickedUpCount(void) {
+	for (int i = 0; i < sizeof(item_types) / sizeof(item_types[0]); i++) {
+		item_types[i].picked_up = 0;
+	}
 }
 ITEM *Item_GetCurrentItem(void)
 {
@@ -642,13 +647,20 @@ void Item_Pickup(WOBJ *player, WOBJ *dropped_item)
 		player->item = dropped_item->item;
 		item_current.hide_timer = ITEM_HIDE_TIMER * 2;
 		item_current.type = dropped_item->item;
-		item_current.durability = dropped_item->custom_floats[0];
+
+		if (!item_types[item_current.type].picked_up) {
+			item_types[item_current.type].picked_up = 1;
+			PLAYER_LOCAL_DATA *pld = player->local_data;
+			pld->special_level += item_types[item_current.type].special_amount;
+		}
+
+		//item_current.durability = dropped_item->custom_floats[0];
 		if (item_types[dropped_item->item].on_pickup != NULL)
 			item_types[dropped_item->item].on_pickup(&item_current, player);
 		Interaction_DestroyWobjInstant(dropped_item);
 	}
 }
-void Item_PickupByType(WOBJ *player, int itemtype, float durability)
+void Item_PickupByType(WOBJ *player, int itemtype)
 {
 	if (player->item == ITEM_TYPE_NOITEM)
 	{
@@ -656,8 +668,8 @@ void Item_PickupByType(WOBJ *player, int itemtype, float durability)
 		player->item = itemtype;
 		item_current.hide_timer = ITEM_HIDE_TIMER;
 		item_current.type = itemtype;
-		item_current.durability = durability;
-		if (durability < 0.0f) item_current.durability = item_types[itemtype].max_durability;
+		//item_current.durability = durability;
+		//if (durability < 0.0f) item_current.durability = item_types[itemtype].max_durability;
 		if (item_types[itemtype].on_pickup != NULL)
 			item_types[itemtype].on_pickup(&item_current, player);
 	}
@@ -671,7 +683,7 @@ void Item_Drop(WOBJ *player)
 			item_types[player->item].on_drop(&item_current, player);
 		WOBJ *dropped = Interaction_CreateWobj(item_types[player->item].wobj_dropped_type,
 							   player->x, player->y, player->item, 0.0f);
-		dropped->custom_floats[0] = item_current.durability;
+		//dropped->custom_floats[0] = item_current.durability;
 		player->item = ITEM_TYPE_NOITEM;
 		item_current.type = ITEM_TYPE_NOITEM;
 	}
@@ -692,11 +704,11 @@ void Item_Update(WOBJ *player)
 	{
 		if (item_types[player->item].update != NULL)
 			item_types[player->item].update(&item_current, player);
-		if (item_current.durability <= 0.0f && item_types[player->item].max_durability > 0.1f) {
-			Interaction_PlaySound(player, 56);
-			BreakPart_CreateParts(player->x, player->y, -5.0f, item_types[item_current.type].frames[0].x, item_types[item_current.type].frames[0].y, 2, 2);
-			Item_DestroyCurrentItem(player);
-		}
+		//if (item_current.durability <= 0.0f && item_types[player->item].max_durability > 0.1f) {
+		//	Interaction_PlaySound(player, 56);
+		//	BreakPart_CreateParts(player->x, player->y, -5.0f, item_types[item_current.type].frames[0].x, item_types[item_current.type].frames[0].y, 2, 2);
+		//	Item_DestroyCurrentItem(player);
+		//}
 		item_current.life_timer++;
 		item_current.use_timer--;
 		item_current.custom_timer--;
@@ -788,7 +800,7 @@ static void ItemShotgun_OnUse(ITEM *shotgun, WOBJ *player)
 	shotgun->custom_timer = 5+1;
 	shotgun->use_timer = 10;
 
-	shotgun->durability -= 1.0f;
+	//shotgun->durability -= 1.0f;
 }
 static void ItemShotgun_OnDrop(ITEM *shotgun, WOBJ *player)
 {
@@ -838,7 +850,7 @@ static void ItemSniper_OnUse(ITEM *shotgun, WOBJ *player)
 	Interaction_PlaySound(player, 11);
 	shotgun->custom_timer = 37;
 	shotgun->use_timer = 25;
-	shotgun->durability -= 1.0f;
+	//shotgun->durability -= 1.0f;
 
 	float knockback = (shotgun->type == ITEM_TYPE_AWP) ? 5.0f : 3.0f;
 	if (player->flags & WOBJ_HFLIP)
@@ -862,7 +874,7 @@ static void ItemAWP_OnUse(ITEM *awp, WOBJ *player)
 	Interaction_PlaySound(player, 11);
 	awp->use_timer = 15;
 	awp->custom_timer = 10;
-	awp->durability -= 1.0f;
+	//awp->durability -= 1.0f;
 
 	if (player->flags & WOBJ_HFLIP)
 		player->vel_x += 4.5f;
@@ -1012,6 +1024,31 @@ static void ItemUltraSword_OnUse(ITEM *sword, WOBJ *player)
 
 static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 {
+	PLAYER_LOCAL_DATA *pld = player->local_data;
+
+	switch (item->type)
+	{
+	case ITEM_TYPE_APPLE: pld->special_level += 1; break;
+	case ITEM_TYPE_CAKE: pld->special_level += 5; break;
+	case ITEM_TYPE_CHEESEBURGER: pld->special_level += 5; break;
+	case ITEM_TYPE_BEASTCHURGER: pld->special_level += 50; break;
+	case ITEM_TYPE_HEALTH_POITION: pld->special_level += 1; break;
+	case ITEM_TYPE_SPEED_POTION: pld->special_level += 10; break;
+	case ITEM_TYPE_JUMP_POTION: pld->special_level += 10; break;
+	case ITEM_TYPE_STRENGTH_POTION: pld->special_level += 10; break;
+	case ITEM_TYPE_FIRE_POTION: pld->special_level += 10; break;
+	case ITEM_TYPE_POISIONUS_JUMP_POTION: pld->special_level += 10; break;
+	case ITEM_TYPE_POISIONUS_SPEED_POTION: pld->special_level += 10; break;
+	case ITEM_TYPE_POISIONUS_STRENGTH_POTION: pld->special_level += 10; break;
+	case ITEM_TYPE_MEGA_POTION: pld->special_level += 50; break;
+	case ITEM_TYPE_ULTRA_MEGA_POTION: pld->special_level += 100; break;
+	case ITEM_TYPE_50MONEY: pld->special_level += 10; break;
+	case ITEM_TYPE_100MONEY: pld->special_level += 25; break;
+	case ITEM_TYPE_500MONEY: pld->special_level += 50; break;
+	case ITEM_TYPE_1UP_JUICE: pld->special_level += 100; break;
+	case ITEM_TYPE_WRENCH: pld->special_level += 100; break;
+	}
+
 	switch (item->type)
 	{
 	case ITEM_TYPE_APPLE:
@@ -1040,44 +1077,42 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 		Interaction_PlaySound(player, 57); break;
 	}
 
-	PLAYER_LOCAL_DATA *pld;
+	float hpboost = 0.0f;
+
 	switch (item->type)
 	{
-	case ITEM_TYPE_APPLE: player->health += 25.0f; break;
-	case ITEM_TYPE_CAKE: player->health += 60.0f; break;
+	case ITEM_TYPE_APPLE: hpboost = 25.0f; break;
+	case ITEM_TYPE_CAKE: hpboost = 60.0f; break;
 	case ITEM_TYPE_STRENGTH_POTION: player->strength += 0.01f; break;
 	case ITEM_TYPE_SPEED_POTION: player->speed += 0.5f; break;
 	case ITEM_TYPE_JUMP_POTION: player->jump += 0.5f; break;
 	case ITEM_TYPE_POISIONUS_STRENGTH_POTION: player->strength -= 1.0f; break;
 	case ITEM_TYPE_POISIONUS_SPEED_POTION: player->speed -= 1.0f; break;
 	case ITEM_TYPE_POISIONUS_JUMP_POTION: player->jump -= 0.5f; break;
-	case ITEM_TYPE_HEALTH_POITION: player->health += 50.0f; break;
+	case ITEM_TYPE_HEALTH_POITION: hpboost = 50.0f; break;
 	case ITEM_TYPE_50MONEY: player->money += 50; break;
 	case ITEM_TYPE_100MONEY: player->money += 100; break;
 	case ITEM_TYPE_500MONEY: player->money += 500; break;
-	case ITEM_TYPE_CHEESEBURGER: player->health += 35.0f; break;
+	case ITEM_TYPE_CHEESEBURGER: hpboost = 35.0f; break;
 	case ITEM_TYPE_BEASTCHURGER:
 		pld = player->local_data;
-		if (pld->beastchurger_timer < 0)
-		{
-			player->strength *= 25.0f;
-			pld->beastchurger_music = Audio_GetCurrentPlayingMusic();
-			Audio_PlayMusic(6, CNM_TRUE);
-		}
-		pld->beastchurger_timer = 30 * 20;
+		pld->power_level += PLAYER_POWER_LEVEL_CAP * 2;
 		break;
 	case ITEM_TYPE_FIRE_POTION:
 		((PLAYER_LOCAL_DATA *)player->local_data)->fire_resistance = 30 * 15;
 		player->flags |= WOBJ_FIRE_TYPE;
 		break;
-	case ITEM_TYPE_MEGA_POTION: player->health += 1000.0f; break;
-	case ITEM_TYPE_ULTRA_MEGA_POTION: player->health += 10000.0f; break;
+	case ITEM_TYPE_MEGA_POTION: hpboost = 1000.0f; break;
+	case ITEM_TYPE_ULTRA_MEGA_POTION: hpboost = 10000.0f; break;
 	case ITEM_TYPE_1UP_JUICE: g_saves[g_current_save].lives++; break;
-	case ITEM_TYPE_WRENCH:
-		((PLAYER_LOCAL_DATA *)player->local_data)->offhand_durability =
-			item_types[((PLAYER_LOCAL_DATA *)player->local_data)->offhand_item].max_durability;
+	//case ITEM_TYPE_WRENCH:
+		//((PLAYER_LOCAL_DATA *)player->local_data)->offhand_durability =
+			//item_types[((PLAYER_LOCAL_DATA *)player->local_data)->offhand_item].max_durability;
 		break;
 	}
+
+	player->health += hpboost;
+	((PLAYER_LOCAL_DATA *)player->local_data)->power_level += hpboost * PLAYER_POWER_LEVEL_MUL / 5.0f;
 
 	//player->item = ITEM_TYPE_NOITEM;
 	//player->item = ITEM_TYPE_NOITEM;
@@ -1111,8 +1146,8 @@ static void ItemUnboundWand_Update(ITEM *wand, WOBJ *player)
 
 	return;
 got_wand:
-	wand->durability = (wand->durability / item_types[old_type].max_durability) * item_types[wand->type].max_durability;
-	if (item_types[wand->type].max_durability <= 0.01f) wand->durability = 100.0f;
+	//wand->durability = (wand->durability / item_types[old_type].max_durability) * item_types[wand->type].max_durability;
+	//if (item_types[wand->type].max_durability <= 0.01f) wand->durability = 100.0f;
 	player->item = wand->type;
 	if (item_types[wand->type].on_pickup != NULL)
 		item_types[wand->type].on_pickup(wand, player);
@@ -1126,7 +1161,7 @@ static void ItemFireWand_OnUse(ITEM *item, WOBJ *player)
 	fire->strength = player->strength + 0.05f;
 	item->use_timer = 20;
 	Interaction_PlaySound(player, 9);
-	item->durability -= 1.0f;
+	//item->durability -= 1.0f;
 	item->hide_timer = ITEM_HIDE_TIMER;
 }
 static void ItemIceWand_OnUse(ITEM *item, WOBJ *player)
@@ -1137,7 +1172,7 @@ static void ItemIceWand_OnUse(ITEM *item, WOBJ *player)
 	ice->strength = player->strength + 0.01f;
 	item->use_timer = 25;
 	Interaction_PlaySound(player, 9);
-	item->durability -= 1.0f;
+	//item->durability -= 1.0f;
 	item->hide_timer = ITEM_HIDE_TIMER;
 }
 static void ItemAirWand_OnUpdate(ITEM *item, WOBJ *player) {
@@ -1178,7 +1213,7 @@ static void ItemAirWand_OnUse(ITEM *item, WOBJ *player)
 	f->strength = player->strength + 0.02f;
 	item->use_timer = 20;
 	item->hide_timer = ITEM_HIDE_TIMER;
-	item->durability -= 1.0f;
+	//item->durability -= 1.0f;
 	if (!item->last_in_use)
 		Interaction_PlaySound(player, 9);
 	//item->use_timer = 1;
@@ -1194,7 +1229,7 @@ static void ItemLightningWand_OnUse(ITEM *item, WOBJ *player)
 	{
 		0.0f, -speed*0.707f, -speed, -speed*0.707f
 	};
-	item->durability -= 1.0f;
+	//item->durability -= 1.0f;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -1224,7 +1259,7 @@ static void ItemGoldenShotgun_OnUse(ITEM *shotgun, WOBJ *player)
 		w->vel_x = (player->flags & WOBJ_HFLIP) ? -9.0f : 9.0f;
 		w->vel_y = y[i];
 	}
-	shotgun->durability -= 1.0f;
+	//shotgun->durability -= 1.0f;
 	
 	Interaction_PlaySound(player, 0);
 	shotgun->use_timer = 10;
@@ -1243,7 +1278,7 @@ static void ItemGoopBottle_OnUse(ITEM *item, WOBJ *player) {
 		w->vel_x = player->vel_x + ((player->flags & WOBJ_HFLIP) ? -2.0f : 2.0f) + x[i];
 		w->vel_y = -5.0f;
 	}
-	item->durability -= 1.0f;
+	//item->durability -= 1.0f;
 	
 	Interaction_PlaySound(player, 22);
 	item->use_timer = 35;
@@ -1270,7 +1305,7 @@ static void ItemLaserRifle_OnUse(ITEM *laser, WOBJ *player)
 	WOBJ *l = Interaction_CreateWobj(WOBJ_PLAYER_LASER, player->x, player->y, ((player->flags & WOBJ_HFLIP) ? -1 : 1), 0.0f);
 	l->strength = player->strength + 0.1f;
 	l->flags |= WOBJ_IS_PLAYER_WEAPON;
-	laser->durability -= 1.0f;
+	//laser->durability -= 1.0f;
 	laser->use_timer = 30;
 	laser->melee_obj = l;
 	laser->hide_timer = ITEM_HIDE_TIMER;
@@ -1283,7 +1318,7 @@ static void ItemRocketLauncher_OnUse(ITEM *rpg, WOBJ *player)
 	rocket->flags |= WOBJ_IS_PLAYER_WEAPON;
 	rpg->use_timer = 13;
 	Player_PlayShootAnim(player);
-	rpg->durability -= 1.0f;
+	//rpg->durability -= 1.0f;
 	rpg->hide_timer = ITEM_HIDE_TIMER;
 }
 
@@ -1350,7 +1385,7 @@ static void ItemMinigun_OnUpdate(ITEM *minigun, WOBJ *player)
 	}
 
 	if (minigun->in_use) {
-		minigun->durability -= 0.1f;
+		//minigun->durability -= 0.1f;
 	}
 }
 static void ItemMinigun_OnDrop(ITEM *minigun, WOBJ *player)
@@ -1385,7 +1420,7 @@ static void ItemFlameThrower_OnUse(ITEM *flamethrower, WOBJ *player)
 	flame->speed += fabsf(player->vel_x);
 	flamethrower->use_timer = 3;
 	flamethrower->custom_ints[0] += 1;
-	flamethrower->durability -= 0.5f;
+	//flamethrower->durability -= 0.5f;
 	flamethrower->hide_timer = ITEM_HIDE_TIMER;
 	if (flamethrower->custom_ints[0] > 10)
 	{
@@ -1432,7 +1467,7 @@ static void ItemFissionGun_OnUse(ITEM *gun, WOBJ *player)
 	bolt->custom_ints[1] = 0;
 	gun->use_timer = 20;
 	gun->custom_timer = 20;
-	gun->durability -= 1.5f;
+	//gun->durability -= 1.5f;
 	gun->hide_timer = ITEM_HIDE_TIMER;
 }
 

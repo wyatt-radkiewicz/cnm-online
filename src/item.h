@@ -62,8 +62,9 @@ typedef struct _ITEM_TYPE
 	ITEM_DRAW_FUNC draw;
 	int use_on_held;
 	int wobj_dropped_type;
-	float max_durability;
+	int special_amount;
 	int draw_infront;
+	int picked_up;
 } ITEM_TYPE;
 
 typedef struct _ITEM
@@ -73,7 +74,7 @@ typedef struct _ITEM
 	int custom_timer;
 	int custom_ints[2];
 	float custom_floats[2];
-	float durability;
+	//float durability;
 	WOBJ *melee_obj, *objs[8];
 	int in_use, last_in_use;
 	int hide_timer;
@@ -81,17 +82,18 @@ typedef struct _ITEM
 
 #define ITEM_HIDE_TIMER 20
 
-extern const ITEM_TYPE item_types[];
+extern ITEM_TYPE item_types[];
 
 void Item_Init(void);
 void Item_Reset(void);
+void Item_ResetPickedUpCount(void);
 ITEM *Item_GetCurrentItem(void);
 const ITEM_TYPE *Item_GetItemType(int type_id);
 
 void Item_TryPickupAndDrop(WOBJ *player);
 void Item_Pickup(WOBJ *player, WOBJ *dropped_item);
 // Set durability to a negative number to use max durability for the item
-void Item_PickupByType(WOBJ *player, int itemtype, float durability);
+void Item_PickupByType(WOBJ *player, int itemtype);
 void Item_Drop(WOBJ *player);
 void Item_Update(WOBJ *player);
 void Item_Draw(WOBJ *player, int camx, int camy);

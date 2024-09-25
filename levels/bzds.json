@@ -970,7 +970,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -990,7 +990,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1010,7 +1010,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1030,7 +1030,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1050,7 +1050,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1070,7 +1070,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1090,7 +1090,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1110,7 +1110,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -1130,7 +1130,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3748,7 +3748,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3768,7 +3768,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3788,7 +3788,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3808,7 +3808,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3828,7 +3828,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3848,7 +3848,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3868,7 +3868,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3888,7 +3888,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3908,7 +3908,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -3928,7 +3928,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": true
+          "starts_on": false
         }
       },
       "spawning_criteria": {
@@ -7380,7 +7380,7 @@
             6942.454
           ],
           "start_activated": false,
-          "teleport_players": true,
+          "teleport_players": false,
           "link_id": 5
         }
       },
@@ -7482,7 +7482,7 @@
     },
     {
       "pos": [
-        3456.2148,
+        3456.0,
         8224.0
       ],
       "type_data": {
@@ -7498,12 +7498,12 @@
         "max_concurrent_spawns": 0
       },
       "dropped_item": null,
-      "spawner_group": null
+      "spawner_group": 31
     },
     {
       "pos": [
         3312.0,
-        8224.426
+        8224.0
       ],
       "type_data": {
         "CoolPlatform": {
@@ -7518,12 +7518,12 @@
         "max_concurrent_spawns": 0
       },
       "dropped_item": null,
-      "spawner_group": null
+      "spawner_group": 31
     },
     {
       "pos": [
-        3136.0,
-        8224.0
+        3135.7485,
+        8224.247
       ],
       "type_data": {
         "CoolPlatform": {
@@ -7538,7 +7538,7 @@
         "max_concurrent_spawns": 0
       },
       "dropped_item": null,
-      "spawner_group": null
+      "spawner_group": 31
     },
     {
       "pos": [
@@ -8402,24 +8402,6 @@
         "spawn_delay_secs": 0.0,
         "mode": "PlayerCountBased",
         "max_concurrent_spawns": 1
-      },
-      "dropped_item": null,
-      "spawner_group": null
-    },
-    {
-      "pos": [
-        2816.0,
-        8192.0
-      ],
-      "type_data": {
-        "UpgradeTrigger": {
-          "trigger_type": "DeephausBoots"
-        }
-      },
-      "spawning_criteria": {
-        "spawn_delay_secs": 0.0,
-        "mode": "MultiAndSingleplayer",
-        "max_concurrent_spawns": 0
       },
       "dropped_item": null,
       "spawner_group": null
@@ -11952,7 +11934,7 @@
       "repeat_up": false,
       "repeat_down": false,
       "repeat_horizontally": false,
-	:     "in_foreground": false,
+      "in_foreground": false,
       "bottom3d": 0,
       "top3d": 0,
       "height3d": 0,

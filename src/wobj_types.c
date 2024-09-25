@@ -426,8 +426,8 @@ static void WobjDroppedItem_Create(WOBJ *wobj)
 	if (wobj->item == ITEM_TYPE_JUMP_POTION && Util_RandInt(0, 1000) >= 999)
 		wobj->item = ITEM_TYPE_POISIONUS_JUMP_POTION;
 
-	// Setting the durability
-	wobj->custom_floats[0] = item_types[wobj->item].max_durability;
+	//// Setting the durability
+	//wobj->custom_floats[0] = item_types[wobj->item].max_durability;
 
 	if ((wobj->item == ITEM_TYPE_KEY_RED ||
 		wobj->item == ITEM_TYPE_KEY_BLUE ||
@@ -1070,7 +1070,7 @@ static void WobjHeavyHammerSwing_Update(WOBJ *wobj)
 		}
 		Interaction_DestroyWobj(wobj);
 		if (player->item) {
-			Item_GetCurrentItem()->durability -= 1.0f;
+			//Item_GetCurrentItem()->durability -= 1.0f;
 		}
 		//((PLAYER_LOCAL_DATA *)player->local_data)->has_hammer_jumped = CNM_FALSE;
 	}

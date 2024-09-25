@@ -3298,8 +3298,8 @@
     },
     {
       "pos": [
-        6896.0,
-        1344.0
+        6896.472,
+        1343.5421
       ],
       "type_data": {
         "TeleportArea2": {
@@ -3308,7 +3308,7 @@
             2368.0
           ],
           "start_activated": true,
-          "teleport_players": false,
+          "teleport_players": true,
           "link_id": 0
         }
       },
@@ -3332,8 +3332,8 @@
             2368.0
           ],
           "start_activated": true,
-          "teleport_players": false,
-          "link_id": 0
+          "teleport_players": true,
+          "link_id": 3
         }
       },
       "spawning_criteria": {
@@ -3346,7 +3346,7 @@
     },
     {
       "pos": [
-        5600.0,
+        5599.542,
         2304.0
       ],
       "type_data": {
@@ -3356,8 +3356,8 @@
             1408.0
           ],
           "start_activated": true,
-          "teleport_players": false,
-          "link_id": 0
+          "teleport_players": true,
+          "link_id": 1
         }
       },
       "spawning_criteria": {
@@ -3380,8 +3380,8 @@
             1408.0
           ],
           "start_activated": true,
-          "teleport_players": false,
-          "link_id": 0
+          "teleport_players": true,
+          "link_id": 2
         }
       },
       "spawning_criteria": {
@@ -5818,7 +5818,7 @@
     },
     {
       "solid": false,
-      "transparency": 0,
+      "transparency": 7,
       "damage_type": {
         "Spikes": 100000
       },

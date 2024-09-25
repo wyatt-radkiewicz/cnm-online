@@ -289,14 +289,14 @@ void Player_SetSkinInstant(WOBJ *wobj, int skinid) {
 void Player_SwapOffhand(WOBJ *wobj) {
 	PLAYER_LOCAL_DATA *local_data = wobj->local_data;
 	int curritem = Item_GetCurrentItem()->type;
-	float currdur = Item_GetCurrentItem()->durability;
+	//float currdur = Item_GetCurrentItem()->durability;
 	int offhand = local_data->offhand_item;
 	Item_DestroyCurrentItem(wobj);
 	//wobj->item = offhand;
-	Item_PickupByType(wobj, offhand, local_data->offhand_durability);
+	Item_PickupByType(wobj, offhand);
 	Audio_PlaySound(51, CNM_FALSE, wobj->x, wobj->y);
 	local_data->offhand_item = curritem;
-	local_data->offhand_durability = currdur;
+	//local_data->offhand_durability = currdur;
 	Item_NullifyGhostPickup();
 }
 
@@ -365,7 +365,7 @@ void WobjPlayer_Create(WOBJ *wobj)
 	local_data->numflaps = 0;
 	local_data->isdiving = CNM_FALSE;
 	local_data->saved_diving_vel = 0.0f;
-	local_data->upgradehp = 100.0f;
+	//local_data->upgradehp = 100.0f;
 	local_data->jump_init_yspd = 0.0f;
 	local_data->level_end_unlockable = -1;
 	local_data->level_end_found_secret = CNM_FALSE;
@@ -405,8 +405,10 @@ void WobjPlayer_Create(WOBJ *wobj)
 
 	local_data->plat_velx_add = 0.0f;
 	local_data->platinfo.active = false;
+	local_data->power_level = 0;
 
 	PlayerSpawn_SetWobjLoc(&wobj->x);
+	Item_ResetPickedUpCount();
 
 	if (Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer != -1 && wobj->internal.owned) {
 		local_data->pet = Interaction_CreateWobj(WOBJ_PLAYER_PET, wobj->x, wobj->y, Game_GetVar(GAME_VAR_PLAYER_PET)->data.integer, 0.0f);
@@ -1237,13 +1239,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 					// Look further down for vel_x change
 					//apply_plat_velx = CNM_TRUE;
 				}
-				if (local_data->in_water) {
-					if (wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) {
-						Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x - 16.0f, wobj->y, 0, 0.0f);
-						Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x + 16.0f, wobj->y, 1, 0.0f);
-					}
-					wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
+				if (wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) {
+					Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x - 16.0f, wobj->y, 0, 0.0f);
+					Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x + 16.0f, wobj->y, 1, 0.0f);
 				}
+				wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
 				const float ang = Wobj_GetGroundAngle(wobj);
 				//wobj->vel_y = -jmp_speed * cosf(ang);
 				//wobj->vel_x += -jmp_speed * sinf(ang);
@@ -1374,7 +1374,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_VERYBIG_TUNES_TRIGGER);
 	if (other != NULL)
 	{
-		if (local_data->beastchurger_timer > 0)
+		if (wobj->custom_ints[1] & PLAYER_FLAG_BEASTCHURGER)
 			local_data->beastchurger_music = other->custom_ints[0];
 		else
 			Audio_PlayMusic(other->custom_ints[0], CNM_TRUE);
@@ -1419,17 +1419,20 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_SHOES);
 	if (other != NULL && local_data->finish_timer <= 0) {
 		local_data->upgrade_state = PLAYER_UPGRADE_SHOES;
-		local_data->upgradehp = 100.0f;
+		local_data->special_level += 80;
+		//local_data->upgradehp = 100.0f;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_WINGS);
 	if (other != NULL && local_data->finish_timer <= 0) {
 		local_data->upgrade_state = PLAYER_UPGRADE_WINGS;
-		local_data->upgradehp = 100.0f;
+		local_data->special_level += 80;
+		//local_data->upgradehp = 100.0f;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_UPGRADE_CRYSTAL_WINGS);
 	if (other != NULL && local_data->finish_timer <= 0) {
 		local_data->upgrade_state = PLAYER_UPGRADE_CRYSTAL_WINGS;
-		local_data->upgradehp = 50.0f;
+		local_data->special_level += 80;
+		//local_data->upgradehp = 100.0f;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_NOUPGRADE_TRIGGER);
 	if (other != NULL && local_data->finish_timer <= 0)
@@ -1442,6 +1445,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		else
 			local_data->mpoverride = wobj->custom_ints[0];
 		local_data->upgrade_state = PLAYER_UPGRADE_MAXPOWER;
+		local_data->special_level += 80;
 		if (old_upgrade_state != PLAYER_UPGRADE_MAXPOWER) {
 			wobj->strength *= maxpowerinfos[local_data->mpoverride].strength;
 		}
@@ -1449,7 +1453,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_VORTEX_UPGRADE_TRIGGER);
 	if (other != NULL && local_data->finish_timer <= 0) {
 		local_data->upgrade_state = PLAYER_UPGRADE_VORTEX;
-		local_data->upgradehp = 100.0f;
+		local_data->special_level += 80;
+		//local_data->upgradehp = 100.0f;
 	}
 
 	if (local_data->upgrade_state != PLAYER_UPGRADE_MAXPOWER && old_upgrade_state == PLAYER_UPGRADE_MAXPOWER) {
@@ -1480,7 +1485,23 @@ void WobjPlayer_Update(WOBJ *wobj)
 	other = Wobj_GetWobjCollidingWithType(wobj, BANDIT_GUY);
 	if (other != NULL)
 	{
-		Item_Drop(wobj);
+		BreakPart_CreateParts(wobj->x, wobj->y, -5.0f, item_types[Item_GetCurrentItem()->type].frames[0].x, item_types[Item_GetCurrentItem()->type].frames[0].y, 2, 2);
+		Item_DestroyCurrentItem(wobj);
+		switch (local_data->upgrade_state) {
+		case PLAYER_UPGRADE_WINGS:
+			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 416, 1040, 3, 3);
+			break;
+		case PLAYER_UPGRADE_CRYSTAL_WINGS:
+			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 320, 1040, 3, 3);
+			break;
+		case PLAYER_UPGRADE_VORTEX:
+			BreakPart_CreateParts(wobj->x, wobj->y, -4.0f, 160, 32, 2, 2);
+			break;
+		case PLAYER_UPGRADE_SHOES:
+			BreakPart_CreateParts(wobj->x, wobj->y, -4.0f, 400, 0, 2, 1);
+			break;
+		}
+		local_data->upgrade_state = PLAYER_UPGRADE_NONE;
 		Interaction_PlaySound(wobj, 13);
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_SPRING_BOARD);
@@ -1601,10 +1622,61 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (wobj->item != ITEM_TYPE_ULTRA_SWORD)
 		local_data->uswords_have = 4;
 
-	if (--local_data->beastchurger_timer == 0)
+	if (wobj->custom_ints[1] & PLAYER_FLAG_BEASTCHURGER)
 	{
-		wobj->strength /= 25.0f;
-		Audio_PlayMusic(local_data->beastchurger_music, CNM_TRUE);
+		if (local_data->power_level > PLAYER_POWER_LEVEL_CAP / 5) {
+			local_data->power_level -= 15;
+		} else {
+			local_data->power_level -= 5;
+			if (!local_data->low_beast_flag) {
+				local_data->low_beast_flag = 1;
+				wobj->strength *= 9.0f;
+			}
+		}
+		if (local_data->power_level < -PLAYER_POWER_LEVEL_CAP / 20) {
+			local_data->power_level = 0;
+			wobj->strength /= 3.0f;
+			if (local_data->low_beast_flag) {
+				local_data->low_beast_flag = 0;
+				wobj->strength /= 9.0f;
+			}
+			Audio_PlayMusic(local_data->beastchurger_music, CNM_TRUE);
+			wobj->custom_ints[1] &= ~PLAYER_FLAG_BEASTCHURGER;
+		}
+	} else if (local_data->power_level >= PLAYER_POWER_LEVEL_CAP) {
+		local_data->power_level = PLAYER_POWER_LEVEL_CAP;
+		wobj->custom_ints[1] |= PLAYER_FLAG_BEASTCHURGER;
+		wobj->strength *= 3.0f;
+		local_data->beastchurger_music = Audio_GetCurrentPlayingMusic();
+		Audio_PlayMusic(6, CNM_TRUE);
+		local_data->low_beast_flag = 0;
+	}
+
+	if (wobj->custom_ints[1] & PLAYER_FLAG_SPECIAL)
+	{
+		if (local_data->special_level > PLAYER_SPECIAL_LEVEL_CAP / 5) {
+			if (Game_GetFrame() % 2 == 0) {
+				local_data->special_level -= 1;
+			}
+		} else {
+			if (Game_GetFrame() % 8 == 0) {
+				local_data->special_level -= 1;
+			}
+		}
+		if (local_data->special_level < 0) {
+			local_data->special_level = 0;
+			wobj->custom_ints[1] &= ~PLAYER_FLAG_SPECIAL;
+		}
+	} else if (local_data->special_level >= PLAYER_SPECIAL_LEVEL_CAP) {
+		local_data->special_level = PLAYER_SPECIAL_LEVEL_CAP;
+		wobj->custom_ints[1] |= PLAYER_FLAG_SPECIAL;
+	}
+
+	if (local_data->power_level > PLAYER_POWER_LEVEL_CAP) {
+		local_data->power_level = PLAYER_POWER_LEVEL_CAP;
+	}
+	if (local_data->special_level > PLAYER_SPECIAL_LEVEL_CAP) {
+		local_data->special_level = PLAYER_SPECIAL_LEVEL_CAP;
 	}
 
 	wobj->custom_ints[1] &= ~PLAYER_FLAG_SHOWN_UPGRADE_STATE;
@@ -1743,8 +1815,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 		wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
 		wobj->custom_ints[1] &= ~PLAYER_FLAG_SLIDE_AFTERIMAGE;
 		wobj->health = 100.0f;
-		wobj->speed = 5.0f;
-		wobj->jump = 10.0f;
+		if (!(wobj->custom_ints[1] & PLAYER_FLAG_SPECIAL)) {
+			wobj->speed = 5.0f;
+			wobj->jump = 10.0f;
+		}
+		local_data->special_level /= 2.0f;
+		local_data->power_level /= 1.5f;
 		local_data->platinfo.active = CNM_FALSE;
 		clear_used_dialogs();
 		for (int k = 0; k < 5; k++)
@@ -1779,7 +1855,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		_hud_player_yvel = -5.0f;
 		wobj->vel_x = 0.0f;
 		wobj->vel_y = 0.0f;
-		local_data->upgradehp -= 15.0f;
+		//local_data->upgradehp -= 5.0f;
 		if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) {
 			g_can_pause = CNM_FALSE;
 		}
@@ -1788,12 +1864,12 @@ void WobjPlayer_Update(WOBJ *wobj)
 		{
 			//WOBJ *tempitem;
 			//int itemtype = Item_GetCurrentItem()->type;
-			Item_GetCurrentItem()->durability -= 7.5f;
-			if (Item_GetCurrentItem()->durability <= 0.0f &&
-				item_types[Item_GetCurrentItem()->type].max_durability > 0.1f) {
-				BreakPart_CreateParts(wobj->x, wobj->y, -5.0f, item_types[Item_GetCurrentItem()->type].frames[0].x, item_types[Item_GetCurrentItem()->type].frames[0].y, 2, 2);
-				Item_DestroyCurrentItem(wobj);
-			}
+			//Item_GetCurrentItem()->durability -= 7.5f;
+			//if (Item_GetCurrentItem()->durability <= 0.0f &&
+			//	item_types[Item_GetCurrentItem()->type].max_durability > 0.1f) {
+			//	BreakPart_CreateParts(wobj->x, wobj->y, -5.0f, item_types[Item_GetCurrentItem()->type].frames[0].x, item_types[Item_GetCurrentItem()->type].frames[0].y, 2, 2);
+			//	Item_DestroyCurrentItem(wobj);
+			//}
 			//float durability = Item_GetCurrentItem()->durability;
 			//Item_DestroyCurrentItem(wobj);
 			//if (durability > 0.0f) Item_PickupByType(wobj, itemtype, durability);
@@ -1950,7 +2026,8 @@ plat_velx_application:
 	if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES) wobj->flags |= WOBJ_EARTH_TYPE;
 	if (local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) wobj->flags |= WOBJ_WATER_TYPE;
 	if (local_data->upgrade_state == PLAYER_UPGRADE_VORTEX) wobj->flags |= WOBJ_VOID_TYPE;
-	if (local_data->ability3_timer <= 0 && local_data->finish_timer <= 0 && !Game_GetVar(GAME_VAR_GOD)->data.integer) {
+	if (local_data->ability3_timer <= 0 && local_data->finish_timer <= 0
+		&& !Game_GetVar(GAME_VAR_GOD)->data.integer) {
 		recved_lava_damage = Interaction_WobjReceiveBlockDamage(wobj);
 		if (wobj->health >= old_hp)
 			recved_lava_damage = CNM_FALSE;
@@ -1973,32 +2050,32 @@ plat_velx_application:
 	if (wobj->health < old_hp)
 	{
 		wobj->flags |= WOBJ_DAMAGE_INDICATE;
-		local_data->upgradehp -= 0.5f;
+		//local_data->upgradehp -= 0.f;
 		if (wobj->item) {
-			Item_GetCurrentItem()->durability -= 0.1f;
+			//Item_GetCurrentItem()->durability -= 0.1f;
 		}
 		//local_data->item_durability -= 0.33f;
 		local_data->animforce_cooldown_timer = 4;
 		local_data->animforce_cooldown = CNM_TRUE;
 		local_data->curranim = PLAYER_ANIM_HURT;
 	}
-	if (local_data->upgradehp <= 0.0f) {
-		switch (local_data->upgrade_state) {
-		case PLAYER_UPGRADE_WINGS:
-			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 416, 1040, 3, 3);
-			break;
-		case PLAYER_UPGRADE_CRYSTAL_WINGS:
-			BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 320, 1040, 3, 3);
-			break;
-		case PLAYER_UPGRADE_VORTEX:
-			BreakPart_CreateParts(wobj->x, wobj->y, -4.0f, 160, 32, 2, 2);
-			break;
-		case PLAYER_UPGRADE_SHOES:
-			BreakPart_CreateParts(wobj->x, wobj->y, -4.0f, 400, 0, 2, 1);
-			break;
-		}
-		local_data->upgrade_state = PLAYER_UPGRADE_NONE;
-	}
+	//if (local_data->upgradehp <= 0.0f) {
+	//	switch (local_data->upgrade_state) {
+	//	case PLAYER_UPGRADE_WINGS:
+	//		BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 416, 1040, 3, 3);
+	//		break;
+	//	case PLAYER_UPGRADE_CRYSTAL_WINGS:
+	//		BreakPart_CreateParts(wobj->x - 8.0f, wobj->y - 8.0f, -6.0f, 320, 1040, 3, 3);
+	//		break;
+	//	case PLAYER_UPGRADE_VORTEX:
+	//		BreakPart_CreateParts(wobj->x, wobj->y, -4.0f, 160, 32, 2, 2);
+	//		break;
+	//	case PLAYER_UPGRADE_SHOES:
+	//		BreakPart_CreateParts(wobj->x, wobj->y, -4.0f, 400, 0, 2, 1);
+	//		break;
+	//	}
+	//	local_data->upgrade_state = PLAYER_UPGRADE_NONE;
+	//}
 
 	if ((recved_lava_damage || recved_normal_damage) && !Audio_IsSoundPlaying(1))
 		Interaction_PlaySound(wobj, 1);
@@ -2203,7 +2280,15 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 
 void Player_RecieveDamage(WOBJ *player, WOBJ *inflictor, float damage_taken)
 {
-	if (!Game_GetVar(GAME_VAR_GOD)->data.integer) player->health -= damage_taken;
+	//PLAYER_LOCAL_DATA *data = player->local_data;
+
+	if (!Game_GetVar(GAME_VAR_GOD)->data.integer
+		&& !(player->custom_ints[1] & PLAYER_FLAG_SPECIAL)) {
+		player->health -= damage_taken;
+	}
+
+	PLAYER_LOCAL_DATA *data = player->local_data;
+	data->power_level += damage_taken * PLAYER_POWER_LEVEL_MUL / 5.0f;
 }
 
 static void StepPlayerAnimation(WOBJ *wobj)
@@ -2386,6 +2471,56 @@ static void DrawPlayerChar(WOBJ *wobj, int camx, int camy)
 		wobj->flags & WOBJ_HFLIP,
 		wobj->flags & WOBJ_VFLIP
 	);
+	if (wobj->custom_ints[1] & PLAYER_FLAG_BEASTCHURGER) {
+		float pulse_speed = 10.0f;
+		float pmin = 4.0f, pmax = 7.0f;
+		if (wobj == Game_GetVar(GAME_VAR_PLAYER)->data.pointer) {
+			PLAYER_LOCAL_DATA *pld = wobj->local_data;
+			if (pld->power_level < PLAYER_POWER_LEVEL_CAP / 5) {
+				pulse_speed = 2.0f;
+				pmin = 2.0f;
+				pmax = 5.0f;
+			}
+		}
+
+		float transf = sinf((float)Game_GetFrame() / pulse_speed) / 2.0f + 0.5f;
+		int trans = transf * (pmax - pmin) + pmin;
+		Renderer_DrawColorMask
+		(
+			(int)wobj->x - camx + skin9offsetx,
+			(int)ceilf(wobj->y) - camy + skin9offsety,
+			&pr,
+			trans,
+			RCOL_RED,
+			wobj->flags & WOBJ_HFLIP,
+			wobj->flags & WOBJ_VFLIP
+		);
+	}
+	if (wobj->custom_ints[1] & PLAYER_FLAG_SPECIAL) {
+		float pulse_speed = 10.0f;
+		float pmin = 5.0f, pmax = 7.0f;
+		if (wobj == Game_GetVar(GAME_VAR_PLAYER)->data.pointer) {
+			PLAYER_LOCAL_DATA *pld = wobj->local_data;
+			if (pld->special_level < PLAYER_SPECIAL_LEVEL_CAP / 5) {
+				pulse_speed = 2.0f;
+				pmin = 2.0f;
+				pmax = 5.0f;
+			}
+		}
+
+		float transf = sinf((float)Game_GetFrame() / pulse_speed + 1.5f) / 2.0f + 0.5f;
+		int trans = transf * (pmax - pmin) + pmin;
+		Renderer_DrawColorMask
+		(
+			(int)wobj->x - camx + skin9offsetx,
+			(int)ceilf(wobj->y) - camy + skin9offsety,
+			&pr,
+			trans,
+			RCOL_PINK,
+			wobj->flags & WOBJ_HFLIP,
+			wobj->flags & WOBJ_VFLIP
+		);
+	}
 	//wobj->flags &= WOBJ_DAMAGE_INDICATE;
 
 	if (wobj->flags & WOBJ_HAS_PLAYER_FINISHED) {
@@ -2811,19 +2946,19 @@ void Player_DrawHUD(WOBJ *player) {
 
 	Util_SetRect(&r, 224, 1264, 96, 32);
 	Renderer_DrawBitmap(RENDERER_WIDTH - 96, 0, &r, 2, RENDERER_LIGHT);
-	// Upgrade Health
-	if (local_data->upgradehp > 0.0f && local_data->upgrade_state != PLAYER_UPGRADE_NONE) {
-		DrawUpgradeHPBar(RENDERER_WIDTH - 96 + 91, 5+16, (int)(81.0f * (local_data->upgradehp / 100.0f)));
-	}
+	// Draw special level
+	float percent = (float)local_data->special_level / PLAYER_SPECIAL_LEVEL_CAP;
+	if (percent > 1.0f) percent = 1.0f;
+	DrawUpgradeHPBar(RENDERER_WIDTH - 96 + 91, 5+16, (int)(81.0f * percent));
 	// Item Durability
 	int visible_width = 81;
-	if (!player->item) visible_width = 0;
-	if (player->item && item_types[player->item].max_durability <= 0.1f) {
-		visible_width = 81;
-	}
-	if (player->item && item_types[player->item].max_durability > 0.1f) {
-		visible_width = (int)(Item_GetCurrentItem()->durability / item_types[player->item].max_durability * 81.0f); 
-	}
+	//if (!player->item) visible_width = 0;
+	visible_width = (int)((float)local_data->power_level / (float)PLAYER_POWER_LEVEL_CAP * 81.0f);
+	if (local_data->power_level > PLAYER_POWER_LEVEL_CAP) visible_width = 81;
+	if (local_data->power_level < 0) visible_width = 0;
+	//if (player->item && item_types[player->item].max_durability > 0.1f) {
+		//visible_width = (int)(Item_GetCurrentItem()->durability / item_types[player->item].max_durability * 81.0f); 
+	//}
 
 	//Console_Print("%f",Item_GetCurrentItem()->durability);
 	DrawDurabilityBar(RENDERER_WIDTH - 96 + 91, 6, visible_width);
@@ -3040,18 +3175,20 @@ void Player_SaveData(WOBJ *player, savedata_t *data) {
 	//strcpy(data->level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
 	data->item = player->item;
 	data->offhand = local_data->offhand_item;
-	data->itemhp = Item_GetCurrentItem()->durability;
-	data->offhandhp = local_data->offhand_durability;
+	//data->itemhp = Item_GetCurrentItem()->durability;
+	//data->offhandhp = local_data->offhand_durability;
+	data->itemhp = 100;
+	data->offhandhp = 100;
 	data->upgrade_state = local_data->upgrade_state;
-	data->upgradehp = local_data->upgradehp;
+	//data->upgradehp = local_data->upgradehp;
 }
 void Player_LoadFromSave(WOBJ *player, const savedata_t *data) {
 	PLAYER_LOCAL_DATA *local_data = player->local_data;
 	local_data->offhand_item = data->offhand;
-	local_data->offhand_durability = data->offhandhp;
-	local_data->upgradehp = data->upgradehp;
+	//local_data->offhand_durability = data->offhandhp;
+	//local_data->upgradehp = data->upgradehp;
 	local_data->upgrade_state = data->upgrade_state;
-	Item_PickupByType(player, data->item, data->itemhp);
+	//Item_PickupByType(player, data->item, data->itemhp);
 	player->health = data->hp;
 	player->strength = (float)data->strength / 100.0f;
 	//strcpy();

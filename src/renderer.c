@@ -918,6 +918,64 @@ void Renderer_DrawBitmap2(int _x, int _y, const CNM_RECT *_src, int trans, int l
 		}
 	}
 }
+void Renderer_DrawColorMask(int _x, int _y, const CNM_RECT *_src, int trans,
+		int _color, int hflip, int vflip) {
+	int x, y, tx, ty;
+	if (!renderer_initialized) return;
+	CNM_RECT src = *_src;
+	if (_y < 0) {
+		if (_y + src.h < 0) {
+			return;
+		} else {
+			if (!vflip) src.y -= _y;
+			src.h += _y;
+			_y = 0;
+		}
+	}
+	if (_y + src.h > RENDERER_HEIGHT) {
+		if (_y >= RENDERER_HEIGHT) {
+			return;
+		} else {
+			if (vflip) src.y += src.h - (RENDERER_HEIGHT - _y);
+			src.h = RENDERER_HEIGHT - _y;
+		}
+	}
+	if (_x < 0) {
+		if (_x + src.w < 0) {
+			return;
+		} else {
+			if (!hflip) src.x -= _x;
+			src.w += _x;
+			_x = 0;
+		}
+	}
+	if (_x + src.w > RENDERER_WIDTH) {
+		if (_x >= RENDERER_WIDTH) {
+			return;
+		} else {
+			if (hflip) src.x += src.w - (RENDERER_WIDTH - _x);
+			src.w = RENDERER_WIDTH - _x;
+		}
+	}
+
+	int tx_start, ty_start, tx_step, ty_step;
+	tx_start = (hflip) ? (src.x + src.w - 1) : (src.x);
+	ty_start = (vflip) ? (src.y + src.h - 1) : (src.y);
+	tx_step = hflip ? -1 : 1;
+	ty_step = vflip ? -1 : 1;
+
+	for (y = _y, ty = ty_start; y < _y + src.h; y++, ty += ty_step)
+	{
+		uint8_t *dst_color = &((unsigned char *)renderer_scr->pixels)[_x + y * RENDERER_WIDTH];
+		const uint8_t *src_color = &((unsigned char *)renderer_gfx->pixels)[ty * renderer_gfx->w + tx_start];
+		for (x = _x, tx = tx_start; x < _x + src.w; x++, tx += tx_step, dst_color++, src_color += tx_step)
+		{
+			if (!src_color) continue;
+			const uint8_t color = renderer_trans[_color][*dst_color][trans];
+			*dst_color = *src_color ? color : *dst_color;
+		}
+	}
+}
 /*void Renderer_DrawBitmapScaled(const CNM_RECT *dest, const CNM_RECT *src, int trans, int light)
 {
 	int x, y;

@@ -31,13 +31,19 @@
 #define PLAYER_UPGRADE_VORTEX 4
 #define PLAYER_UPGRADE_MAXPOWER 5
 
-#define PLAYER_FLAG_SHOWN_UPGRADE_STATE 0xF
+#define PLAYER_FLAG_SHOWN_UPGRADE_STATE 0x7
+#define PLAYER_FLAG_BEASTCHURGER (1 << 3)
 #define PLAYER_FLAG_USED_DOUBLE_JUMP (1 << 4)
 #define PLAYER_FLAG_STOMPING (1 << 5)
 #define PLAYER_FLAG_SLIDE_AFTERIMAGE (1 << 6)
+#define PLAYER_FLAG_SPECIAL (1 << 7)
 #define PLAYER_MAX_VORTEXES 3
 
 #define PLAYER_MAX_SKINS 11
+
+#define PLAYER_POWER_LEVEL_CAP 10000
+#define PLAYER_POWER_LEVEL_MUL 100.0f
+#define PLAYER_SPECIAL_LEVEL_CAP 1000
 
 typedef struct _PLAYER_MAXPOWER_INFO
 {
@@ -85,7 +91,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int in_teleport;
 	int upgrade_state;
 	int fire_resistance;
-	int beastchurger_timer;
+	int low_beast_flag;
 	int uswords_have;
 	int beastchurger_music;
 	int checkpoint;
@@ -108,7 +114,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int created_vortexes_id;
 	unsigned int score;
 	int offhand_item;
-	float offhand_durability;
+	//float offhand_durability;
 	int finish_timer;
 	float grav, grav_add;
 	int is_sliding;
@@ -122,7 +128,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	//float flap_spdadd, flap_accadd;
 	int isflying;
 	int numflaps, isdiving, saved_diving_vel;
-	float upgradehp;
+	//float upgradehp;
 	int next_level_line;
 	float jump_init_yspd;
 	int level_end_rank, level_end_score, level_end_time_score;
@@ -144,6 +150,9 @@ typedef struct _PLAYER_LOCAL_DATA
 
 	float last_hp;
 	float plat_velx_add;
+
+	int power_level;
+	int special_level;
 
 	WOBJ *pet;
 

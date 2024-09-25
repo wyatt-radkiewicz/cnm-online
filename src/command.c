@@ -90,6 +90,8 @@ static void Command_God(const char *args, int from_player);
 static void Command_Pet(const char *args, int from_player);
 static void Command_Wide(const char *args, int from_player);
 static void Command_MemStat(const char *args, int from_player);
+static void Command_Rage(const char *args, int from_player);
+static void Command_Special(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -160,7 +162,9 @@ static const char *const command_names[] =
 	"god",
 	"pet",
 	"wide",
-	"memstat"
+	"memstat",
+	"rage",
+	"special"
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -233,6 +237,8 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_Pet,
 	Command_Wide,
 	Command_MemStat,
+	Command_Rage,
+	Command_Special,
 };
 
 static int can_run_cheat1(int from_player) {
@@ -613,10 +619,7 @@ static void Command_SetUpgrade(const char *args, int from_player)
 	WOBJ *player = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	PLAYER_LOCAL_DATA *ld = player->local_data;
 	ld->upgrade_state = atoi(Command_ExtractArg(args, 0));
-	ld->upgradehp = 100.0f;
-	if (ld->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) {
-		ld->upgradehp = 75.0f;
-	}
+	//ld->upgradehp = 100.0f;
 }
 static void Command_StartDialoge(const char *args, int from_player)
 {
@@ -811,5 +814,19 @@ static void Command_Wide(const char *args, int from_player) {
 }
 static void Command_MemStat(const char *args, int from_player) {
 	Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer = !Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer;
+}
+static void Command_Rage(const char *args, int from_player) {
+	if (!can_run_cheat1(from_player)) return;
+
+	WOBJ *wobj = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
+	PLAYER_LOCAL_DATA *data = wobj->local_data;
+	data->power_level = PLAYER_POWER_LEVEL_CAP + 1;
+}
+static void Command_Special(const char *args, int from_player) {
+	if (!can_run_cheat1(from_player)) return;
+
+	WOBJ *wobj = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
+	PLAYER_LOCAL_DATA *data = wobj->local_data;
+	data->special_level = PLAYER_SPECIAL_LEVEL_CAP + 1;
 }
 

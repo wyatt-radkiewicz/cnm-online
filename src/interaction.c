@@ -250,6 +250,15 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 	case INTERACTION_MODE_SINGLEPLAYER:
 		if (wobj_types[victim->type].hurt != NULL && !(victim->flags & WOBJ_INVULN))
 		{
+			PLAYER_LOCAL_DATA *pld = NULL;
+			if (is_player) {
+				pld = (PLAYER_LOCAL_DATA *)interaction_player->local_data;
+			}
+
+			if (pld) {
+				pld->power_level += dmg * PLAYER_POWER_LEVEL_MUL;
+			}
+
 			victim->flags |= WOBJ_DAMAGE_INDICATE;
 			victim->health -= dmg;
 			//if (is_player)
@@ -262,8 +271,8 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 				{
 					interaction_player->money += wobj_types[victim->type].money_reward;
 					interaction_player->strength += wobj_types[victim->type].strength_reward;
-					PLAYER_LOCAL_DATA *pld = (PLAYER_LOCAL_DATA *)interaction_player->local_data;
 					pld->score += wobj_types[victim->type].score_reward + 100;
+					pld->special_level += wobj_types[victim->type].score_reward / 10 + 10;
 				}
 				Wobj_DestroyWobj(victim);
 			}
@@ -273,6 +282,10 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 	case INTERACTION_MODE_CLIENT:
 		if (wobj_types[victim->type].hurt != NULL && !(victim->flags & WOBJ_INVULN))
 		{
+			PLAYER_LOCAL_DATA *pld = NULL;
+			if (is_player && interaction_player == Game_GetVar(GAME_VAR_PLAYER)->data.pointer) {
+				pld = (PLAYER_LOCAL_DATA *)interaction_player->local_data;
+			}
 			/*victim->health -= inflictor->strength;
 			if (!victim->internal.owned)
 			{
@@ -290,6 +303,10 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 			else
 				victim->health -= dmg;
 
+			if (pld) {
+				pld->power_level += dmg * PLAYER_POWER_LEVEL_MUL;
+			}
+
 			//if (is_player && !Interaction_IsUnownedWobjInDestoryed(victim))
 			//	interaction_player->strength += wobj_types[victim->type].strength_reward;
 			if (NetGame_GetClientWobjHealth(victim) < 0.0f)//victim->health < 0.0f)
@@ -298,8 +315,7 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 				{
 					interaction_player->money += wobj_types[victim->type].money_reward;
 					interaction_player->strength += wobj_types[victim->type].strength_reward;
-					if (interaction_player == Game_GetVar(GAME_VAR_PLAYER)->data.pointer) {
-						PLAYER_LOCAL_DATA *pld = (PLAYER_LOCAL_DATA *)interaction_player->local_data;
+					if (pld) {
 						pld->score += wobj_types[victim->type].score_reward + 100;
 					}
 				}
@@ -417,7 +433,16 @@ int Interaction_WobjReceiveBlockDamage(WOBJ *wobj)
 		if (props == NULL) return CNM_FALSE;
 		if (props->dmg_type != BLOCK_DMG_TYPE_NONE)
 		{
-			wobj->health -= (float)props->dmg / 30.0f;
+			float dmg = (float)props->dmg / 30.0f;
+			if (wobj == Game_GetVar(GAME_VAR_PLAYER)->data.pointer) {
+				if ((wobj->custom_ints[1] & PLAYER_FLAG_SPECIAL)
+					&& dmg < 99.0f) {
+					PLAYER_LOCAL_DATA *data = wobj->local_data;
+					data->power_level += dmg * PLAYER_POWER_LEVEL_MUL;
+					dmg = 0;
+				}
+			}
+			wobj->health -= dmg;
 			if (props->dmg_type == BLOCK_DMG_TYPE_QUICKSAND)
 			{
 				if (wobj->vel_y > -2.5f) wobj->vel_y = 0.5f;
