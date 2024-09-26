@@ -226,19 +226,23 @@ void titlebg_draw(void(*mid_callback)(void)) {
 	Renderer_SaveToEffectsBuffer();
 	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS_EX, (int)_camx, (int)(_camy - 0.5f));
 
-	Util_SetRect(&player, 224 + ((Game_GetFrame() % 2) * 32), 144, 32, 32);
-	int hflip = vel[0] < 0.0f;
-	if (vel[1] > 3.0f) {
-		Renderer_DrawBitmap2((int)pos[0] - 8, (int)pos[1] - 8, wings + 2 + (Game_GetFrame() / 3 % 2), 2, RENDERER_LIGHT, hflip, 0);
-	} else {
-		Renderer_DrawBitmap2((int)pos[0] - 8, (int)pos[1] - 8, wings + (Game_GetFrame() / 10 % 2), 2, RENDERER_LIGHT, hflip, 0);
+	if (Game_TopState() != GAME_STATE_CREDITS) {
+		Util_SetRect(&player, 224 + ((Game_GetFrame() % 2) * 32), 144, 32, 32);
+		int hflip = vel[0] < 0.0f;
+		if (vel[1] > 3.0f) {
+			Renderer_DrawBitmap2((int)pos[0] - 8, (int)pos[1] - 8, wings + 2 + (Game_GetFrame() / 3 % 2), 2, RENDERER_LIGHT, hflip, 0);
+		} else {
+			Renderer_DrawBitmap2((int)pos[0] - 8, (int)pos[1] - 8, wings + (Game_GetFrame() / 10 % 2), 2, RENDERER_LIGHT, hflip, 0);
+		}
+		Renderer_DrawBitmap2((int)pos[0], (int)pos[1], &player, 0, RENDERER_LIGHT, hflip, 0.0f);
 	}
-	Renderer_DrawBitmap2((int)pos[0], (int)pos[1], &player, 0, RENDERER_LIGHT, hflip, 0.0f);
 	
 	Background_Draw(1, (int)_camx, (int)_camy);
 
 	clear_lens_flare();
 	if (lensflare) draw_lens_flare(_camx, _camy, floorf(_camx_spd), floorf(_camy_spd));
+
+	if (Game_TopState() == GAME_STATE_CREDITS) return;
 
 	if (mid_callback) mid_callback();
 

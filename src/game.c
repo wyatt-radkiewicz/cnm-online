@@ -62,7 +62,8 @@ static GAME_STATE_TYPE game_states[] =
 	{GameState_ClientDownloading_Init, GameState_ClientDownloading_Quit, GameState_ClientDownloading_Update, GameState_ClientDownloading_Draw},
 #endif
 	{GameState_BitmapBench_Init, GameState_BitmapBench_Quit, GameState_BitmapBench_Update, GameState_BitmapBench_Draw},
-	{GameState_MasterServer_Init, GameState_MasterServer_Quit, GameState_MasterServer_Update, NULL}
+	{GameState_MasterServer_Init, GameState_MasterServer_Quit, GameState_MasterServer_Update, NULL},
+	{GameState_Credits_Init, GameState_Credits_Quit, GameState_Credits_Update, GameState_Credits_Draw},
 };
 static GAME_VAR game_vars[GAME_VAR_MAX];
 
@@ -252,6 +253,10 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_WIDESCREEN].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_MEM_STATUS].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_SPECIAL_ENTRANCE].data.integer = CNM_FALSE;
+	game_vars[GAME_VAR_DRAW_HUD].data.integer = CNM_TRUE;
+	game_vars[GAME_VAR_DRAW_FG].data.integer = CNM_TRUE;
+	game_vars[GAME_VAR_DRAW_BG].data.integer = CNM_TRUE;
+	game_vars[GAME_VAR_DRAW_OBJ].data.integer = CNM_TRUE;
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);

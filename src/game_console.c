@@ -231,7 +231,7 @@ void GameConsole_Draw(void)
 	if (!gameconsole_initialized)
 		return;
 
-	if (Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer || Game_GetDedicatedGameInfo()->warp) {
+	if (Game_GetVar(GAME_VAR_MEM_STATUS)->data.integer) {
 		if (Game_TopState() == GAME_STATE_MAINMENU || Game_TopState() == GAME_STATE_CLIENT_CONNECTING) Renderer_SetFont(288, 416, 8, 8);
 		else Renderer_SetFont(256, 192, 8, 8);
 

@@ -59,6 +59,9 @@ void EndingText_Start(int start_line, int end_line)
 	if (ending_has_started && ending_line_start == start_line && ending_line_end == end_line)
 		return;
 	ending_y = 0;
+	if (Game_TopState() == GAME_STATE_CREDITS) {
+		ending_y -= 60;
+	}
 	ending_line_start = start_line;
 	ending_line_end = end_line;
 	ending_has_started = CNM_TRUE;
@@ -68,14 +71,21 @@ void EndingText_Draw(void)
 	ending_y += 1;
 
 	Renderer_SetFont(256, 192, 8, 8);
+	
+	int height = 8;
+	if (Game_TopState() == GAME_STATE_CREDITS) {
+		height = 32;
+		Renderer_SetFont(0, 1584, 8, 8);
+	}
+
 
 	int num_lines = (ending_line_end - ending_line_start);
-	if (-ending_y + (num_lines * 8 + 16) + RENDERER_HEIGHT > 0)
+	if (-ending_y + (num_lines * height + 16) + RENDERER_HEIGHT > 0)
 	{
 		int y = RENDERER_HEIGHT - ending_y;
 		for (int i = ending_line_start; i < ending_line_end; i++)
 		{
-			Renderer_DrawText(32, y + i * 8, 0, RENDERER_LIGHT, ending_lines[i]);
+			Renderer_DrawText(32, y + i * height, 0, RENDERER_LIGHT, ending_lines[i]);
 		}
 	}
 	else

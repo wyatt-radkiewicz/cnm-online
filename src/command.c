@@ -92,6 +92,11 @@ static void Command_Wide(const char *args, int from_player);
 static void Command_MemStat(const char *args, int from_player);
 static void Command_Rage(const char *args, int from_player);
 static void Command_Special(const char *args, int from_player);
+static void Command_DrawHud(const char *args, int from_player);
+static void Command_DrawFg(const char *args, int from_player);
+static void Command_DrawBg(const char *args, int from_player);
+static void Command_DrawObj(const char *args, int from_player);
+static void Command_Credits(const char *args, int from_player);
 static const char *const command_names[] =
 {
 	"save_blocks",
@@ -164,7 +169,12 @@ static const char *const command_names[] =
 	"wide",
 	"memstat",
 	"rage",
-	"special"
+	"special",
+	"drawhud",
+	"drawfg",
+	"drawbg",
+	"drawobj",
+	"endsky",
 };
 static const COMMAND_FUNC command_funcs[] =
 {
@@ -239,6 +249,11 @@ static const COMMAND_FUNC command_funcs[] =
 	Command_MemStat,
 	Command_Rage,
 	Command_Special,
+	Command_DrawHud,
+	Command_DrawFg,
+	Command_DrawBg,
+	Command_DrawObj,
+	Command_Credits,
 };
 
 static int can_run_cheat1(int from_player) {
@@ -828,5 +843,20 @@ static void Command_Special(const char *args, int from_player) {
 	WOBJ *wobj = Game_GetVar(GAME_VAR_PLAYER)->data.pointer;
 	PLAYER_LOCAL_DATA *data = wobj->local_data;
 	data->special_level = PLAYER_SPECIAL_LEVEL_CAP + 1;
+}
+static void Command_DrawHud(const char *args, int from_player) {
+	Game_GetVar(GAME_VAR_DRAW_HUD)->data.integer = !Game_GetVar(GAME_VAR_DRAW_HUD)->data.integer;
+}
+static void Command_DrawFg(const char *args, int from_player) {
+	Game_GetVar(GAME_VAR_DRAW_FG)->data.integer = !Game_GetVar(GAME_VAR_DRAW_FG)->data.integer;
+}
+static void Command_DrawBg(const char *args, int from_player) {
+	Game_GetVar(GAME_VAR_DRAW_BG)->data.integer = !Game_GetVar(GAME_VAR_DRAW_BG)->data.integer;
+}
+static void Command_DrawObj(const char *args, int from_player) {
+	Game_GetVar(GAME_VAR_DRAW_OBJ)->data.integer = !Game_GetVar(GAME_VAR_DRAW_OBJ)->data.integer;
+}
+static void Command_Credits(const char *args, int from_player) {
+	Game_SwitchState(GAME_STATE_CREDITS);
 }
 

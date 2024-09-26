@@ -280,10 +280,12 @@ void FileSystem_SearchForLevels(int clear_level_list)
         while ((dir = readdir(d)) != NULL) {
             period = strchr(dir->d_name, '.');
             if (period != NULL && strcmp(period, ".cnmb") == 0) {
-				if (strncmp(dir->d_name, "_title", 6) == 0) {
-					num_title_levels++;
-					continue;
-				}
+		if (strncmp(dir->d_name, "_title", 6) == 0) {
+			num_title_levels++;
+			continue;
+		} else if (dir->d_name[0] == '_') {
+			continue;
+		}
                 char cnms_level_name_path[FILESYSTEM_MAX_LENGTH + 1];
                 int l;
                 strcpy(levels[num_levels].level, "levels/");

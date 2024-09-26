@@ -2150,8 +2150,8 @@ plat_velx_application:
 	}
 
 	// Cap player health, money, and strength
-	//if (wobj->health > PLAYER_HP_MAX)
-		//wobj->health = PLAYER_HP_MAX;
+	if (wobj->health > PLAYER_HP_MAX)
+		wobj->health = PLAYER_HP_MAX;
 	if (wobj->strength > 9.99f)
 		wobj->strength = 9.99f;
 	// if (wobj->money > 99999)

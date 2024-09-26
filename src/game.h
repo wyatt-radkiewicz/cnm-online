@@ -74,6 +74,10 @@ typedef enum _GAME_VARS
 	GAME_VAR_WIDESCREEN,
 	GAME_VAR_MEM_STATUS,
 	GAME_VAR_SPECIAL_ENTRANCE,
+	GAME_VAR_DRAW_HUD,
+	GAME_VAR_DRAW_FG,
+	GAME_VAR_DRAW_BG,
+	GAME_VAR_DRAW_OBJ,
 	GAME_VAR_MAX
 } GAME_VARS;
 
@@ -119,7 +123,8 @@ typedef enum _GAME_STATES
 	GAME_STATE_MINIGAME1_TEST,
 #endif
 	GAME_STATE_BITMAP_BENCH,
-	GAME_STATE_MASTER_SERVER
+	GAME_STATE_MASTER_SERVER,
+	GAME_STATE_CREDITS,
 } GAME_STATES;
 
 void GameState_Base_Init(void);
@@ -189,6 +194,10 @@ void GameState_BitmapBench_Draw(void);
 void GameState_MasterServer_Init(void);
 void GameState_MasterServer_Quit(void);
 void GameState_MasterServer_Update(void);
+void GameState_Credits_Init(void);
+void GameState_Credits_Quit(void);
+void GameState_Credits_Update(void);
+void GameState_Credits_Draw(void);
 
 void Game_Init(const DEDICATED_GAME_INFO *gi);
 void Game_Quit(void);

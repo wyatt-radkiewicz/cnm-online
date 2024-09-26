@@ -14,6 +14,7 @@
 #include "ending_text.h"
 #include "fadeout.h"
 #include "mem.h"
+#include "filesystem.h"
 
 #define NETGAME_MAX_WOBJ_UPDATES 32
 
@@ -122,6 +123,8 @@ void Interaction_Tick(void) {
 	if (_next_level_timer == 0 && interaction_mode == INTERACTION_MODE_SINGLEPLAYER) {
 		if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
 			Game_SwitchState(GAME_STATE_MAINMENU);
+		} else if (strcmp(Game_GetVar(GAME_VAR_LEVEL)->data.string, "levels/credits") == 0) {
+			Game_SwitchState(GAME_STATE_CREDITS);
 		} else {
 			Game_PopState();
 			Game_PushState(GAME_STATE_SINGLEPLAYER);

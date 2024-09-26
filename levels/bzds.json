@@ -970,7 +970,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -990,7 +990,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1010,7 +1010,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1030,7 +1030,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1050,7 +1050,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1070,7 +1070,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1090,7 +1090,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1110,7 +1110,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -1130,7 +1130,7 @@
         "DisapearingPlatform": {
           "time_on": 2.0,
           "time_off": 1.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3748,7 +3748,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3768,7 +3768,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3788,7 +3788,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3808,7 +3808,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3828,7 +3828,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3848,7 +3848,7 @@
         "DisapearingPlatform": {
           "time_on": 3.0,
           "time_off": 2.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3868,7 +3868,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3888,7 +3888,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3908,7 +3908,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -3928,7 +3928,7 @@
         "DisapearingPlatform": {
           "time_on": 1.0,
           "time_off": 3.0,
-          "starts_on": false
+          "starts_on": true
         }
       },
       "spawning_criteria": {
@@ -4331,7 +4331,11 @@
         1200.0,
         14384.0
       ],
-      "type_data": "PlayerSpawn",
+      "type_data": {
+        "PlayerSpawn": {
+          "special_entrance": false
+        }
+      },
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
@@ -6761,7 +6765,7 @@
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "DRAGON DEEZ NUTS",
+          "next_level": "end",
           "extra_unlocked_level": null,
           "is_secret": false
         }
@@ -6776,12 +6780,12 @@
     },
     {
       "pos": [
-        14976.0,
-        18592.0
+        14975.92,
+        18592.082
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "DRAGON DEEZ NUTS",
+          "next_level": "end",
           "extra_unlocked_level": null,
           "is_secret": false
         }
@@ -6796,12 +6800,12 @@
     },
     {
       "pos": [
-        14976.0,
-        18560.0
+        14976.079,
+        18560.078
       ],
       "type_data": {
         "FinishTrigger": {
-          "next_level": "DRAGON DEEZ NUTS",
+          "next_level": "end",
           "extra_unlocked_level": null,
           "is_secret": false
         }
@@ -7380,7 +7384,7 @@
             6942.454
           ],
           "start_activated": false,
-          "teleport_players": false,
+          "teleport_players": true,
           "link_id": 5
         }
       },

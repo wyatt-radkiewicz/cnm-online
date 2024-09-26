@@ -249,35 +249,50 @@ void World_Draw(int mode)
 
 	camx = (int)Camera_GetXPos();
 	camy = (int)Camera_GetYPos();
-	// Draw the background
-	Background_Draw(0, camx, camy);
+
+	if (Game_GetVar(GAME_VAR_DRAW_BG)->data.integer) {
+		// Draw the background
+		Background_Draw(0, camx, camy);
+	}
 	
-	// Draw low priority block layer
-	Blocks_DrawBlocks(BLOCKS_BG, camx, camy);
+	if (Game_GetVar(GAME_VAR_DRAW_FG)->data.integer) {
+		// Draw low priority block layer
+		Blocks_DrawBlocks(BLOCKS_BG, camx, camy);
+	}
 
-	// Update block lighting with respect to object lights
-	Wobj_CalculateLightForScreen(camx, camy);
-	
-	// Draw the wobjs
-	Wobj_DrawWobjs(camx, camy);
+	if (Game_GetVar(GAME_VAR_DRAW_OBJ)->data.integer) {
+		// Update block lighting with respect to object lights
+		Wobj_CalculateLightForScreen(camx, camy);
+		
+		// Draw the wobjs
+		Wobj_DrawWobjs(camx, camy);
+	}
 
-	// Draw the high priority layer of blocks
-	Blocks_DrawBlocks(BLOCKS_FG, camx, camy);
-	Renderer_SaveToEffectsBuffer();
-	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS, camx, camy);
-	Renderer_SaveToEffectsBuffer();
-	Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS_EX, camx, camy);
+	if (Game_GetVar(GAME_VAR_DRAW_FG)->data.integer) {
+		// Draw the high priority layer of blocks
+		Blocks_DrawBlocks(BLOCKS_FG, camx, camy);
+		Renderer_SaveToEffectsBuffer();
+		Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS, camx, camy);
+		Renderer_SaveToEffectsBuffer();
+		Blocks_DrawBlocks(BLOCKS_DUMMY_EFFECTS_EX, camx, camy);
+	}
 
-	// Draw overlayer things
-	Wobj_DrawWobjsOverlayer(camx, camy);
+	if (Game_GetVar(GAME_VAR_DRAW_OBJ)->data.integer) {
+		// Draw overlayer things
+		Wobj_DrawWobjsOverlayer(camx, camy);
+	}
 
-	// High priority background
-	Background_Draw(1, camx, camy);
+	if (Game_GetVar(GAME_VAR_DRAW_BG)->data.integer) {
+		// High priority background
+		Background_Draw(1, camx, camy);
+	}
 
 	//Renderer_DrawHorzRippleEffect(&(CNM_RECT){ .x = 0, .y = 50, .w = 150, .h = 100}, 10.f, 2.f, 0.1f);
 
-	// Player HUD
-	Player_DrawHUD(player);
+	if (Game_GetVar(GAME_VAR_DRAW_HUD)->data.integer) {
+		// Player HUD
+		Player_DrawHUD(player);
+	}
 
 	// Debug helpers
 	//CNM_RECT dr = {RENDERER_WIDTH / 2 - 16, RENDERER_HEIGHT / 2 - 48, 32, 48};
@@ -359,13 +374,15 @@ void World_Draw(int mode)
 		}
 	}
 
-	// Boss Bar
-	BossBar_Draw();
+	if (Game_GetVar(GAME_VAR_DRAW_FG)->data.integer) {
+		// Boss Bar
+		BossBar_Draw();
 
-	// Other MISC. Things to draw
-	Dialoge_Draw();
-	//Fadeout_ApplyFade();
-	EndingText_Draw();
+		// Other MISC. Things to draw
+		Dialoge_Draw();
+		//Fadeout_ApplyFade();
+		EndingText_Draw();
+	}
 
 	// Ending Text
 	if (title_card_timer-- > 0)

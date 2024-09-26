@@ -25,6 +25,7 @@ MODE MUSIC
 25 music/cnmhq.wav
 26 music/mapfinish.wav
 27 music/gameover.wav
+28 music/credits.wav
 MODE SOUNDS
 0 sounds/gun.wav
 1 sounds/hurt.wav
@@ -94,12 +95,18 @@ MODE SOUNDS
 65 sounds/smlsplash.wav
 MODE MUSIC_VOLUME_OVERRIDE
 MODE LEVELSELECT_ORDER
+bzds 0
+classic 0
 race 0
 ghz 0
+hq 0
+cornfields 0
+Abandoned 0
+mt 0
+ein 0
 bonus 100
 arena 100
 rrn 0
-bzds 0
 ocean 300
 train 27000
 ei 400
