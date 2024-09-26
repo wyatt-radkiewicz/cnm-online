@@ -958,6 +958,15 @@ void WobjPlayer_Update(WOBJ *wobj)
 			if (absvelx < 1.5f || !Wobj_IsGrouneded(wobj)) {
 				local_data->is_sliding = CNM_FALSE;
 				local_data->slide_super_jump_timer = 3;
+				if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, -15.0f)) {
+					local_data->is_sliding = CNM_TRUE;
+					local_data->slide_super_jump_timer = 5;
+					if (wobj->flags & WOBJ_HFLIP) {
+						wobj->vel_x = -3.0f;
+					} else {
+						wobj->vel_x = 3.0f;
+					}
+				}
 			}
 		}
 	
@@ -1579,6 +1588,8 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		level_end_rank_y = RENDERER_HEIGHT;
 		wobj->flags |= WOBJ_HAS_PLAYER_FINISHED;
+		Game_GetVar(GAME_VAR_SPECIAL_ENTRANCE)->data.integer =
+			local_data->level_end_found_secret;
 	}
 	other = Wobj_GetWobjCollidingWithType(wobj, WOBJ_BGSPEED_X);
 	if (other != NULL)
@@ -1655,13 +1666,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 	if (wobj->custom_ints[1] & PLAYER_FLAG_SPECIAL)
 	{
 		if (local_data->special_level > PLAYER_SPECIAL_LEVEL_CAP / 5) {
-			if (Game_GetFrame() % 2 == 0) {
-				local_data->special_level -= 1;
-			}
+			local_data->special_level -= 4;
 		} else {
-			if (Game_GetFrame() % 8 == 0) {
-				local_data->special_level -= 1;
-			}
+			local_data->special_level -= 2;
 		}
 		if (local_data->special_level < 0) {
 			local_data->special_level = 0;

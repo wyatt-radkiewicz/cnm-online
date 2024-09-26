@@ -251,6 +251,7 @@ static void Game_InitGameVars(void)
 	game_vars[GAME_VAR_GOD].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_WIDESCREEN].data.integer = CNM_FALSE;
 	game_vars[GAME_VAR_MEM_STATUS].data.integer = CNM_FALSE;
+	game_vars[GAME_VAR_SPECIAL_ENTRANCE].data.integer = CNM_FALSE;
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);

@@ -3,6 +3,7 @@
 #include "player_spawns.h"
 #include "utility.h"
 #include "mem.h"
+#include "game.h"
 
 static int spawning_mode = PLAYER_SPAWN_TYPE_NORMAL_MODES;
 static float (*spawns_x)[PLAYER_SPAWNS_MAX];
@@ -32,26 +33,27 @@ void PlayerSpawns_SetSpawnLoc(int index, float x, float y)
 }
 void PlayerSpawn_SetWobjLoc(float *coords)
 {
-	int index = Util_RandInt(0, PLAYER_SPAWNS_MAX - 1);
-	int i = 0;
-	while (spawns_x[spawning_mode][index] == INFINITY)
-	{
-		index = Util_RandInt(0, PLAYER_SPAWNS_MAX - 1);
-		if (i++ > 255)
-			break;
-	}
-	if (i > 255)
-	{
-		index = 0;
-		for (i = 0; i < 256; i++)
-		{
-			if (spawns_x[spawning_mode][i] != INFINITY)
-			{
-				index = i;
-				break;
-			}
-		}
-	}
+	int index = Game_GetVar(GAME_VAR_SPECIAL_ENTRANCE)->data.integer ? 1 : 0;
+	//int index = Util_RandInt(0, PLAYER_SPAWNS_MAX - 1);
+	//int i = 0;
+	//while (spawns_x[spawning_mode][index] == INFINITY)
+	//{
+	//	index = Util_RandInt(0, PLAYER_SPAWNS_MAX - 1);
+	//	if (i++ > 255)
+	//		break;
+	//}
+	//if (i > 255)
+	//{
+	//	index = 0;
+	//	for (i = 0; i < 256; i++)
+	//	{
+	//		if (spawns_x[spawning_mode][i] != INFINITY)
+	//		{
+	//			index = i;
+	//			break;
+	//		}
+	//	}
+	//}
 	coords[0] = spawns_x[spawning_mode][index];
 	coords[1] = spawns_y[spawning_mode][index];
 }

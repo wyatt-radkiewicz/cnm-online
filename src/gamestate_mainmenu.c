@@ -199,6 +199,7 @@ void GameState_MainMenu_Init(void)
 {
 	if (!titlebg_is_init()) arena_push_zone("TITLEBG");
 	Game_GetVar(GAME_VAR_GOD)->data.integer = CNM_FALSE;
+	Game_GetVar(GAME_VAR_SPECIAL_ENTRANCE)->data.integer = CNM_FALSE;
 	FileSystem_SearchForLevels(CNM_TRUE);
 	Fadeout_Setup();
 	Fadeout_FadeFromWhite(10, 25);
