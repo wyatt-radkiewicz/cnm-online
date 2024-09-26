@@ -91,6 +91,7 @@ MODE SOUNDS
 62 sounds/flydive.wav
 63 sounds/super_slide.wav
 64 sounds/normstomp.wav
+65 sounds/smlsplash.wav
 MODE MUSIC_VOLUME_OVERRIDE
 MODE LEVELSELECT_ORDER
 race 0

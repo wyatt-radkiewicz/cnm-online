@@ -724,7 +724,14 @@ void Interaction_GameOver(void) {
 	case INTERACTION_MODE_CLIENT:
 		break;
 	case INTERACTION_MODE_SINGLEPLAYER:
-		new_save(g_saves + g_current_save);
+		// Delete save file
+		//new_save(g_saves + g_current_save);
+		g_saves[g_current_save].lives = 3;
+		g_saves[g_current_save].offhand = 0;
+		g_saves[g_current_save].item = 0;
+		g_saves[g_current_save].upgrade_state = 0;
+		g_saves[g_current_save].hp = 100;
+		g_saves[g_current_save].strength = 5;
 		save_game(g_current_save, g_saves + g_current_save);
 		Game_SwitchState(GAME_STATE_MAINMENU);
 		break;

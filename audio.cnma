@@ -113,7 +113,6 @@ cm 1000
 lc 1100
 mall 0
 tut 24000
-hq 0
 MODE MAXPOWER0
 spd 2
 jmp 2
