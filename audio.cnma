@@ -26,6 +26,7 @@ MODE MUSIC
 26 music/mapfinish.wav
 27 music/gameover.wav
 28 music/credits.wav
+29 music/scity.wav
 MODE SOUNDS
 0 sounds/gun.wav
 1 sounds/hurt.wav

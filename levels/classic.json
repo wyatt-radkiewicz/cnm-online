@@ -18,7 +18,11 @@
         2560.0,
         1184.0
       ],
-      "type_data": "PlayerSpawn",
+      "type_data": {
+        "PlayerSpawn": {
+          "special_entrance": false
+        }
+      },
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
