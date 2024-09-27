@@ -18,7 +18,7 @@
 #define PLAYER_TURN_AIR 8
 #define PLAYER_ANIM_MAX 9
 
-#define PLAYER_SLIDING_MAX_SPD (final_speed * 1.9f)
+#define PLAYER_SLIDING_MAX_SPD (final_speed * 2.5f)
 
 #define PLAYER_HP_NORMAL_MAX 200
 #define PLAYER_HP_MAX 1000

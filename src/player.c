@@ -902,15 +902,15 @@ void WobjPlayer_Update(WOBJ *wobj)
 			if ((wobj->vel_x > 2.0f || wobj->vel_x < -2.0f) || local_data->sliding_crit_timer > 0) {
 				const float fast_spd = 15.0f;
 				wobj->vel_x *= 1.25f;
-				if (local_data->sliding_crit_timer > 0 && (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) || local_data->slide_input_buffer > 0)) {
+				//if (local_data->sliding_crit_timer > 0 && (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) || local_data->slide_input_buffer > 0)) {
 					if (wobj->flags & WOBJ_HFLIP && wobj->vel_x > -final_speed) wobj->vel_x = -final_speed;
 					else if (~wobj->flags & WOBJ_HFLIP && wobj->vel_x < final_speed) wobj->vel_x = final_speed;  
 					wobj->vel_x *= 1.5f;
 					Interaction_PlaySound(wobj, 63);
-				} else {
+				//} else {
 					wobj->vel_x = CNM_CLAMP(wobj->vel_x, -PLAYER_SLIDING_MAX_SPD, PLAYER_SLIDING_MAX_SPD);
-					Interaction_PlaySound(wobj, 59);
-				}
+					//Interaction_PlaySound(wobj, 59);
+				//}
 				if (fabsf(wobj->vel_x) > fast_spd) {
 					if (wobj->vel_x > fast_spd) wobj->vel_x = fast_spd;
 					else wobj->vel_x = -fast_spd;
