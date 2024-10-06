@@ -231,24 +231,79 @@ static void Renderer_UpdateWindowFromSettings(void)
 		width *= 3;
 		height *= 3;
 	}
+
+	int idx = 0;
+	if (renderer_win != NULL) {
+		//SDL_GetWindowDisplayIndex(renderer_win);
+		//
+
+		int wx, wy;
+		SDL_GetWindowPosition(renderer_win, &wx, &wy);
+		int ww, wh;
+		SDL_GetWindowSize(renderer_win, &ww, &wh);
+		wx += ww / 2;
+		wy += wh / 2;
+
+		for (; idx < SDL_GetNumVideoDisplays(); idx++) {
+			SDL_Rect bounds;
+			SDL_GetDisplayBounds(idx, &bounds);
+
+			if (wx < bounds.x || wx > bounds.x + bounds.w
+				|| wy < bounds.y || wy > bounds.y + bounds.h) {
+				continue;
+			}
+			break;
+		}
+	}
+
+	Console_Print("Screen Number: %d", idx);
+
 	if (renderer_fullscreen) {
 		// non 4 by 3 aspect ratio assume width is more than height
-		SDL_DisplayMode dm;
-		SDL_GetCurrentDisplayMode(0, &dm);
+		//SDL_DisplayMode dm;
+		//SDL_GetCurrentDisplayMode(idx, &dm);
+		SDL_Rect dm;
+		SDL_GetDisplayBounds(idx, &dm);
 		height = dm.h;
 		width = dm.w;
 	}
+
+	// Get window position for fullscreen windows
+	SDL_Rect r;
+	SDL_GetDisplayBounds(idx, &r);
+	int wpos_x, wpos_y;
+	
+	if (renderer_fullscreen) {
+		wpos_x = r.x;
+		wpos_y = r.y;
+	} else if (renderer_win) {
+		int wx, wy;
+		SDL_GetWindowPosition(renderer_win, &wx, &wy);
+		int ww, wh;
+		SDL_GetWindowSize(renderer_win, &ww, &wh);
+		wx += ww / 2;
+		wy += wh / 2;
+
+		wpos_x = wx - width / 2;
+		wpos_y = wy - height / 2;
+		//wpos_x = wx;
+		//wpos_y = wy;
+	} else {
+		wpos_x = r.x + r.w / 2 - width / 2;
+		wpos_y = r.y + r.h / 2 - height / 2;
+	}
+
 	//if (renderer_hires_temp != NULL) SDL_FreeSurface(renderer_hires_temp);
 	if (renderer_win != NULL) SDL_DestroyWindow(renderer_win);
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
 	renderer_win = SDL_CreateWindow
 	(
 		windowname,
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
+		wpos_x,
+		wpos_y,
 		width,
 		height,
-		SDL_WINDOW_SHOWN | (renderer_fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
+		SDL_WINDOW_SHOWN | (renderer_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
 	);
 	if (renderer_gfx) {
 		if (renderer_scr) SDL_FreeSurface(renderer_scr);

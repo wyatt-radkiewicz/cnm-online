@@ -898,32 +898,35 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (local_data->skip_jumpthrough_timer > 0) local_data->skip_jumpthrough_timer--;
 		if (Wobj_IsGrouneded(wobj)) local_data->slide_jump_cooldown--;
 		if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) local_data->slide_input_buffer = 5;
-		if (Wobj_IsGrouneded(wobj) && (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING) || local_data->slide_input_buffer > 0) && !local_data->is_sliding && local_data->slide_jump_cooldown <= 0 && !local_data->lock_controls) {
-			if ((wobj->vel_x > 2.0f || wobj->vel_x < -2.0f) || local_data->sliding_crit_timer > 0) {
-				const float fast_spd = 15.0f;
-				wobj->vel_x *= 1.25f;
-				//if (local_data->sliding_crit_timer > 0 && (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) || local_data->slide_input_buffer > 0)) {
-					if (wobj->flags & WOBJ_HFLIP && wobj->vel_x > -final_speed) wobj->vel_x = -final_speed;
-					else if (~wobj->flags & WOBJ_HFLIP && wobj->vel_x < final_speed) wobj->vel_x = final_speed;  
-					wobj->vel_x *= 1.5f;
-					Interaction_PlaySound(wobj, 63);
-				//} else {
-					wobj->vel_x = CNM_CLAMP(wobj->vel_x, -PLAYER_SLIDING_MAX_SPD, PLAYER_SLIDING_MAX_SPD);
-					//Interaction_PlaySound(wobj, 59);
-				//}
-				if (fabsf(wobj->vel_x) > fast_spd) {
-					if (wobj->vel_x > fast_spd) wobj->vel_x = fast_spd;
-					else wobj->vel_x = -fast_spd;
-				}
-				local_data->slide_super_jump_timer = 0;
-				local_data->slide_input_buffer = 0;
-				local_data->is_sliding = CNM_TRUE;
-				local_data->sliding_jump_timer = 30;
-				wobj->custom_ints[1] |= PLAYER_FLAG_SLIDE_AFTERIMAGE;
-				wobj->hitbox.y = 17.0f;
-				wobj->hitbox.h = 15.0f;
-				local_data->stored_slide_speed = fabsf(wobj->vel_x);
+		if (Wobj_IsGrouneded(wobj) && (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING)
+				|| local_data->slide_input_buffer > 0) && !local_data->is_sliding && local_data->slide_jump_cooldown <= 0 && !local_data->lock_controls) {
+			if (wobj->vel_x > -2.0f && wobj->vel_x < 2.0f) {
+				if (wobj->flags & WOBJ_HFLIP) wobj->vel_x = -2.0f;
+				else wobj->vel_x = 2.0f;
 			}
+			const float fast_spd = 15.0f;
+			wobj->vel_x *= 1.25f;
+			//if (local_data->sliding_crit_timer > 0 && (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) || local_data->slide_input_buffer > 0)) {
+				if (wobj->flags & WOBJ_HFLIP && wobj->vel_x > -final_speed) wobj->vel_x = -final_speed;
+				else if (~wobj->flags & WOBJ_HFLIP && wobj->vel_x < final_speed) wobj->vel_x = final_speed;  
+				wobj->vel_x *= 1.5f;
+				Interaction_PlaySound(wobj, 63);
+			//} else {
+				wobj->vel_x = CNM_CLAMP(wobj->vel_x, -PLAYER_SLIDING_MAX_SPD, PLAYER_SLIDING_MAX_SPD);
+				//Interaction_PlaySound(wobj, 59);
+			//}
+			if (fabsf(wobj->vel_x) > fast_spd) {
+				if (wobj->vel_x > fast_spd) wobj->vel_x = fast_spd;
+				else wobj->vel_x = -fast_spd;
+			}
+			local_data->slide_super_jump_timer = 0;
+			local_data->slide_input_buffer = 0;
+			local_data->is_sliding = CNM_TRUE;
+			local_data->sliding_jump_timer = 30;
+			wobj->custom_ints[1] |= PLAYER_FLAG_SLIDE_AFTERIMAGE;
+			wobj->hitbox.y = 17.0f;
+			wobj->hitbox.h = 15.0f;
+			local_data->stored_slide_speed = fabsf(wobj->vel_x);
 		}
 		if (Wobj_IsGrounded(wobj) && local_data->skip_jumpthrough_timer <= 0 && local_data->slide_jump_cooldown <= 0 && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->is_sliding && fabsf(wobj->vel_x) < 0.05f) {
 			local_data->skip_jumpthrough_timer = 8;

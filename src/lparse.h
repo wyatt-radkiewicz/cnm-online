@@ -29,7 +29,7 @@ extern LParse *global_lparse;
 
 LParse		*lparse_open_from_file(void *fp, LParseMode m);
 LParse		*lparse_open_from_file_inplace(LParse *lparse, void *fp, LParseMode m);
-int			lparse_get_version(LParse *lp);
+int		lparse_get_version(LParse *lp);
 void		lparse_set_version(LParse *lp, int version);
 void		lparse_close(LParse *lp);
 void		lparse_close_inplace(LParse *lp);
