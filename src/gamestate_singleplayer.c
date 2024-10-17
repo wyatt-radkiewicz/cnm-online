@@ -16,6 +16,9 @@
 #include "player.h"
 #include "mem.h"
 
+static int restart_timer;
+static int was_god;
+
 static void GoBackToPlaying(void)
 {
 	pause_menu_unfocus();
@@ -31,6 +34,14 @@ static void Respawn(void)
 	Command_Execute("kill", CNM_FALSE);
 	pause_menu_unfocus();
 }
+static void lsrestart(void) {
+	Input_PushState(INPUT_STATE_NOINPUT);
+	was_god = Game_GetVar(GAME_VAR_GOD)->data.integer;
+	Game_GetVar(GAME_VAR_GOD)->data.integer = CNM_TRUE;
+	restart_timer = 10;
+	pause_menu_unfocus();
+	Fadeout_FadeToWhite(8, 3, 1);
+}
 
 void GameState_Singleplayer_Init(void)
 {
@@ -39,7 +50,9 @@ void GameState_Singleplayer_Init(void)
 	pause_menu_setcallback(PAUSE_MENU_RESPAWN, Respawn);
 	pause_menu_setcallback(PAUSE_MENU_CONTINUE, GoBackToPlaying);
 	pause_menu_setcallback(PAUSE_MENU_EXIT, GoBackToMainMenu);
+	pause_menu_setcallback(PAUSE_MENU_RESTART, lsrestart);
 	World_Start(WORLD_MODE_SINGLEPLAYER);
+	restart_timer = -1;
 }
 void GameState_Singleplayer_Quit(void)
 {
@@ -48,6 +61,14 @@ void GameState_Singleplayer_Quit(void)
 }
 void GameState_Singleplayer_Update(void)
 {
+	if (restart_timer > 0) {
+		restart_timer--;
+		if (restart_timer == 0) {
+			Game_GetVar(GAME_VAR_GOD)->data.integer = was_god;
+			World_SoftRestart();
+		}
+	}
+
 	Input_Update();
 	pause_menu_update();
 	GameConsole_Update();

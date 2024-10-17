@@ -35,9 +35,87 @@ static char (*title_card_strings)[ENDING_TEXT_MAX_WIDTH + 1];
 static int title_card_timer;
 static int title_card_num_lines;
 
+static int g_mode;
+
+static void cleanup_spawner_related(void) {
+	Wobj_DestroyOwnedWobjs();
+	Wobj_DestroyUnownedWobjs();
+	Spawners_UnloadSpawners();
+	PlayerSpawn_ClearAllSpawns();
+	TeleportInfos_FreeLegacyLevelInfo();
+	EndingText_ClearAllLines();
+}
+
+static void startup_spawner_related(void) {
+	char buffer[64];
+
+	// Misc game global vars
+	Game_GetVar(GAME_VAR_GRAVITY)->data.decimal = 0.5f;
+	Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer = 0;
+	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(Filesystem_GetLevelIdFromName(Game_GetVar(GAME_VAR_LEVEL)->data.string));
+
+	// Force unused save slot if in nosave g_mode
+	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) g_current_save = SAVE_SLOTS;
+
+	// Make sure the player is the first thing created as some other entities might depend on it for creation
+	PlayerSpawns_SetMode(PLAYER_SPAWN_TYPE_NORMAL_MODES);
+	player = Wobj_CreateOwned(WOBJ_PLAYER, 0.0f, 0.0f, Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer, 0.0f);
+	Interaction_SetClientPlayerWObj(player);
+	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) Player_TryTitlePopup();
+
+	// Updating and getting world variables
+	Game_GetVar(GAME_VAR_PLAYER)->data.pointer = player;
+
+	// Initialize the spawner multi/single-player g_mode
+	if (g_mode == WORLD_MODE_SINGLEPLAYER)
+		Spawners_SetGlobalMode(SPAWNER_SINGLEPLAYER);
+	else
+		Spawners_SetGlobalMode(SPAWNER_MULTIPLAYER);
+
+	// Loading in the actual spawners
+	sprintf(buffer, "%s.cnms", Game_GetVar(GAME_VAR_LEVEL)->data.string);
+	Serial_LoadSpawners(buffer);
+
+	// Spawn all the objects in
+	if (g_mode != WORLD_MODE_CLIENT)
+	{
+		Spawners_CreateAllWobjsFromSpawners();
+	}
+
+	// Load in the new player position
+	PlayerSpawn_SetWobjLoc(&player->x);
+	{
+		PLAYER_LOCAL_DATA *local_data = player->local_data;
+		if (local_data->pet) {
+			local_data->pet->x = player->x;
+			local_data->pet->y = player->y;
+		}
+	}
+	Camera_Setup((int)player->x, (int)player->y); // Initializing camera values
+	
+	// Load player state
+	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_NOSAVE)->data.integer) {
+		Player_LoadFromSave(player, g_saves + g_current_save);
+		strcpy(g_saves[g_current_save].level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
+		save_game(g_current_save, g_saves + g_current_save);
+		globalsave_visit_level(&g_globalsave, g_saves[g_current_save].level);
+	} else {
+		g_current_save = SAVE_SLOTS;
+		new_save(g_saves + g_current_save);
+		if (Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer) g_saves[g_current_save].lives = 50;
+		Player_LoadFromSave(player, g_saves + g_current_save);
+	}
+}
+
+void World_SoftRestart(void) {
+	cleanup_spawner_related();
+	startup_spawner_related();
+}
+
 void World_Start(int mode)
 {
 	arena_push_zone("WORLD");
+	g_mode = mode;
 	title_card_strings = arena_alloc(sizeof(*title_card_strings) * TITLE_CARD_MAX_LINES);
 	char buffer[UTIL_MAX_TEXT_WIDTH * 2];
 
@@ -72,67 +150,15 @@ void World_Start(int mode)
 	Player_ResetHUD();
 	Game_ResetFrame();
 
-	// Misc game global vars
-	Game_GetVar(GAME_VAR_GRAVITY)->data.decimal = 0.5f;
-	Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer = 0;
-	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(Filesystem_GetLevelIdFromName(Game_GetVar(GAME_VAR_LEVEL)->data.string));
-
-	// Force unused save slot if in nosave mode
-	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) g_current_save = SAVE_SLOTS;
-
 	// Load in the graphics for the level
 	Serial_LoadLevelGfx(Game_GetVar(GAME_VAR_LEVEL)->data.string);
-
-	// Make sure the player is the first thing created as some other entities might depend on it for creation
-	PlayerSpawns_SetMode(PLAYER_SPAWN_TYPE_NORMAL_MODES);
-	player = Wobj_CreateOwned(WOBJ_PLAYER, 0.0f, 0.0f, Game_GetVar(GAME_VAR_PLAYER_SKIN)->data.integer, 0.0f);
-	Interaction_SetClientPlayerWObj(player);
-	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER) Player_TryTitlePopup();
-
-	// Updating and getting world variables
-	Game_GetVar(GAME_VAR_PLAYER)->data.pointer = player;
-
-	// Initialize the spawner multi/single-player mode
-	if (mode == WORLD_MODE_SINGLEPLAYER)
-		Spawners_SetGlobalMode(SPAWNER_SINGLEPLAYER);
-	else
-		Spawners_SetGlobalMode(SPAWNER_MULTIPLAYER);
 
 	// Loading in the actual world
 	sprintf(buffer, "%s.cnmb", Game_GetVar(GAME_VAR_LEVEL)->data.string);
 	Serial_LoadBlocks(buffer);
-	sprintf(buffer, "%s.cnms", Game_GetVar(GAME_VAR_LEVEL)->data.string);
-	Serial_LoadSpawners(buffer);
 
-	// Spawn all the objects in
-	if (mode != WORLD_MODE_CLIENT)
-	{
-		Spawners_CreateAllWobjsFromSpawners();
-	}
-
-	// Load in the new player position
-	PlayerSpawn_SetWobjLoc(&player->x);
-	{
-		PLAYER_LOCAL_DATA *local_data = player->local_data;
-		if (local_data->pet) {
-			local_data->pet->x = player->x;
-			local_data->pet->y = player->y;
-		}
-	}
-	Camera_Setup((int)player->x, (int)player->y); // Initializing camera values
-	
-	// Load player state
-	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_NOSAVE)->data.integer) {
-		Player_LoadFromSave(player, g_saves + g_current_save);
-		strcpy(g_saves[g_current_save].level, Game_GetVar(GAME_VAR_LEVEL)->data.string);
-		save_game(g_current_save, g_saves + g_current_save);
-		globalsave_visit_level(&g_globalsave, g_saves[g_current_save].level);
-	} else {
-		g_current_save = SAVE_SLOTS;
-		new_save(g_saves + g_current_save);
-		if (Game_GetVar(GAME_VAR_FORCE_NOSAVE)->data.integer) g_saves[g_current_save].lives = 50;
-		Player_LoadFromSave(player, g_saves + g_current_save);
-	}
+	// Objects/other things
+	startup_spawner_related();
 
 	// Supervirus stuff
 	if (Game_GetVar(GAME_VAR_SUPERVIRUS)->data.integer) {
@@ -163,13 +189,14 @@ void World_Stop(void)
 	// Save player state
 	if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER && !Game_GetVar(GAME_VAR_NOSAVE)->data.integer) Player_SaveData(player, g_saves + g_current_save);
 
+	cleanup_spawner_related();
 	// General cleanup
-	Wobj_DestroyOwnedWobjs();
-	Wobj_DestroyUnownedWobjs();
-	Spawners_UnloadSpawners();
-	PlayerSpawn_ClearAllSpawns();
-	TeleportInfos_FreeLegacyLevelInfo();
-	EndingText_ClearAllLines();
+	//Wobj_DestroyOwnedWobjs();
+	//Wobj_DestroyUnownedWobjs();
+	//Spawners_UnloadSpawners();
+	//PlayerSpawn_ClearAllSpawns();
+	//TeleportInfos_FreeLegacyLevelInfo();
+	//EndingText_ClearAllLines();
 	WobjDbg_CheckMemLeaks();
 
 	// Setting global variables to NULL values

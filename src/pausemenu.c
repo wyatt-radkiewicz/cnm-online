@@ -20,18 +20,33 @@ static int options_num;
 static int is_focused;
 static int exit_timer, is_exiting;
 
-static pause_menu_func_t funcs[3];
+static pause_menu_func_t funcs[4];
 
 // Singleplayer, Server, Client, Level Select
 static const char *option_names[][4] = {
+	{ "null", "null", "null", "RESTART" },
 	{ "RESPAWN", "RESPAWN", "RESPAWN", "RESPAWN" },
 	{ "CONTINUE", "CONTINUE", "CONTINUE", "CONTINUE" },
 	{ "EXIT", "STOP SERVER", "LEAVE", "EXIT" },
 };
 static int help_text_lines[][4] = {
-	{ 4, 4, 4, 4, }, { 2, 2, 2, 2, }, { 3, 4, 3, 2 },
+	{ 1, 1, 1, 4, },
+	{ 4, 4, 4, 4, },
+	{ 2, 2, 2, 2, },
+	{ 3, 4, 3, 2 },
 };
 static const char *help_text[][4][4] = {
+	{
+		{ "null" },
+		{ "null" },
+		{ "null" },
+		{
+			"RESET ITEMS",
+			"AND STATS AND",
+			"START AT THE",
+			"BEGINNING!"
+		},
+	},
 	{
 		{
 			"DIE AND",
@@ -120,7 +135,7 @@ void pause_menu_init(void) {
 	side_xstart = -192;
 	left_disp = 0;
 	side_blob_x = RENDERER_WIDTH + 8;
-	options_num = 1;
+	options_num = 2;
 	exit_timer = 0;
 	is_exiting = CNM_FALSE;
 	g_can_pause = CNM_TRUE;
@@ -128,7 +143,7 @@ void pause_menu_init(void) {
 }
 void pause_menu_focus(void) {
 	is_focused = CNM_TRUE;
-	options_num = 1;
+	options_num = 2;
 	Input_PushState(INPUT_STATE_GUI);
 	gui_timer = 0;
 }
@@ -147,7 +162,7 @@ void pause_menu_update(void) {
 		}
 		return;
 	}
-	if (Input_GetButtonPressedRepeated(INPUT_DOWN, INPUT_STATE_GUI) && options_num + 1 < 3) {
+	if (Input_GetButtonPressedRepeated(INPUT_DOWN, INPUT_STATE_GUI) && options_num + 1 < 4) {
 		left_disp = 32;
 		side_blob_x = RENDERER_WIDTH;
 		options_num++;
@@ -155,9 +170,11 @@ void pause_menu_update(void) {
 	}
 	int minopt = (
 			(g_saves[g_current_save].lives > 1 ||
-			 Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER ||
-			 Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer)
-			? 0 : 1);
+			 Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER)
+			? 1 : 2);
+	if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+		minopt = 0;
+	}
 	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_GUI) && options_num > minopt) {
 		left_disp = -32;
 		side_blob_x = RENDERER_WIDTH;
@@ -209,6 +226,16 @@ void pause_menu_draw(void) {
 
 	const int start = 160;
 	int idx = options_num - 5;
+	
+	int minopt = 1;
+	if (g_saves[g_current_save].lives <= 1
+		&& Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) {
+		minopt = 2;
+	}
+	if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+		minopt = 0;
+	}
+
 	//Console_Print("%d", options_num);
 	for (int i = -1; i < start/r.h+2; i++) {
 		Util_SetRect(&r, 384, 1536, 128, 32);
@@ -217,7 +244,9 @@ void pause_menu_draw(void) {
 			int center = strlen(option_names[idx][text_mode]) * 8 / 2;
 			if (idx != options_num) Renderer_SetFont(384, 576, 8, 8);
 			else Renderer_SetFont(256, 192, 8, 8);
-			if (!(g_saves[g_current_save].lives <= 1 && idx == 0) || Interaction_GetMode() != INTERACTION_MODE_SINGLEPLAYER) Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx][text_mode]);
+			if (idx >= minopt) {
+				Renderer_DrawText(-r.w + side_xstart + i*32 + left_disp + (r.w / 2 - center), RENDERER_HEIGHT - start + i*32 + left_disp + 8, 0, RENDERER_LIGHT, option_names[idx][text_mode]);
+			}
 			int w = r.w;
 			if (idx == options_num) {
 				Util_SetRect(&r, 376-24, 576 + 8*(Game_GetFrame() / 2 % 6), 8, 8);

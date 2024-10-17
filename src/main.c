@@ -32,9 +32,11 @@ static void Parse_Args(int argc, char **argv) {
 		if (strcmp(argv[i], "-dedicated") == 0) {
 			gi.dedicated = CNM_TRUE;
 		}
-		if (strcmp(argv[i], "-level") == 0)
-		{
+		if (strcmp(argv[i], "-level") == 0) {
 			mode = 1;
+		}
+		if (strcmp(argv[i], "-build_tables") == 0) {
+			gi.build_tables = CNM_TRUE;
 		}
 		if (strcmp(argv[i], "-server_name") == 0)
 		{

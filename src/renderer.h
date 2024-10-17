@@ -38,6 +38,7 @@ void Renderer_SetScreenModeFull(int fullscreen, int hi_res, int widescreen);
 
 void Renderer_LoadBitmap(const char *gfx_file);
 void Renderer_BuildTables(void);
+void Renderer_LoadTables(void);
 //int Renderer_MakeColor(int r, int g, int b);
 int Renderer_GetBitmapHeight(void);
 int Renderer_GetBitmapPixel(int x, int y);

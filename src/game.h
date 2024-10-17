@@ -18,6 +18,7 @@ typedef struct _DEDICATED_GAME_INFO
 	int advertise;
 	int enable_cheats;
 	char serv_name[32];
+	int build_tables;
 } DEDICATED_GAME_INFO;
 typedef struct _GAME_VAR
 {

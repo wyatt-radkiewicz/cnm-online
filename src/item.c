@@ -1026,27 +1026,34 @@ static void ItemGenericConsumeable_OnUse(ITEM *item, WOBJ *player)
 {
 	PLAYER_LOCAL_DATA *pld = player->local_data;
 
+	int inc_lvl = 0;
+
 	switch (item->type)
 	{
-	case ITEM_TYPE_APPLE: pld->special_level += 1; break;
-	case ITEM_TYPE_CAKE: pld->special_level += 5; break;
-	case ITEM_TYPE_CHEESEBURGER: pld->special_level += 5; break;
-	case ITEM_TYPE_BEASTCHURGER: pld->special_level += 50; break;
-	case ITEM_TYPE_HEALTH_POITION: pld->special_level += 1; break;
-	case ITEM_TYPE_SPEED_POTION: pld->special_level += 10; break;
-	case ITEM_TYPE_JUMP_POTION: pld->special_level += 10; break;
-	case ITEM_TYPE_STRENGTH_POTION: pld->special_level += 10; break;
-	case ITEM_TYPE_FIRE_POTION: pld->special_level += 10; break;
-	case ITEM_TYPE_POISIONUS_JUMP_POTION: pld->special_level += 10; break;
-	case ITEM_TYPE_POISIONUS_SPEED_POTION: pld->special_level += 10; break;
-	case ITEM_TYPE_POISIONUS_STRENGTH_POTION: pld->special_level += 10; break;
-	case ITEM_TYPE_MEGA_POTION: pld->special_level += 50; break;
-	case ITEM_TYPE_ULTRA_MEGA_POTION: pld->special_level += 100; break;
-	case ITEM_TYPE_50MONEY: pld->special_level += 10; break;
-	case ITEM_TYPE_100MONEY: pld->special_level += 25; break;
-	case ITEM_TYPE_500MONEY: pld->special_level += 50; break;
-	case ITEM_TYPE_1UP_JUICE: pld->special_level += 100; break;
-	case ITEM_TYPE_WRENCH: pld->special_level += 100; break;
+	case ITEM_TYPE_APPLE: inc_lvl += 1; break;
+	case ITEM_TYPE_CAKE: inc_lvl += 5; break;
+	case ITEM_TYPE_CHEESEBURGER: inc_lvl += 5; break;
+	case ITEM_TYPE_BEASTCHURGER: inc_lvl += 50; break;
+	case ITEM_TYPE_HEALTH_POITION: inc_lvl += 1; break;
+	case ITEM_TYPE_SPEED_POTION: inc_lvl += 10; break;
+	case ITEM_TYPE_JUMP_POTION: inc_lvl += 10; break;
+	case ITEM_TYPE_STRENGTH_POTION: inc_lvl += 10; break;
+	case ITEM_TYPE_FIRE_POTION: inc_lvl += 10; break;
+	case ITEM_TYPE_POISIONUS_JUMP_POTION: inc_lvl += 10; break;
+	case ITEM_TYPE_POISIONUS_SPEED_POTION: inc_lvl += 10; break;
+	case ITEM_TYPE_POISIONUS_STRENGTH_POTION: inc_lvl += 10; break;
+	case ITEM_TYPE_MEGA_POTION: inc_lvl += 50; break;
+	case ITEM_TYPE_ULTRA_MEGA_POTION: inc_lvl += 100; break;
+	case ITEM_TYPE_50MONEY: inc_lvl += 10; break;
+	case ITEM_TYPE_100MONEY: inc_lvl += 25; break;
+	case ITEM_TYPE_500MONEY: inc_lvl += 50; break;
+	case ITEM_TYPE_1UP_JUICE: inc_lvl += 100; break;
+	case ITEM_TYPE_WRENCH: inc_lvl += 100; break;
+	}
+
+	pld->special_level += inc_lvl;
+	if (player->custom_ints[1] & PLAYER_FLAG_BEASTCHURGER) {
+		pld->power_level += inc_lvl * 50;
 	}
 
 	switch (item->type)

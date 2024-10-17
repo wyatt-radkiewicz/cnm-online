@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <limits.h>
 #include <float.h>
 #include <SDL.h>
@@ -13,7 +14,7 @@
 #include "mem.h"
 
 #define RENDERER_LEVELS_LIGHT (RENDERER_LEVELS + 2)
-static SDL_Window *renderer_win;
+SDL_Window *renderer_win;
 static SDL_Surface *renderer_scr;
 static SDL_Surface *renderer_gfx;
 static SDL_Surface *renderer_hires_temp;
@@ -256,7 +257,7 @@ static void Renderer_UpdateWindowFromSettings(void)
 		}
 	}
 
-	Console_Print("Screen Number: %d", idx);
+	//Console_Print("Screen Number: %d", idx);
 
 	if (renderer_fullscreen) {
 		// non 4 by 3 aspect ratio assume width is more than height
@@ -551,6 +552,29 @@ static int get_nearest_color(int r, int g, int b) {
 	return closest_index;
 }
 
+void Renderer_LoadTables(void) {
+	if (!renderer_initialized)
+		return;
+
+	// Load tables from disk
+	SDL_Surface *trans = SDL_LoadBMP("transtbl.bmp");
+	if (!trans) goto build;
+	memcpy(renderer_trans, trans->pixels, sizeof(*renderer_trans) * 256);
+	SDL_FreeSurface(trans);
+	SDL_Surface *light = SDL_LoadBMP("lighttbl.bmp");
+	if (!light) goto build;
+	memcpy(renderer_light, light->pixels, sizeof(*renderer_light) * 256);
+	SDL_FreeSurface(light);
+	SDL_Surface *addi = SDL_LoadBMP("additbl.bmp");
+	if (!addi) goto build;
+	memcpy(renderer_additive, addi->pixels, sizeof(*renderer_additive) * 256);
+	SDL_FreeSurface(addi);
+
+	return;
+build:
+	Renderer_BuildTables();
+}
+
 void Renderer_BuildTables(void)
 {
 	int s, d, l;
@@ -558,6 +582,8 @@ void Renderer_BuildTables(void)
 	float r, g, b, rs, gs, bs;
 	if (!renderer_initialized)
 		return;
+
+	Console_Print("Building Tables");
 
 	//Renderer_BuildConvTable();
 	/* Build the transparency tables */
@@ -585,6 +611,7 @@ void Renderer_BuildTables(void)
 		}
 	}
 
+	// Additive light
 	renderer_additive[0] = RENDERER_LIGHT;
 	for (s = 1; s < 256; s++) {
 		sc = renderer_scr->format->palette->colors[s];
@@ -637,7 +664,36 @@ void Renderer_BuildTables(void)
 		renderer_light[s][RENDERER_BLACK] = get_nearest_color(0, 0, 0);
 		renderer_light[s][RENDERER_WHITE] = get_nearest_color(255, 255, 255);
 	}
+
+	// Save the tables to disk
+	SDL_Surface *trans = SDL_CreateRGBSurface(0, 2048, 256, 8, 0, 0, 0, 0);
+	SDL_SetPaletteColors(
+		trans->format->palette,
+		renderer_scr->format->palette->colors,
+		0, 256);
+	memcpy(trans->pixels, renderer_trans, sizeof(*renderer_trans) * 256);
+	SDL_SaveBMP(trans, "transtbl.bmp");
+	SDL_FreeSurface(trans);
+
+	SDL_Surface *light = SDL_CreateRGBSurface(0, 160, 16, 8, 0, 0, 0, 0);
+	SDL_SetPaletteColors(
+		light->format->palette,
+		renderer_scr->format->palette->colors,
+		0, 256);
+	memcpy(light->pixels, renderer_light, sizeof(*renderer_light) * 256);
+	SDL_SaveBMP(light, "lighttbl.bmp");
+	SDL_FreeSurface(light);
+
+	SDL_Surface *addi = SDL_CreateRGBSurface(0, 16, 16, 8, 0, 0, 0, 0);
+	SDL_SetPaletteColors(
+		addi->format->palette,
+		renderer_scr->format->palette->colors,
+		0, 256);
+	memcpy(addi->pixels, renderer_additive, sizeof(*renderer_additive) * 256);
+	SDL_SaveBMP(addi, "additbl.bmp");
+	SDL_FreeSurface(addi);
 }
+
 int Renderer_GetBitmapHeight(void)
 {
 	if (renderer_initialized && renderer_gfx != NULL)

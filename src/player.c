@@ -899,7 +899,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (Wobj_IsGrouneded(wobj)) local_data->slide_jump_cooldown--;
 		if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING)) local_data->slide_input_buffer = 5;
 		if (Wobj_IsGrouneded(wobj) && (Input_GetButton(INPUT_DOWN, INPUT_STATE_PLAYING)
-				|| local_data->slide_input_buffer > 0) && !local_data->is_sliding && local_data->slide_jump_cooldown <= 0 && !local_data->lock_controls) {
+				|| local_data->slide_input_buffer > 0) && !local_data->is_sliding
+				&& local_data->slide_jump_cooldown <= 0 && !local_data->lock_controls
+				&& (Input_GetButton(INPUT_LEFT, INPUT_STATE_PLAYING)
+					|| Input_GetButton(INPUT_RIGHT, INPUT_STATE_PLAYING))) {
 			if (wobj->vel_x > -2.0f && wobj->vel_x < 2.0f) {
 				if (wobj->flags & WOBJ_HFLIP) wobj->vel_x = -2.0f;
 				else wobj->vel_x = 2.0f;
@@ -1565,6 +1568,11 @@ void WobjPlayer_Update(WOBJ *wobj)
 			local_data->level_end_norank = CNM_TRUE;
 		} else {
 			local_data->level_end_norank = CNM_FALSE;
+		}
+		if (wobj->custom_ints[1] & PLAYER_FLAG_BEASTCHURGER) {
+			// Power score
+			Audio_PlaySound(5, 0, Audio_GetListenerX(), Audio_GetListenerY());
+			Audio_PlaySound(35, 1, Audio_GetListenerX(), Audio_GetListenerY());
 		}
 		local_data->final_time_forscore = Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer;
 		g_can_pause = CNM_FALSE;

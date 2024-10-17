@@ -570,7 +570,7 @@ static void Command_GetChecksum(const char *args, int from_player)
 static void Command_LoadGfxFile(const char *args, int from_player)
 {
 	Renderer_LoadBitmap(Command_ExtractArg(args, 0));
-	Renderer_BuildTables();
+	Renderer_LoadTables();
 	//Renderer_RestartWindow();
 	FileSystem_RegisterGfx(Command_ExtractArg(args, 0));
 }

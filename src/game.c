@@ -303,7 +303,11 @@ void GameState_Base_Init(void)
 					  Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
 					  Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer);
 		Renderer_LoadBitmap("gfx.bmp");
-		Renderer_BuildTables();
+		if (dgame_info.build_tables) {
+			Renderer_BuildTables();
+		} else {
+			Renderer_LoadTables();
+		}
 		Renderer_SetFont(384, 448, 8, 8);
 		
 		Input_Init();

@@ -18,6 +18,8 @@ static char input_last_char;
 static int input_initialized = CNM_FALSE;
 static int mouse_pressed;
 
+extern SDL_Window *renderer_win;
+
 static SDL_GameController *input_pad;
 
 static int input_state_stack2[INPUT_MAX_STATES];
@@ -81,7 +83,15 @@ void Input_Update(void)
 			if (input_callback != NULL)
 				input_callback();
 			break;
+		case SDL_MOUSEMOTION:
+			SDL_ShowCursor(SDL_ENABLE);
+			break;
 		case SDL_KEYDOWN:
+			if (renderer_win
+				&& (SDL_GetWindowFlags(renderer_win) & SDL_WINDOW_INPUT_FOCUS)) {
+				SDL_ShowCursor(SDL_DISABLE);
+			}
+
 			if (event.key.keysym.scancode == SDL_SCANCODE_F4 && event.key.keysym.mod & KMOD_LALT && input_callback != NULL)
 				input_callback();
 			input_last_char = Input_ScancodeToChar(event.key.keysym.scancode,

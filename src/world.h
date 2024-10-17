@@ -10,4 +10,7 @@ void World_Stop(void);
 void World_Update(int mode);
 void World_Draw(int mode);
 
+// Restart for level select
+void World_SoftRestart(void);
+
 #endif

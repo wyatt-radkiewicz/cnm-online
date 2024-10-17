@@ -2,6 +2,7 @@
 #define _pause_menu_h_
 
 enum pause_menu_funcs {
+	PAUSE_MENU_RESTART,
 	PAUSE_MENU_RESPAWN,
 	PAUSE_MENU_CONTINUE,
 	PAUSE_MENU_EXIT,
