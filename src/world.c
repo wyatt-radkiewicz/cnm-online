@@ -44,10 +44,34 @@ static void cleanup_spawner_related(void) {
 	PlayerSpawn_ClearAllSpawns();
 	TeleportInfos_FreeLegacyLevelInfo();
 	EndingText_ClearAllLines();
+
+	arena_pop_zone("WORLD_SPAWNER");
 }
 
 static void startup_spawner_related(void) {
 	char buffer[64];
+
+	arena_push_zone("WORLD_SPAWNER");
+
+	// Initialize things to defualt values
+	Wobj_NormalWobjs_ZoneAllocLocalDataPools();
+	Enemies_ZoneAllocLocalDataPools();
+	Enemies_Reset();
+	Item_Reset();
+	LogicLinks_ResetLinks();
+	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS - 1);
+	Spawners_UnloadSpawners();
+	Wobj_DestroyOwnedObjectsFromLastFrame();
+	Wobj_DestroyOwnedWobjs();
+	Wobj_DestroyUnownedWobjs();
+	EndingText_ResetYValue();
+	Dialoge_End();
+	TTBoss_ResetOnLevelLoad();
+	//Fadeout_Setup();
+	BossBar_Init();
+	Player_ResetHUD();
+	Game_ResetFrame();
+
 
 	// Misc game global vars
 	Game_GetVar(GAME_VAR_GRAVITY)->data.decimal = 0.5f;
@@ -130,25 +154,6 @@ void World_Start(int mode)
 	case WORLD_MODE_HOSTED_SERVER: Interaction_SetMode(INTERACTION_MODE_HOSTED_SERVER); break;
 	case WORLD_MODE_CLIENT: Interaction_SetMode(INTERACTION_MODE_CLIENT); break;
 	}
-
-	// Initialize things to defualt values
-	Wobj_NormalWobjs_ZoneAllocLocalDataPools();
-	Enemies_ZoneAllocLocalDataPools();
-	Enemies_Reset();
-	Item_Reset();
-	LogicLinks_ResetLinks();
-	Background_SetVisibleLayers(0, BACKGROUND_MAX_LAYERS - 1);
-	Spawners_UnloadSpawners();
-	Wobj_DestroyOwnedObjectsFromLastFrame();
-	Wobj_DestroyOwnedWobjs();
-	Wobj_DestroyUnownedWobjs();
-	EndingText_ResetYValue();
-	Dialoge_End();
-	TTBoss_ResetOnLevelLoad();
-	//Fadeout_Setup();
-	BossBar_Init();
-	Player_ResetHUD();
-	Game_ResetFrame();
 
 	// Load in the graphics for the level
 	Serial_LoadLevelGfx(Game_GetVar(GAME_VAR_LEVEL)->data.string);
