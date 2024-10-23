@@ -2293,13 +2293,12 @@ void WobjPlayer_Draw(WOBJ *wobj, int camx, int camy)
 		CNM_FALSE
 	);
 
-	const char *name = NULL;
 	if (Interaction_GetMode() == INTERACTION_MODE_CLIENT ||
-		Interaction_GetMode() == INTERACTION_MODE_HOSTED_SERVER)
+		Interaction_GetMode() == INTERACTION_MODE_HOSTED_SERVER) {
+		const char *name = NULL;
 		name = NetGame_GetNode(wobj->node_id)->name;
-	else if (Interaction_GetMode() == INTERACTION_MODE_SINGLEPLAYER)
-		name = Game_GetVar(GAME_VAR_PLAYER_NAME)->data.string;
-	Renderer_DrawText((int)wobj->x - camx - (strlen(name) * 4) + 16, (int)ceilf(wobj->y) - camy - 12, 0, RENDERER_LIGHT, name);
+		Renderer_DrawText((int)wobj->x - camx - (strlen(name) * 4) + 16, (int)ceilf(wobj->y) - camy - 12, 0, RENDERER_LIGHT, name);
+	}
 
 	switch (wobj->custom_ints[1] & PLAYER_FLAG_SHOWN_UPGRADE_STATE)
 	{
