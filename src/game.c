@@ -344,7 +344,9 @@ void GameState_Base_Init(void)
 			if (Filesystem_GetLevelIdFromFileName(dgame_info.lvl) != -1) {
 				int id = Filesystem_GetLevelIdFromFileName(dgame_info.lvl);
 				strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
-				Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
+				Game_GetVar(GAME_VAR_BRONZE_SCORE)->data.integer = FileSystem_GetLevelParScore(id, 0);
+				Game_GetVar(GAME_VAR_SILVER_SCORE)->data.integer = FileSystem_GetLevelParScore(id, 1);
+				Game_GetVar(GAME_VAR_GOLD_SCORE)->data.integer = FileSystem_GetLevelParScore(id, 2);
 				Game_PushState(GAME_STATE_SINGLEPLAYER);
 			} else {
 				Game_PushState(GAME_STATE_MAINMENU);

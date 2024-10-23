@@ -294,6 +294,8 @@ int main(int argc, char **argv) {
 
 	int ret = 1;
 	for (int i = 0; bmps[i]; i++) {
+		if (strcmp(bmps[i], "levels/credits.bmp") == 0) continue;
+
 		bmp_t bmp;
 		if (!bmp_load(&bmp, bmps[i])) {
 			printf("error: couldn't load output file %s\n", bmps[i]);

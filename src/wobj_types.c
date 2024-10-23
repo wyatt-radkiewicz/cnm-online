@@ -93,7 +93,7 @@ static void WobjShotgunItem_Create(WOBJ *wobj)
 {
 	wobj->anim_frame = 0;
 	wobj->item = 1;
-	wobj->flags = WOBJ_IS_ITEM;
+	//wobj->flags = WOBJ_IS_ITEM;
 	wobj->hitbox.x = 0.0f;
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
@@ -390,7 +390,7 @@ static void WobjKnifeItem_Create(WOBJ *wobj)
 {
 	wobj->anim_frame = 0;
 	wobj->item = ITEM_TYPE_KNIFE;
-	wobj->flags = WOBJ_IS_ITEM;
+	//wobj->flags = WOBJ_IS_ITEM;
 	wobj->hitbox.x = 0.0f;
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
@@ -401,7 +401,7 @@ static void WobjAppleItem_Create(WOBJ *wobj)
 {
 	wobj->anim_frame = 0;
 	wobj->item = ITEM_TYPE_APPLE;
-	wobj->flags = WOBJ_IS_ITEM;
+	//wobj->flags = WOBJ_IS_ITEM;
 	wobj->hitbox.x = 0.0f;
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;
@@ -412,7 +412,7 @@ static void WobjDroppedItem_Create(WOBJ *wobj)
 {
 	wobj->item = wobj->custom_ints[0];
 	wobj->anim_frame = wobj->item;
-	wobj->flags = WOBJ_IS_ITEM;
+	//wobj->flags = WOBJ_IS_ITEM;
 	wobj->hitbox.x = 0.0f;
 	wobj->hitbox.y = 0.0f;
 	wobj->hitbox.w = 32.0f;

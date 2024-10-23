@@ -76,7 +76,13 @@ static void startup_spawner_related(void) {
 	// Misc game global vars
 	Game_GetVar(GAME_VAR_GRAVITY)->data.decimal = 0.5f;
 	Game_GetVar(GAME_VAR_LEVEL_TIMER)->data.integer = 0;
-	Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(Filesystem_GetLevelIdFromName(Game_GetVar(GAME_VAR_LEVEL)->data.string));
+	int lvlid = Filesystem_GetLevelIdFromFileName(Game_GetVar(GAME_VAR_LEVEL)->data.string);
+	Game_GetVar(GAME_VAR_BRONZE_SCORE)->data.integer =
+		FileSystem_GetLevelParScore(lvlid, 0);
+	Game_GetVar(GAME_VAR_SILVER_SCORE)->data.integer =
+		FileSystem_GetLevelParScore(lvlid, 1);
+	Game_GetVar(GAME_VAR_GOLD_SCORE)->data.integer =
+		FileSystem_GetLevelParScore(lvlid, 2);
 
 	// Force unused save slot if in nosave g_mode
 	if (Game_GetVar(GAME_VAR_NOSAVE)->data.integer) g_current_save = SAVE_SLOTS;

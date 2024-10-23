@@ -94,6 +94,14 @@ static int next_snowflake;
 MSPAGE_DATA msdata;
 static int refresh_cooldown;
 
+static void drawminsec(const char *msg, int sec, int w, int x, int y, int trans, int light) {
+	char buf[32];
+	sprintf(buf, "%s:", msg);
+	Renderer_DrawText(x, y, trans, light, buf);
+	sprintf(buf, "%02d:%02d", sec / 60, sec % 60);
+	Renderer_DrawText(x + w - strlen(buf) * 8, y, trans, light, buf);
+}
+
 //static void ServerBrowserLoadPage(int pageid)
 //{
 //	msdata.page = pageid;
@@ -1176,24 +1184,42 @@ void draw_play_gui_nologic(void) {
 		Renderer_DrawText(basex - (8*strlen(lvlname)) / 2, basey + 12, trans2, light, lvlname);
 		memcpy(&r2, FileSystem_GetLevelPreview(id), sizeof(r2));
 		Renderer_DrawBitmap(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + (12*2), &r2, trans2, light);
-		Renderer_DrawText(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + 92 + (12*0), trans2, light, "DIF:");
-		sprintf(text, "%d/10", FileSystem_GetLevelDifficulty(id)+1);
-		Renderer_DrawText(basex + SAVE_SLOT_WIDTH / 2 - 8 - (strlen(text)*8), basey + 92 + (12*0), trans2, light, text);
-		Renderer_DrawText(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + 92 + (12*1), trans2, light, "PAR:");
-		sprintf(text, "%d", FileSystem_GetLevelParScore(id));
-		Renderer_DrawText(basex + SAVE_SLOT_WIDTH / 2 - 8 - (strlen(text)*8), basey + 92 + (12*1), trans2, light, text);
-		Renderer_DrawText(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + 92 + (12*2), trans2, light, "TIME:");
-		sprintf(text, "%.2d:%.2d", g_globalsave.best_times[slot] / 60, g_globalsave.best_times[slot] % 60);
-		Renderer_DrawText(basex + SAVE_SLOT_WIDTH / 2 - 8 - (strlen(text)*8), basey + 92 + (12*2), trans2, light, text);
-		Renderer_DrawText(basex - SAVE_SLOT_WIDTH / 2 + 8, basey + 92 + (12*3), trans2, light, "RANK:");
-		switch (g_globalsave.best_ranks[slot]) {
-		case 0: strcpy(text, "E"); break;
-		case 1: strcpy(text, "D"); break;
-		case 2: strcpy(text, "C"); break;
-		case 3: strcpy(text, "B"); break;
-		case 4: strcpy(text, "A"); break;
-		}
-		Renderer_DrawText(basex + SAVE_SLOT_WIDTH / 2 - 8 - (strlen(text)*8), basey + 92 + (12*3), trans2, light, text);
+		drawminsec(
+			"BRZ",
+			FileSystem_GetLevelParScore(id, 0),
+			SAVE_SLOT_WIDTH - 16,
+			basex - SAVE_SLOT_WIDTH / 2 + 8,
+			basey + 92 + (12*0),
+			trans2,
+			light
+		);
+		drawminsec(
+			"SVR",
+			FileSystem_GetLevelParScore(id, 1),
+			SAVE_SLOT_WIDTH - 16,
+			basex - SAVE_SLOT_WIDTH / 2 + 8,
+			basey + 92 + (12*1),
+			trans2,
+			light
+		);
+		drawminsec(
+			"GLD",
+			FileSystem_GetLevelParScore(id, 2),
+			SAVE_SLOT_WIDTH - 16,
+			basex - SAVE_SLOT_WIDTH / 2 + 8,
+			basey + 92 + (12*2),
+			trans2,
+			light
+		);
+		drawminsec(
+			"B.T",
+			g_globalsave.best_times[slot],
+			SAVE_SLOT_WIDTH - 20,
+			basex - SAVE_SLOT_WIDTH / 2 + 8,
+			basey + 92 + (12*3),
+			trans2,
+			light
+		);
 		//const char *dif = difmsgs[FileSystem_GetLevelDifficulty(id)];
 		//Renderer_DrawText(basex - (8*strlen(dif))/2, basey + 92 + (12*1), trans2, light, dif);
 		//Renderer_DrawText(basex - (7*8) / 2, basey + 92 + (12*2), trans2, light, "- PAR -");

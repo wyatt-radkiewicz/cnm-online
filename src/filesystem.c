@@ -19,7 +19,7 @@ typedef struct levelinf {
 	char level[FILESYSTEM_MAX_LENGTH];
 	char name[UTIL_MAX_TEXT_WIDTH - 1];
 	CNM_RECT preview;
-	int diff, par, type;
+	int diff, par[3], type;
 } levelinf_t;
 
 //static char levels[FILESYSTEM_MAX_LEVELS][FILESYSTEM_MAX_LENGTH];
@@ -48,11 +48,11 @@ const char *FileSystem_GetLevelName(int level)
 {
 	return levels[level].name;
 }
-int FileSystem_GetLevelParScore(int level) {
-	return levels[level].par;
+int FileSystem_GetLevelParScore(int level, int rank) {
+	return levels[level].par[rank];
 }
-void FileSystem_SetLevelParScore(int level, int par) {
-	levels[level].par = par;
+void FileSystem_SetLevelParScore(int level, int rank, int par) {
+	levels[level].par[rank] = par;
 }
 int FileSystem_GetLevelDifficulty(int level)
 {

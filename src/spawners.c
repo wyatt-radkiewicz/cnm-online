@@ -326,6 +326,7 @@ skip_checks:
 		spawner->curr_wobjs++;
 		if (wobj_types[spawner->wobj_type].respawnable)
 			spawner->timer = spawner->duration;
+		created->flags |= spawner->has_respawned ? 0 : WOBJ_AWARD_SCORE;
 		spawner->has_respawned = CNM_TRUE;
 	}
 	return CNM_TRUE;

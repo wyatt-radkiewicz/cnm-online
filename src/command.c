@@ -347,11 +347,11 @@ static void Command_SaveBlocks(const char *args, int from_player)
 {
 	char pathbuf[128];
 
-	if (Game_TopState() != GAME_STATE_BLOCKSEDIT &&
-		Game_TopState() != GAME_STATE_BLOCKPROPSEDIT &&
-		Game_TopState() != GAME_STATE_LIGHT_EDITOR &&
-		Game_TopState() != GAME_STATE_BGEDIT)
-		return;
+	//if (Game_TopState() != GAME_STATE_BLOCKSEDIT &&
+	//	Game_TopState() != GAME_STATE_BLOCKPROPSEDIT &&
+	//	Game_TopState() != GAME_STATE_LIGHT_EDITOR &&
+	//	Game_TopState() != GAME_STATE_BGEDIT)
+	//	return;
 
 	strcpy(pathbuf, "levels/");
 	strcat(pathbuf, Command_ExtractArg(args, 0));
@@ -435,9 +435,9 @@ static void Command_SaveSpawners(const char *args, int from_player)
 {
 	char pathbuf[128];
 
-	if (Game_TopState() != GAME_STATE_OBJEDIT &&
-		Game_TopState() != GAME_STATE_ENDTEXT_EDITOR)
-		return;
+	//if (Game_TopState() != GAME_STATE_OBJEDIT &&
+	//	Game_TopState() != GAME_STATE_ENDTEXT_EDITOR)
+	//	return;
 
 	strcpy(pathbuf, "levels/");
 	strcat(pathbuf, Command_ExtractArg(args, 0));
@@ -786,7 +786,9 @@ static void Command_LocalMap(const char *args, int from_player) {
 
 		int id = Filesystem_GetLevelIdFromFileName(Command_ExtractArg(args, 0));
 		strcpy(Game_GetVar(GAME_VAR_LEVEL)->data.string, FileSystem_GetLevel(id));
-		Game_GetVar(GAME_VAR_PAR_SCORE)->data.integer = FileSystem_GetLevelParScore(id);
+		Game_GetVar(GAME_VAR_BRONZE_SCORE)->data.integer = FileSystem_GetLevelParScore(id, 0);
+		Game_GetVar(GAME_VAR_SILVER_SCORE)->data.integer = FileSystem_GetLevelParScore(id, 1);
+		Game_GetVar(GAME_VAR_GOLD_SCORE)->data.integer = FileSystem_GetLevelParScore(id, 2);
 		Game_SwitchState(GAME_STATE_SINGLEPLAYER);
 	}
 }

@@ -1353,10 +1353,11 @@ void WobjTTBossWaypoint_Create(WOBJ *wobj)
 	if (wobj->custom_ints[0] >= ttboss_num_waypoints)
 		ttboss_num_waypoints = wobj->custom_ints[0] + 1;
 }
+static WOBJ *last_ttboss;
 void WobjTTBoss_Create(WOBJ *wobj)
 {
 	wobj->flags = WOBJ_IS_HOSTILE | WOBJ_VOID_TYPE;
-	wobj->strength = 16.67f;
+	wobj->strength = 10000.67f;
 	wobj->health = 75.0f;
 	wobj->speed = wobj->custom_floats[0];
 	wobj->custom_floats[0] = 0.0f;
@@ -1366,6 +1367,13 @@ void WobjTTBoss_Create(WOBJ *wobj)
 	wobj->link_uuid = 0;
 	wobj->custom_floats[1] = 134.0f;
 	Util_SetBox(&wobj->hitbox, 0.0f, 0.0f, 32.0f, 32.0f);
+	last_ttboss = wobj;
+}
+void TTBoss_Provoke(void) {
+	ttboss_state = TTBOSS_STATE_SEARCHING;
+	last_ttboss->custom_ints[0] = 0;
+	last_ttboss->x = ttboss_x[0];
+	last_ttboss->y = ttboss_y[0];
 }
 void WobjTTBoss_Update(WOBJ *wobj)
 {
@@ -1416,8 +1424,8 @@ void WobjTTBoss_Update(WOBJ *wobj)
 				Interaction_PlaySound(wobj, 21);
 
 			wobj->custom_floats[0] = 0.0f;
-			if (Wobj_GetWobjCollidingWithType(wobj, TT_CHASE_TRIGGER) != NULL)
-				ttboss_state = TTBOSS_STATE_ATTACKING;
+			//if (Wobj_GetWobjCollidingWithType(wobj, TT_CHASE_TRIGGER) != NULL)
+				//ttboss_state = TTBOSS_STATE_ATTACKING;
 
 			if (fabsf(ttboss_x[wobj->custom_ints[0]] - wobj->x) < wobj->speed * 1.5f &&
 				fabsf(ttboss_y[wobj->custom_ints[0]] - wobj->y) < wobj->speed * 1.5f)
@@ -1429,8 +1437,10 @@ void WobjTTBoss_Update(WOBJ *wobj)
 				}
 				if (wobj->custom_ints[0] + 1 >= ttboss_num_waypoints)
 				{
-					wobj->custom_ints[0] = ttboss_num_waypoints - 1;
-					wobj->custom_floats[1] = -134.0f;
+					//wobj->custom_ints[0] = ttboss_num_waypoints - 1;
+					//wobj->custom_floats[1] = -134.0f;
+					//
+					ttboss_state = TTBOSS_STATE_ATTACKING;
 				}
 
 				if (wobj->custom_floats[1] >= 0.0f)

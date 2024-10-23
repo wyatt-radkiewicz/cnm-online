@@ -63,10 +63,18 @@ typedef struct player_platform_info {
 	float relx;
 } player_platform_info_t;
 
+typedef enum hmtype {
+	HM_RED,
+	HM_GREEN,
+	HM_WHITE,
+} hmtype_t;
+
 typedef struct hitmarker {
-	bool active, green;
+	bool active;
+	hmtype_t type;
 	float x, y, vy;
 	int digits[5], ndigits;
+
 	int state;
 	int timer;
 } hitmarker_t;
@@ -180,5 +188,6 @@ void Player_TryTitlePopup(void);
 void Player_ChangePet(WOBJ *player, int petid);
 void player_launch_from_platinfo(WOBJ *wobj, int dovelx);
 void add_hitmarker(int dmg, float x, float y);
+void add_scoremarker(int score);
 
 #endif

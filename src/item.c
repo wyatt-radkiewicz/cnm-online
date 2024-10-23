@@ -614,7 +614,7 @@ void Item_NullifyGhostPickup(void) {
 }
 void Item_TryPickupAndDrop(WOBJ *player)
 {
-	WOBJ *other_item = Wobj_GetWobjColliding(player, WOBJ_IS_ITEM);
+	WOBJ *other_item = Wobj_GetWobjCollidingWithType(player, WOBJ_DROPPED_ITEM);
 	PLAYER_LOCAL_DATA *plr_local = player->local_data;
 	if (_pickup_cooldown > 0) --_pickup_cooldown;
 	int pressed_drop = Input_GetButtonPressed(INPUT_DROP, INPUT_STATE_PLAYING) && !plr_local->lock_controls;

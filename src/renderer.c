@@ -261,10 +261,10 @@ static void Renderer_UpdateWindowFromSettings(void)
 
 	if (renderer_fullscreen) {
 		// non 4 by 3 aspect ratio assume width is more than height
-		//SDL_DisplayMode dm;
-		//SDL_GetCurrentDisplayMode(idx, &dm);
-		SDL_Rect dm;
-		SDL_GetDisplayBounds(idx, &dm);
+		SDL_DisplayMode dm;
+		SDL_GetCurrentDisplayMode(idx, &dm);
+		//SDL_Rect dm;
+		//SDL_GetDisplayBounds(idx, &dm);
 		height = dm.h;
 		width = dm.w;
 	}

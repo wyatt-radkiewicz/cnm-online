@@ -100,7 +100,15 @@ void Serial_LoadAudioCfg(const char *cnma_file)
 				{
 					strcpy(levelpath, "levels/");
 					strcat(levelpath, index_buf);
-					FileSystem_SetLevelParScore(FileSystem_AddLevelToLevelOrder(levelpath), atoi(filename));
+
+					char *next = filename;
+					int lvl = FileSystem_AddLevelToLevelOrder(levelpath);
+					for (int i = 0; next; i++) {
+						FileSystem_SetLevelParScore(lvl, i, atoi(next));
+						next = strchr(next, '_');
+						if (!next) break;
+						else next++;
+					}
 				}
 				else if (mode == 3)
 				{

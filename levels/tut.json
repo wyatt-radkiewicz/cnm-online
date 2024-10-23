@@ -55,7 +55,11 @@
         96.0,
         128.0
       ],
-      "type_data": "PlayerSpawn",
+      "type_data": {
+        "PlayerSpawn": {
+          "special_entrance": false
+        }
+      },
       "spawning_criteria": {
         "spawn_delay_secs": 0.0,
         "mode": "MultiAndSingleplayer",
@@ -701,7 +705,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": true,
-          "text": "Press 'V' to grab objects"
+          "text": "Press 'V' to grab objects\n"
         }
       },
       "spawning_criteria": {
@@ -721,7 +725,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": true,
-          "text": "Press 'Z' to shoot"
+          "text": "Press 'Z' to shoot\n"
         }
       },
       "spawning_criteria": {
@@ -813,7 +817,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": false,
-          "text": "Press 'C' to swap slots.\nPress 'Z' to eat stuff."
+          "text": "Press 'C' to swap slots.\nPress 'Z' to eat stuff.\n"
         }
       },
       "spawning_criteria": {
@@ -869,7 +873,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": false,
-          "text": "Press down while moving to\nslide. Sliding right after landing\nmakes you go fast."
+          "text": "Press down while moving to\nslide. Sliding right after landi\nmakes you go fast.\n"
         }
       },
       "spawning_criteria": {
@@ -889,7 +893,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": false,
-          "text": "GOTCHA BITCH"
+          "text": "GOTCHA BITCH\n"
         }
       },
       "spawning_criteria": {
@@ -909,7 +913,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": false,
-          "text": "GOTCHA BITCH"
+          "text": "GOTCHA BITCH\n"
         }
       },
       "spawning_criteria": {
@@ -929,7 +933,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": false,
-          "text": "GOTCHA BITCH"
+          "text": "GOTCHA BITCH\n"
         }
       },
       "spawning_criteria": {
@@ -987,7 +991,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": false,
-          "text": "Press down in the air to stomp."
+          "text": "Press down in the air to stomp.\n"
         }
       },
       "spawning_criteria": {
@@ -1061,7 +1065,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": false,
-          "text": "Kill enemies and eat stuff to\nbuild rage guage (red)."
+          "text": "Kill enemies and eat stuff to\nbuild rage guage (red).\n"
         }
       },
       "spawning_criteria": {
@@ -1081,7 +1085,7 @@
         "TextSpawner": {
           "dialoge_box": true,
           "despawn": false,
-          "text": "Kill enemies and eat stuff to\nbuild rage guage (red)."
+          "text": "Kill enemies and eat stuff to\nbuild rage guage (red).\n"
         }
       },
       "spawning_criteria": {
@@ -1150,6 +1154,60 @@
       "pos": [
         3712.0,
         608.0
+      ],
+      "type_data": {
+        "DroppedItem": {
+          "item": "Cake"
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        3840.0,
+        320.0
+      ],
+      "type_data": {
+        "DroppedItem": {
+          "item": "Cake"
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        3904.0,
+        224.0
+      ],
+      "type_data": {
+        "DroppedItem": {
+          "item": "Cake"
+        }
+      },
+      "spawning_criteria": {
+        "spawn_delay_secs": 0.0,
+        "mode": "MultiAndSingleplayer",
+        "max_concurrent_spawns": 0
+      },
+      "dropped_item": null,
+      "spawner_group": null
+    },
+    {
+      "pos": [
+        3839.7703,
+        128.0
       ],
       "type_data": {
         "DroppedItem": {

@@ -85,6 +85,7 @@ void WobjTTBoss_Create(WOBJ *wobj);
 void WobjTTBoss_Update(WOBJ *wobj);
 void TTBoss_ResetOnLevelLoad(void);
 void TTBoss_CalmDown(void);
+void TTBoss_Provoke(void);
 
 // Eater Bug
 void WobjEaterBug_Create(WOBJ *wobj);

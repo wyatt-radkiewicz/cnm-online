@@ -183,7 +183,7 @@ typedef enum _WOBJ_TYPES
 #define WOBJ_IS_PLAYER		(1 << 0)
 #define WOBJ_IS_HOSTILE		(1 << 1)
 #define WOBJ_IS_PLAYER_WEAPON (1 << 2)
-#define WOBJ_IS_ITEM		(1 << 3)
+#define WOBJ_AWARD_SCORE	(1 << 3)
 #define	WOBJ_HFLIP			(1 << 4)
 #define WOBJ_VFLIP			(1 << 5)
 #define WOBJ_INVULN			(1 << 6)

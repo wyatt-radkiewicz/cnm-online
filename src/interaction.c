@@ -274,7 +274,11 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 				{
 					interaction_player->money += wobj_types[victim->type].money_reward;
 					interaction_player->strength += wobj_types[victim->type].strength_reward;
-					pld->score += wobj_types[victim->type].score_reward + 100;
+					if (victim->flags & WOBJ_AWARD_SCORE) {
+						int score = wobj_types[victim->type].score_reward + 100;
+						pld->score += score;
+						add_scoremarker(score);
+					}
 					pld->special_level += wobj_types[victim->type].score_reward / 10 + 10;
 				}
 				Wobj_DestroyWobj(victim);
@@ -318,8 +322,10 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 				{
 					interaction_player->money += wobj_types[victim->type].money_reward;
 					interaction_player->strength += wobj_types[victim->type].strength_reward;
-					if (pld) {
-						pld->score += wobj_types[victim->type].score_reward + 100;
+					if (pld && victim->flags & WOBJ_AWARD_SCORE) {
+						int score = wobj_types[victim->type].score_reward + 100;
+						pld->score += score;
+						add_scoremarker(score);
 					}
 				}
 				Interaction_DestroyWobj(victim);
