@@ -428,6 +428,7 @@ static const char *option_names[] = {
 	"PLAYER SETUP",
 	"PLAY",
 	"OPTIONS",
+	"CONTROLS",
 	"JOIN GAME",
 	"HOST GAME",
 	"LOCAL CO-OP",
@@ -435,7 +436,7 @@ static const char *option_names[] = {
 	"SEE YA MAN",
 };
 static int help_text_lines[] = {
-	4, 4, 4, 3, 3, 4, 3, 2,
+	4, 4, 4, 3, 3, 3, 4, 3, 2,
 };
 static const char *help_text[][4] = {
 	{
@@ -455,6 +456,12 @@ static const char *help_text[][4] = {
 		"AUDIO, AND",
 		"OTHER MISC",
 		"SETTINGS",
+	},
+	{
+		"KEYBOARD AND",
+		"CONTROLLER",
+		"SETTINGS",
+		"",
 	},
 	{
 		"JOIN A",
@@ -1361,7 +1368,7 @@ void draw_titlebg_gui(void) {
 		sprintf(levelname, "levels/_title%d", g_globalsave.titlebg);
 		swap_title_bg(levelname);
 	}
-	if (Input_GetButtonPressedRepeated(INPUT_DOWN, INPUT_STATE_PLAYING)) {
+	if (Input_GetButtonPressedRepeated(INPUT_MENUDOWN, INPUT_STATE_PLAYING)) {
 		if (ps_selected + 1 < num_bgs) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			ps_selected++;
@@ -1370,7 +1377,7 @@ void draw_titlebg_gui(void) {
 			ps_pos_target_add = 8;
 		}
 	}
-	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_PLAYING)) {
+	if (Input_GetButtonPressedRepeated(INPUT_MENUUP, INPUT_STATE_PLAYING)) {
 		if (ps_selected > 0) {
 			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			ps_selected--;
@@ -1401,13 +1408,13 @@ void draw_main_gui(void) {
 	draw_play_gui_nologic();
 	draw_main_gui_bars();
 
-	if (Input_GetButtonPressedRepeated(INPUT_DOWN, INPUT_STATE_PLAYING) && options_num + 1 < sizeof(option_names)/sizeof(*option_names)) {
+	if (Input_GetButtonPressedRepeated(INPUT_MENUDOWN, INPUT_STATE_PLAYING) && options_num + 1 < sizeof(option_names)/sizeof(*option_names)) {
 		left_disp = 32;
 		side_blob_x = RENDERER_WIDTH;
 		options_num++;
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 	}
-	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_PLAYING) && options_num > 0) {
+	if (Input_GetButtonPressedRepeated(INPUT_MENUUP, INPUT_STATE_PLAYING) && options_num > 0) {
 		left_disp = -32;
 		side_blob_x = RENDERER_WIDTH;
 		options_num--;
@@ -1468,7 +1475,7 @@ void draw_main_gui(void) {
 			gui_timer = 0;
 			options_mserv = gui_text_box_init(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string, 16);
 			break;
-		case 3:
+		case 4:
 			gui_state = GUI_JOIN_STATE;
 			ps_selected = 0;
 			ps_trans = 0;
@@ -1476,7 +1483,7 @@ void draw_main_gui(void) {
 			strcpy(joingame_buf, Game_GetVar(GAME_VAR_CURRENT_CONNECTING_IP)->data.string);
 			options_mserv = gui_text_box_init(joingame_buf, 16);
 			break;
-		case 4:
+		case 5:
 			gui_state = GUI_HOST_STATE;
 			ps_selected = 0;
 			host_game_level_idx = 0;
@@ -1487,7 +1494,7 @@ void draw_main_gui(void) {
 			options_mserv = gui_text_box_init(Game_GetVar(GAME_VAR_SERVER_NAME)->data.string, 18);
 			titlebg_set_card_movement(4, 0, CNM_FALSE);
 			break;
-		case 5:
+		case 6:
 			//msdata.num_pages = 0;
 			//ServerBrowserLoadPage(0);
 			//sprintf(serverbrowser->elements[1].name, "PAGE: %d/%d", 0, 0);
@@ -1498,7 +1505,7 @@ void draw_main_gui(void) {
 			//titlebg_set_card_movement(4, 0, CNM_FALSE);
 			Audio_PlaySound(40, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 			break;
-		case 6:
+		case 7:
 			cache_titlebgs();
 			gui_state = GUI_TITLEBG_STATE;
 			ps_trans = 0;
@@ -1506,7 +1513,7 @@ void draw_main_gui(void) {
 			ps_pos = ps_selected * (8+8);
 			ps_pos_target = ps_pos;
 			break;
-		case 7:
+		case 8:
 			return_rect = Util_RandInt(0, sizeof(return_rects) / sizeof(*return_rects));
 			quit_rect = Util_RandInt(0, sizeof(quit_rects) / sizeof(*quit_rects));
 			gui_state = GUI_QUIT_STATE;
@@ -1634,11 +1641,11 @@ void draw_host_game_gui(void) {
 	}
 
 	int num_lvls = globalsave_get_num_levels(&g_globalsave);
-	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < (num_lvls ? 4 : 3)) {
+	if (Input_GetButtonPressed(INPUT_MENUDOWN, INPUT_STATE_PLAYING) && ps_selected < (num_lvls ? 4 : 3)) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected++;
 	}
-	if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && ps_selected > 0) {
+	if (Input_GetButtonPressed(INPUT_MENUUP, INPUT_STATE_PLAYING) && ps_selected > 0) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected--;
 	}
@@ -1702,11 +1709,11 @@ void draw_player_setup_gui(void) {
 	gui_text_box_update(&ps_player_name, ps_selected == 0);
 	draw_player_setup();
 
-	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 2) {
+	if (Input_GetButtonPressed(INPUT_MENUDOWN, INPUT_STATE_PLAYING) && ps_selected < 2) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected++;
 	}
-	if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && ps_selected > 0) {
+	if (Input_GetButtonPressed(INPUT_MENUUP, INPUT_STATE_PLAYING) && ps_selected > 0) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected--;
 	}
@@ -1778,11 +1785,11 @@ void draw_options_gui(void) {
 	gui_text_box_update(&options_mserv, ps_selected == 3);
 	draw_player_setup();
 
-	if (Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && ps_selected < 4) {
+	if (Input_GetButtonPressed(INPUT_MENUDOWN, INPUT_STATE_PLAYING) && ps_selected < 4) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected++;
 	}
-	if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && ps_selected > 0) {
+	if (Input_GetButtonPressed(INPUT_MENUUP, INPUT_STATE_PLAYING) && ps_selected > 0) {
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 		ps_selected--;
 	}

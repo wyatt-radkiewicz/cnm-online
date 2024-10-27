@@ -1,7 +1,21 @@
 "127.0.0.1"
-"eklipsed"
+"eklipse"
 1
 1
 1
-0
+8
 "127.0.0.1"
+Up a (null) 0
+Down x (null) 0
+Left (null) leftx -1
+Right (null) leftx 1
+Z rightshoulder righttrigger 1
+T (null) (null) 0
+Up (null) lefty -1
+Down (null) lefty 1
+Backspace start (null) 0
+Backspace x (null) 0
+Return a (null) 0
+V y (null) 0
+` (null) (null) 0
+Backspace (null) (null) 0

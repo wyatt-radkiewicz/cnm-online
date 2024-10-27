@@ -162,7 +162,7 @@ void pause_menu_update(void) {
 		}
 		return;
 	}
-	if (Input_GetButtonPressedRepeated(INPUT_DOWN, INPUT_STATE_GUI) && options_num + 1 < 4) {
+	if (Input_GetButtonPressedRepeated(INPUT_MENUDOWN, INPUT_STATE_GUI) && options_num + 1 < 4) {
 		left_disp = 32;
 		side_blob_x = RENDERER_WIDTH;
 		options_num++;
@@ -175,13 +175,13 @@ void pause_menu_update(void) {
 	if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
 		minopt = 0;
 	}
-	if (Input_GetButtonPressedRepeated(INPUT_UP, INPUT_STATE_GUI) && options_num > minopt) {
+	if (Input_GetButtonPressedRepeated(INPUT_MENUUP, INPUT_STATE_GUI) && options_num > minopt) {
 		left_disp = -32;
 		side_blob_x = RENDERER_WIDTH;
 		options_num--;
 		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
 	}
-	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_GUI)) {
+	if (Input_GetButtonPressed(INPUT_PAUSE, INPUT_STATE_GUI)) {
 		pause_menu_unfocus();
 	}
 	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_GUI) && funcs[options_num]) {

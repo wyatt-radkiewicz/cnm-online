@@ -70,7 +70,7 @@ void GameState_Client_Update(void)
 	Fadeout_StepFade();
 	GameConsole_Update();
 	World_Update(WORLD_MODE_CLIENT);
-	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) pause_menu_focus();
+	if (Input_GetButtonPressed(INPUT_PAUSE, INPUT_STATE_PLAYING)) pause_menu_focus();
 }
 void GameState_Client_Draw(void)
 {

@@ -65,7 +65,7 @@ void GameState_HostedServer_Update(void)
 	Fadeout_StepFade();
 	GameConsole_Update();
 	World_Update(WORLD_MODE_HOSTED_SERVER);
-	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) pause_menu_focus();
+	if (Input_GetButtonPressed(INPUT_PAUSE, INPUT_STATE_PLAYING)) pause_menu_focus();
 }
 void GameState_HostedServer_Draw(void)
 {

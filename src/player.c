@@ -2052,7 +2052,9 @@ plat_velx_application:
 	Item_Update(wobj);
 	Item_TryUse(wobj);
 
-	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING) && !local_data->lock_controls) {
+	if (Input_GetButtonPressed(INPUT_DROP, INPUT_STATE_PLAYING)
+		&& !local_data->lock_controls
+		&& !Wobj_GetWobjCollidingWithType(wobj, WOBJ_DROPPED_ITEM)) {
 		Player_SwapOffhand(wobj);
 	}
 

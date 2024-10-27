@@ -11,12 +11,15 @@
 static int input_last_buttons[INPUT_BUTTONS_MAX];
 static int input_buttons[INPUT_BUTTONS_MAX];
 static int input_repeated_buttons[INPUT_BUTTONS_MAX];
+static int input_controller_repeat[INPUT_BUTTONS_MAX];
 static INPUT_QUITCALLBACK input_callback = NULL;
 static int input_state_stack[INPUT_MAX_STATES];
 static int input_state_top;
 static char input_last_char;
 static int input_initialized = CNM_FALSE;
 static int mouse_pressed;
+static inputbind_t binds[INPUT_BUTTONS_MAX];
+static int textmode;
 
 extern SDL_Window *renderer_win;
 
@@ -28,6 +31,79 @@ static int input_state_changed;
 
 static char Input_ScancodeToChar(SDL_Scancode c, int shift, int caps);
 static void Input_ApplyStateChanges(void);
+
+void input_reset_binds(void) {
+	binds[INPUT_UP] = (inputbind_t){
+		.sc = SDL_SCANCODE_UP,
+		.btn = SDL_CONTROLLER_BUTTON_A,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_DOWN] = (inputbind_t){
+		.sc = SDL_SCANCODE_DOWN,
+		.btn = SDL_CONTROLLER_BUTTON_X,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_MENUUP] = (inputbind_t){
+		.sc = SDL_SCANCODE_UP,
+		.btn = SDL_CONTROLLER_BUTTON_INVALID,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_LEFTY, .dir = -1 },
+	};
+	binds[INPUT_MENUDOWN] = (inputbind_t){
+		.sc = SDL_SCANCODE_DOWN,
+		.btn = SDL_CONTROLLER_BUTTON_INVALID,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_LEFTY, .dir = 1 },
+	};
+	binds[INPUT_LEFT] = (inputbind_t){
+		.sc = SDL_SCANCODE_LEFT,
+		.btn = SDL_CONTROLLER_BUTTON_INVALID,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_LEFTX, .dir = -1 },
+	};
+	binds[INPUT_RIGHT] = (inputbind_t){
+		.sc = SDL_SCANCODE_RIGHT,
+		.btn = SDL_CONTROLLER_BUTTON_INVALID,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_LEFTX, .dir = 1 },
+	};
+	binds[INPUT_FIRE] = (inputbind_t){
+		.sc = SDL_SCANCODE_Z,
+		.btn = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_TRIGGERRIGHT, .dir = 1 },
+	};
+	binds[INPUT_TALK] = (inputbind_t){
+		.sc = SDL_SCANCODE_T,
+		.btn = SDL_CONTROLLER_BUTTON_INVALID,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_PAUSE] = (inputbind_t){
+		.sc = SDL_SCANCODE_BACKSPACE,
+		.btn = SDL_CONTROLLER_BUTTON_START,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_ESCAPE] = (inputbind_t){
+		.sc = SDL_SCANCODE_BACKSPACE,
+		.btn = SDL_CONTROLLER_BUTTON_X,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_ENTER] = (inputbind_t){
+		.sc = SDL_SCANCODE_RETURN,
+		.btn = SDL_CONTROLLER_BUTTON_A,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_DROP] = (inputbind_t){
+		.sc = SDL_SCANCODE_V,
+		.btn = SDL_CONTROLLER_BUTTON_Y,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_CONSOLE] = (inputbind_t){
+		.sc = SDL_SCANCODE_GRAVE,
+		.btn = SDL_CONTROLLER_BUTTON_INVALID,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_BACKSPACE] = (inputbind_t){
+		.sc = SDL_SCANCODE_BACKSPACE,
+		.btn = SDL_CONTROLLER_BUTTON_INVALID,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+}
 
 void Input_Init(void)
 {
@@ -41,6 +117,7 @@ void Input_Init(void)
 	input_state_top2 = 0;
 	input_state_changed = CNM_FALSE;
 	input_pad = NULL;
+
 	for (int i = 0; i < SDL_NumJoysticks(); i++)
 	{
 		if (SDL_IsGameController(i))
@@ -95,27 +172,13 @@ void Input_Update(void)
 			if (event.key.keysym.scancode == SDL_SCANCODE_F4 && event.key.keysym.mod & KMOD_LALT && input_callback != NULL)
 				input_callback();
 			input_last_char = Input_ScancodeToChar(event.key.keysym.scancode,
-												   event.key.keysym.mod & KMOD_SHIFT,
-												   event.key.keysym.mod & KMOD_CAPS);
+				event.key.keysym.mod & KMOD_SHIFT,
+				event.key.keysym.mod & KMOD_CAPS);
 
-			switch (event.key.keysym.scancode)
-			{
-				case SDL_SCANCODE_UP: input_repeated_buttons[INPUT_UP] = CNM_TRUE; break;
-				case SDL_SCANCODE_DOWN: input_repeated_buttons[INPUT_DOWN] = CNM_TRUE; break;
-				case SDL_SCANCODE_LCTRL: input_repeated_buttons[INPUT_FIRE] = CNM_TRUE; break;
-				case SDL_SCANCODE_LEFT: input_repeated_buttons[INPUT_LEFT] = CNM_TRUE; break;
-				case SDL_SCANCODE_RIGHT: input_repeated_buttons[INPUT_RIGHT] = CNM_TRUE; break;
-				case SDL_SCANCODE_W: input_repeated_buttons[INPUT_W] = CNM_TRUE; break;
-				case SDL_SCANCODE_S: input_repeated_buttons[INPUT_S] = CNM_TRUE; break;
-				case SDL_SCANCODE_A: input_repeated_buttons[INPUT_A] = CNM_TRUE; break;
-				case SDL_SCANCODE_D: input_repeated_buttons[INPUT_D] = CNM_TRUE; break;
-				case SDL_SCANCODE_T: input_repeated_buttons[INPUT_TALK] = CNM_TRUE; break;
-				case SDL_SCANCODE_ESCAPE: input_repeated_buttons[INPUT_ESCAPE] = CNM_TRUE; break;
-				case SDL_SCANCODE_RETURN: input_repeated_buttons[INPUT_ENTER] = CNM_TRUE; break;
-				case SDL_SCANCODE_SPACE: input_repeated_buttons[INPUT_DROP] = CNM_TRUE; break;
-				case SDL_SCANCODE_GRAVE: input_repeated_buttons[INPUT_CONSOLE] = CNM_TRUE; break;
-				case SDL_SCANCODE_BACKSPACE: input_repeated_buttons[INPUT_BACKSPACE] = CNM_TRUE; break;
-				default: break;
+			for (int i = 0; i < INPUT_BUTTONS_MAX; i++) {
+				if (binds[i].sc == event.key.keysym.scancode) {
+					input_repeated_buttons[i] = CNM_TRUE;
+				}
 			}
 			break;
 		case SDL_CONTROLLERDEVICEADDED:
@@ -138,71 +201,48 @@ void Input_Update(void)
 
 	keys = SDL_GetKeyboardState(NULL);
 	memcpy(input_last_buttons, input_buttons, sizeof(input_buttons));
-	input_buttons[INPUT_UP] = keys[SDL_SCANCODE_UP];
-	input_buttons[INPUT_DOWN] = keys[SDL_SCANCODE_DOWN];
-	input_buttons[INPUT_FIRE] = keys[SDL_SCANCODE_Z] || mouse_pressed;
-	input_buttons[INPUT_LEFT] = keys[SDL_SCANCODE_LEFT];
-	input_buttons[INPUT_RIGHT] = keys[SDL_SCANCODE_RIGHT];
-	input_buttons[INPUT_W] = keys[SDL_SCANCODE_W];
-	input_buttons[INPUT_S] = keys[SDL_SCANCODE_S];
-	input_buttons[INPUT_A] = keys[SDL_SCANCODE_A];
-	input_buttons[INPUT_D] = keys[SDL_SCANCODE_D];
-	input_buttons[INPUT_TALK] = keys[SDL_SCANCODE_T];
-	input_buttons[INPUT_ESCAPE] = keys[SDL_SCANCODE_ESCAPE];
-	input_buttons[INPUT_ENTER] = keys[SDL_SCANCODE_RETURN];
-	input_buttons[INPUT_DROP] = keys[SDL_SCANCODE_SPACE];
-	input_buttons[INPUT_CONSOLE] = keys[SDL_SCANCODE_GRAVE];
-	input_buttons[INPUT_BACKSPACE] = keys[SDL_SCANCODE_BACKSPACE];
-	if ((Game_TopState() == GAME_STATE_SINGLEPLAYER || Game_TopState() == GAME_STATE_CLIENT || Game_TopState() == GAME_STATE_DEDICATED_SERVER || Game_TopState() == GAME_STATE_HOSTED_SERVER) && Input_TopState() <= INPUT_STATE_PLAYING) {
-		input_buttons[INPUT_UP] = keys[SDL_SCANCODE_SPACE] || keys[SDL_SCANCODE_X] || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_K];
-		input_buttons[INPUT_DOWN] = keys[SDL_SCANCODE_DOWN]|| keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_J];
-		input_buttons[INPUT_LEFT] = keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_H];
-		input_buttons[INPUT_RIGHT] = keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_L];
-		input_buttons[INPUT_ENTER] = keys[SDL_SCANCODE_RETURN] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_C];
-		input_buttons[INPUT_DROP] = keys[SDL_SCANCODE_V] || keys[SDL_SCANCODE_E];
-	}
 
-	if (input_pad != NULL)
-	{
-		int activation = 8000;
-		int left_x = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_LEFTX);
-		int left_y = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_LEFTY);
-		int right_x = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_RIGHTX);
-		int right_y = (int)SDL_GameControllerGetAxis(input_pad, SDL_CONTROLLER_AXIS_RIGHTY);
+	for (int i = 0; i < INPUT_BUTTONS_MAX; i++) {
+		input_buttons[i] = keys[binds[i].sc];
+		if (binds[i].sc == SDL_SCANCODE_BACKSPACE
+			&& textmode) input_buttons[i] = 0;
 
-		if (Input_TopState() == INPUT_STATE_PLAYING)
-		{
-			input_buttons[INPUT_UP] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_A);
-			input_buttons[INPUT_DOWN] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_X);
+		if (!input_pad) continue;
+
+		int cbtn = 0;
+
+		input_controller_repeat[i]++;
+
+		if (binds[i].axis.axis != SDL_CONTROLLER_AXIS_INVALID) {
+			int activation = 12000;
+			int x = (int)SDL_GameControllerGetAxis(input_pad, binds[i].axis.axis);
+
+			if (binds[i].axis.dir > 0) {
+				cbtn |= x > activation;
+			} else {
+				cbtn |= x < -activation;
+			}
 		}
-		else
-		{
-			input_buttons[INPUT_UP] |= (left_y < -activation) || SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_DPAD_UP);
-			input_buttons[INPUT_DOWN] |= (left_y > activation) || SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-			input_buttons[INPUT_ENTER] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_A);
-			input_buttons[INPUT_ESCAPE] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_B);
-		}
-		input_buttons[INPUT_LEFT] |= (left_x < -activation) || SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-		input_buttons[INPUT_RIGHT] |= (left_x > activation) || SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-		input_buttons[INPUT_W] |= (right_y < -activation);
-		input_buttons[INPUT_S] |= (right_y > activation);
-		input_buttons[INPUT_A] |= (right_x < -activation);
-		input_buttons[INPUT_D] |= (right_x > activation);
-		input_buttons[INPUT_ESCAPE] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_BACK);
-		input_buttons[INPUT_ENTER] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_START);
-		input_buttons[INPUT_DROP] |= SDL_GameControllerGetButton(input_pad, SDL_CONTROLLER_BUTTON_Y);
 
-		input_repeated_buttons[INPUT_UP] |= !input_last_buttons[INPUT_UP] && input_buttons[INPUT_UP];
-		input_repeated_buttons[INPUT_DOWN] |= !input_last_buttons[INPUT_DOWN] && input_buttons[INPUT_DOWN];
-		input_repeated_buttons[INPUT_LEFT] |= !input_last_buttons[INPUT_LEFT] && input_buttons[INPUT_LEFT];
-		input_repeated_buttons[INPUT_RIGHT] |= !input_last_buttons[INPUT_RIGHT] && input_buttons[INPUT_RIGHT];
-		input_repeated_buttons[INPUT_W] |= !input_last_buttons[INPUT_W] && input_buttons[INPUT_W];
-		input_repeated_buttons[INPUT_S] |= !input_last_buttons[INPUT_S] && input_buttons[INPUT_S];
-		input_repeated_buttons[INPUT_A] |= !input_last_buttons[INPUT_A] && input_buttons[INPUT_A];
-		input_repeated_buttons[INPUT_D] |= !input_last_buttons[INPUT_D] && input_buttons[INPUT_D];
-		input_repeated_buttons[INPUT_ESCAPE] |= !input_last_buttons[INPUT_ESCAPE] && input_buttons[INPUT_ESCAPE];
-		input_repeated_buttons[INPUT_ENTER] |= !input_last_buttons[INPUT_ENTER] && input_buttons[INPUT_ENTER];
-		input_repeated_buttons[INPUT_DROP] |= !input_last_buttons[INPUT_DROP] && input_buttons[INPUT_DROP];
+		if (binds[i].btn != SDL_CONTROLLER_BUTTON_INVALID) {
+			cbtn |= (int)SDL_GameControllerGetButton(input_pad, binds[i].btn);
+		}
+
+		if (!cbtn) {
+			input_controller_repeat[i] = 0;
+		}
+
+		if (cbtn) {
+			input_buttons[i] = CNM_TRUE;
+			if (input_buttons[i] && !input_last_buttons[i]) {
+				input_repeated_buttons[i] = CNM_TRUE;
+				input_controller_repeat[i] = 0;
+			}
+			if (input_controller_repeat[i] >= 25
+				&& input_controller_repeat[i] % 5 == 0) {
+				input_repeated_buttons[i] = CNM_TRUE;
+			}
+		}
 	}
 }
 void Input_SetQuitCallback(INPUT_QUITCALLBACK callback)
@@ -308,6 +348,21 @@ int Input_TopState(void)
 		return INPUT_STATE_NOINPUT;
 
 	return input_state_stack[input_state_top];
+}
+void input_setbind(INPUT_BUTTONS btn, inputbind_t bind) {
+	binds[btn] = bind;
+	input_last_buttons[btn] = 0;
+	input_buttons[btn] = 0;
+	input_repeated_buttons[btn] = 0;
+}
+inputbind_t input_getbind(INPUT_BUTTONS btn) {
+	return binds[btn];
+}
+void input_start_textmode(void) {
+	textmode = 1;
+}
+void input_end_textmode(void) {
+	textmode = 0;
 }
 
 static char Input_ScancodeToChar(SDL_Scancode c, int shift, int caps)

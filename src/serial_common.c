@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "serial.h"
 #include "console.h"
+#include "input.h"
 #include "game.h"
 #include "renderer.h"
 #include "audio.h"
@@ -154,6 +155,18 @@ void Serial_SaveConfig(void)
 		fputc('\"', fp);
 		fputs(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string, fp);
 		fputs("\"\n", fp);
+		fprintf(fp, "");
+
+		for (int i = 0; i < INPUT_BUTTONS_MAX; i++) {
+			inputbind_t bind = input_getbind(i);
+
+			fprintf(fp, "%s %s %s %d\n",
+				SDL_GetKeyName(SDL_GetKeyFromScancode(bind.sc)),
+				SDL_GameControllerGetStringForButton(bind.btn),
+				SDL_GameControllerGetStringForAxis(bind.axis.axis),
+				bind.axis.dir);
+		}
+
 		fclose(fp);
 	}
 	else
@@ -194,6 +207,22 @@ void Serial_LoadConfig(void)
 								   Game_GetVar(GAME_VAR_HIRESMODE)->data.integer,
 								   Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer);
 		//Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.decimal = (float)Game_GetVar(GAME_VAR_INITIALIZED_AUDIO_VOLUME)->data.integer / 100.0f;
+		
+
+		for (int i = 0; i < INPUT_BUTTONS_MAX; i++) {
+			inputbind_t bind;
+
+			char sc[64], btn[32], axis[32];
+
+			fscanf(fp, "%s %s %s %d\n",
+				sc, btn, axis, &bind.axis.dir);
+			bind.sc = SDL_GetScancodeFromKey(SDL_GetKeyFromName(sc));
+			bind.btn = SDL_GameControllerGetButtonFromString(btn);
+			bind.axis.axis = SDL_GameControllerGetAxisFromString(axis);
+
+			input_setbind(i, bind);
+		}
+
 		fclose(fp);
 	}
 	else

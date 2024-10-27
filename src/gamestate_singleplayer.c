@@ -74,7 +74,7 @@ void GameState_Singleplayer_Update(void)
 	GameConsole_Update();
 	if (!pause_menu_isfocused()) World_Update(WORLD_MODE_SINGLEPLAYER);
 	Fadeout_StepFade();
-	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING) && g_can_pause) pause_menu_focus();
+	if (Input_GetButtonPressed(INPUT_PAUSE, INPUT_STATE_PLAYING) && g_can_pause) pause_menu_focus();
 }
 void GameState_Singleplayer_Draw(void)
 {
