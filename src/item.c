@@ -825,7 +825,7 @@ static void ItemSniper_OnUse(ITEM *shotgun, WOBJ *player)
 	//	player->vel_x -= 3.0f;
 
 	shotgun->hide_timer = ITEM_HIDE_TIMER;
-	float dmg_mul = 1.0f - CNM_MAX((float)shotgun->custom_timer + 8.0f, 0.0f) / 20.0f; 
+	float dmg_mul = 1.0f;// - CNM_MAX((float)shotgun->custom_timer + 8.0f, 0.0f) / 20.0f; 
 	float spread = (float)shotgun->custom_timer / 2.25f;
 	float dir = (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f;
 	if (spread < 0.0f) spread = 0.0f;
