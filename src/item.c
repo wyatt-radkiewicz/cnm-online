@@ -618,7 +618,7 @@ void Item_TryPickupAndDrop(WOBJ *player)
 	PLAYER_LOCAL_DATA *plr_local = player->local_data;
 	if (_pickup_cooldown > 0) --_pickup_cooldown;
 	int pressed_drop = Input_GetButtonPressed(INPUT_DROP, INPUT_STATE_PLAYING) && !plr_local->lock_controls;
-	if (!Wobj_GetWobjCollidingWithType(player, WOBJ_DROPPED_ITEM)) pressed_drop = 0;
+	//if (!Wobj_GetWobjCollidingWithType(player, WOBJ_DROPPED_ITEM)) pressed_drop = 0;
 	if (other_item != NULL &&
 		pressed_drop &&
 		player->item != ITEM_TYPE_NOITEM &&
@@ -808,33 +808,21 @@ static void ItemShotgun_OnDrop(ITEM *shotgun, WOBJ *player)
 	player->flags &= ~WOBJ_LIGHT_SMALL;
 }
 
-static void ItemSniper_OnUse(ITEM *shotgun, WOBJ *player)
+static void ItemSniper_OnUse(ITEM *sniper, WOBJ *player)
 {
-	//WOBJ *w = Interaction_CreateWobj(WOBJ_PLAYER_PELLET,
-	//								 player->x, player->y, 0,
-	//								 (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f);
-	//w->speed = 16.0f;
-	//w->strength = player->strength + 0.5f;
-	//Interaction_PlaySound(player, 11);
-	//shotgun->use_timer = 15;
-	//shotgun->custom_timer = 10;
-
-	//if (player->flags & WOBJ_HFLIP)
-	//	player->vel_x += 3.0f;
-	//else
-	//	player->vel_x -= 3.0f;
-
-	shotgun->hide_timer = ITEM_HIDE_TIMER;
-	float dmg_mul = 1.0f;// - CNM_MAX((float)shotgun->custom_timer + 8.0f, 0.0f) / 20.0f; 
-	float spread = (float)shotgun->custom_timer / 2.25f;
+	sniper->hide_timer = ITEM_HIDE_TIMER;
+	float dmg_mul = (float)sniper->custom_timer / 2.0f;
+	if (dmg_mul < 0.0f) dmg_mul = 0.0f;
+	dmg_mul += 1.0f;
+	float spread = (float)sniper->custom_timer / 1.5f;
 	float dir = (player->flags & WOBJ_HFLIP) ? -1.0f : 1.0f;
 	if (spread < 0.0f) spread = 0.0f;
 	float sprd_rnd = (Util_RandFloat() * 2.0f - 1.0f);
-	for (int i = 0; i < (shotgun->type == ITEM_TYPE_AWP ? 5 : 1); i++) {
+	for (int i = 0; i < (sniper->type == ITEM_TYPE_AWP ? 5 : 1); i++) {
 		WOBJ *pel = Interaction_CreateWobj(WOBJ_SHOTGUN_PEL, player->x + 16.0f, player->y + 13.0f, 0, 0.0f);
 		pel->strength = player->strength + (1.0f * dmg_mul);
 		pel->anim_frame = 1;
-		if (shotgun->type == ITEM_TYPE_AWP) {
+		if (sniper->type == ITEM_TYPE_AWP) {
 			pel->x -= 11.0f;
 			pel->x += (float)i * 5.0f;
 			pel->custom_floats[1] = 0.35f;
@@ -849,11 +837,11 @@ static void ItemSniper_OnUse(ITEM *shotgun, WOBJ *player)
 	}
 	Player_PlayShootAnim(player);
 	Interaction_PlaySound(player, 11);
-	shotgun->custom_timer = 37;
-	shotgun->use_timer = 25;
-	//shotgun->durability -= 1.0f;
+	sniper->custom_timer = 25;
+	sniper->use_timer = 15;
+	//sniper->durability -= 1.0f;
 
-	float knockback = (shotgun->type == ITEM_TYPE_AWP) ? 5.0f : 3.0f;
+	float knockback = (sniper->type == ITEM_TYPE_AWP) ? 5.0f : 3.0f;
 	if (player->flags & WOBJ_HFLIP)
 		player->vel_x += knockback;
 	else

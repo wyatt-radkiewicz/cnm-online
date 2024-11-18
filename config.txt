@@ -14,8 +14,10 @@ T (null) (null) 0
 Up (null) lefty -1
 Down (null) lefty 1
 Backspace start (null) 0
-Backspace x (null) 0
+Escape x (null) 0
 Return a (null) 0
 V y (null) 0
+C b (null) 0
 ` (null) (null) 0
 Backspace (null) (null) 0
+R (null) (null) 0

@@ -79,13 +79,18 @@ void input_reset_binds(void) {
 		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
 	};
 	binds[INPUT_ESCAPE] = (inputbind_t){
-		.sc = SDL_SCANCODE_BACKSPACE,
+		.sc = SDL_SCANCODE_ESCAPE,
 		.btn = SDL_CONTROLLER_BUTTON_X,
 		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
 	};
 	binds[INPUT_ENTER] = (inputbind_t){
 		.sc = SDL_SCANCODE_RETURN,
 		.btn = SDL_CONTROLLER_BUTTON_A,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_SWAP] = (inputbind_t){
+		.sc = SDL_SCANCODE_C,
+		.btn = SDL_CONTROLLER_BUTTON_B,
 		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
 	};
 	binds[INPUT_DROP] = (inputbind_t){
@@ -100,6 +105,11 @@ void input_reset_binds(void) {
 	};
 	binds[INPUT_BACKSPACE] = (inputbind_t){
 		.sc = SDL_SCANCODE_BACKSPACE,
+		.btn = SDL_CONTROLLER_BUTTON_INVALID,
+		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
+	};
+	binds[INPUT_RESTART] = (inputbind_t){
+		.sc = SDL_SCANCODE_R,
 		.btn = SDL_CONTROLLER_BUTTON_INVALID,
 		.axis = { .axis = SDL_CONTROLLER_AXIS_INVALID, .dir = 0 },
 	};

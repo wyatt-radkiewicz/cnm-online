@@ -67,6 +67,10 @@ void GameState_Singleplayer_Update(void)
 			Game_GetVar(GAME_VAR_GOD)->data.integer = was_god;
 			World_SoftRestart();
 		}
+	} else if (Game_GetVar(GAME_VAR_LEVEL_SELECT_MODE)->data.integer) {
+		if (Input_GetButtonPressed(INPUT_RESTART, INPUT_STATE_PLAYING)) {
+			lsrestart();
+		}
 	}
 
 	Input_Update();
