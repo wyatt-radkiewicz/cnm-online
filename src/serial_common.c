@@ -160,8 +160,11 @@ void Serial_SaveConfig(void)
 		for (int i = 0; i < INPUT_BUTTONS_MAX; i++) {
 			inputbind_t bind = input_getbind(i);
 
+			const char *name = SDL_GetKeyName(SDL_GetKeyFromScancode(bind.sc));
+			if (name[0] == '\0') name = NULL;
+
 			fprintf(fp, "%s %s %s %d\n",
-				SDL_GetKeyName(SDL_GetKeyFromScancode(bind.sc)),
+				name,
 				SDL_GameControllerGetStringForButton(bind.btn),
 				SDL_GameControllerGetStringForAxis(bind.axis.axis),
 				bind.axis.dir);

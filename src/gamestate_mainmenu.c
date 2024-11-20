@@ -53,6 +53,7 @@ enum gui_state {
 	GUI_MAIN_STATE,
 	GUI_PLAYER_SETUP,
 	GUI_OPTIONS_STATE,
+	GUI_CONTROLS_STATE,
 	GUI_JOIN_STATE,
 	GUI_HOST_STATE,
 	GUI_LOCAL_STATE,
@@ -614,6 +615,7 @@ static int ps2_pos, ps2_pos_target;
 static int ps2_pos_target_add;
 static struct gui_text_box ps_player_name, options_mserv;
 static int host_game_level_idx;
+static int is_selecting_key;
 
 static void DrawHealthBar(int x, int y, int w, int trans2) {
 	CNM_RECT r;
@@ -680,9 +682,57 @@ static const char *skin_names[] = {
 };
 
 #define MAX_BGS 64
-static char bgs[MAX_BGS][ENDING_TEXT_MAX_WIDTH + 1];
+static char bgs[MAX_BGS][128];
 static int bgids[MAX_BGS];
 static int num_bgs;
+
+static void update_control(int idx, bool waiting_input) {
+	int btn = input_get_from_idx(idx);
+	strcpy(bgs[idx], input_get_name(btn));
+	int len = strlen(bgs[idx]);
+	while (len++ < 9) strcat(bgs[idx], " ");
+	strcat(bgs[idx], ":");
+
+	if (waiting_input) {
+		strcat(bgs[idx], "PRESS INPUT");
+	} else {
+		const char *name;
+		inputbind_t bind = input_getbind(btn);
+
+		name = SDL_GetKeyName(SDL_GetKeyFromScancode(bind.sc));
+		if (name[0] == '\0') strcat(bgs[idx], "NO KEY");
+		else strcat(bgs[idx], name);
+		strcat(bgs[idx], ",");
+
+		len = strlen(bgs[idx]);
+		while (len++ < 9+10) strcat(bgs[idx], " ");
+
+		name = SDL_GameControllerGetStringForButton(bind.btn);
+		if (name) {
+			strcat(bgs[idx], name);
+		} else {
+			name = SDL_GameControllerGetStringForAxis(bind.axis.axis);
+			if (name) {
+				if (bind.axis.dir > 0) strcat(bgs[idx], "+");
+				else strcat(bgs[idx], "-");
+				strcat(bgs[idx], name);
+			} else {
+				strcat(bgs[idx], "NO JOYSTICK");
+			}
+		}
+	}
+}
+
+static void cache_controls(void) {
+	num_bgs = 1;
+	strcpy(bgs[0], "RESET TO DEFAULT");
+
+	while (true) {
+		int i = input_get_from_idx(num_bgs);
+		if (i == -1) break;
+		update_control(num_bgs++, false);
+	}
+}
 
 static void cache_titlebgs(void) {
 	num_bgs = 1;
@@ -731,17 +781,40 @@ void draw_player_setup(void) {
 		ystart = -32;
 		height = 3;
 	}
+	bool is_controls_state = last_gui_state == GUI_CONTROLS_STATE || gui_state == GUI_CONTROLS_STATE;
+	int mid = RENDERER_WIDTH / 2;
+	int midwidth = 0;
+	if (is_controls_state) {
+		midwidth = 32;
+		Util_SetRect(&r, 400, 32, midwidth, 48);
+		Util_SetRect(&r2, 400, 64, midwidth, 16);
+		Renderer_DrawBitmap2(mid, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
+		Renderer_DrawBitmap2(mid - r.w, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+		for (int i = 0; i < height; i++) {
+			Renderer_DrawBitmap2(mid - r.w, RENDERER_HEIGHT / 2 + ystart + i*r2.h + r.h, &r2, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+			Renderer_DrawBitmap2(mid, RENDERER_HEIGHT / 2 + ystart + i*r2.h + r.h, &r2, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
+		}
+		Renderer_DrawBitmap2(mid, RENDERER_HEIGHT / 2 + ystart + height*r2.h + r.h, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
+		Renderer_DrawBitmap2(mid - r.w, RENDERER_HEIGHT / 2 + ystart + height*r2.h + r.h, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
+	}
 	Util_SetRect(&r, 400, 32, 112, 48);
 	Util_SetRect(&r2, 400, 64, 112, 16);
-	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
-	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
-	for (int i = 0; i < height; i++) {
-		Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, RENDERER_HEIGHT / 2 + ystart + i*r2.h + r.h, &r2, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
-		Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + ystart + i*r2.h + r.h, &r2, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
+	if (is_controls_state) {
+		Util_SetRect(&r, 384, 32, 128, 48);
+		Util_SetRect(&r2, 384, 64, 128, 16);
 	}
-	Renderer_DrawBitmap2(RENDERER_WIDTH / 2, RENDERER_HEIGHT / 2 + ystart + height*r2.h + r.h, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
-	Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - r.w, RENDERER_HEIGHT / 2 + ystart + height*r2.h + r.h, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
+	Renderer_DrawBitmap2(mid + midwidth, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
+	Renderer_DrawBitmap2(mid - midwidth - r.w, RENDERER_HEIGHT / 2 + ystart, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+	for (int i = 0; i < height; i++) {
+		Renderer_DrawBitmap2(mid - midwidth - r.w, RENDERER_HEIGHT / 2 + ystart + i*r2.h + r.h, &r2, trans, RENDERER_LIGHT, CNM_TRUE, CNM_FALSE);
+		Renderer_DrawBitmap2(mid + midwidth, RENDERER_HEIGHT / 2 + ystart + i*r2.h + r.h, &r2, trans, RENDERER_LIGHT, CNM_FALSE, CNM_FALSE);
+	}
+	Renderer_DrawBitmap2(mid + midwidth, RENDERER_HEIGHT / 2 + ystart + height*r2.h + r.h, &r, trans, RENDERER_LIGHT, CNM_FALSE, CNM_TRUE);
+	Renderer_DrawBitmap2(mid - midwidth - r.w, RENDERER_HEIGHT / 2 + ystart + height*r2.h + r.h, &r, trans, RENDERER_LIGHT, CNM_TRUE, CNM_TRUE);
 	gui_timer++;
+	if (is_controls_state) {
+		r.w += midwidth;
+	}
 	
 	int target_selected = ps_selected * 12;
 	if ((last_gui_state == GUI_HOST_STATE || gui_state == GUI_HOST_STATE) && ps_selected == 4) {
@@ -857,10 +930,11 @@ void draw_player_setup(void) {
 			(Game_GetVar(GAME_VAR_WIDESCREEN)->data.integer ? "YES" : " NO"));
 	}
 
-	if (last_gui_state == GUI_TITLEBG_STATE || gui_state == GUI_TITLEBG_STATE) {
-		Renderer_DrawText(RENDERER_WIDTH / 2 - (8*17)/2, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT, "PICK A BACKGROUND");
+	if (last_gui_state == GUI_TITLEBG_STATE || gui_state == GUI_TITLEBG_STATE || is_controls_state) {
+		Renderer_DrawText(RENDERER_WIDTH / 2 - (8*17)/2, RENDERER_HEIGHT / 2 + 16 + 12, trans2, RENDERER_LIGHT,
+			is_controls_state ? "SET CONTROLS" : "PICK A BACKGROUND");
 		for (int i = -4; i < num_bgs + 4; i++) {
-			const char *str = "????";
+			const char *str = is_controls_state ? "" : "????";
 			if (i > -1 && i < num_bgs) str = bgs[i];
 			if (i < 0 || i >= num_bgs || bgids[i] != g_globalsave.titlebg) Renderer_SetFont(288, 544, 8, 8);
 			else Renderer_SetFont(288, 416, 8, 8);
@@ -870,12 +944,16 @@ void draw_player_setup(void) {
 			if (y - center < 2) trans3 += -((y - center) + 2) / 4;
 			if (y - center > 8) trans3 += ((y - center) - 8) / 4;
 			if (trans3 > 7) trans3 = 7;
-			Renderer_DrawText(RENDERER_WIDTH / 2 - (strlen(str)*4), y, trans3, RENDERER_LIGHT, str);
+			int xs = RENDERER_WIDTH / 2 - (strlen(str)*4);
+			if (is_controls_state) {
+				xs = RENDERER_WIDTH / 2 - r.w + 12;
+			}
+			Renderer_DrawText(xs, y, trans3, RENDERER_LIGHT, str);
 			if (ps_selected == i) {
 				const int isblue = (i > -1 && i < num_bgs && bgids[i] == g_globalsave.titlebg) * 24;
 				Util_SetRect(&r2, 312-isblue, 608 + 8*(Game_GetFrame() / 2 % 6), 8, 8);
-				Renderer_DrawBitmap2(RENDERER_WIDTH / 2 - (strlen(str)*4) - 12, y, &r2, trans2, RENDERER_LIGHT, 0, 0);
-				Renderer_DrawBitmap2(RENDERER_WIDTH / 2 + (strlen(str)*4) + 4, y, &r2, trans2, RENDERER_LIGHT, 1, 0);
+				Renderer_DrawBitmap2(xs - 12, y, &r2, trans2, RENDERER_LIGHT, 0, 0);
+				Renderer_DrawBitmap2(xs + strlen(str)*8 + 4, y, &r2, trans2, RENDERER_LIGHT, 1, 0);
 			}
 		}
 	}
@@ -1356,6 +1434,81 @@ void draw_play_gui(void) {
 	}
 }
 
+void draw_controls_gui(void) {
+	draw_main_gui_bars();
+	draw_player_setup();
+
+	if (is_selecting_key) {
+		if (input_got_new_bind()) {
+			update_control(ps_selected, false);
+			is_selecting_key = CNM_FALSE;
+			return;
+		}
+	}
+
+	if (Input_GetButtonPressed(INPUT_ENTER, INPUT_STATE_PLAYING)) {
+		if (ps_selected == 0) {
+			input_reset_binds();
+			cache_controls();
+		} else {
+			input_start_get_new_bind(input_get_from_idx(ps_selected));
+			update_control(ps_selected, true);
+			is_selecting_key = true;
+			return;
+		}
+	}
+	if (Input_GetButtonPressed(INPUT_BACKSPACE, INPUT_STATE_PLAYING)
+		|| Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)) {
+		// Delete the input
+		if (ps_selected > 0) {
+			input_setbind(
+				input_get_from_idx(ps_selected),
+				(inputbind_t){
+					.sc = -1,
+					.btn = SDL_CONTROLLER_BUTTON_INVALID,
+					.axis = {
+						.axis = SDL_CONTROLLER_AXIS_INVALID,
+						.dir = 0,
+					}
+				}
+			);
+			update_control(ps_selected, false);
+		}
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_MENUDOWN, INPUT_STATE_PLAYING)) {
+		if (ps_selected + 1 < num_bgs) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			ps_selected++;
+			ps_pos_target += 8+4;
+		} else {
+			ps_pos_target_add = 8;
+		}
+	}
+	if (Input_GetButtonPressedRepeated(INPUT_MENUUP, INPUT_STATE_PLAYING)) {
+		if (ps_selected > 0) {
+			Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+			ps_selected--;
+			ps_pos_target -= 8+4;
+		} else {
+			ps_pos_target_add = -8;
+		}
+	}
+
+	ps_trans += 2;
+
+	if (Input_GetButtonPressed(INPUT_ESCAPE, INPUT_STATE_PLAYING)
+		&& ps_selected == 0) {
+		Audio_PlaySound(43, CNM_FALSE, Audio_GetListenerX(), Audio_GetListenerY());
+		last_gui_state = gui_state;
+		gui_state = GUI_MAIN_STATE;
+		gui_timer = 0;
+		side_blob_x = RENDERER_WIDTH;
+		side_xstart = -192;
+		ps_trans = 7*2;
+		Serial_SaveConfig();
+	}
+}
+
 void draw_titlebg_gui(void) {
 	draw_main_gui_bars();
 	draw_player_setup();
@@ -1474,6 +1627,16 @@ void draw_main_gui(void) {
 			ps_trans = 0;
 			gui_timer = 0;
 			options_mserv = gui_text_box_init(Game_GetVar(GAME_VAR_MASTER_SERVER_ADDR)->data.string, 16);
+			break;
+		case 3:
+			cache_controls();
+			gui_state = GUI_CONTROLS_STATE;
+			is_selecting_key = 0;
+			ps_trans = 0;
+			gui_timer = 0;
+			ps_selected = 0;
+			ps_pos = ps_selected * (8+8);
+			ps_pos_target = ps_pos;
 			break;
 		case 4:
 			gui_state = GUI_JOIN_STATE;
@@ -1859,6 +2022,7 @@ void draw_new_gui(void) {
 	case GUI_LOCAL_STATE: draw_local_game_gui(); break;
 	case GUI_QUIT_STATE: draw_quit_gui(); break;
 	case GUI_TITLEBG_STATE: draw_titlebg_gui(); break;
+	case GUI_CONTROLS_STATE: draw_controls_gui(); break;
 	}
 }
 void draw_play_gui_bg(void) {
@@ -1911,3 +2075,4 @@ void GameState_MainMenu_Draw(void)
 	GameConsole_Draw();
 	Renderer_Update();
 }
+

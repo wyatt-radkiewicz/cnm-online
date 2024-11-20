@@ -57,6 +57,12 @@ void input_setbind(INPUT_BUTTONS btn, inputbind_t bind);
 inputbind_t input_getbind(INPUT_BUTTONS btn);
 void input_start_textmode(void);
 void input_end_textmode(void);
+int input_got_new_bind(void);
+void input_start_get_new_bind(int idx);
+
+// Returns -1 if the index is invalid
+INPUT_BUTTONS input_get_from_idx(int idx);
+const char *input_get_name(INPUT_BUTTONS btn);
 
 int Input_PushState(int state);
 void Input_PopState(void);
