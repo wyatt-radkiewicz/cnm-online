@@ -3,12 +3,12 @@
 1
 1
 1
-8
+0
 "127.0.0.1"
 Up a (null) 0
 Down x (null) 0
-(null) (null) leftx -1
-(null) (null) leftx 1
+Left (null) leftx -1
+Right (null) leftx 1
 Z (null) righttrigger 1
 T (null) (null) 0
 Up (null) lefty -1

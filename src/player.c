@@ -1024,8 +1024,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
-		if (local_data->upgrade_state != PLAYER_UPGRADE_SHOES &&
-			local_data->upgrade_state != PLAYER_UPGRADE_WINGS &&
+		if (local_data->upgrade_state != PLAYER_UPGRADE_WINGS &&
 			local_data->upgrade_state != PLAYER_UPGRADE_CRYSTAL_WINGS) {
 			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
 				wobj->custom_ints[1] |= PLAYER_FLAG_STOMPING;
@@ -1036,45 +1035,67 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		if (Wobj_IsGrounded(wobj)) {
 			if (wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) {
-				Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x - 16.0f, wobj->y, 0, 0.0f);
-				Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x + 16.0f, wobj->y, 1, 0.0f);
+				if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES) {
+				    const float dmgmul = (fabsf(wobj->vel_x) / final_speed * 0.5f)
+						+ (local_data->air_time / 40.0f);
+								
+					WOBJ *w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
+													 wobj->x + 16.0f, wobj->y + 1.0f, 0, 1.0f);
+					w->speed = 9.0f + wobj->vel_x;
+					w->strength = wobj->strength + 0.1f + dmgmul;
+					w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
+													 wobj->x + 16.0f, wobj->y + 1.0f, 0, -1.0f);
+					w->flags |= WOBJ_HFLIP;
+					w->speed = 9.0f + wobj->vel_x;
+					w->strength = wobj->strength + 0.1f + dmgmul;
+					Interaction_PlaySound(wobj, 25);
+				} else {
+				    Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x - 16.0f, wobj->y, 0, 0.0f);
+				    Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x + 16.0f, wobj->y, 1, 0.0f);
+				}
 			}
 			wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
 		}
-		if ((wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) && wobj->vel_y < 12.0f) {
-			wobj->vel_y += 4.0f;
+		if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES) {
+            if ((wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) && wobj->vel_y < 24.0f) {
+            	wobj->vel_y += 6.0f;
+            }
+		} else {
+		    if ((wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) && wobj->vel_y < 12.0f) {
+		    	wobj->vel_y += 4.0f;
+		    }
 		}
 
 		if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES)
 		{
 			if (!Wobj_IsGrouneded(wobj))
 			{
-				if (!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->lock_controls)
-				{
-					wobj->vel_y = 10.0f;
-					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 32.0f) && !player_is_on_spring(wobj); i++)
-						wobj->y += 24.0f;
-					for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 1.0f) && !player_is_on_spring(wobj); i++)
-						wobj->y += 1.0f;
+				//if (!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && Input_GetButtonPressed//(INPUT_DOWN, INPUT_STATE_PLAYING) && !local_data->lock_controls)
+				//{
+				//	wobj->vel_y = 10.0f;
+				//	for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 32.0f) && //!player_is_on_spring(wobj); i++)
+				//		wobj->y += 24.0f;
+				//	for (int i = 0; i < 32 && !Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 1.0f) && //!player_is_on_spring(wobj); i++)
+				//		wobj->y += 1.0f;
 
-					local_data->slide_jump_cooldown = 5;
+				//	local_data->slide_jump_cooldown = 5;
 
-					WOBJ *w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
-													 wobj->x + 16.0f, wobj->y + 1.0f, 0, 1.0f);
-					w->speed = 9.0f;
-					w->strength = wobj->strength + 0.1f;
-					w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
-													 wobj->x + 16.0f, wobj->y + 1.0f, 0, -1.0f);
-					w->flags |= WOBJ_HFLIP;
-					w->speed = 9.0f;
-					w->strength = wobj->strength + 0.1f;
+				//	WOBJ *w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
+				//									 wobj->x + 16.0f, wobj->y + 1.0f, 0, 1.0f);
+				//	w->speed = 9.0f;
+				//	w->strength = wobj->strength + 0.1f;
+				//	w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
+				//									 wobj->x + 16.0f, wobj->y + 1.0f, 0, -1.0f);
+				//	w->flags |= WOBJ_HFLIP;
+				//	w->speed = 9.0f;
+				//	w->strength = wobj->strength + 0.1f;
 
-					local_data->been_jumping_timer = 10;
-					wobj->vel_y = 15.0f;
-					wobj->custom_ints[1] |= PLAYER_FLAG_USED_DOUBLE_JUMP;
-					wobj->flags |= WOBJ_IS_GROUNDED; // Set grounded flag because we're on the ground lol
-					Interaction_PlaySound(wobj, 25);
-				}
+				//	local_data->been_jumping_timer = 10;
+				//	wobj->vel_y = 15.0f;
+				//	wobj->custom_ints[1] |= PLAYER_FLAG_USED_DOUBLE_JUMP;
+				//	wobj->flags |= WOBJ_IS_GROUNDED; // Set grounded flag because we're on the ground lol
+				//	Interaction_PlaySound(wobj, 25);
+				//}
 			}
 			else
 			{
@@ -1172,8 +1193,9 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 		}
 
-		if (wobj->vel_y >= 15.5f)
-			wobj->vel_y = 15.5f;
+		const float down_cap = local_data->upgrade_state == PLAYER_UPGRADE_SHOES ? 24.0f : 15.5f;
+		if (wobj->vel_y >= down_cap)
+			wobj->vel_y = down_cap;
 	}
 	if (!local_data->vortexed_mode)
 		WobjPhysics_BeginUpdate(wobj);
@@ -1183,6 +1205,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 	//wobj->y += 1.0f;
 	//other = Wobj_GetWobjColliding(wobj, WOBJ_IS_SOLID);
 	local_data->jumped--;
+	if (!Wobj_IsGrounded(wobj) && local_data->air_time < 9999) local_data->air_time++;
 	if (!local_data->vortexed_mode)
 	{
 		if (local_data->jump_input_buffer > 0) local_data->jump_input_buffer--;
@@ -1253,6 +1276,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 				local_data->has_cut_jump = CNM_FALSE;
 				local_data->jump_input_buffer = 0;
 				local_data->is_grounded_buffer = 0;
+				local_data->air_time = 0;
 				float jmp_speed = final_jmp;
 				if (local_data->in_water)
 					jmp_speed /= 1.5f;

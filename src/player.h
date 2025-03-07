@@ -154,6 +154,7 @@ typedef struct _PLAYER_LOCAL_DATA
 	int last_water_block;
 	int in_splash, last_in_splash;
 	int touching_non_cloud_ground;
+	int air_time;
 	//int slope_jumped;
 
 	float last_hp;

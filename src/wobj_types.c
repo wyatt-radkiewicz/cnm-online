@@ -3,6 +3,7 @@
 #include <math.h>
 #include "renderer.h"
 #include "spawners.h"
+#include "utility.h"
 #include "wobj.h"
 #include "input.h"
 #include "blocks.h"
@@ -152,10 +153,14 @@ static void WobjPlayerPellet_Update(WOBJ *wobj)
 	wobj->x += wobj->custom_floats[0] * wobj->speed;
 	wobj->custom_ints[0]++;
 	WobjGenericAttack_Update(wobj);
+	//Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f)
+	const CNM_BOX real = wobj->hitbox;
+	wobj->hitbox = (CNM_BOX){ 12.0f, 8.0f, 1.0f, 1.0f };
 	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, 0.0f, 0.0f) || wobj->custom_ints[0] >= (30*5) || Wobj_GetWobjColliding(wobj, WOBJ_IS_BREAKABLE))
 	{
 		Interaction_DestroyWobj(wobj);
 	}
+	wobj->hitbox = real;
 }
 
 static void WobjVelPlayerPellet_Create(WOBJ *wobj)
