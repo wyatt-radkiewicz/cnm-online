@@ -53,6 +53,12 @@ void WobjSlime_Update(WOBJ *wobj)
 		wobj->custom_ints[1] = Util_RandInt(30, 120);
 	}
 
+	const CNM_BOX real = wobj->hitbox;
+	wobj->hitbox = (CNM_BOX){
+	    .x = wobj->hitbox.x + wobj->hitbox.w / 2.0f,
+	    .y = wobj->hitbox.y + wobj->hitbox.h / 2.0f,
+		.w = 1.0f, .h = 1.0f,
+	};
 	if (wobj->type == WOBJ_SILVER_SLIME)
 	{
 		if (!Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[0] * 8.0f, 16.0f))
@@ -62,6 +68,7 @@ void WobjSlime_Update(WOBJ *wobj)
 	wobj->vel_x = wobj->custom_floats[0];
 	if (Wobj_IsCollidingWithBlocksOrObjects(wobj, wobj->custom_floats[0] * 2.0f, 0.0f))
 		wobj->custom_floats[0] *= -1.0f;
+	wobj->hitbox = real;
 	WobjPhysics_ApplyWindForces(wobj);
 
 	wobj->vel_y += Game_GetVar(GAME_VAR_GRAVITY)->data.decimal;
