@@ -1,5 +1,6 @@
 #ifndef _utility_h_
 #define _utility_h_
+#include <stdbool.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -50,6 +51,16 @@ inline static uint64_t ror64(uint64_t x, uint64_t n) {
 }
 inline static uint64_t rol64(uint64_t x, uint64_t n) {
 	return (x << n) | (x >> (64-n));
+}
+
+inline static float signf(float x) {
+    if (x < 0.0f) {
+        return -1.0f;
+    } else if (x > 0.0f) {
+        return 1.0f;
+    } else {
+        return 0.0f;
+    }
 }
 
 typedef struct _CNM_RECT

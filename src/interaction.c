@@ -282,6 +282,7 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 					pld->special_level += wobj_types[victim->type].score_reward / 10 + 10;
 				}
 				Wobj_DestroyWobj(victim);
+				create_enemy_corpse(victim);
 			}
 		}
 		break;
@@ -329,6 +330,7 @@ void Interaction_DamageWobj(WOBJ *inflictor, WOBJ *victim)
 					}
 				}
 				Interaction_DestroyWobj(victim);
+				create_enemy_corpse(victim);
 			}
 		}
 		if (victim->type == WOBJ_PLAYER) {

@@ -174,6 +174,7 @@ typedef enum _WOBJ_TYPES
 	WOBJ_GOOP,
 	WOBJ_LENS_FLARE,
 	WOBJ_CLOUD_FIRE,
+	WOBJ_ENEMY_CORPSE,
 	WOBJ_MAX
 } WOBJ_TYPES;
 
@@ -285,6 +286,21 @@ typedef struct _WOBJ_GRID_ITER
 	OBJGRID_ITER iter;
 } WOBJ_GRID_ITER;
 
+// When running a point query, check against these parameters, if all match then return true
+struct wobj_coll_query {
+    // If all flags in needs are satisfied, or if needs is 0, then check collision
+    uint32_t needs;
+    
+    // If if at least one of the flags here are satisfied check collision
+    uint32_t any;
+    
+    // If the object is of this type then check collision, set to -1 (255) if dont care
+    uint8_t type;
+    
+    // Skip a specific wobj. Useful if you don't want to detect the one doing the detecting
+    const WOBJ *skip;
+};
+
 extern WOBJ_TYPE wobj_types[WOBJ_MAX];
 
 void Wobj_Init(void);
@@ -335,6 +351,8 @@ WOBJ *Wobj_GetWobjColliding(WOBJ *wobj, int flags);
 WOBJ *Wobj_GetWobjCollidingWithType(WOBJ *wobj, int type);
 int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y);
 int Wobj_IsCollidingWithBlocksOrObjects(WOBJ *wobj, float offset_x, float offset_y);
+bool wobj_check_pt(const float x, const float y, const struct wobj_coll_query query);
+bool wobj_solid_pt(const WOBJ *const wobj, const float x, const float y);
 void Wobj_IterateOverOwned(WOBJ **iter);
 void Wobj_IterateOverDebugUnowned(WOBJ **iter);
 void Wobj_InitGridIteratorOwned(WOBJ_GRID_ITER *iter, int gx, int gy);
@@ -363,5 +381,7 @@ void Create_Splash_Particles(float x, float y, int block, float ang, float spd, 
 void Wobj_DoSplashes(WOBJ *wobj);
 
 void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void);
+
+WOBJ *create_enemy_corpse(const WOBJ *enemy);
 
 #endif

@@ -443,3 +443,8 @@ void World_Draw(int mode)
 		Renderer_SetFont(256, 192, 8, 8);
 	}
 }
+
+bool world_check_pt(const float x, const float y, const struct wobj_coll_query query) {
+    return Blocks_IsCollidingWithSolid(&(const CNM_BOX){ .x = x, .y = y, .w = 1.0f, .h = 1.0f }, true) ||
+        wobj_check_pt(x, y, query);
+}

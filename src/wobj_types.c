@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
 #include "renderer.h"
 #include "spawners.h"
 #include "utility.h"
@@ -2392,6 +2393,249 @@ void draw_lens_flare(int camx, int camy, int xv, int yv) {
 	}
 }
 
+enum {
+    CORPSE_ANIM_SHRINK,
+    CORPSE_ANIM_DISOLVE,
+    CORPSE_ANIM_EXPLODE,
+};
+
+struct corpse_params {
+    struct {
+        float x, y;
+    } pos;
+    struct {
+        float x, y;
+    } cam;
+    CNM_RECT src;
+    float progress;
+    float flash_timer;
+    bool flip;
+    int light;
+};
+
+static void corpse_draw_shrink(const struct corpse_params params) {
+    const int32_t height = (int32_t)((1.0 - params.progress) * (float)params.src.h);
+    const float src_step = (float)params.src.h / (float)height;
+    float src_y = (float)params.src.y;
+    int32_t dst_y = (int32_t)params.pos.y + params.src.h - height - params.cam.y;
+    int trans = 7.0f - params.progress * 7.0f;
+    for (int32_t i = 0; i < height; i++, dst_y++, src_y += src_step) {
+        Renderer_DrawBitmap2(
+            (int32_t)params.pos.x - params.cam.x,
+            dst_y,
+            &(const CNM_RECT){
+                .x = params.src.x,
+                .y = (uint32_t)src_y,
+                .w = params.src.w,
+                .h = 1,
+            },
+            0,
+            params.light,
+            params.flip,
+            false
+        );
+        Renderer_DrawColorMask(
+            (int32_t)params.pos.x - params.cam.x,
+            dst_y,
+            &(const CNM_RECT){
+                .x = params.src.x,
+                .y = (uint32_t)src_y,
+                .w = params.src.w,
+                .h = 1,
+            },
+            trans,
+            RCOL_RED,
+            params.flip,
+            false
+        );
+    }
+}
+
+static float disolve_hash(int x, int y) {
+    uint32_t hash = 2166136261;
+    hash ^= x;
+    hash *= 16777619;
+    hash ^= y * 17;
+    hash *= 16777619;
+    hash &= 0xFFFF;
+    return (float)hash / (float)UINT16_MAX;
+}
+
+static void corpse_draw_dissolve(const struct corpse_params params) {
+    const int bound = params.src.w + params.src.h;
+    int start = bound - params.progress * bound * 2;
+    
+    for (int y = 0; y < params.src.h; y++) {
+        for (int x = 0; x < params.src.w; x++) {
+            const float percent = (float)((x + y) - start) / (float)bound;
+            const uint8_t pixel = Renderer_GetBitmapPixel(params.src.x + x, params.src.y + y);
+            if (percent > disolve_hash(params.pos.x + x, params.pos.y + y) || !pixel) continue;
+            const int rx = x + params.pos.x - params.cam.x,
+                ry = y + params.pos.y - params.cam.y;
+            
+            Renderer_PlotPixel2(rx, ry, pixel, 0, params.light);
+            Renderer_PlotPixel2(rx, ry, RCOL_RED, 3, RENDERER_LIGHT);
+        }
+    }
+}
+
+static void corpse_draw_explode(const struct corpse_params params) {
+    if (params.progress < 0.5) {
+        Renderer_DrawBitmap2(
+            params.pos.x - params.cam.x,
+            params.pos.y - params.cam.y,
+            &params.src,
+            0,
+            params.light,
+            params.flip,
+            false
+        );
+        Renderer_DrawColorMask(
+            params.pos.x - params.cam.x,
+            params.pos.y - params.cam.y,
+            &params.src,
+            7.0f - params.progress * 14.0f,
+            RCOL_RED,
+            params.flip,
+            false
+        );
+    } else {
+        if ((int)params.flash_timer % 2 == 0) {
+            Renderer_DrawColorMask(
+                params.pos.x - params.cam.x,
+                params.pos.y - params.cam.y,
+                &params.src,
+                0,
+                RCOL_RED,
+                params.flip,
+                false
+            );
+        }
+    }
+}
+
+static void WobjEnemyCorpse_Create(WOBJ *const wobj) {}
+WOBJ *create_enemy_corpse(const WOBJ *const enemy) {
+    if (!(enemy->flags & WOBJ_IS_HOSTILE) ||
+        (enemy->flags & (WOBJ_IS_PLAYER | WOBJ_IS_PLAYER_BULLET | WOBJ_IS_PLAYER_WEAPON))) {
+        return NULL;
+    }
+    
+    WOBJ *const corpse = Wobj_CreateOwned(WOBJ_ENEMY_CORPSE, enemy->x, enemy->y, 0, 0.0f);
+    const CNM_RECT frame = wobj_types[enemy->type].frames[0];
+    
+    corpse->hitbox = enemy->hitbox;
+    corpse->custom_ints[0] = frame.x;
+    corpse->custom_ints[1] = frame.y;
+    corpse->money = frame.w;
+    corpse->item = frame.h;
+    corpse->custom_floats[0] = 0.0f;
+    corpse->flags |= enemy->flags & WOBJ_HFLIP;
+    
+    switch (enemy->type) {
+    case WOBJ_FLYING_SLIME:
+    case SPIDER_WALKER:
+    case EATER_BUG:
+    case WOBJ_BOZO_PIN:
+    case WOBJ_DRAGON:
+    case MEGA_FISH:
+    case ROCK_GUY_SMALL1:
+    case ROCK_GUY_SMALL2:
+    case ROCK_GUY_MEDIUM:
+        corpse->anim_frame = CORPSE_ANIM_DISOLVE;
+        break;
+    case WOBJ_SUPER_DRAGON:
+    case TT_BOSS:
+    case BOZO_MKII:
+    case WOBJ_BOZO:
+    case LAVA_DRAGON_HEAD:
+    case LAVA_DRAGON_BODY:
+        corpse->anim_frame = CORPSE_ANIM_EXPLODE;
+        break;
+    default:
+        corpse->anim_frame = CORPSE_ANIM_SHRINK;
+        break;
+    }
+    
+    switch (enemy->type) {
+    case LAVA_DRAGON_HEAD:
+	case LAVA_DRAGON_BODY:
+	case LAVA_DRAGON_BLOB:
+    case WOBJ_BOZO:
+        corpse->custom_floats[1] = 12.5f;
+        break;
+	case TT_BOSS:
+	case BOZO_MKII:
+	case WOBJ_SUPER_DRAGON:
+        corpse->custom_floats[1] = 7.5f;
+        break;
+	case WOBJ_DRAGON:
+	case BOZO_LASER_MINION:
+	case LAVA_MONSTER:
+	   corpse->custom_floats[1] = 5.0f;
+        break;
+    case SLIME_WALKER:
+	case ROCK_GUY_MEDIUM:
+	case ROCK_GUY_SLIDER:
+	case ROCK_GUY_SMASHER:
+        corpse->custom_floats[1] = 2.5f;
+        break;
+    default:
+        corpse->custom_floats[1] = 1.0f;
+        break;
+    }
+    
+    corpse->custom_floats[1] *= 30.0f;
+    return corpse;
+}
+static void WobjEnemyCorpse_Update(WOBJ *corpse) {
+    corpse->custom_floats[0] += 1.0f;
+    if (corpse->custom_floats[0] > corpse->custom_floats[1]) {
+        Interaction_DestroyWobj(corpse);
+    }
+}
+static void WobjEnemyCorpse_Draw(WOBJ *corpse, int camx, int camy) {
+    const float percent = corpse->custom_floats[0] / corpse->custom_floats[1];
+    if (percent > 0.5) {
+        float add = (percent - 0.5) * 2.0 * 1.08;
+        if (add > 1.0f) {
+            add = 1.0f;
+            corpse->health = (int)corpse->health;
+        }
+        corpse->health += add;
+    }
+    const struct corpse_params params = {
+        .cam = { .x = camx, .y = camy },
+        .pos = { .x = corpse->x, .y = corpse->y },
+        .src = {
+            .x = corpse->custom_ints[0],
+            .y = corpse->custom_ints[1],
+            .w = corpse->money,
+            .h = corpse->item,
+        },
+        .progress = percent,
+        .flash_timer = corpse->health,
+        .flip = corpse->flags & WOBJ_HFLIP,
+        .light = Blocks_GetCalculatedBlockLight(
+            (corpse->x + corpse->hitbox.x + corpse->hitbox.w / 2.0f) / BLOCK_SIZE,
+            (corpse->y + corpse->hitbox.y + corpse->hitbox.h / 2.0f) / BLOCK_SIZE
+        ),
+    };
+    switch (corpse->anim_frame) {
+    case CORPSE_ANIM_SHRINK:
+        corpse_draw_shrink(params);
+        break;
+    case CORPSE_ANIM_DISOLVE:
+        corpse_draw_dissolve(params);
+        break;
+    case CORPSE_ANIM_EXPLODE:
+        corpse_draw_explode(params);
+        break;
+    default:
+        assert(false && "Unexpected corpse animation routine.");
+    }
+}
+
 void Wobj_NormalWobjs_ZoneAllocLocalDataPools(void) {
 	_ldpool_pet = dynpool_init(4, sizeof(PetLocalData), arena_alloc);
 }
@@ -4531,4 +4775,16 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		CNM_TRUE, // Does network interpolation?
 		CNM_FALSE // Can respawn?
 	},
+	{ // 161: Enemy Corpse Object
+	   WobjEnemyCorpse_Create, // Create
+	   WobjEnemyCorpse_Update, // Update
+	   WobjEnemyCorpse_Draw, // Draw
+	   NULL, // Hurt callback
+	   { // Animation Frames
+	   },
+	   0.0f, // Strength reward
+	   0, // Money reward
+	   CNM_FALSE, // Does network interpolation?
+	   CNM_FALSE // Can respawn?
+	}
 };

@@ -14,6 +14,7 @@
 #include "spawners.h"
 #include "player.h"
 #include "mem.h"
+#include "world.h"
 
 #define GET_WOBJ(iter) ((WOBJ *)((unsigned char *)(iter) - offsetof(WOBJ, internal.obj)))
 //#define WOBJ_SEARCH_MAP_SIZE (1 << 11)
@@ -1120,6 +1121,70 @@ WOBJ *Wobj_GetWobjCollidingWithType(WOBJ *wobj, int type)
 	}
 	return NULL;
 }
+
+static bool wobj_check_pt_in_chunk(
+    const int32_t chunk_x,
+    const int32_t chunk_y,
+    const float x,
+    const float y,
+    const struct wobj_coll_query query
+) {
+    OBJGRID_ITER grid;
+    for (int i = 0; i < 2; i++) {
+        ObjGrid_MakeIter(
+            ((OBJGRID *const [2]){ owned_grid, unowned_grid })[i],
+            chunk_x,
+            chunk_y,
+            &grid
+        );
+        for (WOBJ *obj = GET_WOBJ(grid); grid; ObjGrid_AdvanceIter(&grid), obj = GET_WOBJ(grid)) {
+            float interp_x, interp_y;
+            WobjCalculate_InterpolatedPos(obj, &interp_x, &interp_y);
+            
+            if (x < interp_x + obj->hitbox.x ||
+                x > interp_x + obj->hitbox.w + obj->hitbox.w ||
+                y < interp_y + obj->hitbox.y ||
+                y > interp_y + obj->hitbox.y + obj->hitbox.h) continue;
+            if ((obj->flags & query.needs) != query.needs) continue;
+            if ((obj->flags & query.any) == 0) continue;
+            if (query.type != (typeof(query.type))-1 && query.type != obj->type) continue;
+            if (obj == query.skip) continue;
+            
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool wobj_check_pt(const float x, const float y, const struct wobj_coll_query query) {
+    if (x < 0.0f || y < 0.0f || x >= OBJGRID_SIZE * 256 || y >= OBJGRID_SIZE * 256) {
+        return false;
+    }
+    
+    const int32_t base_x = (int32_t)(x / OBJGRID_SIZE), base_y = (int32_t)(y / OBJGRID_SIZE);
+    for (int32_t chunk_y = base_y - 1; chunk_y <= base_y + 1; chunk_y++) {
+        for (int32_t chunk_x = base_x - 1; chunk_x <= base_x + 1; chunk_x++) {
+            if (wobj_check_pt_in_chunk(chunk_x, chunk_y, x, y, query)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+bool wobj_solid_pt(const WOBJ *const wobj, const float x, const float y) {
+    const float rel_x = wobj->x + wobj->hitbox.x + wobj->hitbox.w / 2.0f + x,
+        rel_y = wobj->y + wobj->hitbox.y + wobj->hitbox.h / 2.0f + y;
+    const struct wobj_coll_query query = {
+        .needs = 0,
+        .any = WOBJ_IS_SOLID | WOBJ_IS_JUMPTHROUGH | WOBJ_IS_MOVESTAND,
+        .type = (uint8_t)-1,
+        .skip = wobj,
+    };
+    return world_check_pt(rel_x, rel_y, query);
+}
+
 int Wobj_IsCollidingWithBlocks(WOBJ *wobj, float offset_x, float offset_y)
 {
 	CNM_BOX b;
