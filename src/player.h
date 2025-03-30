@@ -162,6 +162,7 @@ typedef struct _PLAYER_LOCAL_DATA
 
 	int power_level;
 	int special_level;
+	int wings_counter;
 
 	WOBJ *pet;
 

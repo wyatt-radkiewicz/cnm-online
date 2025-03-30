@@ -621,8 +621,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		local_data->isflying = CNM_FALSE;
 		local_data->numflaps = 0;
 	}
-	if ((local_data->upgrade_state == PLAYER_UPGRADE_WINGS ||
-		local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) && !Wobj_IsGrouneded(wobj)) {
+	if ((local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) && !Wobj_IsGrouneded(wobj)  && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
 		//if (local_data->isdiving) local_data->slide_jump_cooldown = 3;
 		if (wobj->vel_y > 1.0f && wobj->vel_y < 9.0f && local_data->isflying) {
 			final_speed += wobj->vel_y / 3.0f;
@@ -1024,9 +1023,10 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		//Console_Print("%d", Wobj_IsGrounded(wobj));
 
-		if (local_data->upgrade_state != PLAYER_UPGRADE_WINGS &&
-			local_data->upgrade_state != PLAYER_UPGRADE_CRYSTAL_WINGS) {
-			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
+		if (local_data->upgrade_state != PLAYER_UPGRADE_CRYSTAL_WINGS ||
+		      (!local_data->isflying && !local_data->isdiving)) {
+			if (!Wobj_IsGrounded(wobj) && Input_GetButtonPressed(INPUT_DOWN, INPUT_STATE_PLAYING) &&
+			    !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
 				wobj->custom_ints[1] |= PLAYER_FLAG_STOMPING;
 				if (local_data->slide_jump_cooldown < 5) local_data->slide_jump_cooldown = 5;
 				else local_data->slide_jump_cooldown = 7;
@@ -1035,7 +1035,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		if (Wobj_IsGrounded(wobj)) {
 			if (wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) {
-				if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES) {
+				if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES || local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) {
 				    const float dmgmul = (fabsf(wobj->vel_x) / final_speed * 0.5f)
 						+ (local_data->air_time / 40.0f);
 								
@@ -1043,11 +1043,23 @@ void WobjPlayer_Update(WOBJ *wobj)
 													 wobj->x + 16.0f, wobj->y + 1.0f, 0, 1.0f);
 					w->speed = 9.0f + wobj->vel_x;
 					w->strength = wobj->strength + 0.1f + dmgmul;
+					if (local_data->upgrade_state == PLAYER_UPGRADE_WINGS
+					   || local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) {
+						w->anim_frame = 1;
+						w->flags &= ~WOBJ_FIRE_TYPE;
+						w->flags &= ~WOBJ_WATER_TYPE;
+					}
 					w = Interaction_CreateWobj(DEEPHOUSE_BOOT_BLAST,
 													 wobj->x + 16.0f, wobj->y + 1.0f, 0, -1.0f);
 					w->flags |= WOBJ_HFLIP;
 					w->speed = 9.0f + wobj->vel_x;
 					w->strength = wobj->strength + 0.1f + dmgmul;
+					if (local_data->upgrade_state == PLAYER_UPGRADE_WINGS
+					   || local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) {
+					    w->anim_frame = 1;
+						w->flags &= ~WOBJ_FIRE_TYPE;
+						w->flags &= ~WOBJ_WATER_TYPE;
+					}
 					Interaction_PlaySound(wobj, 25);
 				} else {
 				    Interaction_CreateWobj(WOBJ_PLAYER_STOMP_DUST, wobj->x - 16.0f, wobj->y, 0, 0.0f);
@@ -1056,7 +1068,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 			}
 			wobj->custom_ints[1] &= ~PLAYER_FLAG_STOMPING;
 		}
-		if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES) {
+		if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES || local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) {
             if ((wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) && wobj->vel_y < 24.0f) {
             	wobj->vel_y += 6.0f;
             }
@@ -1066,7 +1078,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		    }
 		}
 
-		if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES)
+		if (local_data->upgrade_state == PLAYER_UPGRADE_SHOES || local_data->upgrade_state == PLAYER_UPGRADE_WINGS)
 		{
 			if (!Wobj_IsGrouneded(wobj))
 			{
@@ -1102,13 +1114,13 @@ void WobjPlayer_Update(WOBJ *wobj)
 				wobj->custom_ints[1] &= ~PLAYER_FLAG_USED_DOUBLE_JUMP;
 			}
 		}
-		else if (local_data->upgrade_state == PLAYER_UPGRADE_WINGS || (
+		else if ((
 				local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER &&
 				maxpowerinfos[local_data->mpoverride].ability == 2
 				) || local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS)
 		{
 			if (!Wobj_IsGrouneded(wobj) && Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls &&
-				(local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS || local_data->numflaps < 2))
+				(local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS || local_data->numflaps < 2) && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING))
 			{
 				local_data->isflying = CNM_TRUE;
 				if (!local_data->isdiving || wobj->vel_y < 3.0f) {
@@ -1135,7 +1147,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 					if (wobj->vel_y < -FLAPACCEL) wobj->vel_y = -FLAPACCEL;
 				}
 			}
-			if (!Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls) {
+			if (!Wobj_IsGrouneded(wobj) && Input_GetButton(INPUT_UP, INPUT_STATE_PLAYING) && !local_data->lock_controls  && !(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING)) {
 				if (local_data->isdiving && wobj->vel_y > -local_data->saved_diving_vel) {
 					if (local_data->upgrade_state == PLAYER_UPGRADE_CRYSTAL_WINGS) wobj->vel_x *= 1.0f;
 					else wobj->vel_x *= 0.7f;
@@ -1356,6 +1368,16 @@ void WobjPlayer_Update(WOBJ *wobj)
 		if (!Wobj_IsGrouneded(wobj))
 		{
 			if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) &&
+				local_data->upgrade_state == PLAYER_UPGRADE_WINGS &&
+				!(wobj->custom_ints[1] & PLAYER_FLAG_STOMPING) &&
+				local_data->wings_counter < 3 && !local_data->lock_controls && !local_data->in_water) {
+				wobj->vel_y = -7.5f;
+				local_data->jumped = 0;
+				local_data->wings_counter++;
+				Interaction_PlaySound(wobj, 61);
+			}
+		
+			if (Input_GetButtonPressed(INPUT_UP, INPUT_STATE_PLAYING) &&
 				local_data->upgrade_state == PLAYER_UPGRADE_MAXPOWER &&
 				maxpowerinfos[local_data->mpoverride].ability == 1 &&
 				!(wobj->custom_ints[1] & PLAYER_FLAG_USED_DOUBLE_JUMP) && !local_data->lock_controls)
@@ -1387,6 +1409,7 @@ void WobjPlayer_Update(WOBJ *wobj)
 		}
 		if (Wobj_IsGrouneded(wobj))
 		{
+		    local_data->wings_counter = 0;
 			wobj->custom_ints[1] &= ~PLAYER_FLAG_USED_DOUBLE_JUMP;
 			if (local_data->ability3_hasjumped) {
 				local_data->ability3_hasjumped = 0;

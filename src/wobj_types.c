@@ -3594,7 +3594,8 @@ WOBJ_TYPE wobj_types[WOBJ_MAX] =
 		WobjGeneric_Draw, // Draw
 		NULL, // Hurt callback
 		{ // Animation Frames
-			{352, 640, 32, 32}
+			{352, 640, 32, 32},
+			{112, 1840, 32, 32},
 		},
 		0.0f, // Strength reward
 		0, // Money reward
