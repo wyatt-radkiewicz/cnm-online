@@ -185,9 +185,11 @@ static void xmas_init(void) {
 static void swap_title_bg(const char *lvl) {
 	char pathbuf[32];
 
-	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) arena_pop_zone("XMAS_ALLOC");
-
 	arena_pop_zone("TITLEBG");
+	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) {
+		arena_pop_zone("XMAS_ALLOC");
+	}
+	xmas_init();
 	arena_push_zone("TITLEBG");
 
 	// Load in the graphics for the level
@@ -201,12 +203,14 @@ static void swap_title_bg(const char *lvl) {
 
 	titlebg_cleanup();
 	titlebg_init();
-	xmas_init();
 }
 
 void GameState_MainMenu_Init(void)
 {
-	if (!titlebg_is_init()) arena_push_zone("TITLEBG");
+	xmas_init();
+	if (!titlebg_is_init()) {
+		arena_push_zone("TITLEBG");
+	}
 	Game_GetVar(GAME_VAR_GOD)->data.integer = CNM_FALSE;
 	Game_GetVar(GAME_VAR_SPECIAL_ENTRANCE)->data.integer = CNM_FALSE;
 	FileSystem_SearchForLevels(CNM_TRUE);
@@ -244,17 +248,16 @@ void GameState_MainMenu_Init(void)
 	playbit0_x = playbit1_x = -1000;
 	globalsave_save(&g_globalsave);
 	//pressed_start = CNM_FALSE;
-
-	xmas_init();
 }
 void GameState_MainMenu_Quit(void)
 {
-	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) arena_pop_zone("XMAS_ALLOC");
-
 	Net_RemovePollingFunc(MainMenu_OnPacket);
 	if (cleanup_bg) {
 		titlebg_cleanup();
 		arena_pop_zone("TITLEBG");
+	}
+	if (Game_GetVar(GAME_VAR_XMAS_MODE)->data.integer) {
+		arena_pop_zone("XMAS_ALLOC");
 	}
 }
 
